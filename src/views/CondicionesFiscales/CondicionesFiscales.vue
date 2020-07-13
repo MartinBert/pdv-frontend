@@ -100,7 +100,7 @@ export default {
     },
     loaded: false,
     tenant: "",
-    service: "documentosComerciales",
+    service: "condicionesFiscales",
     token: localStorage.getItem("token"),
     dialogDeleteObject: false
   }),
@@ -126,11 +126,11 @@ export default {
     },
 
     newObject: function() {
-      this.$router.push({ name: "documentosComercialesForm", params: { id: 0 } });
+      this.$router.push({ name: "condicionesFiscalesForm", params: { id: 0 } });
     },
 
     edit: function(id) {
-      this.$router.push({ name: "documentosComercialesForm", params: { id: id } });
+      this.$router.push({ name: "condicionesFiscalesForm", params: { id: id } });
     },
 
     filterObjects: function(filter){

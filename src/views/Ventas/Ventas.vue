@@ -105,7 +105,6 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getAll(this.paginate.page - 1, this.paginate.size);
-    this.getOtherModels(0, 200000);
   },
 
   methods: {

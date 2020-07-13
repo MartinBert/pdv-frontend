@@ -21,16 +21,17 @@
             <v-select
               type="text"
               :items="condicioniva"
-              item-text="text"
+              item-text="nombre"
               item-value="id"
               v-model="object.condicionIva"
               :counter="50"
+              :return-object="true"
               label="Condición frente al IVA"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-select>
           </v-col>
-          <v-col v-if="object.condicionIva == 1 || object.condicionIva == 2">
+          <v-col>
             <v-text-field
               type="text"
               v-model="object.razonSocial"
@@ -40,12 +41,10 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
-          <v-col v-if="object.condicionIva == 3">
+          <v-col>
             <v-text-field type="text" v-model="object.nombre" :counter="50" label="Nombre" required></v-text-field>
           </v-col>
-          <v-col
-            v-if="object.condicionIva == 3 || object.condicionIva == 1 || object.condicionIva == 2"
-          >
+          <v-col>
             <v-text-field
               type="text"
               v-model="object.cuit"
@@ -111,11 +110,7 @@ export default {
       { id: 1, text: "Física" },
       { id: 2, text: "Jurídica" }
     ],
-    condicioniva: [
-      { id: 1, text: "Responsable Inscripto" },
-      { id: 2, text: "Monotributista" },
-      { id: 3, text: "Particular" }
-    ],
+    condicioniva: [],
     object: {},
     loaded: false,
     tenant: "",
@@ -132,6 +127,7 @@ export default {
     } else {
       this.loaded = true;
     }
+    this.getCondicionesIva();
   },
   methods: {
     getObject(id) {
@@ -140,6 +136,15 @@ export default {
         .then(data => {
           this.object = data.data;
           this.loaded = true;
+        });
+    },
+
+    getCondicionesIva(){
+      GenericService(this.tenant, "condicionesFiscales", this.token)
+        .getAll()
+        .then(data => {
+          this.condicioniva = data.data.content;
+          console.log(this.condicioniva);
         });
     },
 

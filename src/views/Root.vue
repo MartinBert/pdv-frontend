@@ -42,7 +42,7 @@
 
       <v-menu offset-y>
         <template v-slot:activator="{ on }">
-          <v-icon large v-on="on">mdi-account-circle</v-icon>
+          <v-icon large v-on="on">mdi-account-circle-outline</v-icon>
         </template>
         <v-card class="mx-auto" max-width="344" outlined>
           <v-list-item three-line>
@@ -82,6 +82,26 @@ export default {
     nameRouter: "",
     modulos: [
       {
+        name: "ventas",
+        title: "Ventas",
+        visible: false,
+        icon: "mdi-point-of-sale",
+        childs: [
+          {
+            path: "/ventas",
+            name: "ventasForm",
+            title: "Venta",
+            visible: false
+          },
+          {
+            path: "/listaventas",
+            name: "ventas",
+            title: "Lista",
+            visible: false
+          },
+        ]
+      },
+      {
         name: "productos",
         title: "Productos",
         visible: false,
@@ -114,47 +134,15 @@ export default {
         ]
       },
       {
-        name: "usuarios",
-        title: "Usuarios",
+        name: "documentos",
+        title: "Doc. Comerciales",
         visible: false,
-        icon: "mdi-account",
+        icon: "mdi-text-box-outline",
         childs: [
           {
-            path: "/usuarios",
-            name: "usuarios",
+            path: "/documentos_comerciales",
+            name: "documentos",
             title: "Lista",
-            visible: false
-          },
-          {
-            path: "/perfiles",
-            name: "perfiles",
-            title: "Perfiles",
-            visible: false
-          }
-        ]
-      },
-      {
-        name: "ventas",
-        title: "Ventas",
-        visible: false,
-        icon: "mdi-shopping",
-        childs: [
-          {
-            path: "/ventas",
-            name: "ventasForm",
-            title: "Venta",
-            visible: false
-          },
-          {
-            path: "/listaventas",
-            name: "ventas",
-            title: "Lista",
-            visible: false
-          },
-          {
-            path: "/documentosComerciales",
-            name: "documentosComerciales",
-            title: "Documentos",
             visible: false
           },
         ]
@@ -163,7 +151,7 @@ export default {
         name: "personas",
         title: "Personas",
         visible: false,
-        icon: "mdi-shopping",
+        icon: "mdi-account-group-outline",
         childs: [
           {
             path: "/clientes",
@@ -190,7 +178,41 @@ export default {
             visible: false
           }
         ]
-      }
+      },
+      {
+        name: "relaciones",
+        title: "Relaciones",
+        visible: false,
+        icon: "mdi-link-variant",
+        childs: [
+          {
+            path: "/condiciones_fiscales",
+            name: "condicionesFiscales",
+            title: "Cond. Fiscal",
+            visible: false
+          },
+        ]
+      },
+      {
+        name: "usuarios",
+        title: "Usuarios",
+        visible: false,
+        icon: "mdi-account-outline",
+        childs: [
+          {
+            path: "/usuarios",
+            name: "usuarios",
+            title: "Lista",
+            visible: false
+          },
+          {
+            path: "/perfiles",
+            name: "perfiles",
+            title: "Perfiles",
+            visible: false
+          }
+        ]
+      },
     ],
     modulosVisibles: []
   }),

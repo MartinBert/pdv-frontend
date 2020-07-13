@@ -15,7 +15,7 @@ export default (tenant,service,token) =>{
         },
 
         getForBarCode: function(barcode){
-            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/${barcode}`, {
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/codb/${barcode}`, {
                 headers: { Authorization: "Bearer " + token }
             })
         },

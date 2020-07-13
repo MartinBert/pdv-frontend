@@ -27,6 +27,8 @@ import Transportistas from '../views/Transportistas/Transportistas.vue'
 import TransportistasForm from '../views/Transportistas/TransportistasForm.vue'
 import DocumentosComerciales from '../views/DocumentosComerciales/DocumentosComerciales.vue'
 import DocumentosComercialesForm from '../views/DocumentosComerciales/DocumentosComercialesForm.vue'
+import CondicionesFiscales from '../views/CondicionesFiscales/CondicionesFiscales.vue'
+import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm.vue'
 
 Vue.use(VueRouter)
 
@@ -181,15 +183,27 @@ const routes = [
                 meta: { requiresAuth: true }
             },
             {
-                path: 'documentosComerciales',
-                name: 'documentosComerciales',
+                path: 'documentos_comerciales',
+                name: 'documentos',
                 component: DocumentosComerciales,
                 meta: { requiresAuth: true }
             },
             {
-                path: 'documentosComerciales/form/:id',
+                path: 'documentos_comerciales/form/:id',
                 name: 'documentosComercialesForm',
                 component: DocumentosComercialesForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'condiciones_fiscales',
+                name: 'condicionesFiscales',
+                component: CondicionesFiscales,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'condiciones_fiscales/form/:id',
+                name: 'condicionesFiscalesForm',
+                component: CondicionesFiscalesForm,
                 meta: { requiresAuth: true }
             },
             {

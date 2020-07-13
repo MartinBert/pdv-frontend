@@ -15,36 +15,29 @@
             ></v-text-field>
             </v-col>
             <v-col class="col-6"> 
-              <v-text-field 
-              type="text"
-              v-model="object.codigoDocumento"
-              :counter="3"
-              label="Código del comprobante"
-              required
+              <v-autocomplete
+              :items="tipoIdentificacion"
+              v-model="object.tipoDocumento"
+              item-text="text"
+              item-value="id"
+              label="Tipo de documento"
               :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
+            ></v-autocomplete>
             </v-col>
         </v-row>
         <v-row class="ma-1">
-          <v-col cols="12" sm="6" md="6">
-            <v-radio-group 
-            label="Tipo de documento"
-            v-model="object.tipo" 
-            column 
-            required
-            :rules="[v => !!v || 'Campo requerido...']"
-            >
-              <v-radio
-                label="Fiscal"
-                color="red"
-                value="true"
-              ></v-radio>
-              <v-radio
-                label="No fiscal"
-                color="secondary"
-                value="false"
-              ></v-radio>
-            </v-radio-group>
+          <v-col>
+            <v-autocomplete
+              @input="Test()"
+              :items="documentos"
+              v-model="object.documentos"
+              item-text="nombre"
+              item-value="id"
+              :return-object="true"
+              label="Documentos asociados"
+              :rules="[v => !!v || 'Campo requerido...']"
+              multiple
+            ></v-autocomplete>
           </v-col>
         </v-row>
         <div class="ma-1">
@@ -70,12 +63,17 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     valid: true,
+    tipoIdentificacion:[
+      {"id": 1, "text": "CUIT"},
+      {"id": 2, "text": "DNI"}
+    ],
     object: {
       activo: true,
     },
+    documentos: [],
     loaded: false,
     tenant: "",
-    service: "documentosComerciales",
+    service: "condicionesFiscales",
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: ""
@@ -83,6 +81,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.getDocumentos();
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
@@ -99,14 +98,29 @@ export default {
         });
     },
 
+    getDocumentos(){
+      GenericService(this.tenant, "documentosComerciales", this.token)
+        .getAll()
+        .then(data => {
+          this.documentos = data.data.content;
+          console.log(this.documentos);
+        });
+    },
+
+    Test(){
+      console.log(this.object.documento_comercial_id)
+    },
+
     save() {
       this.$refs.form.validate();
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
-          this.$router.push({ name: "documentos" });
+          console.log(this.object);
+          this.$router.push({ name: "condicionesFiscales" });
         })
         .catch(error => {
+           console.log(this.object);
           if (error.response.status == 500) {
             this.snackError = true;
             this.errorMessage = "Ocurrio un error";
@@ -115,7 +129,7 @@ export default {
     },
 
     back() {
-      this.$router.push({ name: "documentos" });
+      this.$router.push({ name: "condicionesFiscales" });
     }
   }
 };
