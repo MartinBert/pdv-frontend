@@ -1,23 +1,24 @@
 <template>
   <v-card width="100%">
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
-    <div>
+    <v-col cols="12">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-5">
-          <v-col>
+          <v-col cols="5">
               <v-autocomplete
-              multiple
-              :items="objects"
+              @change="getComercialDocuments(object.cliente_id.condicionIva)"
+              v-model="object.cliente_id"
+              :items="objects.clientes"
               item-text="razonSocial"
               :return-object="true"
               :rules="[v => !!v || 'Campo requerido...']"
               placeholder="Seleccione un cliente..."
             ></v-autocomplete>
             </v-col>
-            <v-col>
+            <v-col cols="4">
               <v-autocomplete
-              multiple
-              item-text="razonSocial"
+              :items="objects.documentos"
+              item-text="nombre"
               :return-object="true"
               :rules="[v => !!v || 'Campo requerido...']"
               placeholder="Seleccione un tipo de comprobante..."
@@ -30,17 +31,20 @@
               <v-data-table :headers="headers" calculate-widths></v-data-table>
             </v-card>
           </v-col>
-          <v-col cols="3">
-            <Calculator/>
-          </v-col>
         </v-row>
       </v-form>
-    </div>
+      <v-row class="ma-5">
+        <v-col cols="3">
+          <Calculator/>
+        </v-col>
+      </v-row> 
+    </v-col>
   </v-card>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
+import VentasService from "../../services/VentasService";
 import Calculator from "../../components/Calculator.vue"
 
 export default {
@@ -49,7 +53,11 @@ export default {
     barcode: "",
     page: 0,
     size: 1000,
-    objects: {},
+    object:{},
+    objects: {
+      clientes: [],
+      comprobantes: []
+    },
     tenant: "",
     service: "productos",
     token: localStorage.getItem("token"),
@@ -69,23 +77,22 @@ export default {
   },
 
   created () {
-      // Add barcode scan listener and pass the callback function
-      this.$barcodeScanner.init(this.onBarcodeScanned)
-    },
+    this.$barcodeScanner.init(this.onBarcodeScanned)
+  },
 
   mounted() {
-      this.tenant = this.$route.params.tenant;
+    this.tenant = this.$route.params.tenant;
       GenericService(this.tenant, "clientes", this.token)
         .getAll(this.page, this.size)
         .then(data => {
-          this.objects = data.data.content;
+          this.objects.clientes = data.data.content;
         });
   },
 
   methods: {
 
-   onBarcodeScanned (barcode) {
-        GenericService(this.tenant, "productos", this.token)
+    onBarcodeScanned (barcode) {
+        VentasService(this.tenant, "productos", this.token)
         .getForBarCode(barcode)
         .then(data => {
           this.products = data.data;
@@ -99,9 +106,13 @@ export default {
         });
       },
 
+    getComercialDocuments(id){
+      this.objects.documentos = id.documentos
+    },
+
     save() {
       GenericService(this.tenant, this.service, this.token)
-        .save(this.pr)
+        .save(this.object)
         .then(() => {
           this.$router.push({ name: "ventas/form" });
         })
@@ -113,7 +124,6 @@ export default {
         });
     },
 
-    
   }
 };
 </script>

@@ -90,11 +90,11 @@ export default {
           {
             path: "/ventas",
             name: "ventasForm",
-            title: "Venta",
+            title: "Generar Venta",
             visible: false
           },
           {
-            path: "/listaventas",
+            path: "/ventas/list",
             name: "ventas",
             title: "Lista",
             visible: false
@@ -143,6 +143,26 @@ export default {
             path: "/documentos_comerciales",
             name: "documentos",
             title: "Lista",
+            visible: false
+          },
+        ]
+      },
+      {
+        name: "mediosPago",
+        title: "Medios de Pago",
+        visible: false,
+        icon: "mdi-text-box-outline",
+        childs: [
+          {
+            path: "/medios_de_pago",
+            name: "mediosPago",
+            title: "Medios de pago",
+            visible: false
+          },
+          {
+            path: "/planes_de_pago",
+            name: "planesPago",
+            title: "Planes de pago",
             visible: false
           },
         ]

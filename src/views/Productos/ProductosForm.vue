@@ -238,7 +238,6 @@ export default {
     } else {
       this.loaded = true;
     }
-
     this.getOtherModels(0, 20000);
   },
 

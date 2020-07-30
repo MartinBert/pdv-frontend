@@ -11,7 +11,6 @@
               item-text="text"
               item-value="id"
               v-model="object.tipoPersona"
-              :counter="50"
               label="Tipo de persona"
               required
               :rules="[v => !!v || 'Campo requerido...']"

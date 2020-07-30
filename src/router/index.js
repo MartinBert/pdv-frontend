@@ -29,6 +29,10 @@ import DocumentosComerciales from '../views/DocumentosComerciales/DocumentosCome
 import DocumentosComercialesForm from '../views/DocumentosComerciales/DocumentosComercialesForm.vue'
 import CondicionesFiscales from '../views/CondicionesFiscales/CondicionesFiscales.vue'
 import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm.vue'
+import MediosPago from '../views/MediosPago/MediosPago.vue'
+import MediosPagoForm from '../views/MediosPago/MediosPagoForm.vue'
+import PlanesPago from '../views/PlanesPago/PlanesPago.vue'
+import PlanesPagoForm from '../views/PlanesPago/PlanesPagoForm.vue'
 
 Vue.use(VueRouter)
 
@@ -204,6 +208,30 @@ const routes = [
                 path: 'condiciones_fiscales/form/:id',
                 name: 'condicionesFiscalesForm',
                 component: CondicionesFiscalesForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'medios_de_pago',
+                name: 'mediosPago',
+                component: MediosPago,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'medios_de_pago/form/:id',
+                name: 'mediosPagoForm',
+                component: MediosPagoForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'planes_de_pago',
+                name: 'planesPago',
+                component: PlanesPago,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'planes_de_pago/form/:id',
+                name: 'planesPagoForm',
+                component: PlanesPagoForm,
                 meta: { requiresAuth: true }
             },
             {

@@ -14,12 +14,6 @@ export default (tenant,service,token) =>{
             })
         },
 
-        getForBarCode: function(barcode){
-            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/codb/${barcode}`, {
-                headers: { Authorization: "Bearer " + token }
-            })
-        },
-
         save: function(body){
             return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`,body, {
                 headers: { Authorization: "Bearer " + token }

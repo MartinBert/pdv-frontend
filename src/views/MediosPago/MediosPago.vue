@@ -2,10 +2,10 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="1">
-          <v-btn class="primary" raised>Reporte de Ventas</v-btn>
+        <v-col cols="6">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-spacer></v-spacer>
+        <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
@@ -28,11 +28,6 @@
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Código de barras</th>
-            <th>Código de producto</th>
-            <th>Marca</th>
-            <th>Precio de costo</th>
-            <th>Precio de venta</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -40,14 +35,9 @@
           <tr>
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
-            <td>{{object.codigoBarra}}</td>
-            <td>{{object.codigoProducto}}</td>
-            <td>{{object.marca ? object.marca.nombre : 'Sin marca'}}</td>
-            <td>${{object.precioCosto}}</td>
-            <td>${{object.precioTotal}}</td>
             <td>
-              <v-icon title="Editar">mdi-pencil</v-icon>
-              <v-icon title="Eliminar">mdi-delete</v-icon>
+              <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
+              <v-icon title="Eliminar" @click="openDelete(object.id)">mdi-delete</v-icon>
             </td>
           </tr>
         </tbody>
@@ -74,6 +64,20 @@
     ></v-pagination>
     <!-- End Paginate -->
 
+    <!-- Dialog Delete-->
+    <v-dialog v-model="dialogDeleteObject" width="500">
+      <v-card>
+        <v-toolbar class="d-flex justify-center" color="primary" dark>
+          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
+        </v-toolbar>
+        <v-card-title class="d-flex justify-center">¿Está seguro que desea realizar esta acción?</v-card-title>
+        <v-card-actions class="d-flex justify-center pb-4">
+          <v-btn small color="disabled" class="mr-5" @click="deleteObject">Si</v-btn>
+          <v-btn small color="disabled" @click="dialogDeleteObject = false">No</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog Delete -->
   </v-container>
 </template>
 
@@ -81,14 +85,8 @@
 import GenericService from "../../services/GenericService";
 
 export default {
-
-  components:{
-    
-  }, 
   data: () => ({
-    icon: "mdi-check-circle",
-    file: null,
-    objects: null,
+    objects: [],
     filterString: "",
     paginate: {
       page: 1,
@@ -97,16 +95,14 @@ export default {
     },
     loaded: false,
     tenant: "",
-    service: "ventas",
+    service: "mediosPago",
     token: localStorage.getItem("token"),
     dialogDeleteObject: false
   }),
-
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getAll(this.paginate.page - 1, this.paginate.size);
   },
-
   methods: {
     getAll: function(page, size) {
       this.objects = [];
@@ -120,6 +116,18 @@ export default {
         });
     },
 
+    changePage: function(page) {
+      this.getAll(page - 1, this.paginate.size);
+    },
+
+    newObject: function() {
+      this.$router.push({ name: "mediosPagoForm", params: { id: 0 } });
+    },
+
+    edit: function(id) {
+      this.$router.push({ name: "mediosPagoForm", params: { id: id } });
+    },
+
     filterObjects: function(filter){
       var f ={
         nombre:filter
@@ -131,6 +139,20 @@ export default {
         });
     },
 
+    openDelete: function(id) {
+      this.idObjet = id;
+      this.dialogDeleteObject = true;
+    },
+
+    deleteObject: function() {
+      this.dialog = true;
+      this.dialogDeleteObject = false;
+      GenericService(this.tenant, this.service, this.token)
+        .delete(this.idObjet)
+        .then(() => {
+          this.getAll(this.paginate.page - 1, this.paginate.size);
+        });
+    }
   }
 };
 </script>

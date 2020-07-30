@@ -26,11 +26,12 @@
               v-model="object.condicionIva"
               :counter="50"
               label="Condición frente al IVA"
+              :return-object="true"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-select>
           </v-col>
-          <v-col v-if="object.condicionIva == 1 || object.condicionIva == 2">
+          <v-col>
             <v-text-field
               type="text"
               v-model="object.razonSocial"
@@ -40,12 +41,10 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
-          <v-col v-if="object.condicionIva == 3">
+          <v-col>
             <v-text-field type="text" v-model="object.nombre" :counter="50" label="Nombre" required></v-text-field>
           </v-col>
-          <v-col
-            v-if="object.condicionIva == 3 || object.condicionIva == 1 || object.condicionIva == 2"
-          >
+          <v-col>
             <v-text-field
               type="text"
               v-model="object.cuit"
