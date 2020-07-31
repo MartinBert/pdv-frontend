@@ -14,6 +14,17 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
             </v-col>
+            <v-col class="col-6"> 
+              <v-autocomplete
+                :items="medios_pago"
+                v-model="object.planPago"
+                multiple
+                item-text="nombre"
+                label="Medios de pago"
+                :return-object="true"
+                :rules="[v => !!v || 'Campo requerido...']"
+              ></v-autocomplete>
+            </v-col>
         </v-row>
         <div class="ma-1">
           <v-col class="col-6">
@@ -39,6 +50,7 @@ export default {
   data: () => ({
     valid: true,
     object: {},
+    medios_pago: [],
     loaded: false,
     tenant: "",
     service: "mediosPago",
@@ -54,6 +66,8 @@ export default {
     } else {
       this.loaded = true;
     }
+
+    this.getPlanes();
   },
   methods: {
     getObject(id) {
@@ -63,6 +77,14 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
+    },
+
+    getPlanes(){
+      GenericService(this.tenant, "planesPago", this.token)
+      .getAll(0, 1000)
+      .then(data => {
+        this.medios_pago = data.data.content;
+      })
     },
 
     save() {

@@ -48,6 +48,16 @@
             ></v-autocomplete>
           </v-col>
           <v-col>
+             <v-text-field
+              type="number"
+              v-model="cantidad"
+              :counter="50"
+              label="Código de producto"
+              required
+              :rules="[v => !!v || 'Campo requerido...']"
+            ></v-text-field>
+          </v-col>
+          <v-col>
             <v-autocomplete
               :items="depositos"
               v-model="object.depositos"

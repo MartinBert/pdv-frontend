@@ -28,6 +28,8 @@
           <tr>
             <th>ID</th>
             <th>Nombre</th>
+            <th>Cantidad de cuotas</th>
+            <th>Porcentaje de recargo</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -35,6 +37,8 @@
           <tr>
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
+            <td>{{object.cuotas}}</td>
+            <td>{{object.porcentaje}}%</td>
             <td>
               <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
               <v-icon title="Eliminar" @click="openDelete(object.id)">mdi-delete</v-icon>

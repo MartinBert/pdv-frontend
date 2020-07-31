@@ -42,7 +42,12 @@
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text" v-model="object.nombre" :counter="50" label="Nombre" required></v-text-field>
+            <v-text-field type="text" 
+            v-model="object.nombre" 
+            :counter="50" 
+            label="Nombre" 
+            required
+            ></v-text-field>
           </v-col>
           <v-col>
             <v-text-field
@@ -57,13 +62,25 @@
         </v-row>
         <v-row class="ma-3">
           <v-col>
-            <v-text-field type="text" v-model="object.direccion" :counter="50" label="Dirección"></v-text-field>
+            <v-text-field type="text" 
+            v-model="object.direccion" 
+            :counter="50" 
+            label="Dirección"
+            ></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text" v-model="object.email" :counter="50" label="Email"></v-text-field>
+            <v-text-field type="text" 
+            v-model="object.email" 
+            :counter="50" 
+            label="Email"
+            ></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text" v-model="object.telefono" :counter="50" label="Teléfono"></v-text-field>
+            <v-text-field type="text" 
+            v-model="object.telefono" 
+            :counter="50" 
+            label="Teléfono"
+            ></v-text-field>
           </v-col>
           <v-col>
             <v-text-field

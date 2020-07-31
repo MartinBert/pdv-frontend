@@ -151,7 +151,7 @@ export default {
         name: "mediosPago",
         title: "Medios de Pago",
         visible: false,
-        icon: "mdi-text-box-outline",
+        icon: "mdi-credit-card-outline",
         childs: [
           {
             path: "/medios_de_pago",

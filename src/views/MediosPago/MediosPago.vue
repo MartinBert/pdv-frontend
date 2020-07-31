@@ -28,6 +28,7 @@
           <tr>
             <th>ID</th>
             <th>Nombre</th>
+            <th>Planes asociados</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -35,6 +36,7 @@
           <tr>
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
+            <td><v-icon title="Ver planes" @click="openPlans(object.planPago)">mdi-clipboard-list</v-icon></td>
             <td>
               <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
               <v-icon title="Eliminar" @click="openDelete(object.id)">mdi-delete</v-icon>
@@ -78,6 +80,25 @@
       </v-card>
     </v-dialog>
     <!-- End Dialog Delete -->
+
+    <!-- Dialog Planes-->
+    <v-dialog v-model="seePlansDialog" width="300">
+      <v-card>
+        <v-toolbar class="d-flex justify-center" color="primary" dark>
+          <v-toolbar-title>Planes</v-toolbar-title>
+        </v-toolbar>
+          <v-list>
+            <v-list-item v-for="p in plans" :key="p.id">
+              <v-list-item-icon>
+                <v-icon>mdi-clipboard-list</v-icon>
+              </v-list-item-icon>
+                {{p.nombre}}
+            </v-list-item>
+          </v-list>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog Planes -->
+
   </v-container>
 </template>
 
@@ -86,6 +107,7 @@ import GenericService from "../../services/GenericService";
 
 export default {
   data: () => ({
+    plans: "",
     objects: [],
     filterString: "",
     paginate: {
@@ -97,7 +119,8 @@ export default {
     tenant: "",
     service: "mediosPago",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false
+    dialogDeleteObject: false,
+    seePlansDialog: false
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -142,6 +165,11 @@ export default {
     openDelete: function(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
+    },
+
+    openPlans: function(plans){
+      this.plans = plans;
+      this.seePlansDialog = true;
     },
 
     deleteObject: function() {

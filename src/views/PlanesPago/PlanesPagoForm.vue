@@ -4,12 +4,30 @@
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-1">
-            <v-col class="col-6"> 
+            <v-col class="col-4"> 
               <v-text-field 
               type="text"
               v-model="object.nombre"
               :counter="50"
               label="Nombre"
+              required
+              :rules="[v => !!v || 'Campo requerido...']"
+            ></v-text-field>
+            </v-col>
+            <v-col class="col-4"> 
+              <v-text-field 
+              type="number"
+              v-model="object.cuotas"
+              label="Cantidad de cuotas"
+              required
+              :rules="[v => !!v || 'Campo requerido...']"
+            ></v-text-field>
+            </v-col>
+            <v-col class="col-2"> 
+              <v-text-field 
+              type="number"
+              v-model="object.porcentaje"
+              label="Porcentaje %"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
