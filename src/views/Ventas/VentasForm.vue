@@ -17,6 +17,7 @@
             </v-col>
             <v-col cols="4">
               <v-autocomplete
+              v-model="object.documento"
               :items="objects.documentos"
               item-text="nombre"
               :return-object="true"
@@ -31,13 +32,34 @@
               <v-data-table :headers="headers" calculate-widths></v-data-table>
             </v-card>
           </v-col>
-        </v-row>
-      </v-form>
-      <v-row class="ma-5">
-        <v-col cols="3">
+          <v-col cols="3">
           <Calculator/>
         </v-col>
-      </v-row> 
+        </v-row>
+        <v-row>
+            <v-col cols="5">
+              <v-autocomplete
+              @change="getPaymentPlans(object.mediosPago)"
+              v-model="object.mediosPago"
+              :items="objects.medios_de_pago"
+              item-text="nombre"
+              :return-object="true"
+              :rules="[v => !!v || 'Campo requerido...']"
+              placeholder="Seleccione un medio de pago..."
+              ></v-autocomplete>
+            </v-col>
+            <v-col cols="5">
+              <v-autocomplete
+              v-model="object.planPago"
+              :items="objects.planes"
+              item-text="nombre"
+              :return-object="true"
+              :rules="[v => !!v || 'Campo requerido...']"
+              placeholder="Seleccione un plan de pago..."
+              ></v-autocomplete>
+            </v-col>
+        </v-row>
+      </v-form>
     </v-col>
   </v-card>
 </template>
@@ -56,7 +78,7 @@ export default {
     object:{},
     objects: {
       clientes: [],
-      comprobantes: []
+      medios_de_pago: []
     },
     tenant: "",
     service: "productos",
@@ -87,6 +109,12 @@ export default {
         .then(data => {
           this.objects.clientes = data.data.content;
         });
+      GenericService(this.tenant, "mediosPago", this.token)
+        .getAll(this.page, this.size)
+        .then(data => {
+          this.objects.medios_de_pago = data.data.content;
+          console.log(this.objects.medios_de_pago);
+        });
   },
 
   methods: {
@@ -108,6 +136,11 @@ export default {
 
     getComercialDocuments(id){
       this.objects.documentos = id.documentos
+    },
+
+    getPaymentPlans(id){
+      this.objects.planes = id.planPago
+      console.log(this.objects.planes);
     },
 
     save() {

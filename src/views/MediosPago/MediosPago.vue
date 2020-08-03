@@ -87,14 +87,21 @@
         <v-toolbar class="d-flex justify-center" color="primary" dark>
           <v-toolbar-title>Planes</v-toolbar-title>
         </v-toolbar>
+        <div v-if="plans != ''" align="center" justify="center">
           <v-list>
             <v-list-item v-for="p in plans" :key="p.id">
-              <v-list-item-icon>
+                <v-list-item-icon>
                 <v-icon>mdi-clipboard-list</v-icon>
-              </v-list-item-icon>
+                </v-list-item-icon>
                 {{p.nombre}}
             </v-list-item>
           </v-list>
+        </div>
+        <div v-if="plans == ''" align="center" justify="center">
+          <img id="ghostImage" src="./ghost.png"><br>
+          <img src="./shadow.png"><br>
+          Nada por aquí...
+        </div>
       </v-card>
     </v-dialog>
     <!-- End Dialog Planes -->
