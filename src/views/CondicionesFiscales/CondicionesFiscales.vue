@@ -28,7 +28,6 @@
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Tipo de documento</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -36,10 +35,6 @@
           <tr>
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
-            <td>
-              <v-alert type="success" dense v-if="object.tipo" width="30%">Fiscal</v-alert>
-              <v-alert color="secondary" icon="mdi-close-circle" dense dark width="30%" v-if="!object.tipo">No fiscal</v-alert>
-            </td>
             <td>
               <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
               <v-icon title="Eliminar" @click="openDelete(object.id)">mdi-delete</v-icon>

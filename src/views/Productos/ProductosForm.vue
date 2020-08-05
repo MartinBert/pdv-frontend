@@ -46,17 +46,7 @@
               :return-object="true"
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-autocomplete>
-          </v-col>
-          <v-col>
-             <v-text-field
-              type="number"
-              v-model="cantidad"
-              :counter="50"
-              label="Código de producto"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
-          </v-col>
+          </v-col> 
           <v-col>
             <v-autocomplete
               :items="depositos"
@@ -67,6 +57,17 @@
               :return-object="true"
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-autocomplete>
+          </v-col>
+          <v-col v-for="o in object.depositos" :key="o.id" style="display: inline-block;">
+            <v-text-field
+            v-bind:id="`deposito${o.id}`"
+            type="number"
+            :counter="50"
+            v-bind:label="`Cantidad de unidades en ${o.nombre}`"
+            required
+            :rules="[v => !!v || 'Campo requerido...']"
+            ></v-text-field>
+            <v-btn @click="Apply(o.id)">Aplicar</v-btn>
           </v-col>
         </v-row>
         <v-row class="ma-1">
@@ -229,6 +230,7 @@ export default {
     object: {
       estado: 1
     },
+    cantidad: [],
     loaded: false,
     tenant: "",
     service: "productos",
@@ -287,6 +289,11 @@ export default {
         });
     },
 
+    Apply(id){
+      this.cantidad.push(document.getElementById(`deposito${id}`).value);
+      document.getElementById(`deposito${id}`).setAttribute("disabled", true);
+    },
+   
     calculations: function() {
       this.object.costoNeto = (this.object.costoBruto * (1 - 0.21)).toFixed(2);
       this.object.ivaCompra = (
@@ -319,17 +326,39 @@ export default {
     },
 
     save() {
+
+      console.log(this.cantidad1);
+      var depositos = this.object.depositos;
+      var cantidad = this.cantidad;
+      var tenant = this.tenant;
+      var token = this.token;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
-        .then(() => {
-          this.$router.push({ name: "productos" });
-        })
+        .then(
+          function(data){
+            console.log(data);
+            depositos.forEach(el=>{
+              var stock = {
+              producto: data.data,
+              deposito: el,
+              cantidad:cantidad
+              }
+              
+              console.log(stock);
+
+              GenericService(tenant, "stock",token)
+              .save(stock)
+
+            });
+          })
         .catch(error => {
           if (error.response.status == 500) {
             this.snackError = true;
             this.errorMessage = "Ocurrio un error";
           }
         });
+      this.$router.push({ name: "productos" })
+      
     },
 
     back() {
