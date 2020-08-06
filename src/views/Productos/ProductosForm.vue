@@ -326,8 +326,6 @@ export default {
     },
 
     save() {
-
-      console.log(this.cantidad1);
       var depositos = this.object.depositos;
       var cantidad = this.cantidad;
       var tenant = this.tenant;
@@ -336,19 +334,14 @@ export default {
         .save(this.object)
         .then(
           function(data){
-            console.log(data);
-            depositos.forEach(el=>{
+            depositos.forEach((el, index)=>{
               var stock = {
               producto: data.data,
               deposito: el,
-              cantidad:cantidad
+              cantidad:cantidad[index]
               }
-              
-              console.log(stock);
-
               GenericService(tenant, "stock",token)
               .save(stock)
-
             });
           })
         .catch(error => {
@@ -358,7 +351,6 @@ export default {
           }
         });
       this.$router.push({ name: "productos" })
-      
     },
 
     back() {
