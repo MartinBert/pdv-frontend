@@ -45,8 +45,8 @@
                       <td>{{ p.nombre }}</td>
                       <td>{{ p.codigoBarra }}</td>
                       <td>
-                        <input class="" />
-                        {{ p.cant }}</td>
+                        <input type="number" @input="updateTotal(p.id)" v-model="p.cant" />
+                      </td>
                       <td>${{ p.precioTotal }}</td>
                       <td>${{ p.total }}</td>
                     </tr>
@@ -61,7 +61,7 @@
             </v-card>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row class="ma-5">
           <v-col cols="5">
             <v-autocomplete
               @change="getPaymentPlans(object.mediosPago)"
@@ -73,7 +73,7 @@
               placeholder="Seleccione un medio de pago..."
             ></v-autocomplete>
           </v-col>
-          <v-col cols="5">
+          <v-col cols="4">
             <v-autocomplete
               v-model="object.planPago"
               :items="objects.planes"
@@ -84,6 +84,7 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
+        <v-btn class="primary">Finalizar venta</v-btn>
       </v-form>
     </v-col>
   </v-card>
@@ -117,24 +118,30 @@ export default {
   },
 
   mounted() {
+
+    //Validate tenant
     this.tenant = this.$route.params.tenant;
+    //-->
+
+    //Call objects for database
     GenericService(this.tenant, "clientes", this.token)
       .getAll(this.page, this.size)
       .then((data) => {
         this.objects.clientes = data.data.content;
       });
+
     GenericService(this.tenant, "mediosPago", this.token)
       .getAll(this.page, this.size)
       .then((data) => {
         this.objects.medios_de_pago = data.data.content;
       });
+    //-->
+
   },
 
   methods: {
-    asd() {
-      console.log(2);
-    },
 
+    //Mark product
     onBarcodeScanned(barcode) {
       VentasService(this.tenant, "productos", this.token)
         .getForBarCode(barcode)
@@ -142,7 +149,7 @@ export default {
           if(this.products.length > 0){
             this.products.forEach(el =>{
               if(el.id == data.data.id){
-                el.cant += 1;
+                el.cant = parseInt(el.cant) + 1;
                 el.total = (el.precioTotal*el.cant);
               }else{
                 data.data.cant = 1
@@ -164,7 +171,9 @@ export default {
           }
         });
     },
+    //-->
 
+    //Call <autocomplete> inputs objects
     getComercialDocuments(id) {
       this.objects.documentos = id.documentos;
     },
@@ -172,7 +181,9 @@ export default {
     getPaymentPlans(id) {
       this.objects.planes = id.planPago;
     },
+    //-->
 
+    //Save sale on database and print comercial document
     save() {
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
@@ -186,6 +197,22 @@ export default {
           }
         });
     },
+    //-->
+
+    // -- Price Modification cases
+
+    //When the quantity of units change
+    updateTotal(id){
+      this.products.forEach(el =>{
+        if(el.id == id){
+          el.total = (el.precioTotal*el.cant);
+        }
+      })
+    }
+    //-->
+
+    // --- >>
+
   },
 };
 </script>
