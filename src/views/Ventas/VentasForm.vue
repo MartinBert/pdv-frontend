@@ -55,8 +55,7 @@
               </v-simple-table>
                 <v-row>
                   <v-col cols="1"></v-col>
-                  <v-col cols="5">TOTAL</v-col>
-                  <v-col cols="2"></v-col>
+                  <v-col>TOTAL: ${{(totalVenta)}}</v-col>
               </v-row>
             </v-card>
           </v-col>
@@ -105,6 +104,7 @@ export default {
       clientes: [],
       medios_de_pago: [],
     },
+    totalVenta: "",
     products: [],
     tenant: "",
     service: "productos",
@@ -146,22 +146,56 @@ export default {
       VentasService(this.tenant, "productos", this.token)
         .getForBarCode(barcode)
         .then((data) => {
-          if(this.products.length > 0){
-            this.products.forEach(el =>{
-              if(el.id == data.data.id){
-                el.cant = parseInt(el.cant) + 1;
-                el.total = (el.precioTotal*el.cant);
-              }else{
-                data.data.cant = 1
-                data.data.total = (data.data.precioTotal*data.data.cant)
-                this.products.push(data.data);
+          if(this.products.length > 0){ //Check that objects exist in the array
+            var count = 0;
+            var o = this.products.length;
+              console.log("B ----- >")
+              for(var i = 0; i < this.products.length; i++){
+                count += 1;
+                if(this.products[i].id == data.data.id){
+                  console.log("1 -> b")
+                  this.products[i].cant = parseInt(this.products[i].cant) + 1;
+                  this.products[i].total = (this.products[i].precioTotal*this.products[i].cant);
+                  this.totalVenta += this.products[i].total;
+                  break;
+                }
+                if(this.products[i].id != data.data.id && count == o){
+                  console.log("2 -> b")
+                  console.log(data.data);
+                  data.data.cant = 1
+                  data.data.total = (data.data.precioTotal*data.data.cant)
+                  this.products.push(data.data);
+                  this.totalVenta += data.data.total;
+                  break
+                }
               }
-            })
+
+            // this.products.forEach(el => {
+            //   count += 1;
+            //   console.log(o)
+            //   console.log(count);
+            //   if(data.data.id == el.id){
+            //     console.log("1 -> b")
+            //     el.cant = parseInt(el.cant) + 1;
+            //     el.total = (el.precioTotal*el.cant);
+            //     this.totalVenta += el.total;
+            //   }
+            //   if(data.data.id != el.id && count == o){
+            //     console.log("2 -> b")
+            //     console.log(data.data);
+            //     data.data.cant = 1
+            //     data.data.total = (data.data.precioTotal*data.data.cant)
+            //     this.products.push(data.data);
+            //     this.totalVenta += data.data.total;
+            //   }
+            // })
+
           }else{
+            console.log("A ----- >")
             data.data.cant = 1
             data.data.total = (data.data.precioTotal*data.data.cant)
+            this.totalVenta = data.data.total;
             this.products.push(data.data);
-            console.log(this.products);
           }
         })
         .catch((error) => {
@@ -205,7 +239,9 @@ export default {
     updateTotal(id){
       this.products.forEach(el =>{
         if(el.id == id){
+          this.totalVenta -= el.total;
           el.total = (el.precioTotal*el.cant);
+          this.totalVenta += el.total;       
         }
       })
     }
