@@ -233,6 +233,20 @@ export default {
           }
         ]
       },
+      {
+        name: "configuraciones",
+        title: "Configuraciones",
+        visible: false,
+        icon: "mdi-account-outline",
+        childs: [
+          {
+            path: "/empresa",
+            name: "empresas",
+            title: "Empresa",
+            visible: false
+          },
+        ]
+      }
     ],
     modulosVisibles: []
   }),

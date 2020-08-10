@@ -70,7 +70,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getDocumentos();
+    this.getDocumentos(0, 200000);
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
@@ -87,9 +87,9 @@ export default {
         });
     },
 
-    getDocumentos(){
+    getDocumentos(page, size){
       GenericService(this.tenant, "documentosComerciales", this.token)
-        .getAll()
+        .getAll(page, size)
         .then(data => {
           this.documentos = data.data.content;
           console.log(this.documentos);

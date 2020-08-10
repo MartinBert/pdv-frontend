@@ -2,19 +2,10 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="1">
+        <v-col cols="6">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-col cols="3">
-          <v-file-input
-          v-model="file" 
-          class="mt-0"
-          placeholder="Importar documentos"
-          accept=".xlsx, xls"
-          @change="importDocuments($event)"
-          ></v-file-input>
-        </v-col>
-        <v-col cols="4"></v-col>
+        <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
@@ -37,7 +28,9 @@
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Tipo de documento</th>
+            <th>Razón Social</th>
+            <th>CUIT</th>
+            <th>Detalles</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -45,9 +38,10 @@
           <tr>
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
+            <td>{{object.razonSocial}}</td>
+            <td>{{object.cuit}}</td>
             <td>
-              <v-alert type="success" dense v-if="object.tipo" width="30%">Fiscal</v-alert>
-              <v-alert color="secondary" icon="mdi-close-circle" dense dark width="30%" v-if="!object.tipo">No fiscal</v-alert>
+                <v-icon title="Stock" @click="showStock(object.id)">mdi-text-box</v-icon>
             </td>
             <td>
               <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
@@ -97,12 +91,10 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import XLSX from 'xlsx'
 
 export default {
   data: () => ({
     objects: [],
-    file: null,
     filterString: "",
     paginate: {
       page: 1,
@@ -111,7 +103,7 @@ export default {
     },
     loaded: false,
     tenant: "",
-    service: "documentosComerciales",
+    service: "empresas",
     token: localStorage.getItem("token"),
     dialogDeleteObject: false
   }),
@@ -137,16 +129,16 @@ export default {
     },
 
     newObject: function() {
-      this.$router.push({ name: "documentosComercialesForm", params: { id: 0 } });
+      this.$router.push({ name: "empresasForm", params: { id: 0 } });
     },
 
     edit: function(id) {
-      this.$router.push({ name: "documentosComercialesForm", params: { id: id } });
+      this.$router.push({ name: "empresasForm", params: { id: id } });
     },
 
     filterObjects: function(filter){
       var f ={
-        nombre:filter
+        razonSocial:filter
       }
       GenericService(this.tenant, this.service, this.token)
         .filter(f)
@@ -168,71 +160,7 @@ export default {
         .then(() => {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         });
-    },
-
-    importDocuments: function(event) {
-      console.log(this.file);
-      this.file = event;
-      var excel = [];
-      var reader = new FileReader();
-      reader.onload = e => {
-        var data = e.target.result;
-        var workbook = XLSX.read(data, { type: "binary" });
-
-        var sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function(y) {
-          var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-          if (exceljson.length > 0) {
-            for (var i = 0; i < exceljson.length; i++) {
-              excel.push(exceljson[i]);
-            }
-          }
-        });
-        var doc = this.validateImport(excel);
-        if (doc.status) {
-          GenericService(this.tenant, this.service, this.token)
-            .saveAll(doc.data)
-            .then(() => {
-              this.getAll(this.paginate.page - 1, this.paginate.size);
-              this.loaderStatus = true;
-              window.setTimeout(()=>{
-                this.loader = false
-                this.loaderStatus=false;
-              }, 2000);              
-            });
-        }
-      };
-      reader.readAsBinaryString(this.file);
-    },
-
-    validateImport: function(objects) {
-      this.loader = true;
-      var importacion = {
-        status: true,
-        data: [],
-        message: ""
-      };
-      objects.forEach((element, index) => {
-        if (
-          element.nombre &&
-          element.codigoDocumento &&
-          element.tipo
-        ) {
-          var obj = {
-            nombre: element.nombre,
-            codigoDocumento: String(element.codigoDocumento),
-            tipo: Boolean(element.tipo),
-            activo: true,
-          };
-          importacion.data.push(obj);
-        } else {
-          importacion.status = false;
-          importacion.message = "Faltan datos en el renglón " + (index + 2);
-        }
-      });
-      return importacion;
-    },
-
+    }
   }
 };
 </script>

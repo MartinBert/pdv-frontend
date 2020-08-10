@@ -33,6 +33,8 @@ import MediosPago from '../views/MediosPago/MediosPago.vue'
 import MediosPagoForm from '../views/MediosPago/MediosPagoForm.vue'
 import PlanesPago from '../views/PlanesPago/PlanesPago.vue'
 import PlanesPagoForm from '../views/PlanesPago/PlanesPagoForm.vue'
+import Empresas from '../views/Empresas/Empresas.vue'
+import EmpresasForm from '../views/Empresas/EmpresasForm.vue'
 
 Vue.use(VueRouter)
 
@@ -232,6 +234,18 @@ const routes = [
                 path: 'planes_de_pago/form/:id',
                 name: 'planesPagoForm',
                 component: PlanesPagoForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'empresa',
+                name: 'empresas',
+                component: Empresas,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'empresa/form/:id',
+                name: 'empresasForm',
+                component: EmpresasForm,
                 meta: { requiresAuth: true }
             },
             {
