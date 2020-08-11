@@ -6,7 +6,7 @@
         <v-row class="ma-5">
           <v-col cols="5">
             <v-autocomplete
-              @change="getComercialDocuments(object.cliente_id.condicionIva)"
+              @change="getComercialDocuments(object.cliente_id.condicionIva.documentos, objects.empresa[0].condicionIva.documentos)"
               v-model="object.cliente_id"
               :items="objects.clientes"
               item-text="razonSocial"
@@ -83,7 +83,7 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
-        <v-btn class="primary">Finalizar venta</v-btn>
+        <v-btn class="primary" @click="save()">Finalizar venta</v-btn>
       </v-form>
     </v-col>
   </v-card>
@@ -92,6 +92,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
+import axios from 'axios';
 
 export default {
   data: () => ({
@@ -102,12 +103,14 @@ export default {
     object: {},
     objects: {
       clientes: [],
+      empresa: [],
       medios_de_pago: [],
+      documentos: []
     },
     totalVenta: "",
     products: [],
     tenant: "",
-    service: "productos",
+    service: "ventas",
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
@@ -135,6 +138,12 @@ export default {
       .then((data) => {
         this.objects.medios_de_pago = data.data.content;
       });
+
+    GenericService(this.tenant, "empresas", this.token)
+    .getAll(this.page, this.size)
+    .then((data) => {
+      this.objects.empresa = data.data.content;
+    })
     //-->
 
   },
@@ -146,7 +155,7 @@ export default {
       VentasService(this.tenant, "productos", this.token)
         .getForBarCode(barcode)
         .then((data) => {
-          if(this.products.length > 0){ //Check that objects exist in the array
+          if(this.products.length > 0){
             var count = 0;
             var o = this.products.length;
               console.log("B ----- >")
@@ -169,27 +178,6 @@ export default {
                   break
                 }
               }
-
-            // this.products.forEach(el => {
-            //   count += 1;
-            //   console.log(o)
-            //   console.log(count);
-            //   if(data.data.id == el.id){
-            //     console.log("1 -> b")
-            //     el.cant = parseInt(el.cant) + 1;
-            //     el.total = (el.precioTotal*el.cant);
-            //     this.totalVenta += el.total;
-            //   }
-            //   if(data.data.id != el.id && count == o){
-            //     console.log("2 -> b")
-            //     console.log(data.data);
-            //     data.data.cant = 1
-            //     data.data.total = (data.data.precioTotal*data.data.cant)
-            //     this.products.push(data.data);
-            //     this.totalVenta += data.data.total;
-            //   }
-            // })
-
           }else{
             console.log("A ----- >")
             data.data.cant = 1
@@ -208,8 +196,14 @@ export default {
     //-->
 
     //Call <autocomplete> inputs objects
-    getComercialDocuments(id) {
-      this.objects.documentos = id.documentos;
+    getComercialDocuments(clientCond, businessCond) {
+      for(var i = 0; i < clientCond.length; i++){
+        businessCond.forEach(el => {
+          if(clientCond[i].id == el.id){
+            this.objects.documentos.push(el);
+          }
+        })
+      }
     },
 
     getPaymentPlans(id) {
@@ -219,23 +213,65 @@ export default {
 
     //Save sale on database and print comercial document
     save() {
-      GenericService(this.tenant, this.service, this.token)
-        .save(this.object)
-        .then(() => {
-          this.$router.push({ name: "ventas/form" });
-        })
-        .catch((error) => {
-          if (error.response.status == 500) {
-            this.snackError = true;
-            this.errorMessage = "Ocurrio un error";
+      //Create date of body document
+      var fecha = new Date();
+      var generatedFecha = fecha.getFullYear().toString()+('0'+(fecha.getMonth()+1)).toString()+fecha.getDate().toString();
+
+      //Instance body from AFIP ws-services
+      var body = {
+      "alicIva": [
+        {
+          "baseImp": 100,
+          "id": 5,
+          "importe": 21
+        }
+      ],
+      "asociados": [],
+      "cbteTipo": this.object.documento.id,
+      "concepto": 1,
+      "cotizMoneda": 1,
+      "cuit": this.objects.empresa[0].cuit,
+      "fecha": generatedFecha,
+      "fechaServicioHasta": generatedFecha,
+      "fechaServicioVenc": generatedFecha,
+      "fechaServiciodesde": generatedFecha,
+      "fechaVencimientoPago": "0",
+      "idMoneda": "PES",
+      "impNeto": 100,
+      "name": "Marcelo Agustini",
+      "nroDesde": "",
+      "nroDoc": 27518700,
+      "nroHasta": "",
+      "opcionales": [],
+      "ptoVenta": 4,
+      "tipoDoc": 94,
+      "tributos": []
+      }
+      
+      //Get authorized voucher number
+      axios.get(`http://localhost:8080/rest/api/facturas/obtenerUltimoNumeroAutorizado/innovare/20260027655/4/${body.cbteTipo}`,
+      {headers: {
+        Authorization:  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNTk3MTY2MDIxLCJpc3MiOiJJU1NVRVIifQ.ywGMiq5eLNRp_xVfRgTAm3ZTnpZPWgVG0K45NJQWz1M"
+      }})
+      .then((data)=>{
+        //Assign nroDesde & nroHasta
+        body.nroDesde = data.data + 1;
+        body.nroHasta = body.nroDesde;
+        
+        //Post data & recive CAE from AFIP 
+        axios.post(`http://localhost:8080/rest/api/facturas/generarComprobante/innovare`, body, {
+          "headers": {
+            Authorization : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNTk3MTY2MDIxLCJpc3MiOiJJU1NVRVIifQ.ywGMiq5eLNRp_xVfRgTAm3ZTnpZPWgVG0K45NJQWz1M"
           }
-        });
+        }).then((data) => {
+          console.log(data);
+        })
+      })
+
     },
     //-->
 
-    // -- Price Modification cases
-
-    //When the quantity of units change
+    //Price Modification cases
     updateTotal(id){
       this.products.forEach(el =>{
         if(el.id == id){
@@ -246,8 +282,6 @@ export default {
       })
     }
     //-->
-
-    // --- >>
 
   },
 };
