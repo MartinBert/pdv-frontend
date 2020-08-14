@@ -35,6 +35,8 @@ import PlanesPago from '../views/PlanesPago/PlanesPago.vue'
 import PlanesPagoForm from '../views/PlanesPago/PlanesPagoForm.vue'
 import Empresas from '../views/Empresas/Empresas.vue'
 import EmpresasForm from '../views/Empresas/EmpresasForm.vue'
+import PuntosVenta from '../views/PuntosVenta/PuntosVenta.vue'
+import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm.vue'
 
 Vue.use(VueRouter)
 
@@ -246,6 +248,18 @@ const routes = [
                 path: 'empresa/form/:id',
                 name: 'empresasForm',
                 component: EmpresasForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'puntos_venta',
+                name: 'puntosVenta',
+                component: PuntosVenta,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'puntos_venta/form/:id',
+                name: 'puntosVentaForm',
+                component: PuntosVentaForm,
                 meta: { requiresAuth: true }
             },
             {

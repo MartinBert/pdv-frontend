@@ -242,7 +242,13 @@ export default {
           {
             path: "/empresa",
             name: "empresas",
-            title: "Empresa",
+            title: "Empresas",
+            visible: false
+          },
+          {
+            path: "/puntos_venta",
+            name: "puntosVenta",
+            title: "Puntos de venta",
             visible: false
           },
         ]

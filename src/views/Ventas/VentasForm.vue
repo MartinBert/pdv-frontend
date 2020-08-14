@@ -53,9 +53,9 @@
                   </tbody>
                 </template>
               </v-simple-table>
-                <v-row>
-                  <v-col cols="1"></v-col>
-                  <v-col>TOTAL: ${{(totalVenta)}}</v-col>
+              <v-row>
+                <v-col cols="1"></v-col>
+                <v-col>TOTAL: ${{(totalVenta)}}</v-col>
               </v-row>
             </v-card>
           </v-col>
@@ -84,6 +84,7 @@
           </v-col>
         </v-row>
         <v-btn class="primary" @click="save()">Finalizar venta</v-btn>
+        <v-btn class="primary ml-5" @click="info()">INFO BUTTON</v-btn>
       </v-form>
     </v-col>
   </v-card>
@@ -92,7 +93,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
-import axios from 'axios';
+// import axios from "axios";
 
 export default {
   data: () => ({
@@ -105,9 +106,8 @@ export default {
       clientes: [],
       empresa: [],
       medios_de_pago: [],
-      documentos: []
+      documentos: [],
     },
-    totalVenta: "",
     products: [],
     tenant: "",
     service: "ventas",
@@ -120,8 +120,17 @@ export default {
     this.$barcodeScanner.init(this.onBarcodeScanned);
   },
 
-  mounted() {
+  computed: {
+    totalVenta() {
+      var tot = 0;
+      this.products.forEach(el => {
+        tot += parseFloat(el.total);
+      })
+      return tot;
+    },
+  },
 
+  mounted() {
     //Validate tenant
     this.tenant = this.$route.params.tenant;
     //-->
@@ -140,50 +149,48 @@ export default {
       });
 
     GenericService(this.tenant, "empresas", this.token)
-    .getAll(this.page, this.size)
-    .then((data) => {
-      this.objects.empresa = data.data.content;
-    })
+      .getAll(this.page, this.size)
+      .then((data) => {
+        this.objects.empresa = data.data.content;
+      });
     //-->
-
   },
 
   methods: {
-
-    //Mark product
+    //Mark product || change <cant>
     onBarcodeScanned(barcode) {
       VentasService(this.tenant, "productos", this.token)
         .getForBarCode(barcode)
         .then((data) => {
-          if(this.products.length > 0){
-            var count = 0;
-            var o = this.products.length;
-              console.log("B ----- >")
-              for(var i = 0; i < this.products.length; i++){
-                count += 1;
-                if(this.products[i].id == data.data.id){
-                  console.log("1 -> b")
-                  this.products[i].cant = parseInt(this.products[i].cant) + 1;
-                  this.products[i].total = (this.products[i].precioTotal*this.products[i].cant);
-                  this.totalVenta += this.products[i].total;
-                  break;
-                }
-                if(this.products[i].id != data.data.id && count == o){
-                  console.log("2 -> b")
-                  console.log(data.data);
-                  data.data.cant = 1
-                  data.data.total = (data.data.precioTotal*data.data.cant)
-                  this.products.push(data.data);
-                  this.totalVenta += data.data.total;
-                  break
-                }
-              }
-          }else{
-            console.log("A ----- >")
-            data.data.cant = 1
-            data.data.total = (data.data.precioTotal*data.data.cant)
-            this.totalVenta = data.data.total;
+          if (this.products.length == 0) {
+            console.log("A -------->");
+            data.data.cant = 1;
+            data.data.total = data.data.precioTotal;
             this.products.push(data.data);
+          } else {
+            console.log("B -------->");
+            var count = 0;
+            for (var i = 0; i < this.products.length; i++) {
+              if (this.products[i].id == data.data.id) {
+                console.log("B1 ------->");
+                this.products[i].cant = parseInt(this.products[i].cant) + 1;
+                this.products[i].total =
+                  this.products[i].precioTotal * this.products[i].cant;
+                break;
+              } else if (
+                this.products[i].id != data.data.id &&
+                count == this.products.length - 1
+              ) {
+                console.log("B2 ------->");
+                data.data.cant = 1;
+                data.data.total = data.data.precioTotal;
+                this.products.push(data.data);
+                break;
+              } else {
+                console.log("B3 ------->");
+                count += 1;
+              }
+            }
           }
         })
         .catch((error) => {
@@ -193,16 +200,25 @@ export default {
           }
         });
     },
+
+    updateTotal(id){
+      this.products.forEach(el =>{
+        if(el.id == id){
+          el.total = 0;
+          el.total = parseFloat(el.precioTotal)*el.cant;
+        }
+      })
+    },
     //-->
 
     //Call <autocomplete> inputs objects
     getComercialDocuments(clientCond, businessCond) {
-      for(var i = 0; i < clientCond.length; i++){
-        businessCond.forEach(el => {
-          if(clientCond[i].id == el.id){
+      for (var i = 0; i < clientCond.length; i++) {
+        businessCond.forEach((el) => {
+          if (clientCond[i].id == el.id) {
             this.objects.documentos.push(el);
           }
-        })
+        });
       }
     },
 
@@ -214,75 +230,100 @@ export default {
     //Save sale on database and print comercial document
     save() {
       //Create date of body document
-      var fecha = new Date();
-      var generatedFecha = fecha.getFullYear().toString()+('0'+(fecha.getMonth()+1)).toString()+fecha.getDate().toString();
+      // var fecha = new Date();
+      // var generatedFecha =
+      //   fecha.getFullYear().toString() +
+      //   ("0" + (fecha.getMonth() + 1)).toString() +
+      //   fecha.getDate().toString();
+      //-->
+      
+      //Create alicIva of body document
+      var alicIva = [{
+        baseImp: 0,
+        id: 5,
+        importe: 0,
+      }]
+
+      if(this.object.documento.ivaCat == 2 || this.object.documento.ivaCat == 1){
+        alicIva[0].baseImp = this.totalVenta / 1.21;
+        alicIva[0].importe = Math.round((this.totalVenta - alicIva[0].baseImp)*100) / 100;
+      }else{
+        alicIva = [];
+      }
+      //-->
+      
 
       //Instance body from AFIP ws-services
-      var body = {
-      "alicIva": [
-        {
-          "baseImp": 100,
-          "id": 5,
-          "importe": 21
-        }
-      ],
-      "asociados": [],
-      "cbteTipo": this.object.documento.id,
-      "concepto": 1,
-      "cotizMoneda": 1,
-      "cuit": this.objects.empresa[0].cuit,
-      "fecha": generatedFecha,
-      "fechaServicioHasta": generatedFecha,
-      "fechaServicioVenc": generatedFecha,
-      "fechaServiciodesde": generatedFecha,
-      "fechaVencimientoPago": "0",
-      "idMoneda": "PES",
-      "impNeto": 100,
-      "name": "Marcelo Agustini",
-      "nroDesde": "",
-      "nroDoc": 27518700,
-      "nroHasta": "",
-      "opcionales": [],
-      "ptoVenta": 4,
-      "tipoDoc": 94,
-      "tributos": []
-      }
-      
-      //Get authorized voucher number
-      axios.get(`http://localhost:8080/rest/api/facturas/obtenerUltimoNumeroAutorizado/innovare/20260027655/4/${body.cbteTipo}`,
-      {headers: {
-        Authorization:  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNTk3MTY2MDIxLCJpc3MiOiJJU1NVRVIifQ.ywGMiq5eLNRp_xVfRgTAm3ZTnpZPWgVG0K45NJQWz1M"
-      }})
-      .then((data)=>{
-        //Assign nroDesde & nroHasta
-        body.nroDesde = data.data + 1;
-        body.nroHasta = body.nroDesde;
-        
-        //Post data & recive CAE from AFIP 
-        axios.post(`http://localhost:8080/rest/api/facturas/generarComprobante/innovare`, body, {
-          "headers": {
-            Authorization : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNTk3MTY2MDIxLCJpc3MiOiJJU1NVRVIifQ.ywGMiq5eLNRp_xVfRgTAm3ZTnpZPWgVG0K45NJQWz1M"
-          }
-        }).then((data) => {
-          console.log(data);
-        })
-      })
+      // var body = {
+      //   alicIva: [
+      //     {
+      //       baseImp: 100,
+      //       id: 5,
+      //       importe: 21,
+      //     },
+      //   ],
+      //   asociados: [],
+      //   cbteTipo: this.object.documento.codigoDocumento,
+      //   concepto: 1,
+      //   cotizMoneda: 1,
+      //   cuit: this.objects.empresa[0].cuit,
+      //   fecha: generatedFecha,
+      //   fechaServicioHasta: generatedFecha,
+      //   fechaServicioVenc: generatedFecha,
+      //   fechaServiciodesde: generatedFecha,
+      //   fechaVencimientoPago: "0",
+      //   idMoneda: "PES",
+      //   impNeto: 100,
+      //   name: "Marcelo Agustini",
+      //   nroDesde: "",
+      //   nroDoc: 27518700,
+      //   nroHasta: "",
+      //   opcionales: [],
+      //   ptoVenta: this.objects.empresa[0].puntosVenta[0].idFiscal,
+      //   tipoDoc: 94,
+      //   tributos: [],
+      // };
 
+      //Get authorized voucher number
+      // axios
+      //   .get(
+      //     `http://localhost:8080/rest/api/facturas/obtenerUltimoNumeroAutorizado/innovare/20260027655/4/${body.cbteTipo}`,
+      //     {
+      //       headers: {
+      //         Authorization:
+      //           "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNTk3MTY2MDIxLCJpc3MiOiJJU1NVRVIifQ.ywGMiq5eLNRp_xVfRgTAm3ZTnpZPWgVG0K45NJQWz1M",
+      //       },
+      //     }
+      //   )
+      //   .then((data) => {
+          //Assign nroDesde & nroHasta
+          // body.nroDesde = data.data + 1;
+          // body.nroHasta = body.nroDesde;
+
+          //Post data & recive CAE from AFIP
+        //   axios
+        //     .post(
+        //       `http://localhost:8080/rest/api/facturas/generarComprobante/innovare`,
+        //       body,
+        //       {
+        //         headers: {
+        //           Authorization:
+        //             "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNTk3MTY2MDIxLCJpc3MiOiJJU1NVRVIifQ.ywGMiq5eLNRp_xVfRgTAm3ZTnpZPWgVG0K45NJQWz1M",
+        //         },
+        //       }
+        //     )
+        //     .then((data) => {
+        //       console.log(data);
+        //     });
+        // });
     },
     //-->
 
-    //Price Modification cases
-    updateTotal(id){
-      this.products.forEach(el =>{
-        if(el.id == id){
-          this.totalVenta -= el.total;
-          el.total = (el.precioTotal*el.cant);
-          this.totalVenta += el.total;       
-        }
-      })
-    }
+    //Info
+    info() {
+      console.log(this.objects.empresa[0].puntosVenta[0].idFiscal);
+    },
     //-->
-
   },
 };
 </script>
