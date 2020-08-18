@@ -7,13 +7,12 @@
           <v-col>
             <v-select
               type="text"
-              :items="condicioniva"
-              item-text="nombre"
+              :items="empresas"
+              item-text="alias"
               item-value="id"
-              v-model="object.condicionIva"
-              :counter="50"
+              v-model="object.empresa"
               :return-object="true"
-              label="Condición frente al IVA"
+              label="Empresa"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-select>
@@ -21,32 +20,70 @@
           <v-col>
             <v-text-field
               type="text"
-              v-model="object.razonSocial"
+              v-model="object.nombre"
               :counter="50"
-              label="Razón social"
+              label="Nombre de sucursal"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
             <v-text-field type="text"
-            v-model="object.alias" 
+            v-model="object.telefono" 
             :counter="50" 
-            label="Nombre de Fantasía / Alias" 
+            label="Teléfono" 
+            required
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field type="text"
+            v-model="object.telefonoAlternativo" 
+            :counter="50" 
+            label="Teléfono alternativo" 
             required
             ></v-text-field>
           </v-col>
           <v-col>
             <v-text-field
               type="text"
-              v-model="object.cuit"
+              v-model="object.email"
               :counter="50"
-              label="CUIT o DNI"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
+              label="Email"
             ></v-text-field>
           </v-col>
         </v-row>
+        <v-row class="ma-3">
+          <v-col>
+            <v-text-field type="text" 
+            v-model="object.provincia" 
+            :counter="50" 
+            label="Provincia"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field type="text" 
+            v-model="object.ciudad" 
+            :counter="50" 
+            label="Ciudad"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field type="text" 
+            v-model="object.direccion" 
+            :counter="50" 
+            label="Dirección"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              type="text"
+              v-model="object.nombreContacto"
+              :counter="50"
+              label="Nombre de contacto"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
         <div class="ma-1">
           <v-col class="col-6">
             <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
@@ -67,8 +104,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import EmpresasService from "../../services/EmpresasService";
-
 export default {
   data: () => ({
     valid: true,
@@ -77,12 +112,11 @@ export default {
       { id: 2, text: "Jurídica" }
     ],
     condicioniva: [],
-    object: {
-      tipoPersona: 2,
-    },
+    object: {},
+    empresas: [],
     loaded: false,
     tenant: "",
-    service: "empresas",
+    service: "sucursales",
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: ""
@@ -96,6 +130,7 @@ export default {
       this.loaded = true;
     }
     this.getCondicionesIva();
+    this.getEmpresas();
   },
   methods: {
     getObject(id) {
@@ -108,10 +143,19 @@ export default {
     },
 
     getCondicionesIva(){
-      EmpresasService(this.tenant, this.service, this.token)
-        .getIvaConditions()
+      GenericService(this.tenant, "condicionesFiscales", this.token)
+        .getAll()
         .then(data => {
-          this.condicioniva = data.data;
+          this.condicioniva = data.data.content;
+          console.log(this.condicioniva);
+        });
+    },
+
+    getEmpresas(){
+      GenericService(this.tenant, "empresas", this.token)
+        .getAll()
+        .then(data => {
+          this.empresas = data.data.content;
         });
     },
 
@@ -120,7 +164,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
-          this.$router.push({ name: "empresas" });
+          this.$router.push({ name: "sucursales" });
         })
         .catch(error => {
           if (error.response.status == 500) {
@@ -131,7 +175,7 @@ export default {
     },
 
     back() {
-      this.$router.push({ name: "empresas" });
+      this.$router.push({ name: "sucursales" });
     }
   }
 };

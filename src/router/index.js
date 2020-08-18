@@ -37,6 +37,8 @@ import Empresas from '../views/Empresas/Empresas.vue'
 import EmpresasForm from '../views/Empresas/EmpresasForm.vue'
 import PuntosVenta from '../views/PuntosVenta/PuntosVenta.vue'
 import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm.vue'
+import Sucursales from '../views/Sucursales/Sucursales.vue'
+import SucursalesForm from '../views/Sucursales/SucursalesForm.vue'
 
 Vue.use(VueRouter)
 
@@ -260,6 +262,18 @@ const routes = [
                 path: 'puntos_venta/form/:id',
                 name: 'puntosVentaForm',
                 component: PuntosVentaForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'sucursales',
+                name: 'sucursales',
+                component: Sucursales,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'sucursales/form/:id',
+                name: 'sucursalesForm',
+                component: SucursalesForm,
                 meta: { requiresAuth: true }
             },
             {

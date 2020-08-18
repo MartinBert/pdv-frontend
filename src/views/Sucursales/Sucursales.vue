@@ -27,17 +27,20 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Razón Social</th>
-            <th>CUIT</th>
-            <th>Detalles</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Dirección</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
             <td>{{object.id}}</td>
-            <td>{{object.razonSocial}}</td>
-            <td>{{object.cuit}}</td>
+            <td>{{object.nombre}}</td>
+            <td>{{object.telefono}}</td>
+            <td>{{object.email}}</td>
+            <td>{{object.direccion}}</td>
             <td>
                 <v-icon title="Stock" @click="showStock(object.id)">mdi-text-box</v-icon>
             </td>
@@ -101,7 +104,7 @@ export default {
     },
     loaded: false,
     tenant: "",
-    service: "empresas",
+    service: "sucursales",
     token: localStorage.getItem("token"),
     dialogDeleteObject: false
   }),
@@ -127,11 +130,11 @@ export default {
     },
 
     newObject: function() {
-      this.$router.push({ name: "empresasForm", params: { id: 0 } });
+      this.$router.push({ name: "sucursalesForm", params: { id: 0 } });
     },
 
     edit: function(id) {
-      this.$router.push({ name: "empresasForm", params: { id: id } });
+      this.$router.push({ name: "sucursalesForm", params: { id: id } });
     },
 
     filterObjects: function(filter){

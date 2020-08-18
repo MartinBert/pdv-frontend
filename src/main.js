@@ -17,11 +17,7 @@ Vue.use(Vuex)
 Vue.use(VueBarcodeScanner, options)
 Vue.use(colors)
 const store = new Vuex.Store({
-  state: {
-    warehouseIdObjects: "",
-  },
-  mutations: {
-  }
+  state:{}
 })
 
 new Vue({

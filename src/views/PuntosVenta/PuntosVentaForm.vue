@@ -23,12 +23,12 @@
           <v-col>
             <v-select
               type="text"
-              :items="empresas"
+              :items="sucursales"
               item-text="nombre"
               item-value="id"
-              v-model="object.empresa"
+              v-model="object.sucursal"
               :return-object="true"
-              label="Empresa"
+              label="Sucursales donde funciona"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-select>
@@ -57,7 +57,7 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     valid: true,
-    empresas: [],
+    sucursales: [],
     object: {},
     loaded: false,
     tenant: "",
@@ -74,7 +74,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getEmpresas();
+    this.getSucursales();
   },
   methods: {
     getObject(id) {
@@ -86,11 +86,11 @@ export default {
         });
     },
 
-    getEmpresas(){
-      GenericService(this.tenant, "empresas", this.token)
+    getSucursales(){
+      GenericService(this.tenant, "sucursales", this.token)
         .getAll()
         .then(data => {
-          this.empresas = data.data.content;
+          this.sucursales = data.data.content;
         });
     },
 

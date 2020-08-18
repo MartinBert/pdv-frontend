@@ -31,6 +31,50 @@
           </v-col>
         </v-row>
         <v-row class="ma-1">
+          <v-col class="d-flex col-6">
+            <v-select
+              @input="getSucursales"
+              :items="empresas"
+              v-model="object.empresa"
+              item-text="alias"
+              label="Empresa"
+              required
+              :return-object="true"              
+              :rules="[v => !!v || 'Campo requerido']"
+            >
+            </v-select>
+          </v-col>
+        </v-row>
+        <v-row class="ma-1">
+          <v-col class="d-flex col-6">
+            <v-select
+              @input="getPuntosVenta"
+              :items="sucursales"
+              v-model="object.sucursal"
+              item-text="nombre"
+              label="Sucursal"
+              required
+              :return-object="true"              
+              :rules="[v => !!v || 'Campo requerido']"
+            >
+            </v-select>
+          </v-col>
+        </v-row>
+        <v-row class="ma-1">
+          <v-col class="d-flex col-6">
+            <v-select
+              :items="puntos_venta"
+              v-model="object.puntoVenta"
+              item-text="nombre"
+              label="Punto de venta"
+              required
+              :return-object="true"              
+              :rules="[v => !!v || 'Campo requerido']"
+            >
+            </v-select>
+          </v-col>
+        </v-row>
+        <v-row class="ma-1">
           <v-col class="col-6">
             <v-text-field
               type="text"
@@ -93,6 +137,9 @@ export default {
     perfiles: null,
     object: {},
     perfil: {},
+    empresas: [],
+    sucursales: [],
+    puntos_venta: [],
     loaded: false,
     changePassword: false,
     tenant: "",
@@ -104,6 +151,7 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getPerfiles();
+    this.getEmpresas();
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
@@ -126,6 +174,22 @@ export default {
         .then(data => {
           this.perfiles = data.data.content;
         });
+    },
+
+    getEmpresas() {
+      GenericService(this.tenant, "empresas", this.token)
+        .getAll(0, 100)
+        .then(data => {
+          this.empresas = data.data.content;
+        });
+    },
+
+    getSucursales(){
+      this.sucursales = this.object.empresa.sucursales;
+    },
+
+    getPuntosVenta(){
+      this.puntos_venta = this.object.sucursal.puntosVenta
     },
 
     save() {
