@@ -26,6 +26,9 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
+        <div class="PDFtemplate">
+          aasdfa
+        </div>
         <v-row class="ma-5">
           <v-col cols="9">
             <v-card>
@@ -93,8 +96,8 @@
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
-import verify from "jsonwebtoken";
 import axios from "axios";
+import jsPDF from "jspdf";
 
 export default {
   data: () => ({
@@ -125,9 +128,9 @@ export default {
   computed: {
     totalVenta() {
       var tot = 0;
-      this.products.forEach(el => {
+      this.products.forEach((el) => {
         tot += parseFloat(el.total);
-      })
+      });
       return tot;
     },
   },
@@ -155,7 +158,7 @@ export default {
       .then((data) => {
         this.objects.empresa = data.data.content;
       });
-    
+
     this.getUser();
     //-->
   },
@@ -205,13 +208,13 @@ export default {
         });
     },
 
-    updateTotal(id){
-      this.products.forEach(el =>{
-        if(el.id == id){
+    updateTotal(id) {
+      this.products.forEach((el) => {
+        if (el.id == id) {
           el.total = 0;
-          el.total = parseFloat(el.precioTotal)*el.cant;
+          el.total = parseFloat(el.precioTotal) * el.cant;
         }
-      })
+      });
     },
     //-->
 
@@ -237,12 +240,12 @@ export default {
         .get(
           `${process.env.VUE_APP_SERVER}/${this.tenant}/api/usuarios/getLogued`,
           {
-            headers: { Authorization: "Bearer " + this.token }
+            headers: { Authorization: "Bearer " + this.token },
           }
         )
-        .then(response => {
+        .then((response) => {
           this.user = response.data;
-        })
+        });
     },
 
     //Save sale on database and print comercial document
@@ -256,27 +259,33 @@ export default {
 
       //Instance empresa & ptoVenta of body document
       var tipoDoc;
-      var cuit =  this.user.empresa.cuit;
+      var cuit = this.user.empresa.cuit;
       var razonSocial = this.user.empresa.razonSocial;
       var ptoVenta = this.user.puntoVenta.idFiscal;
-      if(this.object.documento.ivaCat == 1){
-         tipoDoc = 80;
-      }else{
+      if (this.object.documento.ivaCat == 1) {
+        tipoDoc = 80;
+      } else {
         tipoDoc = 94;
       }
-      
+
       //Instance alicIva  & impNeto of body document
-      var alicIva = [{
-        baseImp: 0,
-        id: 5,
-        importe: 0,
-      }]
-      if(this.object.documento.ivaCat == 2 || this.object.documento.ivaCat == 1){
+      var alicIva = [
+        {
+          baseImp: 0,
+          id: 5,
+          importe: 0,
+        },
+      ];
+      if (
+        this.object.documento.ivaCat == 2 ||
+        this.object.documento.ivaCat == 1
+      ) {
         var impNeto;
-        alicIva[0].baseImp = Math.round((this.totalVenta / 1.21)*100)/ 100;
-        alicIva[0].importe = Math.round((this.totalVenta - alicIva[0].baseImp)*100) / 100;
+        alicIva[0].baseImp = Math.round((this.totalVenta / 1.21) * 100) / 100;
+        alicIva[0].importe =
+          Math.round((this.totalVenta - alicIva[0].baseImp) * 100) / 100;
         impNeto = alicIva[0].baseImp;
-      }else{
+      } else {
         alicIva = [];
       }
 
@@ -334,7 +343,15 @@ export default {
               }
             )
             .then((data) => {
-              console.log(data);
+              console.log(data.data);
+              const doc = new jsPDF();
+              /** WITHOUT CSS */
+              const contentHtml = document.getElementsByTagName('v-simple-table');
+              console.log(contentHtml);
+              doc.fromHTML(contentHtml, 15, 15, {
+                  width: 170
+                });
+              doc.save("sample.pdf");
             });
         });
     },
@@ -342,9 +359,7 @@ export default {
 
     //Info
     info() {
-      var decodeUser = verify.decode(this.token.replace("Bearer ", ""));
-      var user = decodeUser.sub.slice(0, decodeUser.sub.indexOf("/"))
-      console.log(user);
+      console.log(document.getElementsByClassName('PDFtemplate'));
     },
     //-->
   },

@@ -31,6 +31,7 @@
             <th>Nombre</th>
             <th>Usuario</th>
             <th>Perfil</th>
+            <th>Empresa</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -40,6 +41,10 @@
             <td>{{object.nombre}}</td>
             <td>{{object.username}}</td>
             <td>{{object.perfil.nombre}}</td>
+            <td>
+              <span v-if="object.empresa == null">Todas</span>
+              <span v-if="object.empresa != null">{{object.empresa.alias}}</span>
+            </td>
             <td>
               <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
               <v-icon title="Eliminar" @click="openDelete(object.id)">mdi-delete</v-icon>
@@ -118,6 +123,7 @@ export default {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
+          console.log(this.objects)
         });
     },
 
