@@ -97,7 +97,6 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import axios from "axios";
-import jsPDF from "jspdf";
 
 export default {
   data: () => ({
@@ -344,14 +343,6 @@ export default {
             )
             .then((data) => {
               console.log(data.data);
-              const doc = new jsPDF();
-              /** WITHOUT CSS */
-              const contentHtml = document.getElementsByTagName('v-simple-table');
-              console.log(contentHtml);
-              doc.fromHTML(contentHtml, 15, 15, {
-                  width: 170
-                });
-              doc.save("sample.pdf");
             });
         });
     },
