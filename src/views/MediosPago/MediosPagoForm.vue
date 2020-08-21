@@ -20,7 +20,7 @@
                 v-model="object.planPago"
                 multiple
                 item-text="nombre"
-                label="Medios de pago"
+                label="Planes de pago"
                 :return-object="true"
                 :rules="[v => !!v || 'Campo requerido...']"
               ></v-autocomplete>

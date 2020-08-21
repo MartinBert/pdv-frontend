@@ -5,17 +5,14 @@
         <v-col cols="1">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-col cols="2">
-          <div>
-            <v-btn class="primary" raised @click="findFile">IMPORTAR</v-btn>
-            <input
-              ref="uploader"
-              class="d-none"
-              type="file"
-              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              @change="onChange"
-            />
-          </div>
+        <v-col cols="3">
+          <v-file-input
+          v-model="file" 
+          class="mt-0"
+          placeholder="Importar productos"
+          accept=".xlsx, xls"
+          @change="onChange($event)"
+          ></v-file-input>
         </v-col>
         <v-col cols="2">
           <v-select
@@ -358,7 +355,8 @@ export default {
 
     //Importar productos
     onChange: function(event) {
-      this.file = event.target.files ? event.target.files[0] : null;
+      console.log(event);
+      this.file = event;
       var excel = [];
       var reader = new FileReader();
       reader.onload = e => {
@@ -378,13 +376,16 @@ export default {
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
+            .then(function(data){
+              console.log(data)
+            })
             .then(() => {
               this.getAll(this.paginate.page - 1, this.paginate.size);
               this.loaderStatus = true;
               window.setTimeout(()=>{
                 this.loader = false
                 this.loaderStatus=false;
-              }, 2000);              
+              }, 2000);    
             });
         }
       };
@@ -392,7 +393,7 @@ export default {
     },
 
     validateImport: function(objects) {
-      this.loader = true;
+      console.log(objects);
       var importacion = {
         status: true,
         data: [],
@@ -401,24 +402,32 @@ export default {
       objects.forEach((element, index) => {
         if (
           element.nombre &&
-          element.codigo_barra &&
-          element.id_depositos &&
-          element.precio_total
+          element.codigoBarra &&
+          element.codigoProducto &&
+          element.ganancia &&
+          element.precioTotal
         ) {
+          var iva = 21 / 100;
+          var ganancia = element.ganancia / 100;
           var obj = {
             nombre: element.nombre,
-            codigoBarra: String(element.codigo_barra),
-            codigoProducto: String(element.codigo_producto),
-            marca: this.getMarca(element.id_marca),
-            rubro: this.getRubro(element.id_rubro),
+            codigoBarra: String(element.codigoBarra),
+            codigoProducto: String(element.codigoProducto),
+            marca: this.getMarca(element.idMarca),
+            rubro: this.getRubro(element.idRubro),
             propiedad: element.propiedad,
             distribuidores: this.getDistribuidores(
-              String(element.id_distribuidores)
+              String(element.idDistribuidores)
             ),
-            depositos: this.getDepositos(String(element.id_depositos)),
-            precioCosto: element.precio_costo,
+            precioCosto: ((element.precioTotal / (1 + ganancia)) / (1+iva)).toFixed(2),
+            depositos: this.getDepositos(String(element.idDepositos)),
+            costoNeto: (((element.precioTotal / (1 + ganancia)) / (1+iva))/(1+iva)).toFixed(2),
+            costoBruto: ((element.precioTotal / (1 + ganancia)) / (1+iva)).toFixed(2),
+            ivaCompra: (((element.precioTotal / (1 + ganancia)) / (1+iva)) - ((element.precioTotal / (1 + ganancia)) / (1+iva))/(1+iva)).toFixed(2),
             ganancia: element.ganancia,
-            precioTotal: element.precio_total,
+            precioSinIva: (element.precioTotal / (1 + iva)).toFixed(2),
+            ivaVenta: (element.precioTotal - (element.precioTotal / (1 + iva))).toFixed(2),
+            precioTotal: element.precioTotal,
             estado: 1
           };
           importacion.data.push(obj);
