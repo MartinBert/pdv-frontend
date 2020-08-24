@@ -2,10 +2,19 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="6">
+        <v-col cols="1">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-col cols="3"></v-col>
+        <v-col cols="3">
+          <v-file-input
+          v-model="file" 
+          class="mt-0"
+          placeholder="Importar productos"
+          accept=".xlsx, xls"
+          @change="onChange($event)"
+          ></v-file-input>
+        </v-col>
+        <v-col cols="5"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
@@ -111,10 +120,12 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import XLSX from 'xlsx';
 
 export default {
   data: () => ({
     plans: "",
+    file: null,
     objects: [],
     filterString: "",
     paginate: {
@@ -187,6 +198,94 @@ export default {
         .then(() => {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         });
+    },
+
+    onChange: function(event) {
+      console.log(event);
+      this.file = event;
+      var excel = [];
+      var reader = new FileReader();
+      reader.onload = e => {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, { type: "binary" });
+
+        var sheet_name_list = workbook.SheetNames;
+        sheet_name_list.forEach(function(y) {
+          var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+          if (exceljson.length > 0) {
+            for (var i = 0; i < exceljson.length; i++) {
+              excel.push(exceljson[i]);
+            }
+          }
+        });
+        var prod = this.validateImport(excel);
+        if (prod.status) {
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(prod.data)
+            .then(function(data){
+              console.log(data)
+            })
+            .then(() => {
+              this.getAll(this.paginate.page - 1, this.paginate.size);
+              this.loaderStatus = true;
+              window.setTimeout(()=>{
+                this.loader = false
+                this.loaderStatus=false;
+              }, 2000);    
+            });
+        }
+      };
+      reader.readAsBinaryString(this.file);
+    },
+
+    validateImport: function(objects) {
+      console.log(objects);
+      var importacion = {
+        status: true,
+        data: [],
+        message: ""
+      };
+      objects.forEach((element, index) => {
+        if (
+          element.nombre 
+        ) {
+          var obj = {
+            nombre: element.nombre,
+            planPago: this.getPlanesPago(
+              String(element.idPlanes)
+            )
+          };
+          importacion.data.push(obj);
+        } else {
+          importacion.status = false;
+          importacion.message = "Faltan datos en el renglón " + (index + 2);
+        }
+      });
+      return importacion;
+    },
+
+    getPlanesPago: function(d) {
+      var plans = [];
+      if (this.plans && d) {
+        var exp = d.match("-");
+        if (exp) {
+          var stringIds = d.split("-");
+          this.plans.forEach(element => {
+            stringIds.forEach(s => {
+              if (element.id == Number(s)) {
+                plans.push(element);
+              }
+            });
+          });
+        } else {
+          this.plans.forEach(element => {
+            if (element.id == d) {
+              plans.push(element);
+            }
+          });
+        }
+      }
+      return plans;
     }
   }
 };
