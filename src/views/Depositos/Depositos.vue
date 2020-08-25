@@ -3,10 +3,19 @@
     <h3>Depositos</h3>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="6">
+        <v-col cols="1">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-col cols="3"></v-col>
+        <v-col cols="3">
+          <v-file-input
+          v-model="file" 
+          class="mt-0"
+          placeholder="Importar depósitos"
+          accept=".xlsx, xls"
+          @change="importDocuments($event)"
+          ></v-file-input>
+        </v-col>
+        <v-col cols="5"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
@@ -31,7 +40,6 @@
             <th>Nombre</th>
             <th>Dirección</th>
             <th>Telefono</th>
-            <th>Stock</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -41,9 +49,6 @@
             <td>{{object.nombre}}</td>
             <td>{{object.direccion}}</td>
             <td>{{object.telefono}}</td>
-            <td>
-                <v-icon title="Stock" @click="showStock(object.id)">mdi-text-box</v-icon>
-            </td>
             <td>
               <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
               <v-icon title="Eliminar" @click="openDelete(object.id)">mdi-delete</v-icon>
@@ -92,10 +97,12 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import XLSX from 'xlsx';
 
 export default {
   data: () => ({
     objects: [],
+    file: null,
     filterString: "",
     paginate: {
       page: 1,
@@ -161,6 +168,67 @@ export default {
         .then(() => {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         });
+    },
+
+    importDocuments: function(event) {
+      this.file = event;
+      var excel = [];
+      var reader = new FileReader();
+      reader.onload = e => {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, { type: "binary" });
+
+        var sheet_name_list = workbook.SheetNames;
+        sheet_name_list.forEach(function(y) {
+          var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+          if (exceljson.length > 0) {
+            for (var i = 0; i < exceljson.length; i++) {
+              excel.push(exceljson[i]);
+            }
+          }
+        });
+        var doc = this.validateImport(excel);
+        if (doc.status) {
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(doc.data)
+            .then(() => {
+              this.getAll(this.paginate.page - 1, this.paginate.size);
+              this.loaderStatus = true;
+              window.setTimeout(()=>{
+                this.loader = false
+                this.loaderStatus=false;
+              }, 2000);              
+            });
+        }
+      };
+      reader.readAsBinaryString(this.file);
+    },
+
+    validateImport: function(objects) {
+      this.loader = true;
+      var importacion = {
+        status: true,
+        data: [],
+        message: ""
+      };
+      objects.forEach((element, index) => {
+        if (
+          element.nombre &&
+          element.direccion &&
+          element.telefono
+        ) {
+          var obj = {
+            nombre: element.nombre,
+            direccion: element.direccion,
+            telefono: element.telefono
+          };
+          importacion.data.push(obj);
+        } else {
+          importacion.status = false;
+          importacion.message = "Faltan datos en el renglón " + (index + 2);
+        }
+      });
+      return importacion;
     }
   }
 };

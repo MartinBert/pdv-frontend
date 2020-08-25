@@ -38,9 +38,7 @@
               v-model="object.empresa"
               item-text="alias"
               label="Empresa"
-              required
-              :return-object="true"              
-              :rules="[v => !!v || 'Campo requerido']"
+              :return-object="true"
             >
             </v-select>
           </v-col>
@@ -53,9 +51,7 @@
               v-model="object.sucursal"
               item-text="nombre"
               label="Sucursal"
-              required
               :return-object="true"              
-              :rules="[v => !!v || 'Campo requerido']"
             >
             </v-select>
           </v-col>
@@ -67,9 +63,7 @@
               v-model="object.puntoVenta"
               item-text="nombre"
               label="Punto de venta"
-              required
-              :return-object="true"              
-              :rules="[v => !!v || 'Campo requerido']"
+              :return-object="true"
             >
             </v-select>
           </v-col>

@@ -9,7 +9,7 @@
           <v-file-input
           v-model="file" 
           class="mt-0"
-          placeholder="Importar Marcas"
+          placeholder="Importar marcas"
           accept=".xlsx, xls"
           @change="importDocuments($event)"
           ></v-file-input>

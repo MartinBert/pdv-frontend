@@ -9,7 +9,7 @@
           <v-file-input
           v-model="file" 
           class="mt-0"
-          placeholder="Importar Rubros"
+          placeholder="Importar rubros"
           accept=".xlsx, xls"
           @change="importDocuments($event)"
           ></v-file-input>
