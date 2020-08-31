@@ -33,7 +33,6 @@
         </v-card>
       </v-container>
     </v-col>
-    <a href="https://donweb.com/es-ar/certificados-ssl" id="comodoTL" title="Certificados SSL Argentina">Certificados SSL Argentina</a>
   </v-row>
 </template>
 <script>

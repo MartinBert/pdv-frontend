@@ -47,6 +47,6 @@ export default (tenant,service,token) =>{
                     });
                 }
             });
-        }
+        },
     }
 }

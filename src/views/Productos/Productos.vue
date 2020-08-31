@@ -2,8 +2,9 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="1">
+        <v-col cols="2">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          <v-btn class="primary ml-3" @click="getReport()" raised>Reportes</v-btn>
         </v-col>
         <v-col cols="3">
           <v-file-input
@@ -177,6 +178,7 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import ReportsService from "../../services/ReportsService";
 import XLSX from "xlsx";
 
 export default {
@@ -509,6 +511,10 @@ export default {
         }
       }
       return depositos;
+    },
+
+    getReport(){
+      ReportsService(this.tenant,this.service,this.token).listAll();
     }
   }
 };
