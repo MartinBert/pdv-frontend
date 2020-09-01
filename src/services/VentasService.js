@@ -16,9 +16,18 @@ export default (tenant,service,token) =>{
         },
 
         getDate: function(){
-            var fecha = new Date();
-            var generatedFecha = fecha.getFullYear().toString() + ("0" + (fecha.getMonth() + 1)).toString() + fecha.getDate().toString();
-            return generatedFecha;
+            var generatedFecha = new Date();
+            var day = generatedFecha.getDate().toString();
+            if(day.length == 1){
+                day = "0" + day;
+            }
+            var month = (generatedFecha.getMonth() + 1).toString();
+            if(month.length == 1){
+                month = "0" + month;
+            }
+            var fecha = generatedFecha.getFullYear().toString() + month + day;
+            
+            return fecha;
         }
     }
 }

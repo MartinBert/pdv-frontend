@@ -38,6 +38,7 @@
             <th>ID</th>
             <th>Nombre</th>
             <th>Tipo de documento</th>
+            <th>Letra</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -49,6 +50,7 @@
               <v-alert type="success" dense v-if="object.tipo" width="30%">Fiscal</v-alert>
               <v-alert color="secondary" icon="mdi-close-circle" dense dark width="30%" v-if="!object.tipo">No fiscal</v-alert>
             </td>
+            <td>{{object.letra}}</td>
             <td>
               <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
               <v-icon title="Eliminar" @click="openDelete(object.id)">mdi-delete</v-icon>
@@ -216,6 +218,7 @@ export default {
           element.nombre &&
           element.codigoDocumento &&
           element.tipo  &&
+          element.letra &&
           element.ivaCat 
         ) {
           var obj = {
@@ -223,6 +226,7 @@ export default {
             codigoDocumento: String(element.codigoDocumento),
             tipo: Boolean(element.tipo),
             ivaCat: element.ivaCat,
+            letra: String(element.letra),
             activo: true,
           };
           importacion.data.push(obj);

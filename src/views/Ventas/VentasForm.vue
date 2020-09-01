@@ -245,7 +245,7 @@ export default {
     
 
     //Save sale on database and print comercial document
-    save() {    
+    save() {
       var tipoDoc;
       if (this.object.documento.ivaCat == 1) {
         tipoDoc = 80;
@@ -332,7 +332,32 @@ export default {
               }
             )
             .then((data) => {
-              console.log(data.data);
+
+              var respCabAfip = data.data.feCabResp;
+              var respDetAfip = data.data.feDetResp;
+              console.log(respCabAfip)
+              console.log(respDetAfip)
+
+              var comprobante = {
+                letra:this.object.documento.letra,
+                numeroCbte:body.nroDesde,
+                fechaEmision:respCabAfip.fchProceso,
+                fechaVto:respDetAfip[0].caefchVto,
+                condicionVenta:true,
+                productos:this.products,
+                barCode:respDetAfip[0].barcode,
+                cae:respDetAfip[0].cae,
+                puntoVenta:this.user.puntoVenta,
+                sucursal:this.user.sucursal,
+                documentoComercial: this.object.documento,
+                empresa:this.user.empresa,
+                cliente:this.object.cliente
+              }
+
+              console.log(comprobante);
+
+              GenericService(this.tenant, "comprobantesFiscales", this.token)
+                .save(comprobante)
             });
         });
     },
