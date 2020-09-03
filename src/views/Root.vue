@@ -237,7 +237,7 @@ export default {
         name: "configuraciones",
         title: "Configuraciones",
         visible: false,
-        icon: "mdi-account-outline",
+        icon: "mdi-cog-outline",
         childs: [
           {
             path: "/empresa",
