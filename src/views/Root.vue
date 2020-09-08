@@ -1,12 +1,12 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" app clipped>
+    <v-navigation-drawer v-model="drawer" app clipped style="font-family: Cocogose" width="17%">
       <v-list nav dense>
         <div v-for="m in modulosVisibles" :key="m.name">
           <v-list-group v-if="m.childs && m.childs.length > 0">
             <template v-slot:activator>
               <v-list-item-action>
-                <v-icon>{{m.icon}}</v-icon>
+                <img v-bind:src="m.icon" height="40" width="40"/>
               </v-list-item-action>
               <v-list-item-title>{{m.title}}</v-list-item-title>
             </template>
@@ -42,7 +42,7 @@
 
       <v-menu offset-y>
         <template v-slot:activator="{ on }">
-          <v-icon large v-on="on">mdi-account-circle-outline</v-icon>
+          <a><img src="/../../images/icons/perfil.svg" v-on="on" height="50" width="50" style="border-radius: 50% 50% 50% 50%; border: solid 2px #E7ECED;"></a>
         </template>
         <v-card class="mx-auto" max-width="344" outlined>
           <v-list-item three-line>
@@ -61,7 +61,7 @@
     </v-app-bar>
 
     <v-content>
-      <v-container class="d-flex justify-center" fluid>
+      <v-container class="d-flex justify-center root-container" fluid>
         <router-view></router-view>
       </v-container>
     </v-content>
@@ -85,7 +85,7 @@ export default {
         name: "ventas",
         title: "Ventas",
         visible: false,
-        icon: "mdi-point-of-sale",
+        icon: "/../images/icons/ico_01.svg",
         childs: [
           {
             path: "/ventas",
@@ -105,7 +105,7 @@ export default {
         name: "productos",
         title: "Productos",
         visible: false,
-        icon: "mdi-barcode-scan",
+        icon: "/../images/icons/ico_02.svg",
         childs: [
           {
             path: "/productos",
@@ -137,7 +137,7 @@ export default {
         name: "documentos",
         title: "Doc. Comerciales",
         visible: false,
-        icon: "mdi-text-box-outline",
+        icon: "/../images/icons/ico_03.svg",
         childs: [
           {
             path: "/documentos_comerciales",
@@ -151,7 +151,7 @@ export default {
         name: "mediosPago",
         title: "Medios de Pago",
         visible: false,
-        icon: "mdi-credit-card-outline",
+        icon: "/../images/icons/ico_04.svg",
         childs: [
           {
             path: "/medios_de_pago",
@@ -171,7 +171,7 @@ export default {
         name: "personas",
         title: "Personas",
         visible: false,
-        icon: "mdi-account-group-outline",
+        icon: "/../images/icons/ico_05.svg",
         childs: [
           {
             path: "/clientes",
@@ -203,7 +203,7 @@ export default {
         name: "relaciones",
         title: "Relaciones",
         visible: false,
-        icon: "mdi-link-variant",
+        icon: "/../images/icons/ico_06.svg",
         childs: [
           {
             path: "/condiciones_fiscales",
@@ -217,7 +217,7 @@ export default {
         name: "usuarios",
         title: "Usuarios",
         visible: false,
-        icon: "mdi-account-outline",
+        icon: "/../images/icons/ico_07.svg",
         childs: [
           {
             path: "/usuarios",
@@ -237,7 +237,7 @@ export default {
         name: "configuraciones",
         title: "Configuraciones",
         visible: false,
-        icon: "mdi-cog-outline",
+        icon: "/../images/icons/ico_08.svg",
         childs: [
           {
             path: "/empresa",

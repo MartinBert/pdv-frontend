@@ -1,5 +1,5 @@
 <template>
-  <v-card width="100%">
+  <v-card width="100%" style="background-color: transparent;">
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <v-col cols="12">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
@@ -26,13 +26,9 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
-        <div class="PDFtemplate">
-          aasdfa
-        </div>
         <v-row class="ma-5">
           <v-col cols="9">
-            <v-card>
-              <v-simple-table>
+              <v-simple-table style="background-color: transparent;">
                 <template v-slot:default>
                   <thead>
                     <tr>
@@ -60,7 +56,6 @@
                 <v-col cols="1"></v-col>
                 <v-col>TOTAL: ${{(totalVenta)}}</v-col>
               </v-row>
-            </v-card>
           </v-col>
         </v-row>
         <v-row class="ma-5">

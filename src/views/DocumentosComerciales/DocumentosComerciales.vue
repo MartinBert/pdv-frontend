@@ -31,7 +31,7 @@
     </v-form>
 
     <!-- List -->
-    <v-simple-table>
+    <v-simple-table style="background-color: transparent;">
       <template v-slot:default>
         <thead>
           <tr>
@@ -47,13 +47,13 @@
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
             <td>
-              <v-alert type="success" dense v-if="object.tipo" width="30%">Fiscal</v-alert>
-              <v-alert color="secondary" icon="mdi-close-circle" dense dark width="30%" v-if="!object.tipo">No fiscal</v-alert>
+              <v-alert type="success" dense v-if="object.tipo">Fiscal</v-alert>
+              <v-alert color="secondary" icon="mdi-close-circle" dense dark v-if="!object.tipo">No fiscal</v-alert>
             </td>
             <td>{{object.letra}}</td>
             <td>
-              <v-icon title="Editar" @click="edit(object.id)">mdi-pencil</v-icon>
-              <v-icon title="Eliminar" @click="openDelete(object.id)">mdi-delete</v-icon>
+              <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
+              <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
             </td>
           </tr>
         </tbody>
