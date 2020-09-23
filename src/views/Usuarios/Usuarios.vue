@@ -123,7 +123,6 @@ export default {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
-          console.log(this.objects)
         });
     },
 

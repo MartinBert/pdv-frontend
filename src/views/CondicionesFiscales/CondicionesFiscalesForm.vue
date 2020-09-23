@@ -92,7 +92,6 @@ export default {
         .getAll(page, size)
         .then(data => {
           this.documentos = data.data.content;
-          console.log(this.documentos);
         });
     },
 

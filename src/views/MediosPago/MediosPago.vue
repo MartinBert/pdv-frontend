@@ -201,7 +201,6 @@ export default {
     },
 
     onChange: function(event) {
-      console.log(event);
       this.file = event;
       var excel = [];
       var reader = new FileReader();
@@ -222,9 +221,6 @@ export default {
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
-            .then(function(data){
-              console.log(data)
-            })
             .then(() => {
               this.getAll(this.paginate.page - 1, this.paginate.size);
               this.loaderStatus = true;
@@ -239,7 +235,6 @@ export default {
     },
 
     validateImport: function(objects) {
-      console.log(objects);
       var importacion = {
         status: true,
         data: [],
