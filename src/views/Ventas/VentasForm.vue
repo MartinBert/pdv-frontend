@@ -1,96 +1,102 @@
 <template>
-  <v-card width="100%" style="background-color: transparent;">
+  <v-container>
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <v-col cols="12">
-      <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
-        <v-row class="ma-5">
-          <v-col cols="5">
-            <v-autocomplete
-              @change="getComercialDocuments(object.cliente.condicionIva.documentos, user.empresa.condicionIva.documentos)"
-              v-model="object.cliente"
-              :items="objects.clientes"
-              item-text="razonSocial"
-              :return-object="true"
-              :rules="[v => !!v || 'Campo requerido...']"
-              placeholder="Seleccione un cliente..."
-            ></v-autocomplete>
-          </v-col>
-          <v-col cols="4">
-            <v-autocomplete
-              v-model="object.documento"
-              :items="objects.documentos"
-              item-text="nombre"
-              :return-object="true"
-              :rules="[v => !!v || 'Campo requerido...']"
-              placeholder="Seleccione un tipo de comprobante..."
-            ></v-autocomplete>
-          </v-col>
-        </v-row>
-        <v-row class="ma-5">
-          <v-col cols="9">
-              <v-simple-table style="background-color: transparent;">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">Producto</th>
-                      <th class="text-left">Codigo de barras</th>
-                      <th class="text-left">Cantidad</th>
-                      <th class="text-left">Precion unitario</th>
-                      <th class="text-left">Precion total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="p in products" :key="p.id">
-                      <td>{{ p.nombre }}</td>
-                      <td>{{ p.codigoBarra }}</td>
-                      <td>
-                        <input type="number" @input="updateTotal(p.id)" v-model="p.cant" />
-                      </td>
-                      <td>${{ p.precioTotal }}</td>
-                      <td>${{ p.total }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
+      <v-row>
+          <v-col cols="10">
+            <v-form ref="form" v-model="valid" :lazy-validation="false">
               <v-row>
-                <v-col cols="1"></v-col>
-                <v-col>TOTAL: ${{(totalVenta)}}</v-col>
+                <v-col cols="6">
+                  <v-autocomplete
+                    @change="getComercialDocuments(object.cliente.condicionIva.documentos, user.empresa.condicionIva.documentos)"
+                    v-model="object.cliente"
+                    :items="objects.clientes"
+                    item-text="razonSocial"
+                    :return-object="true"
+                    :rules="[v => !!v || 'Campo requerido...']"
+                    placeholder="Seleccione un cliente..."
+                  ></v-autocomplete>
+                </v-col>
+                <v-col cols="6">
+                  <v-autocomplete
+                    v-model="object.documento"
+                    :items="objects.documentos"
+                    item-text="nombre"
+                    :return-object="true"
+                    :rules="[v => !!v || 'Campo requerido...']"
+                    placeholder="Seleccione un tipo de comprobante..."
+                  ></v-autocomplete>
+                </v-col>
+                <v-col cols="6">
+                  <v-autocomplete
+                    @change="getPaymentPlans(object.mediosPago)"
+                    v-model="object.mediosPago"
+                    :items="objects.medios_de_pago"
+                    item-text="nombre"
+                    :return-object="true"
+                    :rules="[v => !!v || 'Campo requerido...']"
+                    placeholder="Seleccione un medio de pago..."
+                  ></v-autocomplete>
+                </v-col>
+                <v-col cols="6">
+                  <v-autocomplete
+                    v-model="object.planPago"
+                    :items="objects.planes"
+                    item-text="nombre"
+                    :return-object="true"
+                    :rules="[v => !!v || 'Campo requerido...']"
+                    placeholder="Seleccione un plan de pago..."
+                  ></v-autocomplete>
+                </v-col>
               </v-row>
+              <v-row>
+                <v-col cols="12">
+                    <v-simple-table style="background-color: transparent;">
+                      <template v-slot:default>
+                        <thead>
+                          <tr>
+                            <th class="text-left">Producto</th>
+                            <th class="text-left">Codigo de barras</th>
+                            <th class="text-left">Cantidad</th>
+                            <th class="text-left">Precion unitario</th>
+                            <th class="text-left">Precion total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="p in products" :key="p.id">
+                            <td>{{ p.nombre }}</td>
+                            <td>{{ p.codigoBarra }}</td>
+                            <td>
+                              <input type="number" @input="updateTotal(p.id)" v-model="p.cant" />
+                            </td>
+                            <td>${{ p.precioTotal }}</td>
+                            <td>${{ p.total }}</td>
+                          </tr>
+                        </tbody>
+                      </template>
+                    </v-simple-table>
+                    <v-row>
+                      <v-col cols="1"></v-col>
+                      <v-col>TOTAL: ${{(totalVenta)}}</v-col>
+                    </v-row>
+                </v-col>
+              </v-row>
+              <v-btn class="primary" @click="save()">Finalizar venta</v-btn>
+              <v-btn class="primary ml-5" @click="info()">INFO BUTTON</v-btn>
+            </v-form>
           </v-col>
-        </v-row>
-        <v-row class="ma-5">
-          <v-col cols="5">
-            <v-autocomplete
-              @change="getPaymentPlans(object.mediosPago)"
-              v-model="object.mediosPago"
-              :items="objects.medios_de_pago"
-              item-text="nombre"
-              :return-object="true"
-              :rules="[v => !!v || 'Campo requerido...']"
-              placeholder="Seleccione un medio de pago..."
-            ></v-autocomplete>
+          <v-col cols="2">
+            <Calculator/>
           </v-col>
-          <v-col cols="4">
-            <v-autocomplete
-              v-model="object.planPago"
-              :items="objects.planes"
-              item-text="nombre"
-              :return-object="true"
-              :rules="[v => !!v || 'Campo requerido...']"
-              placeholder="Seleccione un plan de pago..."
-            ></v-autocomplete>
-          </v-col>
-        </v-row>
-        <v-btn class="primary" @click="save()">Finalizar venta</v-btn>
-        <v-btn class="primary ml-5" @click="info()">INFO BUTTON</v-btn>
-      </v-form>
+      </v-row>
     </v-col>
-  </v-card>
+  </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
+import Calculator from "../../components/Calculator";
 import axios from "axios";
 
 export default {
@@ -115,6 +121,10 @@ export default {
     snackError: false,
     errorMessage: "",
   }),
+
+  components:{
+    Calculator
+  },
 
   created() {
     this.$barcodeScanner.init(this.onBarcodeScanned);
