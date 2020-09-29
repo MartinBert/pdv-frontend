@@ -3,53 +3,78 @@
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <v-col cols="12">
       <v-row>
-          <v-col cols="10">
+          <v-col cols="9">
             <v-form ref="form" v-model="valid" :lazy-validation="false">
               <v-row>
-                <v-col cols="6">
-                  <v-autocomplete
-                    @change="getComercialDocuments(object.cliente.condicionIva.documentos, user.empresa.condicionIva.documentos)"
-                    v-model="object.cliente"
-                    :items="objects.clientes"
-                    item-text="razonSocial"
-                    :return-object="true"
-                    :rules="[v => !!v || 'Campo requerido...']"
-                    placeholder="Seleccione un cliente..."
-                  ></v-autocomplete>
+                <v-col cols="8">
+                  <v-row>
+                    <v-col cols="6">
+                      <div class="button_cliente_class">
+                        <v-autocomplete
+                        @change="getComercialDocuments(object.cliente.condicionIva.documentos, user.empresa.condicionIva.documentos)"
+                        v-model="object.cliente"
+                        :items="objects.clientes"
+                        item-text="razonSocial"
+                        :return-object="true"
+                        ></v-autocomplete>
+                      </div>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-autocomplete
+                        class="button-ventas comprobante"
+                        v-model="object.documento"
+                        :items="objects.documentos"
+                        item-text="nombre"
+                        :return-object="true"
+                        :rules="[v => !!v || 'Campo requerido...']"
+                        placeholder="Seleccione un tipo de comprobante..."
+                      ></v-autocomplete>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-autocomplete
+                        class="button-ventas medio-pago"
+                        @change="getPaymentPlans(object.mediosPago)"
+                        v-model="object.mediosPago"
+                        :items="objects.medios_de_pago"
+                        item-text="nombre"
+                        :return-object="true"
+                        :rules="[v => !!v || 'Campo requerido...']"
+                        placeholder="Seleccione un medio de pago..."
+                      ></v-autocomplete>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-autocomplete
+                        class="button-ventas plan-pago"
+                        v-model="object.planPago"
+                        :items="objects.planes"
+                        item-text="nombre"
+                        :return-object="true"
+                        :rules="[v => !!v || 'Campo requerido...']"
+                        placeholder="Seleccione un plan de pago..."
+                      ></v-autocomplete>
+                    </v-col>
+                  </v-row>
                 </v-col>
-                <v-col cols="6">
-                  <v-autocomplete
-                    v-model="object.documento"
-                    :items="objects.documentos"
-                    item-text="nombre"
-                    :return-object="true"
-                    :rules="[v => !!v || 'Campo requerido...']"
-                    placeholder="Seleccione un tipo de comprobante..."
-                  ></v-autocomplete>
-                </v-col>
-                <v-col cols="6">
-                  <v-autocomplete
-                    @change="getPaymentPlans(object.mediosPago)"
-                    v-model="object.mediosPago"
-                    :items="objects.medios_de_pago"
-                    item-text="nombre"
-                    :return-object="true"
-                    :rules="[v => !!v || 'Campo requerido...']"
-                    placeholder="Seleccione un medio de pago..."
-                  ></v-autocomplete>
-                </v-col>
-                <v-col cols="6">
-                  <v-autocomplete
-                    v-model="object.planPago"
-                    :items="objects.planes"
-                    item-text="nombre"
-                    :return-object="true"
-                    :rules="[v => !!v || 'Campo requerido...']"
-                    placeholder="Seleccione un plan de pago..."
-                  ></v-autocomplete>
+                <v-col cols="4">
+                  <div class="verticalSeparator"></div>
+                  <v-container style="color: rgb(63, 81, 181)">
+                    <v-row>
+                      <v-col class="text-right">
+                        <label class="mr-3">TOTAL:</label>
+                        <input class="totalInput" type="text">
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col class="text-right">
+                        <label class="mr-3">ITEMS:</label>
+                        <input class="totalInput" type="text">
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-col>
               </v-row>
               <v-row>
+                <div class="horizontalSeparator"></div>
                 <v-col cols="12">
                     <v-simple-table style="background-color: transparent;">
                       <template v-slot:default>
@@ -85,8 +110,23 @@
               <v-btn class="primary ml-5" @click="info()">INFO BUTTON</v-btn>
             </v-form>
           </v-col>
-          <v-col cols="2">
-            <Calculator/>
+          <v-col cols="3">
+            <v-row>
+              <v-col cols="1">
+                <div class="verticalSeparator"></div>
+              </v-col>
+              <v-col cols="11">
+                <Calculator/>
+                <div class="mt-3">
+                  <div class="cleanslate w24tz-current-time w24tz-middle" style="display: inline-block !important; visibility: hidden !important; min-width:300px !important; min-height:145px !important;">
+                    <p>
+                    <a href="//24timezones.com/Argentina/hora" style="text-decoration: none;" class="clock24" id="tz24-1600967960-cc10022-eyJob3VydHlwZSI6IjI0Iiwic2hvd2RhdGUiOiIxIiwic2hvd3NlY29uZHMiOiIxIiwiY29udGFpbmVyX2lkIjoiY2xvY2tfYmxvY2tfY2I1ZjZjZDUxOGU0MTE2IiwidHlwZSI6ImRiIiwibGFuZyI6ImVzIn0=" title="Hora Mundial - Argentina" target="_blank" rel="nofollow">Hora actual en Argentina</a>
+                    </p>
+                    <div id="clock_block_cb5f6cd518e4116"></div>
+                  </div>
+                </div>
+              </v-col>
+            </v-row>
           </v-col>
       </v-row>
     </v-col>
@@ -367,12 +407,36 @@ export default {
         });
     },
     //-->
-
-    //Info
-    info() {
-      console.log(`${process.env.VUE_APP_API_AFIP}/asdf`);
-    },
-    //-->
   },
 };
 </script>
+<style scoped>
+  .button_cliente_class{
+    background-image: url('/images/buttons/btn_cliente.svg');
+    width: 100%;
+    height: 100%;
+  }
+
+  .verticalSeparator{
+    float: left;
+    background-color: black;
+    height: 100%;
+    width: 2px;
+  }
+
+  .totalInput{
+    font-family: Century Gothic, CenturyGothic, AppleGothic, sans-serif;
+    border: solid 1px rgb(63, 81, 181);
+    background-color: #fff;
+    color: black;
+    text-align: right;
+    padding: 5px;
+  }
+
+  .horizontalSeparator{
+    width: 100%;
+    height: 2px;
+    margin-right: 10px;
+    background-color: black;
+  }
+</style>

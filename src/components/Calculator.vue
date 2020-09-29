@@ -13,7 +13,10 @@
           <div class="clear" @click="clear()">C</div>
         </v-col>
         <v-col class="sr">
-          <div class="clear" @click="partialClear()">CE</div>
+          <div class="clear" @click="currentSyntaxClear()">CE</div>
+        </v-col>
+        <v-col class="sr">
+          <div class="clear" @click="partialClear()">«</div>
         </v-col>
       </v-row>
       <v-row>
@@ -74,7 +77,7 @@
           </v-row>
           <v-row>
             <v-col class="sr">
-              <div class="black" @click="addExpression(',')">,</div>
+              <div class="black" @click="addExpression('.')">.</div>
             </v-col>
           </v-row>
         </v-col>
@@ -123,32 +126,55 @@ export default {
   methods: {
     addExpression(e) {
       let searchNumbers = /[0-9]/;
-      let searchOperators = /(,|\+|-|\/|\*|=)/;
+      let searchOperators = /(.|\+|-|\/|\*|=)/;
 
       let matchNumbers = searchNumbers.exec(e);
       let matchOperators = searchOperators.exec(e);
 
       if (matchNumbers) {
         this.currentSyntax += e.toString();
-        console.log("----------------1");
       }else if(matchOperators[0] == '+' || matchOperators[0] == '-' || matchOperators[0] == '/' || matchOperators[0] == '*'){
-        if(this.historicSyntax == ""){
+        if(this.historicSyntax && this.currentSyntax){
+          let previosSimbol = this.historicSyntax.slice(this.historicSyntax.length - 1, this.historicSyntax.length);
+          this.historicSyntax = `${this.historicSyntax} ${this.currentSyntax} ${e}`;
+          this.processCalculation(this.currentSyntax, previosSimbol);
+          this.currentSyntax = "";
+        }else if(this.historicSyntax && !this.currentSyntax){
+          this.historicSyntax = this.historicSyntax.slice(0, this.historicSyntax.length - 1);
+          this.historicSyntax = this.historicSyntax + e;
+        }else if(this.result == 0 && !this.historicSyntax && !this.currentSyntax){
+          this.result = 0;
+          this.currentSyntax = "";
+          this.historicSyntax = "";
+        }else if(this.result != 0 && !this.historicSyntax && !this.currentSyntax){
+          this.historicSyntax = `${this.result} ${e}`;
+        }else{
           this.historicSyntax = `${this.historicSyntax} ${this.currentSyntax} ${e}`;
           this.result = this.currentSyntax;
           this.currentSyntax = "";
+        }
+      }else if(matchOperators[0] == '.'){
+        if(!this.historicSyntax && !this.currentSyntax){
+          this.currentSyntax = "";
+          this.historicSyntax = "";
+        }else if(!this.currentSyntax && this.historicSyntax){
+          this.currentSyntax = "";
         }else{
-          let previosSimbol = this.historicSyntax.substring(this.historicSyntax.length-1, this.historicSyntax.length-2);
-          this.historicSyntax = `${this.historicSyntax} ${this.currentSyntax} ${e}`;
-          this.processCalculation(this.currentSyntax, matchOperators[0], previosSimbol);
+          this.currentSyntax = this.currentSyntax + e;
+        }
+      }else{
+        if(this.historicSyntax){
+          let previosSimbol = this.historicSyntax.slice(this.historicSyntax.length - 1, this.historicSyntax.length);
+          this.processCalculation(this.currentSyntax, previosSimbol);
+          this.currentSyntax = "";
+          this.historicSyntax = "";
+        }else if(!this.historicSyntax && !this.currentSyntax){
+          this.currentSyntax = "";
+          this.historicSyntax = "";
+        }else{
+          this.result = parseFloat(this.currentSyntax).toFixed(2);
           this.currentSyntax = "";
         }
-        console.log("----------------2");
-      }else if(matchOperators[0] == ','){
-        console.log("----------------3");
-        this.currentSyntax = this.currentSyntax + e;
-      }else{
-        console.log("----------------4");
-        console.log(e);
       }
     },
 
@@ -158,30 +184,34 @@ export default {
       this.result = 0;
     },
 
-    partialClear() {
+    currentSyntaxClear() {
       this.currentSyntax = "";
     },
 
-    processCalculation(e, simbol, previosSimbol){
+    partialClear(){
+      this.currentSyntax = this.currentSyntax.slice(0, this.currentSyntax.length - 1);
+    },
 
+    processCalculation(e, previosSimbol){
       switch (previosSimbol) {
         case '+':
-            this.result = this.result + e;
+            this.result = parseFloat(this.result) + parseFloat(e);
+            this.result = this.result.toFixed(2)
           break;
 
         case '-':
-            this.result = this.currentSyntax;
-
+            this.result = parseFloat(this.result) - parseFloat(e);
+            this.result = this.result.toFixed(2)
           break;
 
         case '/':
-          this.historicSyntax = this.historicSyntax + " " + this.currentSyntax;
-          this.currentSyntax = "";
-          this.currentSyntax = e.toString();
+            this.result = parseFloat(this.result) / parseFloat(e);
+            this.result = this.result.toFixed(2)
           break;
 
         default:
-          this.currentSyntax = e.toString();
+            this.result = parseFloat(this.result) * parseFloat(e);
+            this.result = this.result.toFixed(2)
           break;
       }
     }
