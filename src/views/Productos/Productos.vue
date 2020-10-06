@@ -2,11 +2,11 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="2">
+        <v-col cols="2" v-if="loguedUser.perfil.id < 3">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
           <v-btn class="primary ml-3" @click="getReport()" raised>Reportes</v-btn>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="3" v-if="loguedUser.perfil.id < 3">
           <v-file-input
           v-model="file" 
           class="mt-0"
@@ -210,13 +210,15 @@ export default {
     service: "productos",
     token: localStorage.getItem("token"),
     dialogStock: false,
-    dialogDeleteObject: false
+    dialogDeleteObject: false,
+    loguedUser: ''
   }),
 
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getAll(this.paginate.page - 1, this.paginate.size);
     this.getOtherModels(0, 200000);
+    this.getLoguedUser();
   },
 
   methods: {
@@ -515,6 +517,15 @@ export default {
 
     getReport(){
       ReportsService(this.tenant,this.service,this.token).listAll();
+    },
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        console.log(this.loguedUser);
+      })
     }
   }
 };

@@ -48,5 +48,10 @@ export default (tenant,service,token) =>{
                 }
             });
         },
+
+        getLoguedUser(){
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/usuarios/getLogued`,
+              { headers: { Authorization: "Bearer " + token }});
+        }
     }
 }

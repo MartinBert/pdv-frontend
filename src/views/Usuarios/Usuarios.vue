@@ -37,15 +37,15 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{object.id}}</td>
-            <td>{{object.nombre}}</td>
-            <td>{{object.username}}</td>
-            <td>{{object.perfil.nombre}}</td>
-            <td>
+            <td v-if="loguedUser.perfil.id === 1 || loguedUser.empresa.id === object.empresa.id">{{object.id}}</td>
+            <td v-if="loguedUser.perfil.id === 1 || loguedUser.empresa.id === object.empresa.id">{{object.nombre}}</td>
+            <td v-if="loguedUser.perfil.id === 1 || loguedUser.empresa.id === object.empresa.id">{{object.username}}</td>
+            <td v-if="loguedUser.perfil.id === 1 || loguedUser.empresa.id === object.empresa.id">{{object.perfil.nombre}}</td>
+            <td v-if="loguedUser.perfil.id === 1 || loguedUser.empresa.id === object.empresa.id">
               <span v-if="object.empresa == null">Todas</span>
               <span v-if="object.empresa != null">{{object.empresa.alias}}</span>
             </td>
-            <td>
+            <td v-if="loguedUser.perfil.id === 1 || loguedUser.empresa.id === object.empresa.id">
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
               <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
             </td>
@@ -107,12 +107,16 @@ export default {
     tenant: "",
     service: "usuarios",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false
+    dialogDeleteObject: false,
+    loguedUser: {}
   }),
+
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.getUserLogued();
     this.getAll(this.paginate.page - 1, this.paginate.size);
   },
+
   methods: {
     getAll: function(page, size) {
       this.objects = [];
@@ -123,22 +127,23 @@ export default {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
+          console.log(this.objects);
         });
     },
 
-    changePage: function(page) {
+    changePage(page) {
       this.getAll(page - 1, this.paginate.size);
     },
 
-    newObject: function() {
+    newObject() {
       this.$router.push({ name: "usuariosForm", params: { id: 0 } });
     },
 
-    edit: function(id) {
+    edit(id) {
       this.$router.push({ name: "usuariosForm", params: { id: id } });
     },
 
-    filterObjects: function(filter){
+    filterObjects(filter){
       var f ={
         nombre:filter
       }
@@ -149,12 +154,12 @@ export default {
         });
     },
 
-    openDelete: function(id) {
+    openDelete(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
     },
 
-    deleteObject: function() {
+    deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
       GenericService(this.tenant, this.service, this.token)
@@ -162,6 +167,15 @@ export default {
         .then(() => {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         });
+    },
+
+    getUserLogued(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        console.log(this.loguedUser);
+      })
     }
   }
 };

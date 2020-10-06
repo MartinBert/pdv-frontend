@@ -30,7 +30,7 @@
             </v-select>
           </v-col>
         </v-row>
-        <v-row class="ma-1">
+          <v-row class="ma-1">
           <v-col class="d-flex col-6">
             <v-select
               @input="getSucursales"
@@ -140,18 +140,20 @@ export default {
     service: "usuarios",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: ""
+    errorMessage: "",
+    loguedUser: {}
   }),
+
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getPerfiles();
-    this.getEmpresas();
+    this.getLoguedUser();
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
       this.loaded = true;
     }
   },
+
   methods: {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
@@ -178,6 +180,14 @@ export default {
         });
     },
 
+    getEmpresasForId(id){
+      GenericService(this.tenant, "empresas", this.token)
+      .get(id)
+      .then(data => {
+        this.empresas = [data.data];
+      })
+    },
+
     getSucursales(){
       this.sucursales = this.object.empresa.sucursales;
     },
@@ -188,6 +198,9 @@ export default {
 
     save() {
       this.$refs.form.validate();
+      if(!this.object.perfil){
+        this.object.perfil = 4
+      }
       this.object.password = this.object.setPassword;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
@@ -208,6 +221,20 @@ export default {
 
     resetPassword: function() {
       this.changePassword = !this.changePassword;
+    },
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        if(this.loguedUser.perfil.id != 1){
+          this.getEmpresasForId(this.loguedUser.empresa.id);
+        }else{
+          this.getPerfiles();
+          this.getEmpresas();
+        }
+      })
     }
   }
 };
