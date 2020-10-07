@@ -9,15 +9,14 @@
                 <v-col cols="8">
                   <v-row>
                     <v-col cols="6">
-                      <div class="button_cliente_class">
-                        <v-autocomplete
-                        @change="getComercialDocuments(object.cliente.condicionIva.documentos, user.empresa.condicionIva.documentos)"
-                        v-model="object.cliente"
-                        :items="objects.clientes"
-                        item-text="razonSocial"
-                        :return-object="true"
-                        ></v-autocomplete>
-                      </div>
+                      <v-autocomplete
+                      @change="getComercialDocuments(object.cliente.condicionIva.documentos, user.empresa.condicionIva.documentos)"
+                      v-model="object.cliente"
+                      :items="objects.clientes"
+                      item-text="razonSocial"
+                      :return-object="true"
+                      placeholder="Seleccione un cliente"
+                      ></v-autocomplete>
                     </v-col>
                     <v-col cols="6">
                       <v-autocomplete
@@ -61,7 +60,7 @@
                     <v-row>
                       <v-col class="text-right">
                         <label class="mr-3">TOTAL:</label>
-                        <input class="totalInput" type="text">
+                        <input class="totalInput" v-model="totalVenta" type="text">
                       </v-col>
                     </v-row>
                     <v-row>
@@ -100,14 +99,13 @@
                         </tbody>
                       </template>
                     </v-simple-table>
-                    <v-row>
-                      <v-col cols="1"></v-col>
-                      <v-col>TOTAL: ${{(totalVenta)}}</v-col>
-                    </v-row>
                 </v-col>
               </v-row>
-              <v-btn class="primary" @click="save()">Finalizar venta</v-btn>
-              <v-btn class="primary ml-5" @click="info()">INFO BUTTON</v-btn>
+              <v-row>
+                <v-col class="text-right">
+                  <v-btn class="primary" @click="save()">Finalizar venta</v-btn>
+                </v-col>
+              </v-row>
             </v-form>
           </v-col>
           <v-col cols="3">
@@ -222,16 +220,13 @@ export default {
         .getForBarCode(barcode)
         .then((data) => {
           if (this.products.length == 0) {
-            console.log("A -------->");
             data.data.cant = 1;
             data.data.total = data.data.precioTotal;
             this.products.push(data.data);
           } else {
-            console.log("B -------->");
             var count = 0;
             for (var i = 0; i < this.products.length; i++) {
               if (this.products[i].id == data.data.id) {
-                console.log("B1 ------->");
                 this.products[i].cant = parseInt(this.products[i].cant) + 1;
                 this.products[i].total =
                   this.products[i].precioTotal * this.products[i].cant;
@@ -240,13 +235,11 @@ export default {
                 this.products[i].id != data.data.id &&
                 count == this.products.length - 1
               ) {
-                console.log("B2 ------->");
                 data.data.cant = 1;
                 data.data.total = data.data.precioTotal;
                 this.products.push(data.data);
                 break;
               } else {
-                console.log("B3 ------->");
                 count += 1;
               }
             }
@@ -287,8 +280,6 @@ export default {
     },
     //-->
 
-    
-
     //Save sale on database and print comercial document
     save() {
       var tipoDoc;
@@ -297,9 +288,9 @@ export default {
       } else {
         tipoDoc = 94;
       }
-
-      var cuit = this.user.empresa.cuit;
-      var razonSocial = this.user.empresa.razonSocial;
+      
+      var cuit = this.user.sucursal.cuit;
+      var razonSocial = this.user.sucursal.razonSocial;
       var ptoVenta = this.user.puntoVenta.idFiscal;
       
       var alicIva = [
@@ -380,8 +371,6 @@ export default {
 
               var respCabAfip = data.data.feCabResp;
               var respDetAfip = data.data.feDetResp;
-              console.log(respCabAfip)
-              console.log(respDetAfip)
 
               var comprobante = {
                 letra:this.object.documento.letra,
@@ -398,8 +387,6 @@ export default {
                 empresa:this.user.empresa,
                 cliente:this.object.cliente
               }
-
-              console.log(comprobante);
 
               GenericService(this.tenant, "comprobantesFiscales", this.token)
                 .save(comprobante)
