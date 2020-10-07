@@ -69,12 +69,13 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.getLoguedUser();
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
       this.loaded = true;
     }
-    this.getSucursales();
+    
   },
   methods: {
     getObject(id) {
@@ -92,6 +93,22 @@ export default {
         .then(data => {
           this.sucursales = data.data.content;
         });
+    },
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        console.log(this.loguedUser);
+        if(this.loguedUser.perfil.id == 2){
+          this.sucursales = this.loguedUser.empresa.sucursales;
+        }else if(this.loguedUser.perfil.id == 3){
+          this.sucursales = [this.loguedUser.sucursal];
+        }else{
+          this.getSucursales();
+        }
+      })
     },
 
     save() {

@@ -128,7 +128,7 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     valid:true,
-    perfiles: null,
+    perfiles: [],
     object: {},
     perfil: {},
     empresas: [],
@@ -172,6 +172,14 @@ export default {
         });
     },
 
+    getPerfilesForId(id){
+      GenericService(this.tenant, "perfiles", this.token)
+      .get(id)
+      .then(data => {
+        this.perfiles.push(data.data);
+      })
+    },
+
     getEmpresas() {
       GenericService(this.tenant, "empresas", this.token)
         .getAll(0, 100)
@@ -198,9 +206,6 @@ export default {
 
     save() {
       this.$refs.form.validate();
-      if(!this.object.perfil){
-        this.object.perfil = 4
-      }
       this.object.password = this.object.setPassword;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
@@ -230,6 +235,8 @@ export default {
         this.loguedUser = data.data;
         if(this.loguedUser.perfil.id != 1){
           this.getEmpresasForId(this.loguedUser.empresa.id);
+          this.getPerfilesForId(3);
+          this.getPerfilesForId(4);
         }else{
           this.getPerfiles();
           this.getEmpresas();

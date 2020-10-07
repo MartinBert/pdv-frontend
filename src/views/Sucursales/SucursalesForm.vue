@@ -52,7 +52,7 @@
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row class="ma-3">
+        <v-row class="ma-1">
           <v-col>
             <v-text-field type="text" 
             v-model="object.provincia" 
@@ -83,6 +83,60 @@
             ></v-text-field>
           </v-col>
         </v-row>
+        <v-row class="mt-5"></v-row>
+        <v-row class="mt-5"></v-row>
+        <v-row class="mt-5"></v-row>
+        <v-row class="mt-5"></v-row>
+        <v-row class="mt-5">
+          <v-col class="text-center">
+            <h4>Completar en caso de que la sucursal no realice sus actividades comerciales bajo la misma informacion fiscal que la empresa</h4>
+          </v-col>
+        </v-row>
+
+        <v-row class="ml-1 mr-1 mb-1">
+          <v-col>
+            <v-select
+              type="text"
+              :items="condicioniva"
+              item-text="nombre"
+              item-value="id"
+              v-model="object.condicionIva"
+              :counter="50"
+              :return-object="true"
+              label="Condición frente al IVA"
+            ></v-select>
+          </v-col>
+          <v-col>
+            <v-text-field
+              type="text"
+              v-model="object.cuit"
+              :counter="50"
+              label="CUIT"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field type="date"
+            v-model="object.fechaInicioAct" 
+            :counter="50" 
+            label="Fecha de inicio de actividad" 
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field type="text"
+            v-model="object.ingBruto" 
+            :counter="50" 
+            label="Número de ingresos brutos" 
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              type="text"
+              v-model="object.razonSocial"
+              :counter="50"
+              label="Razón social"
+            ></v-text-field>
+          </v-col>
+        </v-row>
 
         <div class="ma-1">
           <v-col class="col-6">
@@ -104,6 +158,8 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import EmpresasService from "../../services/EmpresasService";
+
 export default {
   data: () => ({
     valid: true,
@@ -124,13 +180,13 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.getLoguedUser();
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
       this.loaded = true;
     }
     this.getCondicionesIva();
-    this.getEmpresas();
   },
   methods: {
     getObject(id) {
@@ -143,23 +199,52 @@ export default {
     },
 
     getCondicionesIva(){
-      GenericService(this.tenant, "condicionesFiscales", this.token)
-        .getAll()
+      EmpresasService(this.tenant, "empresas", this.token)
+        .getIvaConditions()
         .then(data => {
-          this.condicioniva = data.data.content;
-          console.log(this.condicioniva);
+          this.condicioniva = data.data;
         });
     },
 
-    getEmpresas(){
+    getEmpresas() {
       GenericService(this.tenant, "empresas", this.token)
-        .getAll()
+        .getAll(0, 100)
         .then(data => {
           this.empresas = data.data.content;
         });
     },
 
+    getEmpresasForId(id){
+      GenericService(this.tenant, "empresas", this.token)
+      .get(id)
+      .then(data => {
+        this.empresas = [data.data];
+      })
+    },
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        if(this.loguedUser.perfil.id != 1){
+          this.getEmpresasForId(this.loguedUser.empresa.id);
+        }else{
+          this.getEmpresas();
+        }
+      })
+    },
+
     save() {
+
+      if(!this.object.condicionIva || !this.object.cuit || !this.object.fechaInicioAct || !this.object.ingBruto || !this.object.razonSocial){
+        this.object.condicionIva = this.object.empresa.condicionIva;
+        this.object.cuit = this.object.empresa.cuit;
+        this.object.fechaInicioAct = this.object.empresa.fechaInicioAct;
+        this.object.ingBruto = this.object.empresa.ingBruto;
+        this.object.razonSocial = this.object.empresa.razonSocial;
+      }
+
       this.$refs.form.validate();
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)

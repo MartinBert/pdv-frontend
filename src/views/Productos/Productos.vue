@@ -2,11 +2,11 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="2" v-if="loguedUser.perfil.id < 3">
+        <v-col cols="2" v-if="perfil < 3">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
           <v-btn class="primary ml-3" @click="getReport()" raised>Reportes</v-btn>
         </v-col>
-        <v-col cols="3" v-if="loguedUser.perfil.id < 3">
+        <v-col cols="3" v-if="perfil < 3">
           <v-file-input
           v-model="file" 
           class="mt-0"
@@ -184,6 +184,7 @@ import XLSX from "xlsx";
 export default {
   data: () => ({
     icon: "mdi-check-circle",
+    perfil: 0,
     loader: false,
     loaderStatus: false,
     filterString: "",
@@ -222,7 +223,8 @@ export default {
   },
 
   methods: {
-    getAll: function(page, size) {
+
+    getAll(page, size) {
       this.objects = [];
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
@@ -260,19 +262,19 @@ export default {
         });
     },
 
-    changePage: function(page) {
+    changePage(page) {
       this.getAll(page - 1, this.paginate.size);
     },
 
-    newObject: function() {
+    newObject() {
       this.$router.push({ name: "productosForm", params: { id: 0 } });
     },
 
-    edit: function(id) {
+    edit(id) {
       this.$router.push({ name: "productosForm", params: { id: id } });
     },
 
-    filterObjects: function(filter){
+    filterObjects(filter){
       var f ={
         nombre:filter
       }
@@ -283,12 +285,12 @@ export default {
         });
     },
 
-    openDelete: function(id) {
+    openDelete(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
     },
 
-    deleteObject: function() {
+    deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
       GenericService(this.tenant, this.service, this.token).disable(
@@ -297,7 +299,7 @@ export default {
       );
     },
 
-    showStock: function(object) {
+    showStock(object) {
       this.stock = [];
       this.object = object;
       this.object.depositos.forEach(d => {
@@ -318,7 +320,7 @@ export default {
       this.dialogStock = true;
     },
 
-    updateStock: function() {
+    updateStock() {
       var stocks = [];
       this.stock.forEach(element => {
         if (element.stock.cantidad >= 0) {
@@ -358,7 +360,7 @@ export default {
     },
 
     //Importar productos
-    onChange: function(event) {
+    onChange(event) {
       console.log(event);
       this.file = event;
       var excel = [];
@@ -396,7 +398,7 @@ export default {
       reader.readAsBinaryString(this.file);
     },
 
-    validateImport: function(objects) {
+    validateImport(objects) {
       console.log(objects);
       var importacion = {
         status: true,
@@ -443,7 +445,7 @@ export default {
       return importacion;
     },
 
-    getMarca: function(id) {
+    getMarca(id) {
       var marca = null;
       if (this.marcas && id) {
         this.marcas.forEach(element => {
@@ -455,7 +457,7 @@ export default {
       return marca;
     },
 
-    getRubro: function(id) {
+    getRubro(id) {
       var rubro = null;
       if (this.rubros && id) {
         this.rubros.forEach(element => {
@@ -467,7 +469,7 @@ export default {
       return rubro;
     },
 
-    getDistribuidores: function(d) {
+    getDistribuidores(d) {
       var distribuidores = [];
       if (this.distribuidores && d) {
         var exp = d.match("-");
@@ -491,7 +493,7 @@ export default {
       return distribuidores;
     },
 
-    getDepositos: function(d) {
+    getDepositos(d) {
       var depositos = [];
       if (this.depositos && d) {
         var exp = d.match("-");
@@ -524,7 +526,7 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        console.log(this.loguedUser);
+        this.perfil = this.loguedUser.perfil.id;
       })
     }
   }

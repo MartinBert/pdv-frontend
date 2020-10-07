@@ -3,7 +3,7 @@
     <v-form class="mb-3">
       <v-row>
         <v-col cols="6">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          <v-btn v-if="perfil != 3" class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
         <v-col cols="3"></v-col>
         <v-col cols="3">
@@ -97,6 +97,8 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     objects: [],
+    perfil: 0,
+    loguedUser: null,
     filterString: "",
     paginate: {
       page: 1,
@@ -109,12 +111,35 @@ export default {
     token: localStorage.getItem("token"),
     dialogDeleteObject: false
   }),
+
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.getLoguedUser();
   },
+
   methods: {
-    getAll: function(page, size) {
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        console.log(this.loguedUser)
+        if(this.loguedUser.perfil.id == 2){
+          this.perfil = 2;
+          this.objects = this.loguedUser.empresa.sucursales;
+          this.loaded = true;
+        }else if(this.loguedUser.perfil.id == 3){
+          this.perfil = 3;
+          this.objects = [this.loguedUser.sucursal];
+          this.loaded = true;
+        }else{
+          this.getAll(0, 100000);
+        }
+      })
+    },
+
+    getAll(page, size) {
       this.objects = [];
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
@@ -126,19 +151,19 @@ export default {
         });
     },
 
-    changePage: function(page) {
+    changePage(page) {
       this.getAll(page - 1, this.paginate.size);
     },
 
-    newObject: function() {
+    newObject() {
       this.$router.push({ name: "sucursalesForm", params: { id: 0 } });
     },
 
-    edit: function(id) {
+    edit(id) {
       this.$router.push({ name: "sucursalesForm", params: { id: id } });
     },
 
-    filterObjects: function(filter){
+    filterObjects(filter){
       var f ={
         razonSocial:filter
       }
@@ -149,12 +174,12 @@ export default {
         });
     },
 
-    openDelete: function(id) {
+    openDelete(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
     },
 
-    deleteObject: function() {
+    deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
       GenericService(this.tenant, this.service, this.token)
@@ -162,7 +187,7 @@ export default {
         .then(() => {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         });
-    }
+    },
   }
 };
 </script>

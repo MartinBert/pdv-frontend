@@ -32,7 +32,7 @@
             <v-text-field type="text"
             v-model="object.alias" 
             :counter="50" 
-            label="Nombre de Fantasía / Alias" 
+            label="Nombre de fantasía / Alias" 
             required
             ></v-text-field>
           </v-col>
@@ -42,6 +42,28 @@
               v-model="object.cuit"
               :counter="50"
               label="CUIT o DNI"
+              required
+              :rules="[v => !!v || 'Campo requerido...']"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row class="ma-1">
+          <v-col class="col-3">
+            <v-text-field
+              type="date"
+              v-model="object.fechaInicioAct"
+              :counter="50"
+              label="Fecha de inicio de actividad"
+              required
+              :rules="[v => !!v || 'Campo requerido...']"
+            ></v-text-field>
+          </v-col>
+          <v-col class="col-3">
+            <v-text-field
+              type="text"
+              v-model="object.ingBruto"
+              :counter="50"
+              label="Ingresos brutos"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>

@@ -90,6 +90,7 @@ export default {
   data: () => ({
     objects: [],
     empresas: [],
+    loguedUser: null,
     filterString: "",
     paginate: {
       page: 1,
@@ -104,10 +105,11 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.getLoguedUser();
   },
+
   methods: {
-    getAll: function(page, size) {
+    getAll(page, size) {
       this.objects = [];
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
@@ -119,19 +121,19 @@ export default {
         });
     },
 
-    changePage: function(page) {
+    changePage(page) {
       this.getAll(page - 1, this.paginate.size);
     },
 
-    newObject: function() {
+    newObject() {
       this.$router.push({ name: "puntosVentaForm", params: { id: 0 } });
     },
 
-    edit: function(id) {
+    edit(id) {
       this.$router.push({ name: "puntosVentaForm", params: { id: id } });
     },
 
-    filterObjects: function(filter){
+    filterObjects(filter){
       var f ={
         razonSocial:filter
       }
@@ -142,12 +144,12 @@ export default {
         });
     },
 
-    openDelete: function(id) {
+    openDelete(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
     },
 
-    deleteObject: function() {
+    deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
       GenericService(this.tenant, this.service, this.token)
@@ -156,6 +158,28 @@ export default {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         });
     },
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        if(this.loguedUser.perfil.id == 2){
+          var obj = this.loguedUser.empresa.sucursales;
+          obj.forEach(el => {
+              el.puntosVenta.forEach(e => {
+                this.objects.push(e);
+              })
+          })
+          this.loaded = true;
+        }else if(this.loguedUser.perfil.id == 3){
+          this.objects = this.loguedUser.sucursal.puntosVenta;
+          this.loaded = true;
+        }else{
+          this.getAll(0, 100000);
+        }
+      })
+    }
   }
 };
 </script>
