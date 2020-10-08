@@ -178,20 +178,6 @@ export default {
       }
     },
 
-    clear() {
-      this.currentSyntax = "";
-      this.historicSyntax = "";
-      this.result = 0;
-    },
-
-    currentSyntaxClear() {
-      this.currentSyntax = "";
-    },
-
-    partialClear(){
-      this.currentSyntax = this.currentSyntax.slice(0, this.currentSyntax.length - 1);
-    },
-
     processCalculation(e, previosSimbol){
       switch (previosSimbol) {
         case '+':
@@ -214,7 +200,22 @@ export default {
             this.result = this.result.toFixed(2)
           break;
       }
+    },
+
+    clear() {
+      this.currentSyntax = "";
+      this.historicSyntax = "";
+      this.result = 0;
+    },
+
+    currentSyntaxClear() {
+      this.currentSyntax = "";
+    },
+
+    partialClear(){
+      this.currentSyntax = this.currentSyntax.slice(0, this.currentSyntax.length - 1);
     }
+    
   },
 };
 </script>

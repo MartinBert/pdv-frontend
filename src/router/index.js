@@ -39,6 +39,8 @@ import PuntosVenta from '../views/PuntosVenta/PuntosVenta.vue'
 import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm.vue'
 import Sucursales from '../views/Sucursales/Sucursales.vue'
 import SucursalesForm from '../views/Sucursales/SucursalesForm.vue'
+import Stock from '../views/Stock/Stock.vue'
+import StockForm from '../views/Stock/StockForm.vue'
 
 Vue.use(VueRouter)
 
@@ -94,6 +96,18 @@ const routes = [
                 path: 'depositos/form/:id',
                 name: 'depositosForm',
                 component: DepositosForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'stock',
+                name: 'stock',
+                component: Stock,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'stock/form/:id',
+                name: 'stockForm',
+                component: StockForm,
                 meta: { requiresAuth: true }
             },
             {

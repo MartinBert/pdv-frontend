@@ -131,6 +131,12 @@ export default {
             title: "Depositos",
             visible: false
           },
+          {
+            path: "/stock",
+            name: "stock",
+            title: "Stock",
+            visible: false
+          },
         ]
       },
       {

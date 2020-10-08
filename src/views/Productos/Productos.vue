@@ -53,7 +53,6 @@
             <th>Marca</th>
             <th>Precio de costo</th>
             <th>Precio de venta</th>
-            <th>Stock</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -66,9 +65,6 @@
             <td>{{object.marca ? object.marca.nombre : 'Sin marca'}}</td>
             <td>${{object.precioCosto}}</td>
             <td>${{object.precioTotal}}</td>
-            <td>
-              <a title="Stock"><img src="/../../images/icons/ico_09.svg" @click="showStock(object)" width="40" height="40"></a>
-            </td>
             <td>
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
               <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
@@ -143,33 +139,8 @@
           <span class="headline">Stock {{object.nombre + ' - ID:' + object.id}}</span>
         </v-card-title>
         <v-container>
-          <v-simple-table>
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th>Deposito</th>
-                  <th>Cantidad</th>
-                </tr>
-              </thead>
-              <tbody v-for="s in stock" :key="s.id">
-                <tr>
-                  <td>{{s.deposito.nombre}}</td>
-                  <td>
-                    <v-text-field
-                      type="number"
-                      v-model="s.stock.cantidad"
-                      style="width:100px"
-                      min="0"
-                    ></v-text-field>
-                  </td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
+          {{object.cantidad}}
         </v-container>
-        <v-card-actions>
-          <v-btn color="primary" @click="updateStock()">Aplicar</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- End Dialog stock -->
@@ -299,26 +270,13 @@ export default {
       );
     },
 
-    showStock(object) {
-      this.stock = [];
-      this.object = object;
-      this.object.depositos.forEach(d => {
-        var stock = {
-          deposito: d,
-          stock: {}
-        };
-        this.object.stocks.forEach(s => {
-          if (s.deposito.id == d.id) {
-            stock.stock = {
-              id: s.id,
-              cantidad: s.cantidad
-            };
-          }
-        });
-        this.stock.push(stock);
-      });
-      this.dialogStock = true;
-    },
+    // showStock(object) {
+    //   StockService(this.tenant, "stock", this.token)
+    //   .getForProduct(object)
+    //   .then(data => {
+    //     this.stock = data.data;
+    //   })
+    // },
 
     updateStock() {
       var stocks = [];
