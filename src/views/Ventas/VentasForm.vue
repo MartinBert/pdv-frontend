@@ -136,6 +136,7 @@ import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import Calculator from "../../components/Calculator";
 import axios from "axios";
+import ReportsService from '../../services/ReportsService';
 
 export default {
   data: () => ({
@@ -389,7 +390,12 @@ export default {
               }
 
               GenericService(this.tenant, "comprobantesFiscales", this.token)
-                .save(comprobante)
+                .save(comprobante);
+
+              ReportsService(this.tenant, this.service, this.token)
+              .onCloseSaleReport(comprobante);
+
+              console.log(comprobante);
             });
         });
     },

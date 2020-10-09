@@ -476,7 +476,7 @@ export default {
     },
 
     getReport(){
-      ReportsService(this.tenant,this.service,this.token).listAll();
+      ReportsService(this.tenant,this.service,this.token).listAllProducts();
     },
 
     getLoguedUser(){
