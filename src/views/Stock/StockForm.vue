@@ -75,6 +75,7 @@
           <v-col class="col-6">
             <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
             <v-btn color="default" @click="back()">Cancelar</v-btn>
+            <v-btn color="default" @click="getDepositosForSucursal()">Cancelar</v-btn>
           </v-col>
         </div>
       </v-form>
@@ -91,6 +92,7 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import StocksService from '../../services/StocksService';
 export default {
   data: () => ({
     valid: true,
@@ -127,12 +129,15 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
+    },
 
-      GenericService(this.tenant, "depositos", this.token)
-        .getAll(0, 100000)
-        .then(data => {
-          this.depositos = data.data.content;
-        });
+    getDepositosForSucursal(id){
+      StocksService(this.tenant, "depositos", this.token)
+      .getDepositosForSucursal(id)
+      .then(data => {
+        console.log(data);
+        this.depositos = data.data.content;
+      })
     },
 
     save() {
@@ -180,6 +185,7 @@ export default {
       GenericService(this.tenant, "depositos", this.token)
         .getAll(page, size)
         .then(data => {
+          console.log(data);
           this.depositos = data.data.content;
         });
 
@@ -195,6 +201,7 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
+        this.getDepositosForSucursal(this.loguedUser.sucursal.id);
       })
     }
   }

@@ -65,6 +65,7 @@ export default {
     valid:true,
     object: {},
     loaded: false,
+    loguedUser: "",
     tenant: "",
     service: "depositos",
     token: localStorage.getItem("token"),
@@ -78,6 +79,8 @@ export default {
     } else {
       this.loaded = true;
     }
+
+    this.getUserLogued();
   },
   methods: {
     getObject(id) {
@@ -91,6 +94,7 @@ export default {
 
     save() {      
       this.$refs.form.validate();
+      this.object.sucursales = this.loguedUser.sucursal;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
@@ -107,6 +111,14 @@ export default {
     back() {
       this.$router.push({ name: "depositos" });
     },
+
+    getUserLogued(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+      })
+    }
   }
 };
 </script>
