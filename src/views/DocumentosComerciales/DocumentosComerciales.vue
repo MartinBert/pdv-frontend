@@ -190,6 +190,7 @@ export default {
           }
         });
         var doc = this.validateImport(excel);
+        console.log(doc);
         if (doc.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(doc.data)

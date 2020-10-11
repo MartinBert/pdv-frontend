@@ -1,7 +1,14 @@
 <template>
   <v-container>
+    <!-- Body -->
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <v-col cols="12">
+      <v-row>
+        <v-col>
+          <v-btn color="primary" @click="getProducts()">BUSCAR PRODUCTO</v-btn>
+        </v-col>
+      </v-row>
+      <div class="horizontalSeparator"></div>
       <v-row>
           <v-col cols="9">
             <v-form ref="form" v-model="valid" :lazy-validation="false">
@@ -128,6 +135,97 @@
           </v-col>
       </v-row>
     </v-col>
+    <!-- End Body -->
+
+    <!-- Dialog -->
+    <v-dialog v-model="dialog" scrollable max-width="700px">
+      <v-card>
+        <v-card-title>Seleccione un parámetro para realizar la búsqueda</v-card-title>
+        <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
+          <v-row>
+            <v-col>
+              <v-radio
+              label="Nombre"
+              value="nombre"
+              ></v-radio>
+            </v-col>
+            <v-col>
+              <v-radio
+              label="Código de barras"
+              value="codigodebarras"
+              ></v-radio>
+            </v-col>
+            <v-col>
+              <v-radio
+              label="Código de producto"
+              value="codigodeproducto"
+              ></v-radio>
+            </v-col>
+          </v-row>
+        </v-radio-group>
+        <v-text-field
+            v-if="radioGroup"
+            v-model="filterString"
+            v-on:input="filterObjects(filterString, radioGroup)"
+            dense
+            outlined
+            rounded
+            class="text-left ml-5 mr-5"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        <v-divider></v-divider>
+        <v-card-text style="height: 300px;">
+          <v-container fluid>
+            <v-row>
+              <v-col>
+                <v-simple-table style="background-color: transparent;">
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th>Elegir</th>
+                        <th>Producto</th>
+                        <th>Código de barras</th>
+                        <th>Código de producto</th>
+                      </tr>
+                    </thead>
+                    <tbody v-for="producto in productos" :key="producto.id">
+                      <tr>
+                        <td><v-checkbox 
+                          @change="selectedProducts(producto)"
+                        ></v-checkbox></td>
+                        <td>{{producto.nombre}}</td>
+                        <td>{{producto.codigoBarra}}</td>
+                        <td>{{producto.codigoProducto}}</td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="dialog = false"
+          >
+            Close
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="dialog = false"
+          >
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog -->
+
   </v-container>
 </template>
 
@@ -153,12 +251,16 @@ export default {
       medios_de_pago: [],
       documentos: [],
     },
+    productos: [],
     products: [],
     tenant: "",
     service: "ventas",
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
+    dialog: false,
+    filterString: "",
+    radioGroup: "",
   }),
 
   components:{
@@ -215,7 +317,6 @@ export default {
   },
 
   methods: {
-    //Mark product || change <cant>
     onBarcodeScanned(barcode) {
       VentasService(this.tenant, "productos", this.token)
         .getForBarCode(barcode)
@@ -262,9 +363,7 @@ export default {
         }
       });
     },
-    //-->
 
-    //Call <autocomplete> inputs objects
     getComercialDocuments(clientCond, businessCond) {
       this.objects.documentos = [];
       for (var i = 0; i < clientCond.length; i++) {
@@ -279,9 +378,44 @@ export default {
     getPaymentPlans(id) {
       this.objects.planes = id.planPago;
     },
-    //-->
 
-    //Save sale on database and print comercial document
+    getProducts(){
+      this.dialog = !this.dialog;
+      GenericService(this.tenant, "productos", this.token)
+      .getAll(this.page, this.size)
+      .then((data) => {
+        this.productos = data.data.content;
+      });
+    },
+
+    filterObjects(filter,radio){
+      var filt = {};
+      switch (radio) {
+        case "nombre":
+            filt = {nombre: filter}
+          break;
+        case "codigodebarras":
+            filt = {codigoBarra: filter}
+          break;
+        default:
+          filt = {codigoProducto: filter}
+          break;
+      }      
+
+
+      GenericService(this.tenant, "productos", this.token)
+        .filter(filt)
+        .then(data => {
+          this.productos = data.data.content;
+        });
+    },
+
+    selectedProducts(producto){
+        producto.cant = 1;
+        producto.total = producto.precioTotal;
+        this.products.push(producto);
+    },
+
     save() {
       var tipoDoc;
       if (this.object.documento.ivaCat == 1) {
@@ -399,7 +533,6 @@ export default {
             });
         });
     },
-    //-->
   },
 };
 </script>

@@ -270,14 +270,6 @@ export default {
       );
     },
 
-    // showStock(object) {
-    //   StockService(this.tenant, "stock", this.token)
-    //   .getForProduct(object)
-    //   .then(data => {
-    //     this.stock = data.data;
-    //   })
-    // },
-
     updateStock() {
       var stocks = [];
       this.stock.forEach(element => {
@@ -337,6 +329,7 @@ export default {
           }
         });
         var prod = this.validateImport(excel);
+        console.log(prod)
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
@@ -357,7 +350,6 @@ export default {
     },
 
     validateImport(objects) {
-      console.log(objects);
       var importacion = {
         status: true,
         data: [],

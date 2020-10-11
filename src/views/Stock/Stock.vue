@@ -87,6 +87,7 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import StocksService from "../../services/StocksService";
 
 export default {
   data: () => ({
@@ -107,10 +108,38 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAll(0, 100000);
+    this.getLoguedUser();
   },
 
   methods: {
+     getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        if(this.loguedUser.perfil.id != 1){
+          var sucursal = {
+            sucursal:{
+              id:this.loguedUser.sucursal.id
+            }
+          }
+          this.getStockForSucursal(sucursal);
+        }else{
+          this.getAll(0, 1000000);
+        }
+      })
+    },
+
+    getStockForSucursal(sucursal){
+      StocksService(this.tenant, this.service, this.token)
+      .getForSucursal(sucursal)
+      .then(data => {
+        this.objects = data.data.content;
+        this.paginate.totalPages = data.data.totalPages;
+        this.loaded = true
+      })
+    },
+
     getAll(page, size) {
       this.objects = [];
       this.loaded = false;
@@ -120,7 +149,6 @@ export default {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
-          console.log(this.objects);
         });
     },
 
