@@ -331,8 +331,6 @@ export default {
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
-            .then(function(data){
-            })
             .then(() => {
               this.getAll(this.paginate.page - 1, this.paginate.size);
               this.loaderStatus = true;
