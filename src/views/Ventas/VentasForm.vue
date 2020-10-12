@@ -528,8 +528,6 @@ export default {
 
               ReportsService(this.tenant, this.service, this.token)
               .onCloseSaleReport(comprobante);
-
-              console.log(comprobante);
             });
         });
     },

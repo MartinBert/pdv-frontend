@@ -159,7 +159,6 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        console.log(this.loguedUser);
       })
     },
 

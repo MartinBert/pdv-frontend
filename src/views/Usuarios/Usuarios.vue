@@ -127,7 +127,6 @@ export default {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
-          console.log(this.objects);
         });
     },
 
@@ -174,7 +173,6 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        console.log(this.loguedUser);
       })
     }
   }

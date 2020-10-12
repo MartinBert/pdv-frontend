@@ -148,7 +148,6 @@ export default {
         .getAll()
         .then(data => {
           this.condicioniva = data.data.content;
-          console.log(this.condicioniva);
         });
     },
 

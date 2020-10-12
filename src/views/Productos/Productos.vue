@@ -311,7 +311,6 @@ export default {
 
     //Importar productos
     onChange(event) {
-      console.log(event);
       this.file = event;
       var excel = [];
       var reader = new FileReader();
@@ -329,12 +328,10 @@ export default {
           }
         });
         var prod = this.validateImport(excel);
-        console.log(prod)
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(function(data){
-              console.log(data)
             })
             .then(() => {
               this.getAll(this.paginate.page - 1, this.paginate.size);

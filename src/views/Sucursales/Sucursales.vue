@@ -124,7 +124,6 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        console.log(this.loguedUser)
         if(this.loguedUser.perfil.id == 2){
           this.perfil = 2;
           this.objects = this.loguedUser.empresa.sucursales;

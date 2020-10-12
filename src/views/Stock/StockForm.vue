@@ -6,22 +6,11 @@
         <v-row class="ma-1" v-if="urlId == 0">
             <v-col>
                 <v-autocomplete
-                    :items="productos"
-                    v-model="object.producto"
-                    multiple
-                    item-text="nombre"
-                    label="Productos"
-                    :return-object="true"
-                    :rules="[v => !!v || 'Campo requerido...']"
-                ></v-autocomplete>
-            </v-col>
-            <v-col>
-                <v-autocomplete
                     :items="depositos"
                     v-model="object.deposito"
                     multiple
                     item-text="nombre"
-                    label="Depositos"
+                    label="Seleccione el o los depositos donde se encuentra su stock"
                     :return-object="true"
                     :rules="[v => !!v || 'Campo requerido...']"
                 ></v-autocomplete>
@@ -31,10 +20,80 @@
                     type="number"
                     :counter="50"
                     v-model="object.cantidad"
-                    placeholder="Cantidad"
+                    placeholder="Cantidad de stock"
                     required
                     :rules="[v => !!v || 'Campo requerido...']"
                 ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
+                <label>Seleccione un parámetro para realizar la búsqueda</label>
+                <v-row>
+                  <v-col>
+                    <v-radio
+                    label="Nombre"
+                    value="nombre"
+                    ></v-radio>
+                  </v-col>
+                  <v-col>
+                    <v-radio
+                    label="Código de barras"
+                    value="codigodebarras"
+                    ></v-radio>
+                  </v-col>
+                  <v-col>
+                    <v-radio
+                    label="Código de producto"
+                    value="codigodeproducto"
+                    ></v-radio>
+                  </v-col>
+                </v-row>
+              </v-radio-group>
+              <v-text-field
+                  v-if="radioGroup"
+                  v-model="filterString"
+                  v-on:input="filterObjects(filterString, radioGroup)"
+                  dense
+                  outlined
+                  rounded
+                  class="text-left ml-5 mr-5"
+                  placeholder="Búsqueda"
+                  append-icon="mdi-magnify"
+                ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-simple-table style="background-color: transparent;">
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Nombre</th>
+                      <th>Código de barras</th>
+                      <th>Código de producto</th>
+                      <th>Precio de costo</th>
+                    </tr>
+                  </thead>
+                  <tbody v-for="producto in productos" :key="producto.id">
+                    <tr>
+                      <td><v-checkbox v-model="object.producto" v-bind:value="producto"></v-checkbox></td>
+                      <td>{{producto.nombre}}</td>
+                      <td>{{producto.codigoBarra}}</td>
+                      <td>{{producto.codigoProducto}}</td>
+                      <td>${{producto.precioCosto}}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+              <v-pagination
+                v-model="paginate.page"
+                :length="paginate.totalPages"
+                next-icon="mdi-chevron-right"
+                prev-icon="mdi-chevron-left"
+                :page="paginate.page"
+                :total-visible="8"
+                @input="changePage"
+                v-if="paginate.totalPages > 1"
+              ></v-pagination>
             </v-col>
         </v-row>
         <v-row class="ma-1"  v-if="urlId > 0">
@@ -75,7 +134,6 @@
           <v-col class="col-6">
             <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
             <v-btn color="default" @click="back()">Cancelar</v-btn>
-            <v-btn color="default" @click="getDepositosForSucursal()">Cancelar</v-btn>
           </v-col>
         </div>
       </v-form>
@@ -89,15 +147,17 @@
     </div>
   </v-card>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import StocksService from '../../services/StocksService';
+
 export default {
   data: () => ({
     valid: true,
     urlId: 0,
-    object: {},
+    object: {
+      producto: [],
+    },
     depositos: [],
     productos: [],
     loguedUser: '',
@@ -106,7 +166,15 @@ export default {
     service: "stock",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: ""
+    errorMessage: "",
+    paginate: {
+      page: 1,
+      size: 10,
+      totalPages: 0
+    },
+    radioGroup: '',
+    filterString: '',
+    checked: false
   }),
 
   mounted() {
@@ -117,7 +185,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getOtherModels();
+    this.getOtherModels(0, 10);
     this.getUserLogued();
   },
 
@@ -135,9 +203,12 @@ export default {
       StocksService(this.tenant, "depositos", this.token)
       .getDepositosForSucursal(id)
       .then(data => {
-        console.log(data);
         this.depositos = data.data.content;
       })
+    },
+
+    changePage(page) {
+      this.getOtherModels(page - 1, this.paginate.size);
     },
 
     save() {
@@ -182,19 +253,39 @@ export default {
     },
 
     getOtherModels(page, size) {
-      GenericService(this.tenant, "depositos", this.token)
-        .getAll(page, size)
-        .then(data => {
-          console.log(data);
-          this.depositos = data.data.content;
-        });
-
       GenericService(this.tenant, "productos", this.token)
         .getAll(page, size)
         .then(data => {
           this.productos = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          this.loaded = true;
         });
     },
+
+    filterObjects(filter,radio){
+      var filt = '';
+      switch (radio) {
+        case "nombre":
+            filt = {nombre: filter}
+          break;
+        case "codigodebarras":
+            filt = {codigoBarra: filter}
+          break;
+        default:
+          filt = {codigoProducto: filter}
+          break;
+      }
+
+      if(!filt){
+        this.getOtherModels(0, 10);
+      }else{
+        GenericService(this.tenant, "productos", this.token)
+        .filter(filt)
+        .then(data => {
+          this.productos = data.data.content;
+        });
+      }
+    }, 
 
     getUserLogued(){
       GenericService(this.tenant, this.service, this.token)
