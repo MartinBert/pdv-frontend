@@ -463,7 +463,11 @@ export default {
     },
 
     getReport(){
-      ReportsService(this.tenant,this.service,this.token).listAllProducts();
+      ReportsService(this.tenant,this.service,this.token).listAllProducts().then(res => {
+        var file = new Blob([(res['data'])], {type: 'application/pdf'});
+        var fileURL = URL.createObjectURL(file);
+        window.open(fileURL, '_blank');
+      })
     },
 
     getLoguedUser(){

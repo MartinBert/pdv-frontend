@@ -5,7 +5,9 @@ export default (tenant,service,token) =>{
     // Products reports
         listAllProducts(){
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/generalReport/${tenant}`, {
-                headers: { Authorization: "Bearer " + token }
+                headers: { Authorization: "Bearer " + token },
+                responseType: 'arraybuffer',
+                dataType: 'blob'
             })
         },
 
