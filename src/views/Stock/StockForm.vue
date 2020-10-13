@@ -75,7 +75,7 @@
                   </thead>
                   <tbody v-for="producto in productos" :key="producto.id">
                     <tr>
-                      <td><v-checkbox v-model="object.producto" v-bind:value="producto"></v-checkbox></td>
+                      <td><v-checkbox v-model="producto.selected" @change="checkProduct(producto.id)"></v-checkbox></td>
                       <td>{{producto.nombre}}</td>
                       <td>{{producto.codigoBarra}}</td>
                       <td>{{producto.codigoProducto}}</td>
@@ -183,10 +183,10 @@ export default {
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
+      this.getOtherModels(0, 10);
+      this.getUserLogued();
       this.loaded = true;
     }
-    this.getOtherModels(0, 10);
-    this.getUserLogued();
   },
 
   methods: {
@@ -197,6 +197,17 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
+    },
+
+    checkProduct(id){
+      const productosFiltrados = this.productos.filter(el => el.id === id)[0];
+      if(productosFiltrados.selected){
+        this.object.producto.push(productosFiltrados)
+      }else{
+        const object = this.object.producto.filter(el => el.id !== productosFiltrados.id);
+        this.object.producto = object;
+      }
+      console.log(this.object.producto);
     },
 
     getDepositosForSucursal(id){
@@ -230,7 +241,8 @@ export default {
           this.object.deposito.forEach(ele =>{
                 this.object.producto.forEach(el => {
                     let obj = {
-                        producto: el,
+       
+       producto: el,
                         deposito: ele,
                         cantidad: this.object.cantidad,
                         sucursal: this.loguedUser.sucursal,
@@ -256,7 +268,9 @@ export default {
       GenericService(this.tenant, "productos", this.token)
         .getAll(page, size)
         .then(data => {
-          this.productos = data.data.content;
+          if(this.object.producto.length > 0){
+            console.log(data);
+          }
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
@@ -276,14 +290,27 @@ export default {
           break;
       }
 
-      if(!filt){
+      if(!filt.nombre && !filt.codigoBarra && !filt.codigoProducto){
         this.getOtherModels(0, 10);
       }else{
         GenericService(this.tenant, "productos", this.token)
         .filter(filt)
         .then(data => {
+          if(this.object.producto.length > 0){
+            data.data.content.forEach(el => {
+              this.object.producto.forEach(e => {
+                if(el.id == e.id){
+                  el.selected = true;
+                }
+              })
+            })
+          }
           this.productos = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          this.loaded = true;
         });
+
+        console.log(filt);
       }
     }, 
 
