@@ -149,7 +149,7 @@
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import StocksService from '../../services/StocksService';
+import DepositosService from '../../services/DepositosService';
 
 export default {
   data: () => ({
@@ -180,12 +180,12 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.urlId = this.$route.params.id;
-    if (this.$route.params.id && this.$route.params.id > 0) {
-      this.getObject(this.$route.params.id);
+
+    if (this.urlId && this.urlId > 0) {
+      this.getObject(this.urlId);
     } else {
       this.getOtherModels(0, 10);
       this.getUserLogued();
-      this.loaded = true;
     }
   },
 
@@ -207,11 +207,10 @@ export default {
         const object = this.object.producto.filter(el => el.id !== productosFiltrados.id);
         this.object.producto = object;
       }
-      console.log(this.object.producto);
     },
 
     getDepositosForSucursal(id){
-      StocksService(this.tenant, "depositos", this.token)
+      DepositosService(this.tenant, "depositos", this.token)
       .getDepositosForSucursal(id)
       .then(data => {
         this.depositos = data.data.content;
@@ -269,7 +268,16 @@ export default {
         .getAll(page, size)
         .then(data => {
           if(this.object.producto.length > 0){
-            console.log(data);
+            data.data.content.forEach(el => {
+              this.object.producto.forEach(e => {
+                if(el.id == e.id){
+                  el.selected = true;
+                }
+              })
+            });
+            this.productos = data.data.content;
+          }else{
+            this.productos = data.data.content
           }
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
@@ -290,7 +298,7 @@ export default {
           break;
       }
 
-      if(!filt.nombre && !filt.codigoBarra && !filt.codigoProducto){
+      if(!this.filterString){
         this.getOtherModels(0, 10);
       }else{
         GenericService(this.tenant, "productos", this.token)
@@ -309,8 +317,6 @@ export default {
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-
-        console.log(filt);
       }
     }, 
 

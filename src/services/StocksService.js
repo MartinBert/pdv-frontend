@@ -7,11 +7,5 @@ export default (tenant,service,token) =>{
                 headers: { Authorization: "Bearer " + token }
             })
         },
-
-        getDepositosForSucursal(id){
-            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getDepositosForSucursal/${id}`,{
-                headers: { Authorization: "Bearer " + token }
-            })
-        }
     }
 }
