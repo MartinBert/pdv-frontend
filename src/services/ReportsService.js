@@ -13,8 +13,10 @@ export default (tenant,service,token) =>{
 
     // Sales reports
         onCloseSaleReport(object){
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/onCloseSaleReport`, object,{
-                headers: { Authorization: "Bearer " + token }
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/onCloseSaleReport/${tenant}`, object,{
+                headers: { Authorization: "Bearer " + token },
+                responseType: 'arraybuffer',
+                dataType: 'blob'
             })
         }  
     }

@@ -526,8 +526,14 @@ export default {
               GenericService(this.tenant, "comprobantesFiscales", this.token)
                 .save(comprobante);
 
+              console.log(comprobante);
+
               ReportsService(this.tenant, this.service, this.token)
-              .onCloseSaleReport(comprobante);
+              .onCloseSaleReport(comprobante).then(res => {
+                var file = new Blob([(res['data'])], {type: 'application/pdf'});
+                var fileURL = URL.createObjectURL(file);
+                window.open(fileURL, '_blank');
+              });
             });
         });
     },
