@@ -416,6 +416,17 @@ export default {
         this.products.push(producto);
     },
 
+    formatDate(str){
+      let character = /-/gi;
+      var firstDate = str.replace(character,'');
+      firstDate = firstDate.substring(0,8);
+      let year = firstDate.substring(0, 4);
+      let month = firstDate.substring(4, 6);
+      let day = firstDate.substring(6, 8);
+      let date = day+'/'+month+'/'+year;
+      return date;
+    },
+
     save() {
       var tipoDoc;
       if (this.object.documento.ivaCat == 1) {
@@ -527,6 +538,9 @@ export default {
                 .save(comprobante);
 
               console.log(comprobante);
+
+              comprobante.fechaEmision = this.formatDate(comprobante.fechaEmision);
+              comprobante.fechaVto = this.formatDate(comprobante.fechaVto);
 
               ReportsService(this.tenant, this.service, this.token)
               .onCloseSaleReport(comprobante).then(res => {
