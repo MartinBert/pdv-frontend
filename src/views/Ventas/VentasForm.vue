@@ -88,7 +88,7 @@
                           <tr>
                             <th class="text-left">Producto</th>
                             <th class="text-left">Codigo de barras</th>
-                            <th class="text-left">Cantidad</th>
+                            <th class="text-left">Cantidad de unidades</th>
                             <th class="text-left">Precion unitario</th>
                             <th class="text-left">Precion total</th>
                           </tr>
@@ -98,10 +98,10 @@
                             <td>{{ p.nombre }}</td>
                             <td>{{ p.codigoBarra }}</td>
                             <td>
-                              <input type="number" @input="updateTotal(p.id)" v-model="p.cant" />
+                              <input type="number" @input="updateTotal(p.id)" v-model="p.cantUnidades" />
                             </td>
+                            <td>${{ p.precioUnitario }}</td>
                             <td>${{ p.precioTotal }}</td>
-                            <td>${{ p.total }}</td>
                           </tr>
                         </tbody>
                       </template>
@@ -233,6 +233,7 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import Calculator from "../../components/Calculator";
+import { formatDate } from "../../helpers";
 import axios from "axios";
 import ReportsService from '../../services/ReportsService';
 
@@ -275,7 +276,7 @@ export default {
     totalVenta() {
       var tot = 0;
       this.products.forEach((el) => {
-        tot += parseFloat(el.total);
+        tot += parseFloat(el.precioTotal);
       });
       return tot;
     },
@@ -317,29 +318,42 @@ export default {
   },
 
   methods: {
+
+    processProductsObject(producto){
+      const {nombre, codigoBarra, cantUnidades, precioTotal, total} = producto;
+      let object = {
+        nombre: nombre,
+        codigoBarra: codigoBarra,
+        cantUnidades: cantUnidades,
+        precioUnitario: parseFloat(precioTotal).toFixed(2),
+        precioTotal: parseFloat(total).toFixed(2),
+      }
+      return object;
+    },
+
     onBarcodeScanned(barcode) {
       VentasService(this.tenant, "productos", this.token)
         .getForBarCode(barcode)
         .then((data) => {
           if (this.products.length == 0) {
-            data.data.cant = 1;
+            data.data.cantUnidades = 1;
             data.data.total = data.data.precioTotal;
-            this.products.push(data.data);
+            this.products.push(this.processProductsObject(data.data));
           } else {
             var count = 0;
             for (var i = 0; i < this.products.length; i++) {
               if (this.products[i].id == data.data.id) {
-                this.products[i].cant = parseInt(this.products[i].cant) + 1;
-                this.products[i].total =
-                  this.products[i].precioTotal * this.products[i].cant;
+                this.products[i].cantUnidades = parseInt(this.products[i].cantUnidades) + 1;
+                this.products[i].precioTotal =
+                  this.products[i].precioUnitario * this.products[i].cantUnidades;
                 break;
               } else if (
                 this.products[i].id != data.data.id &&
                 count == this.products.length - 1
               ) {
-                data.data.cant = 1;
+                data.data.cantUnidades = 1;
                 data.data.total = data.data.precioTotal;
-                this.products.push(data.data);
+                this.products.push(this.processProductsObject(data.data));
                 break;
               } else {
                 count += 1;
@@ -358,8 +372,8 @@ export default {
     updateTotal(id) {
       this.products.forEach((el) => {
         if (el.id == id) {
-          el.total = 0;
-          el.total = parseFloat(el.precioTotal) * el.cant;
+          el.precioTotal = 0;
+          el.precioTotal = parseFloat(el.precioUnitario) * el.cantUnidades;
         }
       });
     },
@@ -411,20 +425,9 @@ export default {
     },
 
     selectedProducts(producto){
-        producto.cant = 1;
+        producto.cantUnidades = 1;
         producto.total = producto.precioTotal;
-        this.products.push(producto);
-    },
-
-    formatDate(str){
-      let character = /-/gi;
-      var firstDate = str.replace(character,'');
-      firstDate = firstDate.substring(0,8);
-      let year = firstDate.substring(0, 4);
-      let month = firstDate.substring(4, 6);
-      let day = firstDate.substring(6, 8);
-      let date = day+'/'+month+'/'+year;
-      return date;
+        this.products.push(this.processProductsObject(producto));
     },
 
     save() {
@@ -485,18 +488,20 @@ export default {
         tributos: [],
       };
 
+      console.log(this.token);
+
       //Get authorized voucher number
       axios
         .get(
           `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${razonSocial}/${cuit}/${ptoVenta}/${body.cbteTipo}`,
           {
             headers: {
-              Authorization:
-                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNTk3MTY2MDIxLCJpc3MiOiJJU1NVRVIifQ.ywGMiq5eLNRp_xVfRgTAm3ZTnpZPWgVG0K45NJQWz1M",
+              Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNjAyNzgzOTc4LCJpc3MiOiJJU1NVRVIifQ.JgvBiH_zHDdgLAzNPvZl2eimGcRZAihQn2cTYilONb4"
             },
           }
         )
         .then((data) => {
+          console.log(data.data);
           // Assign nroDesde & nroHasta
           body.nroDesde = data.data + 1;
           body.nroHasta = body.nroDesde;
@@ -539,8 +544,8 @@ export default {
 
               console.log(comprobante);
 
-              comprobante.fechaEmision = this.formatDate(comprobante.fechaEmision);
-              comprobante.fechaVto = this.formatDate(comprobante.fechaVto);
+              comprobante.fechaEmision = formatDate(comprobante.fechaEmision);
+              comprobante.fechaVto = formatDate(comprobante.fechaVto);
 
               ReportsService(this.tenant, this.service, this.token)
               .onCloseSaleReport(comprobante).then(res => {
