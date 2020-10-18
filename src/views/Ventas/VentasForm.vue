@@ -599,7 +599,7 @@ export default {
               comprobante.fechaVto = formatDate(comprobante.fechaVto);
 
               ReportsService(this.tenant, this.service, this.token)
-                .onCloseSaleReport(comprobante)
+                .onCloseSaleReport(comprobante, this.totalVenta)
                 .then((res) => {
                   var file = new Blob([res["data"]], {
                     type: "application/pdf",
@@ -657,7 +657,7 @@ export default {
       GenericService(this.tenant, "comprobantesFiscales",this.token).save(comprobante);
 
       ReportsService(this.tenant, this.service, this.token)
-        .onCloseSaleReport(comprobante)
+        .onCloseSaleReport(comprobante, this.totalVenta)
         .then((res) => {
           var file = new Blob([res["data"]], {
             type: "application/pdf",
