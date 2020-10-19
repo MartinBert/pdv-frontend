@@ -1,17 +1,27 @@
 <template>
   <v-container>
+
     <!-- Body -->
-    <v-snackbar
-      v-model="snackError"
-      :color="'#E53935'"
-      :timeout="3000"
-      :top="true"
-      >{{ errorMessage }}</v-snackbar
-    >
     <v-col cols="12">
       <v-row>
-        <v-col>
-          <v-btn color="primary" @click="getProducts()">BUSCAR PRODUCTO</v-btn>
+        <v-col cols="3">
+          <v-btn color="primary" @click="$store.commit('dialogProductosMutation')">BUSCAR PRODUCTO</v-btn>
+        </v-col>
+        <v-col cols="3"></v-col>
+        <v-col class="text-right">
+          <select class="select-ventas-import" v-model="modificator">
+            <option value="">Modificar importe total</option>
+            <option value="descuento">Descuento</option>
+            <option value="recargo">Recargo</option>
+          </select>
+        </v-col>
+        <v-col cols="3" v-if="modificator">
+          <input
+            class="totalInput"
+            v-model="priceModificationPorcent"
+            type="number"
+          />
+          <v-btn class="success ml-3" @click="applyModification(modificator, priceModificationPorcent)">Aplicar<v-icon>mdi-check-bold</v-icon></v-btn>
         </v-col>
       </v-row>
       <div class="horizontalSeparator"></div>
@@ -44,7 +54,7 @@
                       item-text="nombre"
                       :return-object="true"
                       :rules="[(v) => !!v || 'Campo requerido...']"
-                      placeholder="Seleccione un tipo de comprobante..."
+                      placeholder="Seleccione un tipo de comprobante"
                     ></v-autocomplete>
                   </v-col>
                   <v-col cols="6">
@@ -56,7 +66,7 @@
                       item-text="nombre"
                       :return-object="true"
                       :rules="[(v) => !!v || 'Campo requerido...']"
-                      placeholder="Seleccione un medio de pago..."
+                      placeholder="Seleccione un medio de pago"
                     ></v-autocomplete>
                   </v-col>
                   <v-col cols="6">
@@ -67,7 +77,7 @@
                       item-text="nombre"
                       :return-object="true"
                       :rules="[(v) => !!v || 'Campo requerido...']"
-                      placeholder="Seleccione un plan de pago..."
+                      placeholder="Seleccione un plan de pago"
                     ></v-autocomplete>
                   </v-col>
                 </v-row>
@@ -106,6 +116,7 @@
                         <th class="text-left">Cantidad de unidades</th>
                         <th class="text-left">Precion unitario</th>
                         <th class="text-left">Precion total</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -121,6 +132,7 @@
                         </td>
                         <td>${{ p.precioUnitario }}</td>
                         <td>${{ p.precioTotal }}</td>
+                        <td><button type="button"><img src="/../../images/icons/ico_11.svg" @click="deleteLine(p.id)" width="40" height="40"/></button></td>
                       </tr>
                     </tbody>
                   </template>
@@ -171,90 +183,9 @@
         </v-col>
       </v-row>
     </v-col>
-    <!-- End Body -->
 
     <!-- Dialog -->
-    <v-dialog v-model="dialog" scrollable max-width="700px">
-      <v-card>
-        <v-card-title
-          >Seleccione un parámetro para realizar la búsqueda</v-card-title
-        >
-        <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
-          <v-row>
-            <v-col>
-              <v-radio label="Nombre" value="nombre"></v-radio>
-            </v-col>
-            <v-col>
-              <v-radio
-                label="Código de barras"
-                value="codigodebarras"
-              ></v-radio>
-            </v-col>
-            <v-col>
-              <v-radio
-                label="Código de producto"
-                value="codigodeproducto"
-              ></v-radio>
-            </v-col>
-          </v-row>
-        </v-radio-group>
-        <v-text-field
-          v-if="radioGroup"
-          v-model="filterString"
-          v-on:input="filterObjects(filterString, radioGroup)"
-          dense
-          outlined
-          rounded
-          class="text-left ml-5 mr-5"
-          placeholder="Búsqueda"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-        <v-divider></v-divider>
-        <v-card-text style="height: 300px">
-          <v-container fluid>
-            <v-row>
-              <v-col>
-                <v-simple-table style="background-color: transparent">
-                  <template v-slot:default>
-                    <thead>
-                      <tr>
-                        <th>Elegir</th>
-                        <th>Producto</th>
-                        <th>Código de barras</th>
-                        <th>Código de producto</th>
-                      </tr>
-                    </thead>
-                    <tbody v-for="producto in productos" :key="producto.id">
-                      <tr>
-                        <td>
-                          <v-checkbox
-                            v-model="producto.selected"
-                            @change="checkProduct(producto.id)"
-                          ></v-checkbox>
-                        </td>
-                        <td>{{ producto.nombre }}</td>
-                        <td>{{ producto.codigoBarra }}</td>
-                        <td>{{ producto.codigoProducto }}</td>
-                      </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-btn color="blue darken-1" text @click="dialog = false">
-            Close
-          </v-btn>
-          <v-btn color="blue darken-1" text @click="dialog = false">
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog -->
+    <ProductDialog v-on:productList="addProduct"/>
   </v-container>
 </template>
 
@@ -262,17 +193,18 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import Calculator from "../../components/Calculator";
+import ProductDialog from "../../components/ProductDialog";
 import { formatDate, getCurrentDate } from "../../helpers/dateHelper";
 import {
   calculateAlicIvaBaseImpVentas,
   calculateAlicIvaImporteVentas,
-  generateBarCode
+  generateBarCode,
+  calculatePercentaje
 } from "../../helpers/mathHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
 import StocksService from '../../services/StocksService';
 import DepositosService from '../../services/DepositosService';
-
 
 export default {
   data: () => ({
@@ -296,14 +228,15 @@ export default {
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-    dialog: false,
-    filterString: "",
-    radioGroup: "",
-    afipModuleAuthorization: {}
+    afipModuleAuthorization: {},
+    modificator: "",
+    priceModificationPorcent: 0,
+    
   }),
 
   components: {
     Calculator,
+    ProductDialog
   },
 
   created() {
@@ -314,15 +247,19 @@ export default {
     totalVenta() {
       var tot = 0;
       this.products.forEach((el) => {
-        tot += parseFloat(el.precioTotal);
+        if(this.object.planPago){
+          let porcentaje = parseFloat(this.object.planPago.porcentaje.toString().replace('-','') / 100).toFixed(2);
+          console.log(porcentaje);
+          tot += tot + (tot * porcentaje);
+        }else{
+          tot += parseFloat(el.precioTotal);
+        }
       });
-      return tot;
     },
   },
-
+  
   mounted() {
     this.tenant = this.$route.params.tenant;
-
     GenericService(this.tenant, "clientes", this.token)
       .getAll(this.page, this.size)
       .then(data => {
@@ -439,48 +376,40 @@ export default {
       this.databaseItems.planes = id.planPago;
     },
 
-    getProducts() {
-      this.dialog = !this.dialog;
-      GenericService(this.tenant, "productos", this.token)
-        .getAll(this.page, this.size)
-        .then((data) => {
-          this.productos = data.data.content;
-        });
+    deleteLine(id){
+      const filter = this.products.filter(el => el.id !== id);
+      this.products = filter;
     },
 
-    filterObjects(filter, radio) {
-      var filt = {};
-      switch (radio) {
-        case "nombre":
-          filt = { nombre: filter };
-          break;
-        case "codigodebarras":
-          filt = { codigoBarra: filter };
-          break;
-        default:
-          filt = { codigoProducto: filter };
-          break;
+    applyModification(modificator, priceModificationPorcent){
+      const percent = calculatePercentaje(this.totalVenta, priceModificationPorcent);
+      if(modificator === "descuento"){
+        let obj = {
+          nombre: "DESCUENTO",
+          codigoBarra: 1111111111,
+          cantUnidades: 1,
+          precioUnitario: -percent,
+          precioTotal: -percent,
+        }
+        this.products.push(obj);
+      }else{
+        let obj = {
+          nombre: "RECARGO",
+          codigoBarra: 2222222222,
+          cantUnidades: 1,
+          precioUnitario: percent,
+          precioTotal: percent,
+        }
+        this.products.push(obj);
       }
-
-      GenericService(this.tenant, "productos", this.token)
-        .filter(filt)
-        .then((data) => {
-          this.productos = data.data.content;
-        });
     },
 
-    checkProduct(id) {
-      const productosFiltrados = this.productos.filter((el) => el.id === id)[0];
-      if (productosFiltrados.selected) {
-        productosFiltrados.cantUnidades = 1;
-        productosFiltrados.total = productosFiltrados.precioTotal;
-        this.products.push(this.processProductsObject(productosFiltrados));
-      } else {
-        const object = this.products.filter(
-          (el) => el.id !== productosFiltrados.id
-        );
-        this.products = object;
-      }
+    addProduct(data){
+      let processObjects = [];
+      data.forEach(el => {
+        processObjects.push(this.processProductsObject(el));
+      })
+      this.products = processObjects;
     },
 
     save() {
@@ -696,6 +625,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .button_cliente_class {
   background-image: url("/images/buttons/btn_cliente.svg");
@@ -717,6 +647,16 @@ export default {
   color: black;
   text-align: right;
   padding: 5px;
+}
+
+.select-ventas-import{
+    font-family: Century Gothic, CenturyGothic, AppleGothic, sans-serif;
+    font-weight: bold;
+    font-style: italic;
+    border-bottom: solid 1px rgb(63, 81, 181);
+    color: rgb(172, 171, 171);
+    text-align: right;
+    padding: 5px 10px 5px 10px;
 }
 
 .horizontalSeparator {

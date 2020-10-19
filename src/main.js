@@ -17,7 +17,24 @@ Vue.use(Vuex)
 Vue.use(VueBarcodeScanner, options)
 Vue.use(colors)
 const store = new Vuex.Store({
-  state:{}
+  state:{
+    dialogProd: false,
+    products: []
+  },
+  mutations: {
+    dialogProductosMutation(state){
+      state.dialogProd = !state.dialogProd;
+    },
+    addProductsToSale(state, object){
+      state.products.push(object);
+      console.log(state.products)
+    },
+    removeProductsToSale(state, id){
+      const productos = state.products.filter(el => el.id !== id);
+      state.products = productos;
+      console.log(state.products)
+    } 
+  }
 })
 
 new Vue({

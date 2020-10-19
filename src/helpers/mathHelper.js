@@ -12,3 +12,9 @@ export function generateBarCode(){
     const barCode = Math.floor(1e9 + (Math.random() * 9e9));
     return barCode;
 }
+
+export function calculatePercentaje(totalVenta, porcentaje){
+    const cleanPorcentaje = parseFloat(porcentaje.replace(/-/, '') / 100);
+    const result = parseFloat(totalVenta * cleanPorcentaje).toFixed(2);
+    return result;
+}
