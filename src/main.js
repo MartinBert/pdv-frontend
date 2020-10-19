@@ -33,6 +33,10 @@ const store = new Vuex.Store({
       const productos = state.products.filter(el => el.id !== id);
       state.products = productos;
       console.log(state.products)
+    },
+    resetStates(state){
+      state.dialogProd = false;
+      state.products = [];
     } 
   }
 })

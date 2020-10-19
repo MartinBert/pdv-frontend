@@ -18,3 +18,9 @@ export function calculatePercentaje(totalVenta, porcentaje){
     const result = parseFloat(totalVenta * cleanPorcentaje).toFixed(2);
     return result;
 }
+
+export function sumarNumeros(array){
+    const reducer = (accumulator, currentValue) => accumulator + currentValue;
+    const result = array.reduce(reducer);
+    return result;
+}

@@ -199,7 +199,8 @@ import {
   calculateAlicIvaBaseImpVentas,
   calculateAlicIvaImporteVentas,
   generateBarCode,
-  calculatePercentaje
+  calculatePercentaje,
+  sumarNumeros
 } from "../../helpers/mathHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
@@ -244,21 +245,21 @@ export default {
   },
 
   computed: {
-    totalVenta() {
-      var tot = 0;
+    totalVenta(){
+      let tot = 0;
+      let porcentajePlan = 0;
+      if(this.object.planPago){
+        porcentajePlan = this.object.planPago.porcentaje
+      }
       this.products.forEach((el) => {
-        if(this.object.planPago){
-          let porcentaje = parseFloat(this.object.planPago.porcentaje.toString().replace('-','') / 100).toFixed(2);
-          console.log(porcentaje);
-          tot += tot + (tot * porcentaje);
-        }else{
-          tot += parseFloat(el.precioTotal);
-        }
+        tot = this.acumularRecargo(porcentajePlan, el.precioTotal, tot);
       });
+      return parseFloat(tot).toFixed(2);
     },
   },
   
   mounted() {
+    this.$store.commit('resetStates');
     this.tenant = this.$route.params.tenant;
     GenericService(this.tenant, "clientes", this.token)
       .getAll(this.page, this.size)
@@ -410,6 +411,15 @@ export default {
         processObjects.push(this.processProductsObject(el));
       })
       this.products = processObjects;
+    },
+
+    acumularRecargo(porcentaje, precioProducto, acumulado){
+      console.log("asdfasdf")
+      let cleanPorcent = parseFloat(porcentaje / 100).toFixed(2);
+      let impPorcent = (precioProducto * cleanPorcent).toFixed(2);
+      let total = sumarNumeros([Number(acumulado), Number(precioProducto), Number(impPorcent)]);
+
+      return total;
     },
 
     save() {
