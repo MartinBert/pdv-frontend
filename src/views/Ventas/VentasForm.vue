@@ -89,6 +89,7 @@
                     <v-col class="text-right">
                       <label class="mr-3">TOTAL:</label>
                       <input
+                        disabled
                         class="totalInput"
                         v-model="totalVenta"
                         type="text"
@@ -98,7 +99,12 @@
                   <v-row>
                     <v-col class="text-right">
                       <label class="mr-3">ITEMS:</label>
-                      <input class="totalInput" type="text" />
+                      <input 
+                      disabled
+                      class="totalInput" 
+                      type="text"
+                      v-model="totalItems"
+                      />
                     </v-col>
                   </v-row>
                 </v-container>
@@ -121,7 +127,7 @@
                     </thead>
                     <tbody>
                       <tr v-for="p in products" :key="p.id">
-                        <td>{{ p.nombre }}</td>
+                        <td @click="applyIndividualPercent(p)" style="cursor:pointer">{{ p.nombre }}</td>
                         <td>{{ p.codigoBarra }}</td>
                         <td>
                           <input
@@ -184,8 +190,28 @@
       </v-row>
     </v-col>
 
-    <!-- Dialog -->
+    <!-- Add products dialog -->
     <ProductDialog v-on:productList="addProduct"/>
+
+    <!-- Individual percent dialog -->
+    <v-dialog
+      v-model="dialogIndividualPercent"
+      width="500"
+    >
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          Modificar precio a renglón
+        </v-card-title>
+        <v-container class="text-center">
+          <v-text-field
+          placeholder="Porcentaje"
+          type="number"
+          v-model="individualPercent"
+          ></v-text-field>
+          <v-btn class="success ml-3" @click="applyToLine(individualPercent)">Aplicar<v-icon>mdi-check-bold</v-icon></v-btn>
+        </v-container>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -232,7 +258,9 @@ export default {
     afipModuleAuthorization: {},
     modificator: "",
     priceModificationPorcent: 0,
-    
+    dialogIndividualPercent: false,
+    renglon: {},
+    individualPercent: "" 
   }),
 
   components: {
@@ -256,6 +284,14 @@ export default {
       });
       return parseFloat(tot).toFixed(2);
     },
+
+    totalItems(){
+      let totItems = 0
+      this.products.forEach(el => {
+        totItems = sumarNumeros([totItems, el.cantUnidades])
+      })
+      return totItems
+    }
   },
   
   mounted() {
@@ -388,7 +424,7 @@ export default {
         let obj = {
           nombre: "DESCUENTO",
           codigoBarra: 1111111111,
-          cantUnidades: 1,
+          cantUnidades: 0,
           precioUnitario: -percent,
           precioTotal: -percent,
         }
@@ -397,12 +433,17 @@ export default {
         let obj = {
           nombre: "RECARGO",
           codigoBarra: 2222222222,
-          cantUnidades: 1,
+          cantUnidades: 0,
           precioUnitario: percent,
           precioTotal: percent,
         }
         this.products.push(obj);
       }
+    },
+
+    applyIndividualPercent(p){
+      this.dialogIndividualPercent = true;
+      this.renglon = p;
     },
 
     addProduct(data){
@@ -414,12 +455,35 @@ export default {
     },
 
     acumularRecargo(porcentaje, precioProducto, acumulado){
-      console.log("asdfasdf")
       let cleanPorcent = parseFloat(porcentaje / 100).toFixed(2);
       let impPorcent = (precioProducto * cleanPorcent).toFixed(2);
       let total = sumarNumeros([Number(acumulado), Number(precioProducto), Number(impPorcent)]);
 
       return total;
+    },
+
+    applyToLine(percent){
+      const type = percent.search("-");
+      let object = {}
+      if(type === 0){
+        object = {
+          nombre: "DESCUENTO EN RENGLÓN "+this.renglon.id,
+          codigoBarra: 3333333333,
+          cantUnidades: 0,
+          precioUnitario: -calculatePercentaje(this.renglon.precioTotal, percent),
+          precioTotal: -calculatePercentaje(this.renglon.precioTotal, percent),
+        }
+      }else{
+        object = {
+          nombre: "RECARGO EN RENGLÓN "+this.renglon.id,
+          codigoBarra: 4444444444,
+          cantUnidades: 0,
+          precioUnitario: calculatePercentaje(this.renglon.precioTotal, percent),
+          precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
+        }
+      }
+      
+      this.products.push(object);
     },
 
     save() {
