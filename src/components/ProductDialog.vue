@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="$store.state.dialogProd" scrollable max-width="700px">
+    <v-dialog v-model="$store.state.ventas.dialogProd" scrollable max-width="700px">
       <v-card>
         <v-row>
             <v-col>
@@ -90,7 +90,7 @@ export default {
 
     watch:{
         setDialog(){
-            this.dialog = this.$store.state.dialogProd
+            this.dialog = this.$store.state.ventas.dialogProd
         }
     },
 
@@ -131,11 +131,11 @@ export default {
         if (productosFiltrados.selected) {
           productosFiltrados.cantUnidades = 1;
           productosFiltrados.total = productosFiltrados.precioTotal;
-          this.$store.commit('addProductsToSale', productosFiltrados);
-          this.$emit('productList', this.$store.state.products);
+          this.$store.commit('ventas/addProductsToSale', productosFiltrados);
+          this.$emit('productList', this.$store.state.ventas.products);
         } else {
-          this.$store.commit('removeProductsToSale', id);
-          this.$emit('productList', this.$store.state.products);
+          this.$store.commit('ventas/removeProductsToSale', id);
+          this.$emit('productList', this.$store.state.ventas.products);
         }
       },
     }

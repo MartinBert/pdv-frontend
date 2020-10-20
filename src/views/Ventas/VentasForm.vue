@@ -5,7 +5,7 @@
     <v-col cols="12">
       <v-row>
         <v-col cols="3">
-          <v-btn color="primary" @click="$store.commit('dialogProductosMutation')">BUSCAR PRODUCTO</v-btn>
+          <v-btn color="primary" @click="$store.commit('ventas/dialogProductosMutation')">BUSCAR PRODUCTO</v-btn>
         </v-col>
         <v-col cols="3"></v-col>
         <v-col class="text-right">
@@ -295,7 +295,7 @@ export default {
   },
   
   mounted() {
-    this.$store.commit('resetStates');
+    this.$store.commit('ventas/resetStates');
     this.tenant = this.$route.params.tenant;
     GenericService(this.tenant, "clientes", this.token)
       .getAll(this.page, this.size)
@@ -590,6 +590,9 @@ export default {
                 documentoComercial: this.object.documento,
                 empresa: this.user.empresa,
                 cliente: this.object.cliente,
+                totalVenta: this.totalVenta,
+                mediosPago: [this.object.mediosPago],
+                planesPago: [this.object.planPago]
               };
 
               GenericService(
@@ -655,6 +658,8 @@ export default {
         documentoComercial: this.object.documento,
         empresa: this.user.empresa,
         cliente: this.object.cliente,
+        totalVenta: this.totalVenta,
+        mediosPago: this.object.mediosPago
       };
 
       GenericService(this.tenant, "comprobantesFiscales",this.token).save(comprobante);
