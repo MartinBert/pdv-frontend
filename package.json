@@ -24,6 +24,7 @@
     "vue": "^2.6.11",
     "vue-barcode-scanner": "^0.8.1",
     "vue-router": "^3.1.6",
+    "vue-sweetalert2": "^4.0.0",
     "vuelidate": "^0.7.5",
     "vuetify": "^2.2.27",
     "vuex": "^3.3.0",

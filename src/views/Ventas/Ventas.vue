@@ -41,13 +41,12 @@
             <td>{{object.id}}</td>
             <td>{{object.fechaEmision}}</td>
             <td>{{object.barCode}}</td>
-            <td><v-btn class="success" @click="seeDetails(object.producto)">VER DETALLES</v-btn></td>
+            <td><v-btn class="success" @click="seeDetails(object.productos)">VER DETALLES</v-btn></td>
             <td><v-btn class="success" @click="seeDetails(object.mediosPago)">VER DETALLES</v-btn></td>
             <td><v-btn class="success" @click="seeDetails(object.planesPago)">VER DETALLES</v-btn></td>
             <td>${{object.totalVenta}}</td>
             <td>
-              <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
-              <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
+              <a title="Reimprimir comprobante"><img src="/../../images/icons/ico_10.svg" @click="print(object)" width="40" height="40"/></a>
             </td>
           </tr>
         </tbody>
@@ -74,78 +73,55 @@
     ></v-pagination>
     <!-- End Paginate -->
 
-    <v-dialog v-model="dialogPaymentsPlans" persistent width="500">
+    <v-dialog v-model="dialog" persistent width="500">
       <v-card>
         <v-card-title class="headline grey lighten-2">
-          Planes de pago asociados a la venta
+          <span v-if="dialogMode === 1">Métodos de pago asociados a la venta</span>
+          <span v-if="dialogMode === 2">Planes de pago asociados a la venta</span>
+          <span v-if="dialogMode === 3">Productos</span>
         </v-card-title>
           <v-simple-table style="background-color: transparent;">
             <template v-slot:default>
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th v-if="dialogMode !== 3">ID</th>
                   <th>Nombre</th>
-                  <th>Cuotas</th>
-                  <th>Porcentaje</th>
+                  <th v-if="dialogMode === 2">Cuotas</th>
+                  <th v-if="dialogMode === 2">Porcentaje</th>
+                  <th v-if="dialogMode === 3">Precio Unitario</th>
+                  <th v-if="dialogMode === 3">Cantidad de unidades</th>
+                  <th v-if="dialogMode === 3">Precio Total</th>
                 </tr>
               </thead>
-              <tbody v-for="object in $store.state.ventas.planesPago" :key="object.id">
+              <tbody v-for="object in $store.state.ventas.detailSalesList" :key="object.id">
                 <tr>
-                  <td>{{object.id}}</td>
+                  <td v-if="dialogMode !== 3">{{object.id}}</td>
                   <td>{{object.nombre}}</td>
-                  <td>{{object.cuotas}}</td>
-                  <td>{{object.porcentaje}}</td>
+                  <td v-if="dialogMode === 2">{{object.cuotas}}</td>
+                  <td v-if="dialogMode === 2">{{object.porcentaje}}</td>
+                  <td v-if="dialogMode === 3">{{object.precioUnitario}}</td>
+                  <td v-if="dialogMode === 3">{{object.cantUnidades}}</td>
+                  <td v-if="dialogMode === 3">{{object.precioTotal}}</td>
                 </tr>
               </tbody>
             </template>
           </v-simple-table>
         <v-card-actions>
-          <v-btn color="primary" @click="closePaymentDialog('plans')">
+          <v-btn color="primary" @click="closeDialog()">
             <i class="material-icons">mdi-pencil</i>
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogPaymentsMethods" persistent width="500">
-      <v-card>
-        <v-card-title class="headline grey lighten-2">
-          Medios de pago asociados a la venta
-        </v-card-title>
-          <v-simple-table style="background-color: transparent;">
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                </tr>
-              </thead>
-              <tbody v-for="object in $store.state.ventas.mediosPago" :key="object.id">
-                <tr>
-                  <td>{{object.id}}</td>
-                  <td>{{object.nombre}}</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        <v-card-actions>
-          <v-btn color="primary" @click="closePaymentDialog('methods')">
-            <i class="material-icons">pencil</i>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
-import { formatDate } from "../../helpers/dateHelper"; 
+import ReportsService from '../../services/ReportsService';
 export default {
-
-  components:{
-    
-  }, 
+   
   data: () => ({
     icon: "mdi-check-circle",
     file: null,
@@ -160,9 +136,9 @@ export default {
     tenant: "",
     service: "comprobantesFiscales",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false,
-    dialogPaymentsPlans: false,
-    dialogPaymentsMethods:false
+    dialogMode: "",
+    dialog: false,
+
   }),
 
   mounted() {
@@ -177,9 +153,6 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .getAll(page, size)
         .then(data => {
-          data.data.content.forEach(el => {
-            el.fechaEmision = formatDate(el.fechaEmision);
-          });
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
@@ -202,14 +175,15 @@ export default {
     },
 
     seeDetails(object){
+      console.log(object);
       if(object[0] !== undefined){
         const evalObject = Object.keys(object[0]);
         if(evalObject[2] === "planPago"){
-          this.openPymentsMethodsDialog(object);
-        }else if(evalObject[2] === "medioPago"){
-          this.openPaymentsPlansDialog(object);
+          this.openDialog(object, 1);
+        }else if(evalObject[2] === "cuotas"){
+          this.openDialog(object, 2);
         }else{
-          console.log(object);
+          this.openDialog(object, 3);
         }
       }else{
         console.log("Undefined data");
@@ -217,25 +191,29 @@ export default {
       
     },
 
-    closePaymentDialog(value){
-      if(value === 'plans'){
-        this.dialogPaymentsPlans = false;
-        this.$store.commit('ventas/resetStates');
-      }else{
-        this.dialogPaymentsMethods = false;
-        this.$store.commit('ventas/resetStates');
-      }
+    closeDialog(){
+      this.dialog = false;
+      this.$store.commit('ventas/resetStates');
     },
 
-    openPaymentsPlansDialog(object){
-      this.$store.commit('ventas/addPaymentsPlans', object);
-      this.dialogPaymentsPlans = true;
+    openDialog(object, type){
+      this.dialogMode = type;
+      this.$store.commit('ventas/addDetailSalesList', object);
+      this.dialog = true; 
     },
 
-    openPymentsMethodsDialog(object){
-      this.$store.commit('ventas/addPaymentsMethods', object);
-      this.dialogPaymentsMethods = true
-    },
+    print(object){
+      ReportsService(this.tenant, "ventas", this.token)
+      .onCloseSaleReport(object)
+      .then((res) => {
+        var file = new Blob([res["data"]], {
+          type: "application/pdf",
+        });
+        var fileURL = URL.createObjectURL(file);
+        window.open(fileURL, "_blank");
+      });
+    }
+
   },
 };
 </script>

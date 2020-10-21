@@ -3,16 +3,14 @@ export default {
   state: {
     dialogProd: false,
     products: [],
-    mediosPago: [],
-    planesPago:[]
+    detailSalesList: []
   },
   getters: {},
   mutations: {
     resetStates(state) {
       state.dialogProd = false;
       state.products = [];
-      state.mediosPago = [],
-      state.planesPago = []
+      state.detailSalesList = []
     },
     dialogProductosMutation(state) {
       state.dialogProd = !state.dialogProd;
@@ -24,12 +22,9 @@ export default {
       const productos = state.products.filter(el => el.id !== id);
       state.products = productos;
     },
-    addPaymentsPlans(state, plans){
-      state.planesPago = plans;
+    addDetailSalesList(state, object){
+      state.detailSalesList = object;
     },
-    addPaymentsMethods(state, methods){
-      state.mediosPago = methods;
-    }
   },
   actions: {}
 };

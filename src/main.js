@@ -7,16 +7,18 @@ import colors from 'vuetify/lib/util/colors';
 import Vuex from 'vuex';
 import VueBarcodeScanner from 'vue-barcode-scanner';
 import store from  './store/index';
+import VueSweetalert2 from 'vue-sweetalert2';
+
 Vue.config.productionTip = false
 
 let options = {
   controlSequenceKeys: ['NumLock', 'Clear']
 }
 
-Vue.use(Vuex)
-Vue.use(VueBarcodeScanner, options)
-Vue.use(colors)
-
+Vue.use(Vuex);
+Vue.use(colors);
+Vue.use(VueBarcodeScanner, options);
+Vue.use(VueSweetalert2);
 new Vue({
   store,
   router,

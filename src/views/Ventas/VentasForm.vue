@@ -53,7 +53,6 @@
                       :items="databaseItems.documentos"
                       item-text="nombre"
                       :return-object="true"
-                      :rules="[(v) => !!v || 'Campo requerido...']"
                       placeholder="Seleccione un tipo de comprobante"
                     ></v-autocomplete>
                   </v-col>
@@ -65,7 +64,6 @@
                       :items="databaseItems.medios_de_pago"
                       item-text="nombre"
                       :return-object="true"
-                      :rules="[(v) => !!v || 'Campo requerido...']"
                       placeholder="Seleccione un medio de pago"
                     ></v-autocomplete>
                   </v-col>
@@ -76,7 +74,6 @@
                       :items="databaseItems.planes"
                       item-text="nombre"
                       :return-object="true"
-                      :rules="[(v) => !!v || 'Campo requerido...']"
                       placeholder="Seleccione un plan de pago"
                     ></v-autocomplete>
                   </v-col>
@@ -288,7 +285,7 @@ export default {
     totalItems(){
       let totItems = 0
       this.products.forEach(el => {
-        totItems = sumarNumeros([totItems, el.cantUnidades])
+        totItems = sumarNumeros([Number(totItems), Number(el.cantUnidades)])
       })
       return totItems
     }
@@ -482,70 +479,94 @@ export default {
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
         }
       }
-      
       this.products.push(object);
+      this.dialogIndividualPercent = false;
     },
 
     save() {
-      let idSucursal = this.user.sucursal.id;
-      DepositosService(this.tenant, "depositos", this.token)
-      .getDepositosForSucursal(idSucursal)
+      /* Constants */
+      const sucursal = this.user.sucursal;
+      const sucursalIdFilterStock = {sucursal: {id: sucursal.id}};
+      const ptoVenta = this.user.puntoVenta;
+      const products = this.products;
+      const documento = this.object.documento;
+      const empresa = this.user.empresa;
+      const cliente = this.object.cliente;
+      const mediosPago = this.object.mediosPago;
+      const planesPago = this.object.planPago;
+      const fecha = this.fecha;
+      const totalVenta = this.totalVenta;
+      const tenant = this.tenant;
+      const token = this.token;
+      const service = this.service;
+      const afipAuthorization = this.afipModuleAuthorization;
+
+      /* Mutable vars */
+      let tipoDoc;
+      let alicIva = { baseImp: 0, id: 5, importe: 0 };
+      let impNeto;
+      let comprobante;
+      let cabeceraAfip;
+      let detalleAfip;
+      let file;
+      let fileURL;
+      let productos;
+      let condVenta;
+
+      if(planesPago.length < 2){
+        if(planesPago[0].cuotas > 1){
+          condVenta = true;
+        }else{
+          condVenta = false;
+        }
+      }else{
+        condVenta = false;
+      }
+
+      DepositosService(tenant, "depositos", token)
+      .getDepositosForSucursal(sucursal.id)
       .then(data => {
         this.depositos = data.data.content;  
-      })
+      });
 
-      var tipoDoc;
-      if (this.object.documento.ivaCat == 1) {
+      if (documento.ivaCat == 1) {
         tipoDoc = 80;
       } else {
         tipoDoc = 94;
       }
 
-      var cuit = this.user.sucursal.cuit;
-      var razonSocial = this.user.sucursal.razonSocial;
-      var ptoVenta = this.user.puntoVenta.idFiscal;
-
-      var alicIva = {
-        baseImp: 0,
-        id: 5,
-        importe: 0,
-      };
       if (
-        this.object.documento.ivaCat == 2 ||
-        this.object.documento.ivaCat == 1
+        documento.ivaCat == 2 ||
+        documento.ivaCat == 1
       ) {
-        var impNeto;
-        alicIva.baseImp = calculateAlicIvaBaseImpVentas(this.totalVenta);
-        alicIva.importe = calculateAlicIvaImporteVentas(
-          this.totalVenta,
-          alicIva.baseImp
-        );
+        alicIva.baseImp = calculateAlicIvaBaseImpVentas(totalVenta);
+        alicIva.importe = calculateAlicIvaImporteVentas(totalVenta,alicIva.baseImp);
         impNeto = alicIva.baseImp;
       } else {
         alicIva = [];
       }
 
       //Instance body from AFIP ws-services
-      var body = {
+      let body = {
         alicIva: [alicIva],
         asociados: [],
-        cbteTipo: this.object.documento.codigoDocumento,
+        cbteTipo: documento.codigoDocumento,
         concepto: 1,
         cotizMoneda: 1,
-        cuit: cuit,
-        fecha: this.fecha,
-        fechaServicioHasta: this.fecha,
-        fechaServicioVenc: this.fecha,
-        fechaServiciodesde: this.fecha,
+        cuit: sucursal.cuit,
+        fecha: fecha,
+        fechaServicioHasta: fecha,
+        fechaServicioVenc: fecha,
+        fechaServiciodesde: fecha,
         fechaVencimientoPago: "0",
         idMoneda: "PES",
         impNeto: impNeto,
-        name: razonSocial,
+        name: sucursal.razonSocial,
         nroDesde: "",
-        nroDoc: this.object.cliente.cuit,
+        nroDoc: cliente.cuit,
         nroHasta: "",
         opcionales: [],
-        ptoVenta: ptoVenta,
+        ptoVenta: ptoVenta.idFiscal,
         tipoDoc: tipoDoc,
         tributos: [],
       };
@@ -553,119 +574,139 @@ export default {
       //Get authorized voucher number
       axios
         .get(
-          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${razonSocial}/${cuit}/${ptoVenta}/${body.cbteTipo}`,
+          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${body.name}/${body.cuit}/${body.ptoVenta}/${body.cbteTipo}`,
           {
-            headers: this.afipModuleAuthorization
+            headers: afipAuthorization
           }
         )
         .then((data) => {
-          // Assign nroDesde & nroHasta
           body.nroDesde = data.data + 1;
           body.nroHasta = body.nroDesde;
 
-          //Post data & recive CAE from AFIP
           axios
             .post(
-              `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/generarComprobante/${razonSocial}`,
+              `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/generarComprobante/${sucursal.razonSocial}`,
               body,
               {
-                headers: this.afipModuleAuthorization
+                headers: afipAuthorization
               }
             )
             .then((data) => {
-              var respCabAfip = data.data.feCabResp;
-              var respDetAfip = data.data.feDetResp;
+                cabeceraAfip = data.data.feCabResp;
+                detalleAfip = data.data.feDetResp;
 
-              var comprobante = {
-                letra: this.object.documento.letra,
+              comprobante = {
+                letra: documento.letra,
                 numeroCbte: body.nroDesde,
-                fechaEmision: respCabAfip.fchProceso,
-                fechaVto: respDetAfip[0].caefchVto,
-                condicionVenta: true,
-                productos: this.products,
-                barCode: respDetAfip[0].barcode,
-                cae: respDetAfip[0].cae,
-                puntoVenta: this.user.puntoVenta,
-                sucursal: this.user.sucursal,
-                documentoComercial: this.object.documento,
-                empresa: this.user.empresa,
-                cliente: this.object.cliente,
-                totalVenta: this.totalVenta,
-                mediosPago: [this.object.mediosPago],
-                planesPago: [this.object.planPago]
+                fechaEmision: formatDate(cabeceraAfip.fchProceso),
+                fechaVto: formatDate(detalleAfip[0].caefchVto),
+                condicionVenta: condVenta,
+                productos: products,
+                barCode: detalleAfip[0].barcode,
+                cae: detalleAfip[0].cae,
+                puntoVenta: ptoVenta,
+                sucursal: sucursal,
+                documentoComercial: documento,
+                empresa: empresa,
+                cliente: cliente,
+                totalVenta: totalVenta,
+                mediosPago: [mediosPago],
+                planesPago: [planesPago]
               };
 
-              GenericService(
-                this.tenant,
-                "comprobantesFiscales",
-                this.token
-              ).save(comprobante);
+              GenericService(tenant,"comprobantesFiscales",token).save(comprobante);
 
-              comprobante.fechaEmision = formatDate(comprobante.fechaEmision);
-              comprobante.fechaVto = formatDate(comprobante.fechaVto);
-
-              ReportsService(this.tenant, this.service, this.token)
-                .onCloseSaleReport(comprobante, this.totalVenta)
-                .then((res) => {
-                  var file = new Blob([res["data"]], {
-                    type: "application/pdf",
-                  });
-                  var fileURL = URL.createObjectURL(file);
-                  window.open(fileURL, "_blank");
-                });
-              let sucursalId = {
-                sucursal: {
-                  id: this.user.sucursal.id
-                }
-              }
-              StocksService(this.tenant, "stock", this.token)
-                .getForSucursal(sucursalId)
+              StocksService(tenant, "stock", token)
+                .getForSucursal(sucursalIdFilterStock)
                 .then(data => {
-                  const productos = data.data.content;
+                  productos = data.data.content;
                   productos.forEach(el => {
                     comprobante.productos.forEach(e => {
                       if(el.producto.id === e.id && el.deposito.id == this.depositos[0].id){
                         el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
-                        GenericService(this.tenant, "stock", this.token)
-                        .save(el);
+                        GenericService(tenant, "stock", token)
+                        .save(el)
                       }
                     })
                   })
                 });
+
+              this.$swal({
+                icon:'success',
+                showConfirmButton: false,
+              }).then(()=>{
+                ReportsService(tenant, service, token)
+                .onCloseSaleReport(comprobante)
+                .then((res) => {
+                  file = new Blob([res["data"]], {
+                    type: "application/pdf",
+                  });
+                  fileURL = URL.createObjectURL(file);
+                  window.open(fileURL, "_blank");
+                });
+              })
+
+              this.object = {};
+              this.products = [];
+              this.$store.commit('ventas/resetStates');
             });
         });
     },
 
     saveNoFiscal(){
-      let idSucursal = this.user.sucursal.id;
+      const idSucursal = this.user.sucursal.id;
+      const sucursalIdFilterStock = {sucursal: {id: this.user.sucursal.id}};
+      const mediosPago = this.object.mediosPago;
+      const planesPago = this.object.planPago;
+      const totalVenta = this.totalVenta;
+      const cliente = this.object.cliente;
+      const empresa = this.user.empresa;
+      const documento = this.object.documento;
+      const sucursal = this.user.sucursal;
+      const ptoVenta = this.user.puntoVenta;
+      const products = this.products;
+
       DepositosService(this.tenant, "depositos", this.token)
       .getDepositosForSucursal(idSucursal)
       .then(data => {
         this.depositos = data.data.content;  
       })
+      let comprobante;
+      let condVenta;
 
-      var comprobante = {
+      if(planesPago.length < 2){
+        if(planesPago[0].cuotas > 1){
+          condVenta = true;
+        }else{
+          condVenta = false;
+        }
+      }else{
+        condVenta = false;
+      }
+
+      comprobante = {
         letra: "X",
         numeroCbte: 0,
         fechaEmision: formatDate(this.fecha),
         fechaVto: formatDate(this.fecha),
-        condicionVenta: true,
-        productos: this.products,
+        condicionVenta: condVenta,
+        productos: products,
         barCode: generateBarCode(),
         cae: "",
-        puntoVenta: this.user.puntoVenta,
-        sucursal: this.user.sucursal,
-        documentoComercial: this.object.documento,
-        empresa: this.user.empresa,
-        cliente: this.object.cliente,
-        totalVenta: this.totalVenta,
-        mediosPago: this.object.mediosPago
+        puntoVenta: ptoVenta,
+        sucursal: sucursal,
+        documentoComercial: documento,
+        empresa: empresa,
+        cliente: cliente,
+        totalVenta: totalVenta,
+        mediosPago: [mediosPago],
+        planesPago: [planesPago]
       };
 
       GenericService(this.tenant, "comprobantesFiscales",this.token).save(comprobante);
 
       ReportsService(this.tenant, this.service, this.token)
-        .onCloseSaleReport(comprobante, this.totalVenta)
+        .onCloseSaleReport(comprobante)
         .then((res) => {
           var file = new Blob([res["data"]], {
             type: "application/pdf",
@@ -673,13 +714,9 @@ export default {
           var fileURL = URL.createObjectURL(file);
           window.open(fileURL, "_blank");
         });
-      let sucursalId = {
-        sucursal: {
-          id: this.user.sucursal.id
-        }
-      }
+      
       StocksService(this.tenant, "stock", this.token)
-        .getForSucursal(sucursalId)
+        .getForSucursal(sucursalIdFilterStock)
         .then(data => {
           const productos = data.data.content;
           productos.forEach(el => {
@@ -700,7 +737,7 @@ export default {
       }else{
         this.saveNoFiscal();
       }
-    }
+    },
   },
 };
 </script>

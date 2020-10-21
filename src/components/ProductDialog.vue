@@ -79,19 +79,18 @@ export default {
     name: "ProductDialog",
 
     data(){
-        return {
-            dialog: null,
-            productos: [],
-            radioGroup: "",
-            filterString: "",
-            products: []
-        }
+      return {
+        dialog: null,
+        productos: [],
+        radioGroup: "",
+        filterString: ""
+      }
     },
 
     watch:{
-        setDialog(){
-            this.dialog = this.$store.state.ventas.dialogProd
-        }
+      setDialog(){
+          this.dialog = this.$store.state.ventas.dialogProd
+      }
     },
 
     mounted(){
@@ -138,6 +137,12 @@ export default {
           this.$emit('productList', this.$store.state.ventas.products);
         }
       },
+
+      refreshProducts(){
+        this.productos.forEach(el => {
+          el.selected = false;
+        })
+      }
     }
 }
 </script>
