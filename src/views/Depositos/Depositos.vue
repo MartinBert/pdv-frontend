@@ -73,7 +73,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="changePage(paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -128,16 +128,16 @@ export default {
       .then(data => {
         this.loguedUser = data.data;
         if(this.loguedUser.perfil.id != 1){
-          this.getDepositosForSucursal(this.loguedUser.sucursal.id);
+          this.getDepositosForSucursal(this.loguedUser.sucursal.id, this.paginate.page - 1, this.paginate.size);
         }else{
           this.getAll(this.paginate.page - 1, this.paginate.size);
         }
       })
     },
 
-    getDepositosForSucursal(id){
+    getDepositosForSucursal(id, page, size){
       DepositosService(this.tenant, this.service, this.token)
-      .getDepositosForSucursal(id)
+      .getDepositosForSucursal(id, page, size)
       .then(data => {
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;
@@ -157,8 +157,12 @@ export default {
         });
     },
 
-    changePage(page) {
-      this.getAll(page - 1, this.paginate.size);
+    changePage(page, size) {
+      if(this.loguedUser.perfil.id != 1){
+        this.getDepositosForSucursal(this.loguedUser.sucursal.id, page, size);
+      }else{
+        this.getAll(page, size);
+      }
     },
 
     newObject() {
@@ -245,7 +249,8 @@ export default {
           var obj = {
             nombre: element.nombre,
             direccion: element.direccion,
-            telefono: element.telefono
+            telefono: element.telefono,
+            sucursales: this.loguedUser.sucursal
           };
           importacion.data.push(obj);
         } else {

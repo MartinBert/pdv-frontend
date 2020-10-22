@@ -23,6 +23,7 @@
               item-text="nombre"
               item-value="id"
               v-model="object.condicionIva"
+              :counter="50"
               :return-object="true"
               label="Condición frente al IVA"
               required
@@ -132,6 +133,7 @@ export default {
       this.loaded = true;
     }
     this.getCondicionesIva();
+    this.getLoguedUser();
   },
   methods: {
     getObject(id) {
@@ -141,6 +143,14 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
+    },
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+      })
     },
 
     getCondicionesIva(){
@@ -153,6 +163,7 @@ export default {
 
     save() {
       this.$refs.form.validate();
+      this.object.sucursales = [this.loguedUser.sucursal];
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {

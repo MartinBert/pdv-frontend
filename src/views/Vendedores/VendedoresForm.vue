@@ -21,12 +21,12 @@
             <v-select
               type="text"
               :items="condicioniva"
-              item-text="text"
+              item-text="nombre"
               item-value="id"
               v-model="object.condicionIva"
               :counter="50"
-              label="Condición frente al IVA"
               :return-object="true"
+              label="Condición frente al IVA"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-select>
@@ -127,18 +127,15 @@ export default {
       { id: 1, text: "Física" },
       { id: 2, text: "Jurídica" }
     ],
-    condicioniva: [
-      { id: 1, text: "Responsable Inscripto" },
-      { id: 2, text: "Monotributista" },
-      { id: 3, text: "Particular" }
-    ],
+    condicioniva: [],
     object: {},
     loaded: false,
     tenant: "",
     service: "vendedores",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: ""
+    errorMessage: "",
+    loguedUser: null
   }),
 
   mounted() {
@@ -148,6 +145,8 @@ export default {
     } else {
       this.loaded = true;
     }
+    this.getCondicionesIva();
+    this.getLoguedUser();
   },
   methods: {
     getObject(id) {
@@ -159,8 +158,25 @@ export default {
         });
     },
 
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+      })
+    },
+
+    getCondicionesIva(){
+      GenericService(this.tenant, "condicionesFiscales", this.token)
+        .getAll()
+        .then(data => {
+          this.condicioniva = data.data.content;
+        });
+    },
+
     save() {
       this.$refs.form.validate();
+      this.object.sucursales = [this.loguedUser.sucursal];
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {

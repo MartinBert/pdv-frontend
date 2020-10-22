@@ -93,14 +93,14 @@
               </template>
             </v-simple-table>
             <v-pagination
-              v-model="paginate.page"
-              :length="paginate.totalPages"
+              v-model="paginateProducts.page"
+              :length="paginateProducts.totalPages"
               next-icon="mdi-chevron-right"
               prev-icon="mdi-chevron-left"
-              :page="paginate.page"
+              :page="paginateProducts.page"
               :total-visible="8"
-              @input="changePage"
-              v-if="paginate.totalPages > 1"
+              @input="changePage(paginateProducts.page - 1, paginateProducts.size)"
+              v-if="paginateProducts.totalPages > 1"
             ></v-pagination>
           </v-col>
         </v-row>
@@ -182,6 +182,10 @@ export default {
     errorMessage: "",
     paginate: {
       page: 1,
+      size: 100000,
+    },
+    paginateProducts: {
+      page: 1,
       size: 10,
       totalPages: 0,
     },
@@ -197,7 +201,7 @@ export default {
     if (this.urlId && this.urlId > 0) {
       this.getObject(this.urlId);
     } else {
-      this.getOtherModels(0, 10);
+      this.getOtherModels(this.paginateProducts.page - 1, this.paginateProducts.size);
       this.getUserLogued();
     }
   },
@@ -224,16 +228,16 @@ export default {
       }
     },
 
-    getDepositosForSucursal(id) {
+    getDepositosForSucursal(id,page,size) {
       DepositosService(this.tenant, "depositos", this.token)
-        .getDepositosForSucursal(id)
+        .getDepositosForSucursal(id,page,size)
         .then((data) => {
           this.depositos = data.data.content;
         });
     },
 
-    changePage(page) {
-      this.getOtherModels(page - 1, this.paginate.size);
+    changePage(page, size) {
+      this.getOtherModels(page, size);
     },
 
     save() {
@@ -293,7 +297,7 @@ export default {
           } else {
             this.productos = data.data.content;
           }
-          this.paginate.totalPages = data.data.totalPages;
+          this.paginateProducts.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
@@ -313,7 +317,7 @@ export default {
       }
 
       if (!this.filterString) {
-        this.getOtherModels(0, 10);
+        this.getOtherModels(this.paginate.page - 1, this.paginate.size);
       } else {
         GenericService(this.tenant, "productos", this.token)
           .filter(filt)
@@ -339,7 +343,7 @@ export default {
         .getLoguedUser()
         .then((data) => {
           this.loguedUser = data.data;
-          this.getDepositosForSucursal(this.loguedUser.sucursal.id);
+          this.getDepositosForSucursal(this.loguedUser.sucursal.id, this.paginate.page - 1, this.paginate.size);
         });
     },
   },

@@ -67,7 +67,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="changePage(paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -91,6 +91,7 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import ClientesService from "../../services/ClientesService";
 
 export default {
   data: () => ({
@@ -109,10 +110,34 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.getLoguedUser();
   },
   methods: {
-    getAll: function(page, size) {
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        if(this.loguedUser.perfil.id != 1){
+          const sucursal = this.loguedUser.sucursal.id
+          this.getClientesForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
+        }else{
+          this.getAll(this.paginate.page - 1, this.paginate.size);
+        }
+      })
+    },
+
+    getClientesForSucursal(sucursal, page, size){
+      ClientesService(this.tenant, this.service, this.token)
+      .getClientesForSucursal(sucursal, page, size)
+      .then(data => {
+        this.objects = data.data.content;
+        this.paginate.totalPages = data.data.totalPages;
+        this.loaded = true;
+      })
+    },
+
+    getAll(page, size) {
       this.objects = [];
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
@@ -124,22 +149,25 @@ export default {
         });
     },
 
-    changePage: function(page) {
-      this.getAll(page - 1, this.paginate.size);
+    changePage(page, size) {
+      if(this.loguedUser.perfil.id != 1){
+        const sucursal = this.loguedUser.sucursal.id;
+        this.getClientesForSucursal(sucursal, page, size);
+      }else{
+        this.getAll(page, size);
+      }
     },
 
-    newObject: function() {
+    newObject() {
       this.$router.push({ name: "clientesForm", params: { id: 0 } });
     },
 
-    edit: function(id) {
+    edit(id) {
       this.$router.push({ name: "clientesForm", params: { id: id } });
     },
 
-    filterObjects: function(filter){
-      var f ={
-        razonSocial:filter
-      }
+    filterObjects(filter){
+      var f = { razonSocial:filter }
       GenericService(this.tenant, this.service, this.token)
         .filter(f)
         .then(data => {
@@ -147,12 +175,12 @@ export default {
         });
     },
 
-    openDelete: function(id) {
+    openDelete(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
     },
 
-    deleteObject: function() {
+    deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
       GenericService(this.tenant, this.service, this.token)

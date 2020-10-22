@@ -68,7 +68,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="changePage(paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -120,6 +120,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from '../../services/ReportsService';
+import VentasService from '../../services/VentasService';
 export default {
    
   data: () => ({
@@ -138,16 +139,41 @@ export default {
     token: localStorage.getItem("token"),
     dialogMode: "",
     dialog: false,
-
+    loguedUser: {}
   }),
 
   mounted() {
     this.$store.commit('ventas/resetStates');
     this.tenant = this.$route.params.tenant;
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.getLoguedUser();
   },
 
   methods: {
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        if(this.loguedUser.perfil.id != 1){
+          const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
+          this.getVentasForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
+        }else{
+          this.getAll(this.paginate.page - 1, this.paginate.size);
+        }
+      })
+    },
+
+    getVentasForSucursal(sucursal, page, size){
+      VentasService(this.tenant, "ventas", this.token)
+      .getVentasForSucursal(sucursal, page, size)
+      .then(data => {
+        this.objects = data.data.content;
+        this.paginate.totalPages = data.data.totalPages;
+        this.loaded = true;
+      })
+    },
+
     getAll(page, size) {
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
@@ -170,8 +196,13 @@ export default {
         });
     },
 
-    changePage(page) {
-      this.getAll(page - 1, this.paginate.size);
+    changePage(page, size) {
+      if(this.loguedUser.perfil.id != 1){
+        const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
+        this.getVentasForSucursal(sucursal, page, size);
+      }else{
+        this.getAll(page, size);
+      }
     },
 
     seeDetails(object){

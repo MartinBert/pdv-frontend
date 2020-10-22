@@ -63,7 +63,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="changePage(paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -118,21 +118,17 @@ export default {
       .then(data => {
         this.loguedUser = data.data;
         if(this.loguedUser.perfil.id != 1){
-          var sucursal = {
-            sucursal:{
-              id:this.loguedUser.sucursal.id
-            }
-          }
-          this.getStockForSucursal(sucursal);
+          const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
+          this.getStockForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
         }else{
-          this.getAll(0, 1000000);
+          this.getAll(this.paginate.page - 1, this.paginate.size);
         }
       })
     },
 
-    getStockForSucursal(sucursal){
+    getStockForSucursal(sucursal, page, size){
       StocksService(this.tenant, this.service, this.token)
-      .getForSucursal(sucursal)
+      .getStockForSucursal(sucursal, page, size)
       .then(data => {
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;
@@ -152,8 +148,13 @@ export default {
         });
     },
 
-    changePage(page) {
-      this.getAll(page - 1, this.paginate.size);
+    changePage(page, size) {
+      if(this.loguedUser.perfil.id != 1){
+        const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
+        this.getStockForSucursal(sucursal, page, size);
+      }else{
+        this.getAll(page, size);
+      }
     },
 
     newObject() {
@@ -165,9 +166,7 @@ export default {
     },
 
     filterObjects(filter){
-      var f ={
-        razonSocial:filter
-      }
+      let f = { razonSocial:filter }
       GenericService(this.tenant, this.service, this.token)
         .filter(f)
         .then(data => {
