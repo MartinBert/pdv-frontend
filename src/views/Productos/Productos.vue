@@ -53,7 +53,7 @@
             <th>Marca</th>
             <th>Precio de costo</th>
             <th>Precio de venta</th>
-            <th>Acciones</th>
+            <th v-if="loguedUser.perfil.id < 3">Acciones</th>
           </tr>
         </thead>
         <tbody v-for="object in objects" :key="object.id">
@@ -65,7 +65,7 @@
             <td>{{object.marca ? object.marca.nombre : 'Sin marca'}}</td>
             <td>${{object.precioCosto}}</td>
             <td>${{object.precioTotal}}</td>
-            <td>
+            <td v-if="loguedUser.perfil.id < 3">
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
               <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
             </td>

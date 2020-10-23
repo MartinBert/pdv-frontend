@@ -46,7 +46,7 @@
             <td><v-btn class="success" @click="seeDetails(object.planesPago)">VER DETALLES</v-btn></td>
             <td>${{object.totalVenta}}</td>
             <td>
-              <a title="Reimprimir comprobante"><img src="/../../images/icons/ico_10.svg" @click="print(object)" width="40" height="40"/></a>
+              <a title="Reimprimir comprobante"><img src="/../../images/icons/impresora.svg" @click="print(object)" width="40" height="40"/></a>
             </td>
           </tr>
         </tbody>
@@ -181,6 +181,7 @@ export default {
         .then(data => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
+          console.log(data);
           this.loaded = true;
         });
     },
@@ -206,7 +207,6 @@ export default {
     },
 
     seeDetails(object){
-      console.log(object);
       if(object[0] !== undefined){
         const evalObject = Object.keys(object[0]);
         if(evalObject[2] === "planPago"){
