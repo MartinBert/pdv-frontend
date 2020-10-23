@@ -33,6 +33,7 @@
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
+            v-btn
           </v-col>
         </v-row>
         <v-row class="ma-1">          

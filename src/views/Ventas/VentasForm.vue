@@ -522,9 +522,9 @@ export default {
       }else{
         condVenta = false;
       }
-
+      console.log(sucursal.id);
       DepositosService(tenant, "depositos", token)
-      .getDepositosForSucursal(sucursal.id)
+      .getDepositosForSucursal(sucursal.id, 0, 100)
       .then(data => {
         this.depositos = data.data.content;  
       });
@@ -580,8 +580,10 @@ export default {
           }
         )
         .then((data) => {
+          console.log(data);
           body.nroDesde = data.data + 1;
           body.nroHasta = body.nroDesde;
+          console.log(sucursal.razonSocial);
 
           axios
             .post(
@@ -611,13 +613,14 @@ export default {
                 cliente: cliente,
                 totalVenta: totalVenta,
                 mediosPago: [mediosPago],
-                planesPago: [planesPago]
+                planesPago: [planesPago],
+                nombreDocumento: documento.nombre
               };
 
               GenericService(tenant,"comprobantesFiscales",token).save(comprobante);
 
               StocksService(tenant, "stock", token)
-                .getForSucursal(sucursalIdFilterStock)
+                .getStockForSucursal(sucursalIdFilterStock, 0, 100000)
                 .then(data => {
                   productos = data.data.content;
                   productos.forEach(el => {
@@ -654,7 +657,6 @@ export default {
     },
 
     saveNoFiscal(){
-      const idSucursal = this.user.sucursal.id;
       const sucursalIdFilterStock = {sucursal: {id: this.user.sucursal.id}};
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
@@ -667,7 +669,7 @@ export default {
       const products = this.products;
 
       DepositosService(this.tenant, "depositos", this.token)
-      .getDepositosForSucursal(idSucursal)
+      .getDepositosForSucursal(sucursal.id ,0,100000)
       .then(data => {
         this.depositos = data.data.content;  
       })
@@ -700,7 +702,8 @@ export default {
         cliente: cliente,
         totalVenta: totalVenta,
         mediosPago: [mediosPago],
-        planesPago: [planesPago]
+        planesPago: [planesPago],
+        nombreDocumento: documento.nombre
       };
 
       GenericService(this.tenant, "comprobantesFiscales",this.token).save(comprobante);
@@ -716,7 +719,7 @@ export default {
         });
       
       StocksService(this.tenant, "stock", this.token)
-        .getForSucursal(sucursalIdFilterStock)
+        .getStockForSucursal(sucursalIdFilterStock, 0, 100000)
         .then(data => {
           const productos = data.data.content;
           productos.forEach(el => {

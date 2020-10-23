@@ -150,6 +150,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
+import {generateBarCode} from "../../helpers/mathHelper";
 import XLSX from "xlsx";
 
 export default {
@@ -246,9 +247,7 @@ export default {
     },
 
     filterObjects(filter){
-      var f ={
-        nombre:filter
-      }
+      var f ={ nombre:filter }
       GenericService(this.tenant, "productos", this.token)
         .filter(f)
         .then(data => {
@@ -328,6 +327,7 @@ export default {
           }
         });
         var prod = this.validateImport(excel);
+        console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
@@ -358,6 +358,9 @@ export default {
           element.ganancia &&
           element.precioTotal
         ) {
+          if(element.codigoBarra == 1){
+            element.codigoBarra = generateBarCode()
+          }
           var iva = 21 / 100;
           var ganancia = element.ganancia / 100;
           var obj = {
