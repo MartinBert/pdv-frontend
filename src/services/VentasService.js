@@ -27,6 +27,12 @@ export default (tenant,service,token) =>{
             return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getForSucursal/${page}/${size}`,sucursal,{
                 headers: { Authorization: "Bearer " + token }
             })
+        },
+
+        filter(object){
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
+                headers: { Authorization: "Bearer " + token }
+            })
         }
         
     }

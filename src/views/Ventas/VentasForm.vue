@@ -1,11 +1,14 @@
 <template>
   <v-container>
-
     <!-- Body -->
     <v-col cols="12">
       <v-row>
         <v-col cols="3">
-          <v-btn color="primary" @click="$store.commit('ventas/dialogProductosMutation')">BUSCAR PRODUCTO</v-btn>
+          <v-btn
+            color="primary"
+            @click="$store.commit('ventas/dialogProductosMutation')"
+            >BUSCAR PRODUCTO</v-btn
+          >
         </v-col>
         <v-col cols="3"></v-col>
         <v-col class="text-right">
@@ -21,7 +24,11 @@
             v-model="priceModificationPorcent"
             type="number"
           />
-          <v-btn class="success ml-3" @click="applyModification(modificator, priceModificationPorcent)">Aplicar<v-icon>mdi-check-bold</v-icon></v-btn>
+          <v-btn
+            class="success ml-3"
+            @click="applyModification(modificator, priceModificationPorcent)"
+            >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
+          >
         </v-col>
       </v-row>
       <div class="horizontalSeparator"></div>
@@ -96,11 +103,11 @@
                   <v-row>
                     <v-col class="text-right">
                       <label class="mr-3">ITEMS:</label>
-                      <input 
-                      disabled
-                      class="totalInput" 
-                      type="text"
-                      v-model="totalItems"
+                      <input
+                        disabled
+                        class="totalInput"
+                        type="text"
+                        v-model="totalItems"
                       />
                     </v-col>
                   </v-row>
@@ -124,7 +131,12 @@
                     </thead>
                     <tbody>
                       <tr v-for="p in products" :key="p.id">
-                        <td @click="applyIndividualPercent(p)" style="cursor:pointer">{{ p.nombre }}</td>
+                        <td
+                          @click="applyIndividualPercent(p)"
+                          style="cursor: pointer"
+                        >
+                          {{ p.nombre }}
+                        </td>
                         <td>{{ p.codigoBarra }}</td>
                         <td>
                           <input
@@ -135,7 +147,16 @@
                         </td>
                         <td>${{ p.precioUnitario }}</td>
                         <td>${{ p.precioTotal }}</td>
-                        <td><button type="button"><img src="/../../images/icons/ico_11.svg" @click="deleteLine(p.id)" width="40" height="40"/></button></td>
+                        <td>
+                          <button type="button">
+                            <img
+                              src="/../../images/icons/ico_11.svg"
+                              @click="deleteLine(p.id)"
+                              width="40"
+                              height="40"
+                            />
+                          </button>
+                        </td>
                       </tr>
                     </tbody>
                   </template>
@@ -144,7 +165,9 @@
             </v-row>
             <v-row>
               <v-col class="text-right">
-                <v-btn class="primary" @click="saveSale(object.documento.tipo)">Finalizar venta</v-btn>
+                <v-btn class="primary" @click="saveSale(object.documento.tipo)"
+                  >Finalizar venta</v-btn
+                >
               </v-col>
             </v-row>
           </v-form>
@@ -188,24 +211,23 @@
     </v-col>
 
     <!-- Add products dialog -->
-    <ProductDialog v-on:productList="addProduct"/>
+    <ProductDialog v-on:productList="addProduct" />
 
     <!-- Individual percent dialog -->
-    <v-dialog
-      v-model="dialogIndividualPercent"
-      width="500"
-    >
+    <v-dialog v-model="dialogIndividualPercent" width="500">
       <v-card>
         <v-card-title class="headline grey lighten-2">
           Modificar precio a renglón
         </v-card-title>
         <v-container class="text-center">
           <v-text-field
-          placeholder="Porcentaje"
-          type="number"
-          v-model="individualPercent"
+            placeholder="Porcentaje"
+            type="number"
+            v-model="individualPercent"
           ></v-text-field>
-          <v-btn class="success ml-3" @click="applyToLine(individualPercent)">Aplicar<v-icon>mdi-check-bold</v-icon></v-btn>
+          <v-btn class="success ml-3" @click="applyToLine(individualPercent)"
+            >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
+          >
         </v-container>
       </v-card>
     </v-dialog>
@@ -223,12 +245,12 @@ import {
   calculateAlicIvaImporteVentas,
   generateBarCode,
   calculatePercentaje,
-  sumarNumeros
+  sumarNumeros,
 } from "../../helpers/mathHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
-import StocksService from '../../services/StocksService';
-import DepositosService from '../../services/DepositosService';
+import StocksService from "../../services/StocksService";
+import DepositosService from "../../services/DepositosService";
 
 export default {
   data: () => ({
@@ -257,12 +279,12 @@ export default {
     priceModificationPorcent: 0,
     dialogIndividualPercent: false,
     renglon: {},
-    individualPercent: "" 
+    individualPercent: "",
   }),
 
   components: {
     Calculator,
-    ProductDialog
+    ProductDialog,
   },
 
   created() {
@@ -270,11 +292,11 @@ export default {
   },
 
   computed: {
-    totalVenta(){
+    totalVenta() {
       let tot = 0;
       let porcentajePlan = 0;
-      if(this.object.planPago){
-        porcentajePlan = this.object.planPago.porcentaje
+      if (this.object.planPago) {
+        porcentajePlan = this.object.planPago.porcentaje;
       }
       this.products.forEach((el) => {
         tot = this.acumularRecargo(porcentajePlan, el.precioTotal, tot);
@@ -282,46 +304,46 @@ export default {
       return parseFloat(tot).toFixed(2);
     },
 
-    totalItems(){
-      let totItems = 0
-      this.products.forEach(el => {
-        totItems = sumarNumeros([Number(totItems), Number(el.cantUnidades)])
-      })
-      return totItems
-    }
+    totalItems() {
+      let totItems = 0;
+      this.products.forEach((el) => {
+        totItems = sumarNumeros([Number(totItems), Number(el.cantUnidades)]);
+      });
+      return totItems;
+    },
   },
-  
+
   mounted() {
-    this.$store.commit('ventas/resetStates');
+    this.$store.commit("ventas/resetStates");
     this.tenant = this.$route.params.tenant;
     GenericService(this.tenant, "clientes", this.token)
       .getAll(this.page, this.size)
-      .then(data => {
+      .then((data) => {
         this.databaseItems.clientes = data.data.content;
       });
 
     GenericService(this.tenant, "mediosPago", this.token)
       .getAll(this.page, this.size)
-      .then(data => {
+      .then((data) => {
         this.databaseItems.medios_de_pago = data.data.content;
       });
 
     GenericService(this.tenant, "empresas", this.token)
       .getAll(this.page, this.size)
-      .then(data => {
+      .then((data) => {
         this.databaseItems.empresa = data.data.content;
       });
 
     VentasService(this.tenant, this.service, this.token)
       .getUser()
-      .then(data => {
+      .then((data) => {
         this.user = data.data;
       });
 
     VentasService(this.tenant, this.service, this.token)
       .getAfipModuleAuthorization()
-      .then(data => {
-        this.afipModuleAuthorization = data.data
+      .then((data) => {
+        this.afipModuleAuthorization = data.data;
       });
   },
 
@@ -355,8 +377,8 @@ export default {
             data.data.total = data.data.precioTotal;
             this.products.push(this.processProductsObject(data.data));
           } else {
-            var count = 0;
-            for (var i = 0; i < this.products.length; i++) {
+            let count = 0;
+            for (let i = 0; i < this.products.length; i++) {
               if (this.products[i].id == data.data.id) {
                 this.products[i].cantUnidades =
                   parseInt(this.products[i].cantUnidades) + 1;
@@ -397,7 +419,7 @@ export default {
 
     getComercialDocuments(clientCond, businessCond) {
       this.databaseItems.documentos = [];
-      for (var i = 0; i < clientCond.length; i++) {
+      for (let i = 0; i < clientCond.length; i++) {
         businessCond.forEach((el) => {
           if (clientCond[i].id == el.id) {
             this.databaseItems.documentos.push(el);
@@ -410,74 +432,87 @@ export default {
       this.databaseItems.planes = id.planPago;
     },
 
-    deleteLine(id){
-      const filter = this.products.filter(el => el.id !== id);
+    deleteLine(id) {
+      const filter = this.products.filter((el) => el.id !== id);
       this.products = filter;
     },
 
-    applyModification(modificator, priceModificationPorcent){
-      const percent = calculatePercentaje(this.totalVenta, priceModificationPorcent);
-      if(modificator === "descuento"){
+    applyModification(modificator, priceModificationPorcent) {
+      const percent = calculatePercentaje(
+        this.totalVenta,
+        priceModificationPorcent
+      );
+      if (modificator === "descuento") {
         let obj = {
           nombre: "DESCUENTO",
           codigoBarra: 1111111111,
           cantUnidades: 0,
           precioUnitario: -percent,
           precioTotal: -percent,
-        }
+        };
         this.products.push(obj);
-      }else{
+      } else {
         let obj = {
           nombre: "RECARGO",
           codigoBarra: 2222222222,
           cantUnidades: 0,
           precioUnitario: percent,
           precioTotal: percent,
-        }
+        };
         this.products.push(obj);
       }
     },
 
-    applyIndividualPercent(p){
+    applyIndividualPercent(p) {
       this.dialogIndividualPercent = true;
       this.renglon = p;
     },
 
-    addProduct(data){
+    addProduct(data) {
       let processObjects = [];
-      data.forEach(el => {
+      data.forEach((el) => {
         processObjects.push(this.processProductsObject(el));
-      })
+      });
       this.products = processObjects;
     },
 
-    acumularRecargo(porcentaje, precioProducto, acumulado){
+    acumularRecargo(porcentaje, precioProducto, acumulado) {
       let cleanPorcent = parseFloat(porcentaje / 100).toFixed(2);
       let impPorcent = (precioProducto * cleanPorcent).toFixed(2);
-      let total = sumarNumeros([Number(acumulado), Number(precioProducto), Number(impPorcent)]);
+      let total = sumarNumeros([
+        Number(acumulado),
+        Number(precioProducto),
+        Number(impPorcent),
+      ]);
 
       return total;
     },
 
-    applyToLine(percent){
+    applyToLine(percent) {
       const type = percent.search("-");
-      let object = {}
-      if(type === 0){
+      let object = {};
+      if (type === 0) {
         object = {
-          nombre: "DESCUENTO EN RENGLÓN "+this.renglon.id,
+          nombre: "DESCUENTO EN RENGLÓN " + this.renglon.id,
           codigoBarra: 3333333333,
           cantUnidades: 0,
-          precioUnitario: -calculatePercentaje(this.renglon.precioTotal, percent),
+          precioUnitario: -calculatePercentaje(
+            this.renglon.precioTotal,
+            percent
+          ),
           precioTotal: -calculatePercentaje(this.renglon.precioTotal, percent),
-        }
-      }else{
+        };
+      } else {
         object = {
-          nombre: "RECARGO EN RENGLÓN "+this.renglon.id,
+          nombre: "RECARGO EN RENGLÓN " + this.renglon.id,
           codigoBarra: 4444444444,
           cantUnidades: 0,
-          precioUnitario: calculatePercentaje(this.renglon.precioTotal, percent),
+          precioUnitario: calculatePercentaje(
+            this.renglon.precioTotal,
+            percent
+          ),
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
-        }
+        };
       }
       this.products.push(object);
       this.dialogIndividualPercent = false;
@@ -486,7 +521,7 @@ export default {
     save() {
       /* Constants */
       const sucursal = this.user.sucursal;
-      const sucursalIdFilterStock = {sucursal: {id: sucursal.id}};
+      const sucursalIdFilterStock = { sucursal: { id: sucursal.id } };
       const ptoVenta = this.user.puntoVenta;
       const products = this.products;
       const documento = this.object.documento;
@@ -513,21 +548,21 @@ export default {
       let productos;
       let condVenta;
 
-      if(planesPago.length < 2){
-        if(planesPago[0].cuotas > 1){
+      if (planesPago.length < 2) {
+        if (planesPago[0].cuotas > 1) {
           condVenta = true;
-        }else{
+        } else {
           condVenta = false;
         }
-      }else{
+      } else {
         condVenta = false;
       }
       console.log(sucursal.id);
       DepositosService(tenant, "depositos", token)
-      .getDepositosForSucursal(sucursal.id, 0, 100)
-      .then(data => {
-        this.depositos = data.data.content;  
-      });
+        .getDepositosForSucursal(sucursal.id, 0, 100)
+        .then((data) => {
+          this.depositos = data.data.content;
+        });
 
       if (documento.ivaCat == 1) {
         tipoDoc = 80;
@@ -535,12 +570,12 @@ export default {
         tipoDoc = 94;
       }
 
-      if (
-        documento.ivaCat == 2 ||
-        documento.ivaCat == 1
-      ) {
+      if (documento.ivaCat == 2 || documento.ivaCat == 1) {
         alicIva.baseImp = calculateAlicIvaBaseImpVentas(totalVenta);
-        alicIva.importe = calculateAlicIvaImporteVentas(totalVenta,alicIva.baseImp);
+        alicIva.importe = calculateAlicIvaImporteVentas(
+          totalVenta,
+          alicIva.baseImp
+        );
         impNeto = alicIva.baseImp;
       } else {
         alicIva = [];
@@ -576,7 +611,7 @@ export default {
         .get(
           `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${body.name}/${body.cuit}/${body.ptoVenta}/${body.cbteTipo}`,
           {
-            headers: afipAuthorization
+            headers: afipAuthorization,
           }
         )
         .then((data) => {
@@ -590,12 +625,12 @@ export default {
               `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/generarComprobante/${sucursal.razonSocial}`,
               body,
               {
-                headers: afipAuthorization
+                headers: afipAuthorization,
               }
             )
             .then((data) => {
-                cabeceraAfip = data.data.feCabResp;
-                detalleAfip = data.data.feDetResp;
+              cabeceraAfip = data.data.feCabResp;
+              detalleAfip = data.data.feDetResp;
 
               comprobante = {
                 letra: documento.letra,
@@ -614,50 +649,55 @@ export default {
                 totalVenta: totalVenta,
                 mediosPago: [mediosPago],
                 planesPago: [planesPago],
-                nombreDocumento: documento.nombre
+                nombreDocumento: documento.nombre,
               };
 
-              GenericService(tenant,"comprobantesFiscales",token).save(comprobante);
+              GenericService(tenant, "comprobantesFiscales", token).save(
+                comprobante
+              );
 
               StocksService(tenant, "stock", token)
                 .getStockForSucursal(sucursalIdFilterStock, 0, 100000)
-                .then(data => {
+                .then((data) => {
                   productos = data.data.content;
-                  productos.forEach(el => {
-                    comprobante.productos.forEach(e => {
-                      if(el.producto.id === e.id && el.deposito.id == this.depositos[0].id){
-                        el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
-                        GenericService(tenant, "stock", token)
-                        .save(el)
+                  productos.forEach((el) => {
+                    comprobante.productos.forEach((e) => {
+                      if (
+                        el.producto.id === e.id &&
+                        el.deposito.id == this.depositos[0].id
+                      ) {
+                        el.cantidad =
+                          parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                        GenericService(tenant, "stock", token).save(el);
                       }
-                    })
-                  })
+                    });
+                  });
                 });
 
               this.$swal({
-                icon:'success',
+                icon: "success",
                 showConfirmButton: false,
-              }).then(()=>{
+              }).then(() => {
                 ReportsService(tenant, service, token)
-                .onCloseSaleReport(comprobante)
-                .then((res) => {
-                  file = new Blob([res["data"]], {
-                    type: "application/pdf",
+                  .onCloseSaleReport(comprobante)
+                  .then((res) => {
+                    file = new Blob([res["data"]], {
+                      type: "application/pdf",
+                    });
+                    fileURL = URL.createObjectURL(file);
+                    window.open(fileURL, "_blank");
                   });
-                  fileURL = URL.createObjectURL(file);
-                  window.open(fileURL, "_blank");
-                });
-              })
+              });
 
               this.object = {};
               this.products = [];
-              this.$store.commit('ventas/resetStates');
+              this.$store.commit("ventas/resetStates");
             });
         });
     },
 
-    saveNoFiscal(){
-      const sucursalIdFilterStock = {sucursal: {id: this.user.sucursal.id}};
+    saveNoFiscal() {
+      const sucursalIdFilterStock = { sucursal: { id: this.user.sucursal.id } };
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
       const totalVenta = this.totalVenta;
@@ -667,30 +707,39 @@ export default {
       const sucursal = this.user.sucursal;
       const ptoVenta = this.user.puntoVenta;
       const products = this.products;
+      const fecha = this.fecha;
+      const tenant = this.tenant;
+      const token = this.token;
+      const service = this.service;
 
-      DepositosService(this.tenant, "depositos", this.token)
-      .getDepositosForSucursal(sucursal.id ,0,100000)
-      .then(data => {
-        this.depositos = data.data.content;  
-      })
+      //Mutable vars
+      let file;
+      let fileURL;
+      let productos
+
+      DepositosService(tenant, "depositos", token)
+        .getDepositosForSucursal(sucursal.id, 0, 100000)
+        .then((data) => {
+          this.depositos = data.data.content;
+        });
       let comprobante;
       let condVenta;
 
-      if(planesPago.length < 2){
-        if(planesPago[0].cuotas > 1){
+      if (planesPago.length < 2) {
+        if (planesPago[0].cuotas > 1) {
           condVenta = true;
-        }else{
+        } else {
           condVenta = false;
         }
-      }else{
+      } else {
         condVenta = false;
       }
 
       comprobante = {
         letra: "X",
         numeroCbte: 0,
-        fechaEmision: formatDate(this.fecha),
-        fechaVto: formatDate(this.fecha),
+        fechaEmision: formatDate(fecha),
+        fechaVto: formatDate(fecha),
         condicionVenta: condVenta,
         productos: products,
         barCode: generateBarCode(),
@@ -703,85 +752,49 @@ export default {
         totalVenta: totalVenta,
         mediosPago: [mediosPago],
         planesPago: [planesPago],
-        nombreDocumento: documento.nombre
+        nombreDocumento: documento.nombre,
       };
 
-      GenericService(this.tenant, "comprobantesFiscales",this.token).save(comprobante);
+      GenericService(tenant, "comprobantesFiscales", token).save(
+        comprobante
+      );
 
-      ReportsService(this.tenant, this.service, this.token)
+      ReportsService(tenant,service,token)
         .onCloseSaleReport(comprobante)
         .then((res) => {
-          var file = new Blob([res["data"]], {
+          file = new Blob([res["data"]], {
             type: "application/pdf",
           });
-          var fileURL = URL.createObjectURL(file);
+          fileURL = URL.createObjectURL(file);
           window.open(fileURL, "_blank");
         });
-      
-      StocksService(this.tenant, "stock", this.token)
+
+      StocksService(tenant, "stock", token)
         .getStockForSucursal(sucursalIdFilterStock, 0, 100000)
-        .then(data => {
-          const productos = data.data.content;
-          productos.forEach(el => {
-            comprobante.productos.forEach(e => {
-              if(el.producto.id === e.id && el.deposito.id == this.depositos[0].id){
+        .then((data) => {
+          productos = data.data.content;
+          productos.forEach((el) => {
+            comprobante.productos.forEach((e) => {
+              if (
+                el.producto.id === e.id &&
+                el.deposito.id == this.depositos[0].id
+              ) {
                 el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
-                GenericService(this.tenant, "stock", this.token)
-                .save(el);
+                GenericService(this.tenant, "stock", this.token).save(el);
               }
-            })
-          })
+            });
+          });
         });
     },
 
-    saveSale(bool){
-      if(bool === true){
+    saveSale(bool) {
+      if (bool === true) {
         this.save();
-      }else{
+      } else {
         this.saveNoFiscal();
       }
-    },
+    }
+
   },
 };
 </script>
-
-<style scoped>
-.button_cliente_class {
-  background-image: url("/images/buttons/btn_cliente.svg");
-  width: 100%;
-  height: 100%;
-}
-
-.verticalSeparator {
-  float: left;
-  background-color: black;
-  height: 100%;
-  width: 2px;
-}
-
-.totalInput {
-  font-family: Century Gothic, CenturyGothic, AppleGothic, sans-serif;
-  border: solid 1px rgb(63, 81, 181);
-  background-color: #fff;
-  color: black;
-  text-align: right;
-  padding: 5px;
-}
-
-.select-ventas-import{
-    font-family: Century Gothic, CenturyGothic, AppleGothic, sans-serif;
-    font-weight: bold;
-    font-style: italic;
-    border-bottom: solid 1px rgb(63, 81, 181);
-    color: rgb(172, 171, 171);
-    text-align: right;
-    padding: 5px 10px 5px 10px;
-}
-
-.horizontalSeparator {
-  width: 100%;
-  height: 2px;
-  margin-right: 10px;
-  background-color: black;
-}
-</style>

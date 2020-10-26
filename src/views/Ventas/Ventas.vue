@@ -8,13 +8,26 @@
         <v-spacer></v-spacer>
         <v-col cols="3">
           <v-text-field
-            v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            type="date"
+            v-model="filterStringDate"
+            v-on:input="filterObjects('fechaEmision',filterStringDate)"
             dense
             outlined
             rounded
             class="text-left"
-            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="3">
+          <v-text-field
+            type="number"
+            v-model="filterStringTotalVenta"
+            v-on:input="filterObjects('totalVenta',filterStringTotalVenta)"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda por total facturado"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
@@ -118,6 +131,7 @@
 </template>
 
 <script>
+import { formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
 import ReportsService from '../../services/ReportsService';
 import VentasService from '../../services/VentasService';
@@ -127,7 +141,8 @@ export default {
     icon: "mdi-check-circle",
     file: null,
     objects: null,
-    filterString: "",
+    filterStringDate: "",
+    filterStringTotalVenta: "",
     paginate: {
       page: 1,
       size: 10,
@@ -186,21 +201,61 @@ export default {
         });
     },
 
-    filterObjects(filter){
-      var f ={
-        nombre:filter
+    filterObjects(filterParam, filter){
+      if(this.loguedUser.perfil.id !== 1){
+        const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } };
+        const sucursalId = this.loguedUser.sucursal.id;
+        const page = this.paginate.page - 1;
+        const size = this.paginate.size;
+        let year;
+        let month;
+        let day;
+
+        if(filter === ''){
+          this.getVentasForSucursal(sucursal, page, size);
+        }else{
+          if(filterParam === 'fechaEmision'){
+          if(this.filterStringTotalVenta !== ""){
+            this.filterStringTotalVenta = "";
+          }
+          year = filter.slice(0, filter.indexOf('-'));
+          month = filter.slice(filter.indexOf('-') + 1, filter.lastIndexOf('-'));
+          day = filter.slice(filter.lastIndexOf('-') + 1, filter.length);
+          filter = formatDate(year+month+day);
+        }else{
+          if(this.filterStringDate !== ""){
+            this.filterStringDate = "";
+          }
+        }
+
+        let object = { sucursalId, filterParam, filter, page, size }
+        
+        VentasService(this.tenant, "ventas", this.token)
+          .filter(object)
+          .then(data => {
+            this.objects = data.data.content;
+            this.paginate.totalPages = data.data.totalPages;
+            this.loaded = true;
+          });
+        }
+      }else{
+        console.log("asdf");
       }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
     },
 
     changePage(page, size) {
       if(this.loguedUser.perfil.id != 1){
         const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
-        this.getVentasForSucursal(sucursal, page, size);
+        if(this.filterStringDate === "" && this.filterStringTotalVenta === ""){
+          this.getVentasForSucursal(sucursal, page, size);
+        }else{
+          if(this.filterStringDate.length > 0){
+            this.filterObjects('fechaEmision', this.filterStringDate);
+          }else{
+            this.filterObjects('totalVenta', this.filterStringTotalVenta);
+          }
+          
+        }
       }else{
         this.getAll(page, size);
       }
@@ -237,10 +292,10 @@ export default {
       ReportsService(this.tenant, "ventas", this.token)
       .onCloseSaleReport(object)
       .then((res) => {
-        var file = new Blob([res["data"]], {
+        let file = new Blob([res["data"]], {
           type: "application/pdf",
         });
-        var fileURL = URL.createObjectURL(file);
+        let fileURL = URL.createObjectURL(file);
         window.open(fileURL, "_blank");
       });
     }
