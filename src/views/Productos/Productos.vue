@@ -364,6 +364,7 @@ export default {
           var iva = 21 / 100;
           var ganancia = element.ganancia / 100;
           var obj = {
+            id: element.id,
             nombre: element.nombre,
             codigoBarra: String(element.codigoBarra),
             codigoProducto: String(element.codigoProducto),
