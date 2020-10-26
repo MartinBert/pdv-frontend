@@ -2,7 +2,7 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="2" v-if="perfil < 3">
+        <v-col cols="4" v-if="perfil < 3">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
           <v-btn class="primary ml-3" @click="getReport()" raised>Reportes</v-btn>
         </v-col>
@@ -310,6 +310,8 @@ export default {
 
     //Importar productos
     onChange(event) {
+      this.loaderStatus = false;
+      this.loaded = false;
       this.file = event;
       var excel = [];
       var reader = new FileReader();
@@ -334,10 +336,7 @@ export default {
             .then(() => {
               this.getAll(this.paginate.page - 1, this.paginate.size);
               this.loaderStatus = true;
-              window.setTimeout(()=>{
-                this.loader = false
-                this.loaderStatus=false;
-              }, 2000);    
+              this.loaded = true;
             });
         }
       };
@@ -364,7 +363,6 @@ export default {
           var iva = 21 / 100;
           var ganancia = element.ganancia / 100;
           var obj = {
-            id: element.id,
             nombre: element.nombre,
             codigoBarra: String(element.codigoBarra),
             codigoProducto: String(element.codigoProducto),
