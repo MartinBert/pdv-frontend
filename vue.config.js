@@ -64,12 +64,13 @@ g+Zo0Hp428LZOpn7pTpEDYj9wj61tNsTnlxo25O6UjhE651U0kcxVokQlVtktA==
 module.exports = {
     devServer: {
       open: process.platform === 'darwin',
-      port: 80,
+      host: '66.97.47.166',
+      port: 443,
       https: {
         key: pem,
         cert: cert
       },
-      public: 'https://66.97.47.166',
+      public: 'https://prysoftgestion.com',
       disableHostCheck: true,
       hotOnly: false,
     },
