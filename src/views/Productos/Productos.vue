@@ -4,15 +4,17 @@
       <v-row>
         <v-col cols="4" v-if="perfil < 3">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          <v-btn class="primary ml-3" @click="getReport()" raised>Reportes</v-btn>
+          <v-btn class="primary ml-3" @click="getReport()" raised
+            >Reportes</v-btn
+          >
         </v-col>
         <v-col cols="3" v-if="perfil < 3">
           <v-file-input
-          v-model="file" 
-          class="mt-0"
-          placeholder="Importar productos"
-          accept=".xlsx, xls"
-          @change="onChange($event)"
+            v-model="file"
+            class="mt-0"
+            placeholder="Importar productos"
+            accept=".xlsx, xls"
+            @change="onChange($event)"
           ></v-file-input>
         </v-col>
         <v-col cols="2">
@@ -42,7 +44,7 @@
     </v-form>
 
     <!-- List -->
-    <v-simple-table style="background-color: transparent;">
+    <v-simple-table style="background-color: transparent">
       <template v-slot:default>
         <thead>
           <tr>
@@ -53,21 +55,33 @@
             <th>Marca</th>
             <th>Precio de costo</th>
             <th>Precio de venta</th>
-            <th v-if="loguedUser.perfil.id < 3">Acciones</th>
+            <th v-if="perfil < 3">Acciones</th>
           </tr>
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{object.id}}</td>
-            <td>{{object.nombre}}</td>
-            <td>{{object.codigoBarra}}</td>
-            <td>{{object.codigoProducto}}</td>
-            <td>{{object.marca ? object.marca.nombre : 'Sin marca'}}</td>
-            <td>${{object.precioCosto}}</td>
-            <td>${{object.precioTotal}}</td>
-            <td v-if="loguedUser.perfil.id < 3">
-              <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
-              <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
+            <td>{{ object.id }}</td>
+            <td>{{ object.nombre }}</td>
+            <td>{{ object.codigoBarra }}</td>
+            <td>{{ object.codigoProducto }}</td>
+            <td>{{ object.marca ? object.marca.nombre : "Sin marca" }}</td>
+            <td>${{ object.precioCosto }}</td>
+            <td>${{ object.precioTotal }}</td>
+            <td v-if="perfil < 3">
+              <a title="Editar"
+                ><img
+                  src="/../../images/icons/ico_10.svg"
+                  @click="edit(object.id)"
+                  width="40"
+                  height="40"
+              /></a>
+              <a title="Eliminar"
+                ><img
+                  src="/../../images/icons/ico_11.svg"
+                  @click="openDelete(object.id)"
+                  width="40"
+                  height="40"
+              /></a>
             </td>
           </tr>
         </tbody>
@@ -76,7 +90,7 @@
     <!-- End List -->
 
     <!-- Loader -->
-    <div class="text-center" style="margin-top:15px" v-if="!loaded">
+    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <!-- End Loader -->
@@ -100,10 +114,16 @@
         <v-toolbar class="d-flex justify-center" color="primary" dark>
           <v-toolbar-title>Eliminar objeto</v-toolbar-title>
         </v-toolbar>
-        <v-card-title class="d-flex justify-center">¿Está seguro que desea realizar esta acción?</v-card-title>
+        <v-card-title class="d-flex justify-center"
+          >¿Está seguro que desea realizar esta acción?</v-card-title
+        >
         <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject">Si</v-btn>
-          <v-btn small color="disabled" @click="dialogDeleteObject = false">No</v-btn>
+          <v-btn small color="disabled" class="mr-5" @click="deleteObject"
+            >Si</v-btn
+          >
+          <v-btn small color="disabled" @click="dialogDeleteObject = false"
+            >No</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -111,19 +131,35 @@
 
     <!-- Dialog Loader -->
     <template>
-      <v-dialog v-model="loader" hide-overlay persistent width="400" v-if="loaderStatus == false">
+      <v-dialog
+        v-model="loader"
+        hide-overlay
+        persistent
+        width="400"
+        v-if="loaderStatus == false"
+      >
         <v-card color="primary" dark>
           <v-card-text>
             Importando productos...
-            <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
           </v-card-text>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="loader" v-if="loaderStatus == true" hide-overlay persistent width="400">
+      <v-dialog
+        v-model="loader"
+        v-if="loaderStatus == true"
+        hide-overlay
+        persistent
+        width="400"
+      >
         <v-card color="primary">
           <v-list-item>
             <v-list-item-content justify="center" align="center">
-              <v-icon x-large color="success">{{this.icon}}</v-icon>
+              <v-icon x-large color="success">{{ this.icon }}</v-icon>
               <v-card-text class="title">¡Importación finalizada!</v-card-text>
             </v-list-item-content>
           </v-list-item>
@@ -131,26 +167,13 @@
       </v-dialog>
     </template>
     <!-- End Dialog Loader -->
-
-    <!-- Dialog stock -->
-    <v-dialog v-model="dialogStock" max-width="800" v-if="dialogStock">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Stock {{object.nombre + ' - ID:' + object.id}}</span>
-        </v-card-title>
-        <v-container>
-          {{object.cantidad}}
-        </v-container>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog stock -->
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-import {generateBarCode} from "../../helpers/mathHelper";
+import { generateBarCode } from "../../helpers/mathHelper";
 import XLSX from "xlsx";
 
 export default {
@@ -170,13 +193,13 @@ export default {
     rubros: [],
     estados: [
       { id: 1, text: "Activos" },
-      { id: 2, text: "Inactivos" }
+      { id: 2, text: "Inactivos" },
     ],
     estadoSeleccionado: { id: 1, text: "Activos" },
     paginate: {
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
@@ -184,52 +207,60 @@ export default {
     token: localStorage.getItem("token"),
     dialogStock: false,
     dialogDeleteObject: false,
-    loguedUser: ''
+    loguedUser: "",
   }),
 
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getAll(this.paginate.page - 1, this.paginate.size);
-    this.getOtherModels(0, 200000);
     this.getLoguedUser();
+    this.getOtherModels(0, 200000);
   },
 
   methods: {
-
     getAll(page, size) {
       this.objects = [];
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
         .getAll(page, size)
-        .then(data => {
+        .then((data) => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
 
+    getLoguedUser() {
+      GenericService(this.tenant, this.service, this.token)
+        .getLoguedUser()
+        .then((data) => {
+          this.loguedUser = data.data;
+          this.perfil = this.loguedUser.perfil.id;
+        });
+    },
+
     getOtherModels(page, size) {
       GenericService(this.tenant, "marcas", this.token)
         .getAll(page, size)
-        .then(data => {
+        .then((data) => {
           this.marcas = data.data.content;
         });
 
       GenericService(this.tenant, "distribuidores", this.token)
         .getAll(page, size)
-        .then(data => {
+        .then((data) => {
           this.distribuidores = data.data.content;
         });
 
       GenericService(this.tenant, "depositos", this.token)
         .getAll(page, size)
-        .then(data => {
+        .then((data) => {
           this.depositos = data.data.content;
         });
 
       GenericService(this.tenant, "rubros", this.token)
         .getAll(page, size)
-        .then(data => {
+        .then((data) => {
           this.rubros = data.data.content;
         });
     },
@@ -246,11 +277,11 @@ export default {
       this.$router.push({ name: "productosForm", params: { id: id } });
     },
 
-    filterObjects(filter){
-      var f ={ nombre:filter }
+    filterObjects(filter) {
+      var f = { nombre: filter };
       GenericService(this.tenant, "productos", this.token)
         .filter(f)
-        .then(data => {
+        .then((data) => {
           this.objects = data.data.content;
         });
     },
@@ -271,24 +302,24 @@ export default {
 
     updateStock() {
       var stocks = [];
-      this.stock.forEach(element => {
+      this.stock.forEach((element) => {
         if (element.stock.cantidad >= 0) {
           if (element.stock.id) {
             stocks.push({
               id: element.stock.id,
               producto: {
-                id: this.object.id
+                id: this.object.id,
               },
               deposito: element.deposito,
-              cantidad: element.stock.cantidad
+              cantidad: element.stock.cantidad,
             });
           } else {
             stocks.push({
               producto: {
-                id: this.object.id
+                id: this.object.id,
               },
               deposito: element.deposito,
-              cantidad: element.stock.cantidad
+              cantidad: element.stock.cantidad,
             });
           }
         }
@@ -296,7 +327,7 @@ export default {
 
       GenericService(this.tenant, "stock", this.token)
         .saveAll(stocks)
-        .then(data => {
+        .then((data) => {
           this.object.stocks = data.data;
           this.showStock(this.object);
         });
@@ -315,12 +346,12 @@ export default {
       this.file = event;
       var excel = [];
       var reader = new FileReader();
-      reader.onload = e => {
+      reader.onload = (e) => {
         var data = e.target.result;
         var workbook = XLSX.read(data, { type: "binary" });
 
         var sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function(y) {
+        sheet_name_list.forEach(function (y) {
           var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
           if (exceljson.length > 0) {
             for (var i = 0; i < exceljson.length; i++) {
@@ -347,7 +378,7 @@ export default {
       var importacion = {
         status: true,
         data: [],
-        message: ""
+        message: "",
       };
       objects.forEach((element, index) => {
         if (
@@ -357,8 +388,8 @@ export default {
           element.ganancia &&
           element.precioTotal
         ) {
-          if(element.codigoBarra == 1){
-            element.codigoBarra = generateBarCode()
+          if (element.codigoBarra == 1) {
+            element.codigoBarra = generateBarCode();
           }
           var iva = 21 / 100;
           var ganancia = element.ganancia / 100;
@@ -372,16 +403,35 @@ export default {
             distribuidores: this.getDistribuidores(
               String(element.idDistribuidores)
             ),
-            precioCosto: ((element.precioTotal / (1 + ganancia)) / (1+iva)).toFixed(2),
+            precioCosto: (
+              element.precioTotal /
+              (1 + ganancia) /
+              (1 + iva)
+            ).toFixed(2),
             depositos: this.getDepositos(String(element.idDepositos)),
-            costoNeto: (((element.precioTotal / (1 + ganancia)) / (1+iva))/(1+iva)).toFixed(2),
-            costoBruto: ((element.precioTotal / (1 + ganancia)) / (1+iva)).toFixed(2),
-            ivaCompra: (((element.precioTotal / (1 + ganancia)) / (1+iva)) - ((element.precioTotal / (1 + ganancia)) / (1+iva))/(1+iva)).toFixed(2),
+            costoNeto: (
+              element.precioTotal /
+              (1 + ganancia) /
+              (1 + iva) /
+              (1 + iva)
+            ).toFixed(2),
+            costoBruto: (
+              element.precioTotal /
+              (1 + ganancia) /
+              (1 + iva)
+            ).toFixed(2),
+            ivaCompra: (
+              element.precioTotal / (1 + ganancia) / (1 + iva) -
+              element.precioTotal / (1 + ganancia) / (1 + iva) / (1 + iva)
+            ).toFixed(2),
             ganancia: element.ganancia,
             precioSinIva: (element.precioTotal / (1 + iva)).toFixed(2),
-            ivaVenta: (element.precioTotal - (element.precioTotal / (1 + iva))).toFixed(2),
+            ivaVenta: (
+              element.precioTotal -
+              element.precioTotal / (1 + iva)
+            ).toFixed(2),
             precioTotal: element.precioTotal,
-            estado: 1
+            estado: 1,
           };
           importacion.data.push(obj);
         } else {
@@ -395,7 +445,7 @@ export default {
     getMarca(id) {
       var marca = null;
       if (this.marcas && id) {
-        this.marcas.forEach(element => {
+        this.marcas.forEach((element) => {
           if (element.id == id) {
             marca = element;
           }
@@ -407,7 +457,7 @@ export default {
     getRubro(id) {
       var rubro = null;
       if (this.rubros && id) {
-        this.rubros.forEach(element => {
+        this.rubros.forEach((element) => {
           if (element.id == id) {
             rubro = element;
           }
@@ -422,15 +472,15 @@ export default {
         var exp = d.match("-");
         if (exp) {
           var stringIds = d.split("-");
-          this.distribuidores.forEach(element => {
-            stringIds.forEach(s => {
+          this.distribuidores.forEach((element) => {
+            stringIds.forEach((s) => {
               if (element.id == Number(s)) {
                 distribuidores.push(element);
               }
             });
           });
         } else {
-          this.distribuidores.forEach(element => {
+          this.distribuidores.forEach((element) => {
             if (element.id == d) {
               distribuidores.push(element);
             }
@@ -446,15 +496,15 @@ export default {
         var exp = d.match("-");
         if (exp) {
           var stringIds = d.split("-");
-          this.depositos.forEach(element => {
-            stringIds.forEach(s => {
+          this.depositos.forEach((element) => {
+            stringIds.forEach((s) => {
               if (element.id == Number(s)) {
                 depositos.push(element);
               }
             });
           });
         } else {
-          this.depositos.forEach(element => {
+          this.depositos.forEach((element) => {
             if (element.id == d) {
               depositos.push(element);
             }
@@ -464,22 +514,15 @@ export default {
       return depositos;
     },
 
-    getReport(){
-      ReportsService(this.tenant,this.service,this.token).listAllProducts().then(res => {
-        var file = new Blob([(res['data'])], {type: 'application/pdf'});
-        var fileURL = URL.createObjectURL(file);
-        window.open(fileURL, '_blank');
-      })
+    getReport() {
+      ReportsService(this.tenant, this.service, this.token)
+        .listAllProducts()
+        .then((res) => {
+          var file = new Blob([res["data"]], { type: "application/pdf" });
+          var fileURL = URL.createObjectURL(file);
+          window.open(fileURL, "_blank");
+        });
     },
-
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        this.perfil = this.loguedUser.perfil.id;
-      })
-    }
-  }
+  },
 };
 </script>
