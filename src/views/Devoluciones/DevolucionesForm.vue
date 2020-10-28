@@ -11,7 +11,6 @@
               item-text="text"
               item-value="id"
               v-model="object.tipoPersona"
-              :counter="50"
               label="Tipo de persona"
               required
               :rules="[v => !!v || 'Campo requerido...']"
@@ -42,7 +41,8 @@
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text" 
+            <v-text-field
+            type="text" 
             v-model="object.nombre" 
             :counter="50" 
             label="Nombre" 
@@ -62,25 +62,13 @@
         </v-row>
         <v-row class="ma-3">
           <v-col>
-            <v-text-field type="text" 
-            v-model="object.direccion" 
-            :counter="50" 
-            label="Dirección"
-            ></v-text-field>
+            <v-text-field type="text" v-model="object.direccion" :counter="50" label="Dirección"></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text" 
-            v-model="object.email" 
-            :counter="50"
-            label="Email"
-            ></v-text-field>
+            <v-text-field type="text" v-model="object.email" :counter="50" label="Email"></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text" 
-            v-model="object.telefono" 
-            :counter="50" 
-            label="Teléfono"
-            ></v-text-field>
+            <v-text-field type="text" v-model="object.telefono" :counter="50" label="Teléfono"></v-text-field>
           </v-col>
           <v-col>
             <v-text-field
@@ -120,22 +108,18 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+
 export default {
   data: () => ({
-    valid: true,
-    tipopersona: [
-      { id: 1, text: "Física" },
-      { id: 2, text: "Jurídica" }
-    ],
-    condicioniva: [],
+    productos: [],
+    clientes: [],
     object: {},
     loaded: false,
     tenant: "",
-    service: "vendedores",
+    service: "devoluciones",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: "",
-    loguedUser: null
+    errorMessage: ""
   }),
 
   mounted() {
@@ -145,9 +129,9 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getCondicionesIva();
     this.getLoguedUser();
   },
+
   methods: {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
@@ -166,12 +150,24 @@ export default {
       })
     },
 
-    getCondicionesIva(){
-      GenericService(this.tenant, "condicionesFiscales", this.token)
-        .getAll()
-        .then(data => {
-          this.condicioniva = data.data.content;
-        });
+    getOtherModels(page, size){
+      GenericService(this.tenant, "productos", this.token)
+      .getAll(page, size)
+      .then(data => {
+        this.productos = data.data;
+      })
+
+      GenericService(this.tenant, "clientes", this.token)
+      .getClientesForSucursal(page, size)
+      .then(data => {
+        this.productos = data.data;
+      })
+
+      GenericService(this.tenant, "productos", this.token)
+      .getAll(page, size)
+      .then(data => {
+        this.productos = data.data;
+      })
     },
 
     save() {
@@ -180,7 +176,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
-          this.$router.push({ name: "vendedores" });
+          this.$router.push({ name: "devoluciones" });
         })
         .catch(error => {
           if (error.response.status == 500) {
@@ -191,7 +187,7 @@ export default {
     },
 
     back() {
-      this.$router.push({ name: "vendedores" });
+      this.$router.push({ name: "devoluciones" });
     }
   }
 };

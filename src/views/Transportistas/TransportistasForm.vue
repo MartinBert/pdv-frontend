@@ -51,7 +51,7 @@
           </v-col>
           <v-col>
             <v-text-field
-              type="text"
+              type="number"
               v-model="object.cuit"
               :counter="50"
               label="CUIT o DNI"

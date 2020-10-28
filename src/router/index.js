@@ -1,46 +1,48 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Root from '../views/Root.vue'
-import Login from '../views/Login.vue'
-import Home from '../views/Home.vue'
-import Usuarios from '../views/Usuarios/Usuarios.vue'
-import UsuariosForm from '../views/Usuarios/UsuariosForm.vue'
-import Perfiles from '../views/Perfiles/Perfiles.vue'
-import PerfilesForm from '../views/Perfiles/PerfilesForm.vue'
-import Depositos from '../views/Depositos/Depositos.vue'
-import DepositosForm from '../views/Depositos/DepositosForm.vue'
-import Distribuidores from '../views/Distribuidores/Distribuidores.vue'
-import DistribuidoresForm from '../views/Distribuidores/DistribuidoresForm.vue'
-import Marcas from '../views/Marcas/Marcas.vue'
-import MarcasForm from '../views/Marcas/MarcasForm.vue'
-import Rubros from '../views/Rubros/Rubros.vue'
-import RubrosForm from '../views/Rubros/RubrosForm.vue'
-import Productos from '../views/Productos/Productos.vue'
-import ProductosForm from '../views/Productos/ProductosForm.vue'
-import Ventas from '../views/Ventas/Ventas.vue'
-import VentasForm from '../views/Ventas/VentasForm.vue'
-import Clientes from '../views/Clientes/Clientes.vue'
-import ClientesForm from '../views/Clientes/ClientesForm.vue'
-import Vendedores from '../views/Vendedores/Vendedores.vue'
-import VendedoresForm from '../views/Vendedores/VendedoresForm.vue'
-import Transportistas from '../views/Transportistas/Transportistas.vue'
-import TransportistasForm from '../views/Transportistas/TransportistasForm.vue'
-import DocumentosComerciales from '../views/DocumentosComerciales/DocumentosComerciales.vue'
-import DocumentosComercialesForm from '../views/DocumentosComerciales/DocumentosComercialesForm.vue'
-import CondicionesFiscales from '../views/CondicionesFiscales/CondicionesFiscales.vue'
-import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm.vue'
-import MediosPago from '../views/MediosPago/MediosPago.vue'
-import MediosPagoForm from '../views/MediosPago/MediosPagoForm.vue'
-import PlanesPago from '../views/PlanesPago/PlanesPago.vue'
-import PlanesPagoForm from '../views/PlanesPago/PlanesPagoForm.vue'
-import Empresas from '../views/Empresas/Empresas.vue'
-import EmpresasForm from '../views/Empresas/EmpresasForm.vue'
-import PuntosVenta from '../views/PuntosVenta/PuntosVenta.vue'
-import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm.vue'
-import Sucursales from '../views/Sucursales/Sucursales.vue'
-import SucursalesForm from '../views/Sucursales/SucursalesForm.vue'
-import Stock from '../views/Stock/Stock.vue'
-import StockForm from '../views/Stock/StockForm.vue'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import Root from '../views/Root.vue';
+import Login from '../views/Login.vue';
+import Home from '../views/Home.vue';
+import Usuarios from '../views/Usuarios/Usuarios.vue';
+import UsuariosForm from '../views/Usuarios/UsuariosForm.vue';
+import Perfiles from '../views/Perfiles/Perfiles.vue';
+import PerfilesForm from '../views/Perfiles/PerfilesForm.vue';
+import Depositos from '../views/Depositos/Depositos.vue';
+import DepositosForm from '../views/Depositos/DepositosForm.vue';
+import Distribuidores from '../views/Distribuidores/Distribuidores.vue';
+import DistribuidoresForm from '../views/Distribuidores/DistribuidoresForm.vue';
+import Marcas from '../views/Marcas/Marcas.vue';
+import MarcasForm from '../views/Marcas/MarcasForm.vue';
+import Rubros from '../views/Rubros/Rubros.vue';
+import RubrosForm from '../views/Rubros/RubrosForm.vue';
+import Productos from '../views/Productos/Productos.vue';
+import ProductosForm from '../views/Productos/ProductosForm.vue';
+import Ventas from '../views/Ventas/Ventas.vue';
+import VentasForm from '../views/Ventas/VentasForm.vue';
+import Clientes from '../views/Clientes/Clientes.vue';
+import ClientesForm from '../views/Clientes/ClientesForm.vue';
+import Vendedores from '../views/Vendedores/Vendedores.vue';
+import VendedoresForm from '../views/Vendedores/VendedoresForm.vue';
+import Transportistas from '../views/Transportistas/Transportistas.vue';
+import TransportistasForm from '../views/Transportistas/TransportistasForm.vue';
+import DocumentosComerciales from '../views/DocumentosComerciales/DocumentosComerciales.vue';
+import DocumentosComercialesForm from '../views/DocumentosComerciales/DocumentosComercialesForm.vue';
+import CondicionesFiscales from '../views/CondicionesFiscales/CondicionesFiscales.vue';
+import CondicionesFiscalesForm from '../views/CondicionesFiscales/CondicionesFiscalesForm.vue';
+import MediosPago from '../views/MediosPago/MediosPago.vue';
+import MediosPagoForm from '../views/MediosPago/MediosPagoForm.vue';
+import PlanesPago from '../views/PlanesPago/PlanesPago.vue';
+import PlanesPagoForm from '../views/PlanesPago/PlanesPagoForm.vue';
+import Empresas from '../views/Empresas/Empresas.vue';
+import EmpresasForm from '../views/Empresas/EmpresasForm.vue';
+import PuntosVenta from '../views/PuntosVenta/PuntosVenta.vue';
+import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm.vue';
+import Sucursales from '../views/Sucursales/Sucursales.vue';
+import SucursalesForm from '../views/Sucursales/SucursalesForm.vue';
+import Stock from '../views/Stock/Stock.vue';
+import StockForm from '../views/Stock/StockForm.vue';
+import Devoluciones from "../views/Devoluciones/Devoluciones.vue";
+import DevolucionesForm from "../views/Devoluciones/DevolucionesForm.vue";
 
 Vue.use(VueRouter)
 
@@ -204,6 +206,18 @@ const routes = [
                 path: 'ventas',
                 name: 'ventasForm',
                 component: VentasForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'devoluciones',
+                name: 'devoluciones',
+                component: Devoluciones,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'devoluciones/form/:id',
+                name: 'devolucionesForm',
+                component: DevolucionesForm,
                 meta: { requiresAuth: true }
             },
             {

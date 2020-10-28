@@ -34,7 +34,7 @@
       <div class="horizontalSeparator"></div>
       <v-row>
         <v-col cols="9">
-          <v-form ref="form" v-model="valid" :lazy-validation="false">
+          <v-form v-on:submit.prevent="saveSale()">
             <v-row>
               <v-col cols="8">
                 <v-row>
@@ -51,6 +51,7 @@
                       item-text="razonSocial"
                       :return-object="true"
                       placeholder="Seleccione un cliente"
+                      required
                     ></v-autocomplete>
                   </v-col>
                   <v-col cols="6">
@@ -61,6 +62,7 @@
                       item-text="nombre"
                       :return-object="true"
                       placeholder="Seleccione un tipo de comprobante"
+                      required
                     ></v-autocomplete>
                   </v-col>
                   <v-col cols="6">
@@ -72,6 +74,7 @@
                       item-text="nombre"
                       :return-object="true"
                       placeholder="Seleccione un medio de pago"
+                      required
                     ></v-autocomplete>
                   </v-col>
                   <v-col cols="6">
@@ -165,9 +168,7 @@
             </v-row>
             <v-row>
               <v-col class="text-right">
-                <v-btn class="primary" @click="saveSale(object.documento.tipo)"
-                  >Finalizar venta</v-btn
-                >
+                <v-btn type="submit" class="primary">Finalizar venta</v-btn>
               </v-col>
             </v-row>
           </v-form>
@@ -438,28 +439,32 @@ export default {
     },
 
     applyModification(modificator, priceModificationPorcent) {
-      const percent = calculatePercentaje(
-        this.totalVenta,
-        priceModificationPorcent
-      );
-      if (modificator === "descuento") {
-        let obj = {
-          nombre: "DESCUENTO",
-          codigoBarra: 1111111111,
-          cantUnidades: 0,
-          precioUnitario: -percent,
-          precioTotal: -percent,
-        };
-        this.products.push(obj);
+      if (this.totalVenta > 0) {
+        const percent = calculatePercentaje(
+          this.totalVenta,
+          priceModificationPorcent
+        );
+        if (modificator === "descuento") {
+          let obj = {
+            nombre: "DESCUENTO",
+            codigoBarra: 1111111111,
+            cantUnidades: 0,
+            precioUnitario: -percent,
+            precioTotal: -percent,
+          };
+          this.products.push(obj);
+        } else {
+          let obj = {
+            nombre: "RECARGO",
+            codigoBarra: 2222222222,
+            cantUnidades: 0,
+            precioUnitario: percent,
+            precioTotal: percent,
+          };
+          this.products.push(obj);
+        }
       } else {
-        let obj = {
-          nombre: "RECARGO",
-          codigoBarra: 2222222222,
-          cantUnidades: 0,
-          precioUnitario: percent,
-          precioTotal: percent,
-        };
-        this.products.push(obj);
+        this.errorAlert("No hay productos seleccionados en la venta");
       }
     },
 
@@ -548,16 +553,20 @@ export default {
       let productos;
       let condVenta;
 
-      if (planesPago.length < 2) {
-        if (planesPago[0].cuotas > 1) {
-          condVenta = true;
+      if (planesPago) {
+        if (planesPago.length < 2) {
+          if (planesPago[0].cuotas > 1) {
+            condVenta = true;
+          } else {
+            condVenta = false;
+          }
         } else {
           condVenta = false;
         }
       } else {
-        condVenta = false;
+        condVenta = true;
       }
-      console.log(sucursal.id);
+
       DepositosService(tenant, "depositos", token)
         .getDepositosForSucursal(sucursal.id, 0, 100)
         .then((data) => {
@@ -615,12 +624,11 @@ export default {
           }
         )
         .then((data) => {
-          console.log(data);
           body.nroDesde = data.data + 1;
           body.nroHasta = body.nroDesde;
-          console.log(sucursal.razonSocial);
-
-          axios
+          if(mediosPago !== undefined){
+            if (body.impNeto !== 0) {
+            axios
             .post(
               `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/generarComprobante/${sucursal.razonSocial}`,
               body,
@@ -628,7 +636,7 @@ export default {
                 headers: afipAuthorization,
               }
             )
-            .then((data) => {
+            .then(data => {
               cabeceraAfip = data.data.feCabResp;
               detalleAfip = data.data.feDetResp;
 
@@ -652,47 +660,56 @@ export default {
                 nombreDocumento: documento.nombre,
               };
 
-              GenericService(tenant, "comprobantesFiscales", token).save(
-                comprobante
-              );
+              if (comprobante.cae) {
+                GenericService(tenant, "comprobantesFiscales", token).save(
+                  comprobante
+                );
 
-              StocksService(tenant, "stock", token)
-                .getStockForSucursal(sucursalIdFilterStock, 0, 100000)
-                .then((data) => {
-                  productos = data.data.content;
-                  productos.forEach((el) => {
-                    comprobante.productos.forEach((e) => {
-                      if (
-                        el.producto.id === e.id &&
-                        el.deposito.id == this.depositos[0].id
-                      ) {
-                        el.cantidad =
-                          parseInt(el.cantidad) - parseInt(e.cantUnidades);
-                        GenericService(tenant, "stock", token).save(el);
-                      }
+                StocksService(tenant, "stock", token)
+                  .getStockForSucursal(sucursalIdFilterStock, 0, 100000)
+                  .then((data) => {
+                    productos = data.data.content;
+                    productos.forEach((el) => {
+                      comprobante.productos.forEach((e) => {
+                        if (
+                          el.producto.id === e.id &&
+                          el.deposito.id == this.depositos[0].id
+                        ) {
+                          el.cantidad =
+                            parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                          GenericService(tenant, "stock", token).save(el);
+                        }
+                      });
                     });
-                  });
+                  })
+                .then(()=>{
+                  this.successAlert("Venta realizada");
+                })
+                .then(() => {
+                  ReportsService(tenant, service, token)
+                    .onCloseSaleReport(comprobante)
+                    .then((res) => {
+                      file = new Blob([res["data"]], {
+                        type: "application/pdf",
+                      });
+                      fileURL = URL.createObjectURL(file);
+                      window.open(fileURL, "_blank");
+                    });
                 });
 
-              this.$swal({
-                icon: "success",
-                showConfirmButton: false,
-              }).then(() => {
-                ReportsService(tenant, service, token)
-                  .onCloseSaleReport(comprobante)
-                  .then((res) => {
-                    file = new Blob([res["data"]], {
-                      type: "application/pdf",
-                    });
-                    fileURL = URL.createObjectURL(file);
-                    window.open(fileURL, "_blank");
-                  });
-              });
-
-              this.object = {};
-              this.products = [];
-              this.$store.commit("ventas/resetStates");
+                this.object = {};
+                this.products = [];
+                this.$store.commit("ventas/resetStates");
+              } else {
+                this.errorAlert(detalleAfip[0].observaciones[0].msg);
+              }
             });
+            } else {
+              this.errorAlert("No hay productos seleccionados en la venta");
+            }
+          }else{
+            this.errorAlert("Debe seleccionar un medio de pago");
+          }
         });
     },
 
@@ -715,7 +732,7 @@ export default {
       //Mutable vars
       let file;
       let fileURL;
-      let productos
+      let productos;
 
       DepositosService(tenant, "depositos", token)
         .getDepositosForSucursal(sucursal.id, 0, 100000)
@@ -725,14 +742,18 @@ export default {
       let comprobante;
       let condVenta;
 
-      if (planesPago.length < 2) {
-        if (planesPago[0].cuotas > 1) {
-          condVenta = true;
+      if (planesPago) {
+        if (planesPago.length < 2) {
+          if (planesPago[0].cuotas > 1) {
+            condVenta = true;
+          } else {
+            condVenta = false;
+          }
         } else {
           condVenta = false;
         }
       } else {
-        condVenta = false;
+        condVenta = true;
       }
 
       comprobante = {
@@ -755,46 +776,90 @@ export default {
         nombreDocumento: documento.nombre,
       };
 
-      GenericService(tenant, "comprobantesFiscales", token).save(
-        comprobante
-      );
+      if(comprobante.mediosPago[0] !== undefined){
+        if(Number(comprobante.totalVenta) !== 0){
+          GenericService(tenant, "comprobantesFiscales", token).save(comprobante);
 
-      ReportsService(tenant,service,token)
-        .onCloseSaleReport(comprobante)
-        .then((res) => {
-          file = new Blob([res["data"]], {
-            type: "application/pdf",
-          });
-          fileURL = URL.createObjectURL(file);
-          window.open(fileURL, "_blank");
-        });
-
-      StocksService(tenant, "stock", token)
-        .getStockForSucursal(sucursalIdFilterStock, 0, 100000)
-        .then((data) => {
-          productos = data.data.content;
-          productos.forEach((el) => {
-            comprobante.productos.forEach((e) => {
-              if (
-                el.producto.id === e.id &&
-                el.deposito.id == this.depositos[0].id
-              ) {
-                el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
-                GenericService(this.tenant, "stock", this.token).save(el);
-              }
+          StocksService(tenant, "stock", token)
+            .getStockForSucursal(sucursalIdFilterStock, 0, 100000)
+            .then((data) => {
+              productos = data.data.content;
+              productos.forEach((el) => {
+                comprobante.productos.forEach((e) => {
+                  if (
+                    el.producto.id === e.id &&
+                    el.deposito.id == this.depositos[0].id
+                  ) {
+                    el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                    GenericService(this.tenant, "stock", this.token).save(el);
+                  }
+                });
+              });
+            })
+          .then(()=>{
+            this.successAlert("Venta realizada");
+          })
+          .then(() => {
+            ReportsService(tenant, service, token)
+            .onCloseSaleReport(comprobante)
+            .then((res) => {
+              file = new Blob([res["data"]], {
+                type: "application/pdf",
+              });
+              fileURL = URL.createObjectURL(file);
+              window.open(fileURL, "_blank");
             });
           });
-        });
+          
+        this.object = {};
+        this.products = [];
+        this.$store.commit("ventas/resetStates");
+
+        }else{
+          this.errorAlert("No hay productos seleccionados en la venta");
+        }
+      }else{
+        this.errorAlert("Debe seleccionar un medio de pago");
+      }
     },
 
-    saveSale(bool) {
-      if (bool === true) {
-        this.save();
-      } else {
-        this.saveNoFiscal();
-      }
-    }
+    saveSale() {
+      const documento = this.object.documento;
 
+      if (documento !== undefined) {
+        if (documento.tipo === true) {
+          this.save();
+        } else {
+          this.saveNoFiscal();
+        }
+      } else {
+        this.errorAlert("Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación");
+      }
+    },
+
+    errorAlert(str){
+      return this.$swal({
+        html:
+          "<div class='text-alert-error'>" +
+          "<img src='/../../images/messages/error_1.svg' />" +
+          "<h1>¡Error!<h1>" +
+          "<p>¡"+str+"!</p>"+
+          "</div>",
+        showConfirmButton: false,
+      });
+    },
+
+    successAlert(str){
+      return this.$swal({
+        width: 300,
+        html:
+          "<div class='text-alert-success'>" +
+          "<img src='/../../images/messages/success_1.svg' />" +
+          "<h1>¡"+str+"!<h1>" +
+          "</div>",
+        showConfirmButton: false,
+      })   
+    }
   },
 };
 </script>

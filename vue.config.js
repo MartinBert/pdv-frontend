@@ -63,16 +63,26 @@ g+Zo0Hp428LZOpn7pTpEDYj9wj61tNsTnlxo25O6UjhE651U0kcxVokQlVtktA==
 
 module.exports = {
     devServer: {
+      /**** PRODUCTION ****/
+      // open: process.platform === 'darwin',
+      // host: '66.97.47.166',
+      // port: 443,
+      // https: {
+      //   key: pem,
+      //   cert: cert
+      // },
+      // public: 'https://prysoftgestion.com',
+      // disableHostCheck: true,
+      // hotOnly: false,
+
+      /**** LOCAL ****/
       open: process.platform === 'darwin',
-      host: '66.97.47.166',
-      port: 443,
-      https: {
-        key: pem,
-        cert: cert
-      },
-      public: 'https://prysoftgestion.com',
+      host: '0.0.0.0',
+      port: 8001,
+      https: false,
       disableHostCheck: true,
       hotOnly: false,
+
     },
     "transpileDependencies": [
       "vuetify"

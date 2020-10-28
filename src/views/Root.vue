@@ -99,6 +99,12 @@ export default {
             title: "Lista",
             visible: false
           },
+          {
+            path: "/devoluciones",
+            name: "devoluciones",
+            title: "Devoluciones y cambios",
+            visible: false
+          },
         ]
       },
       {
