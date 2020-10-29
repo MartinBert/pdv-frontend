@@ -110,7 +110,8 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.getAll(this.paginate.page - 1, this.paginate.size);
+    // this.getLoguedUser();
   },
   methods: {
     getLoguedUser(){
