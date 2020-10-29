@@ -62,7 +62,8 @@ export default {
     service: "planesPago",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: ""
+    errorMessage: "",
+    loguedUser: null
   }),
 
   mounted() {
@@ -72,8 +73,18 @@ export default {
     } else {
       this.loaded = true;
     }
+    this.getLoguedUser();
   },
   methods: {
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+      })
+    },
+
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
@@ -85,6 +96,7 @@ export default {
 
     save() {
       this.$refs.form.validate();
+      this.object.sucursal = this.loguedUser.sucursal;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {

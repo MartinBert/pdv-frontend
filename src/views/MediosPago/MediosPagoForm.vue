@@ -16,7 +16,7 @@
             </v-col>
             <v-col class="col-6"> 
               <v-autocomplete
-                :items="medios_pago"
+                :items="planes_pago"
                 v-model="object.planPago"
                 multiple
                 item-text="nombre"
@@ -46,17 +46,20 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import PlanesService from "../../services/PlanesService";
+
 export default {
   data: () => ({
     valid: true,
     object: {},
-    medios_pago: [],
+    planes_pago: [],
     loaded: false,
     tenant: "",
     service: "mediosPago",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: ""
+    errorMessage: "",
+    loguedUser: null
   }),
 
   mounted() {
@@ -66,10 +69,31 @@ export default {
     } else {
       this.loaded = true;
     }
-
-    this.getPlanes();
+    this.getLoguedUser();
   },
   methods: {
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then(data => {
+        this.loguedUser = data.data;
+        if(this.loguedUser.perfil.id !== 1){
+          this.getPlansForSucursal(this.loguedUser.sucursal.id, 0, 100000);
+        }else{
+          this.getAllPlanes();
+        }
+      })
+    },
+
+    getPlansForSucursal(id, page, size){
+      PlanesService(this.tenant, "planesPago", this.token)
+      .getPlansForSucursal(id, page, size)
+      .then(data => {
+        this.planes_pago = data.data.content;
+      })
+    },
+
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
@@ -79,16 +103,17 @@ export default {
         });
     },
 
-    getPlanes(){
+    getAllPlanes(){
       GenericService(this.tenant, "planesPago", this.token)
       .getAll(0, 1000)
       .then(data => {
-        this.medios_pago = data.data.content;
+        this.planes_pago = data.data.content;
       })
     },
 
     save() {
       this.$refs.form.validate();
+      this.object.sucursal = this.loguedUser.sucursal;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {

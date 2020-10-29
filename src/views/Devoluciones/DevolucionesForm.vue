@@ -2,8 +2,20 @@
   <v-card min-width="100%">
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <div v-if="loaded">
-      <v-form ref="form" class="mt-5">
-        <v-row class="ma-1">
+      <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
+        <v-row>
+          <v-col class="ma-5">
+            <v-autocomplete
+              :items="tiposOperacion"
+              v-model="tipoOperacion"
+              item-text="text"
+              item-value="id"
+              label="Propiedad"
+              :rules="[v => !!v || 'Campo requerido...']"
+            ></v-autocomplete>
+          </v-col>
+        </v-row>
+        <v-row class="ma-1" v-if="tipoOperacion">
           <v-col>
             <v-text-field
               type="text"
@@ -89,7 +101,7 @@
         </v-row>
         <div class="ma-1">
           <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save">Guardar</v-btn>
+            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
             <v-btn color="default" @click="back()">Cancelar</v-btn>
           </v-col>
         </div>
@@ -112,11 +124,17 @@ import ClientesService from "../../services/ClientesService";
 
 export default {
   data: () => ({
+    tiposOperacion: [
+      {id: 1, text: "Devolución"},
+      {id: 2, text: "Cambio de artículo"}
+    ],
+    tipoOperacion: null,
     productos: [],
     clientes: [],
     object: {
       producto: []
     },
+    valid: true,
     loaded: false,
     tenant: "",
     service: "devoluciones",
