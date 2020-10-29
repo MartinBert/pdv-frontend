@@ -2,95 +2,94 @@
   <v-card min-width="100%">
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <div v-if="loaded">
-      <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
+      <v-form ref="form" class="mt-5">
         <v-row class="ma-1">
           <v-col>
-            <v-select
-              type="text"
-              :items="tipopersona"
-              item-text="text"
-              item-value="id"
-              v-model="object.tipoPersona"
-              label="Tipo de persona"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-select>
-          </v-col>
-          <v-col>
-            <v-select
-              type="text"
-              :items="condicioniva"
-              item-text="nombre"
-              item-value="id"
-              v-model="object.condicionIva"
-              :counter="50"
-              :return-object="true"
-              label="Condición frente al IVA"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-select>
-          </v-col>
-          <v-col>
             <v-text-field
               type="text"
-              v-model="object.razonSocial"
+              v-model="object.descripcion"
               :counter="50"
-              label="Razón social"
+              label="Descripción"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="12">
+            <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
+              <label>Seleccione un parámetro para realizar la búsqueda</label>
+              <v-row>
+                <v-col>
+                  <v-radio label="Nombre" value="nombre"></v-radio>
+                </v-col>
+                <v-col>
+                  <v-radio
+                    label="Código de barras"
+                    value="codigodebarras"
+                  ></v-radio>
+                </v-col>
+                <v-col>
+                  <v-radio
+                    label="Código de producto"
+                    value="codigodeproducto"
+                  ></v-radio>
+                </v-col>
+              </v-row>
+            </v-radio-group>
             <v-text-field
-            type="text" 
-            v-model="object.nombre" 
-            :counter="50" 
-            label="Nombre" 
-            required
+              v-if="radioGroup"
+              v-model="filterString"
+              v-on:input="filterObjects(filterString, radioGroup)"
+              dense
+              outlined
+              rounded
+              class="text-left ml-5 mr-5"
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
             ></v-text-field>
           </v-col>
-          <v-col>
-            <v-text-field
-              type="number"
-              v-model="object.cuit"
-              :counter="50"
-              label="CUIT o DNI"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
+          <v-col cols="12">
+            <v-simple-table style="background-color: transparent">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Nombre</th>
+                    <th>Código de barras</th>
+                    <th>Código de producto</th>
+                    <th>Precio de costo</th>
+                  </tr>
+                </thead>
+                <tbody v-for="producto in productos" :key="producto.id">
+                  <tr>
+                    <td>
+                      <v-checkbox
+                        v-model="producto.selected"
+                        @change="checkProduct(producto.id)"
+                      ></v-checkbox>
+                    </td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.codigoBarra }}</td>
+                    <td>{{ producto.codigoProducto }}</td>
+                    <td>${{ producto.precioCosto }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+            <v-pagination
+              v-model="paginate.page"
+              :length="paginate.totalPages"
+              next-icon="mdi-chevron-right"
+              prev-icon="mdi-chevron-left"
+              :page="paginate.page"
+              :total-visible="8"
+              @input="changePage(loguedUser.sucursal.id, paginate.page - 1, paginate.size)"
+              v-if="paginate.totalPages > 1"
+            ></v-pagination>
           </v-col>
         </v-row>
-        <v-row class="ma-3">
-          <v-col>
-            <v-text-field type="text" v-model="object.direccion" :counter="50" label="Dirección"></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field type="text" v-model="object.email" :counter="50" label="Email"></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field type="text" v-model="object.telefono" :counter="50" label="Teléfono"></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              type="text"
-              v-model="object.telefonoAlternativo"
-              :counter="50"
-              label="Teléfono alternativo"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              type="text"
-              v-model="object.nombreContacto"
-              :counter="50"
-              label="Nombre de contacto"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-
         <div class="ma-1">
           <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
+            <v-btn class="mr-4" color="primary" @click="save">Guardar</v-btn>
             <v-btn color="default" @click="back()">Cancelar</v-btn>
           </v-col>
         </div>
@@ -108,18 +107,31 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import StocksService from "../../services/StocksService";
+import ClientesService from "../../services/ClientesService";
 
 export default {
   data: () => ({
     productos: [],
     clientes: [],
-    object: {},
+    object: {
+      producto: []
+    },
     loaded: false,
     tenant: "",
     service: "devoluciones",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: ""
+    errorMessage: "",
+    paginate: {
+      page: 1,
+      size: 10,
+      totalPages: 0
+    },
+    loguedUser: null,
+    radioGroup: "",
+    filterString: "",
+    checked: false,
   }),
 
   mounted() {
@@ -147,31 +159,130 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
+        if(this.loguedUser.perfil.id < 2){
+          this.getAll(this.paginate.page - 1, this.paginate.size);
+        }else{
+          this.getModels(this.loguedUser.sucursal.id, this.paginate.page - 1, this.paginate.size);
+        }
       })
     },
-
-    getOtherModels(page, size){
+    
+    getAll(page, size){
       GenericService(this.tenant, "productos", this.token)
       .getAll(page, size)
       .then(data => {
-        this.productos = data.data;
+        this.productos = data.data.content;
+        this.paginate.totalPages = data.data.totalPages;
       })
 
       GenericService(this.tenant, "clientes", this.token)
-      .getClientesForSucursal(page, size)
+      .getAll(0, 100000)
       .then(data => {
-        this.productos = data.data;
+        this.clientes = data.data.content;
       })
+
+      GenericService(this.tenant, "stock", this.token)
+      .getAll(0, 100000)
+      .then(data => {
+        this.stocks = data.data;
+      })
+    },
+
+    getModels(sucursalId, page, size){
+      const sucursal = { sucursal:{ id:sucursalId } };
 
       GenericService(this.tenant, "productos", this.token)
       .getAll(page, size)
       .then(data => {
-        this.productos = data.data;
+        if (this.object.producto.length > 0) {
+          data.data.content.forEach((el) => {
+            this.object.producto.forEach((e) => {
+              if (el.id == e.id) {
+                el.selected = true;
+              }
+            });
+          });
+          this.productos = data.data.content;
+        } else {
+          this.productos = data.data.content;
+        }
+        this.paginate.totalPages = data.data.totalPages;
+      });
+
+      ClientesService(this.tenant, "clientes", this.token)
+      .getClientesForSucursal(sucursalId, 0, 100000)
+      .then(data => {
+        this.clientes = data.data.content;
+      })
+
+      StocksService(this.tenant, "stock", this.token)
+      .getStockForSucursal(sucursal, 0, 100000)
+      .then(data => {
+        this.stocks = data.data.content;
       })
     },
 
+    changePage(sucursalId, page, size) {
+      const perfil = this.loguedUser.perfil.id;
+
+      if(perfil < 2){
+        this.getAll(page, size);
+      }else{
+        this.getModels(sucursalId, page, size);
+      }
+
+    },
+
+    filterObjects(filter, radio) {
+      const sucursalId = this.loguedUser.sucursal.id;
+      var filt = "";
+      switch (radio) {
+        case "nombre":
+          filt = { nombre: filter };
+          break;
+        case "codigodebarras":
+          filt = { codigoBarra: filter };
+          break;
+        default:
+          filt = { codigoProducto: filter };
+          break;
+      }
+
+      if (!this.filterString) {
+        this.getModels(sucursalId, this.paginate.page - 1, this.paginate.size);
+      } else {
+        GenericService(this.tenant, "productos", this.token)
+          .filter(filt)
+          .then((data) => {
+            if (this.object.producto.length > 0) {
+              data.data.content.forEach((el) => {
+                this.object.producto.forEach((e) => {
+                  if (el.id == e.id) {
+                    el.selected = true;
+                  }
+                });
+              });
+            }
+            this.productos = data.data.content;
+            this.paginate.totalPages = data.data.totalPages;
+            this.loaded = true;
+          });
+      }
+    },
+
+    checkProduct(id) {
+      const productosFiltrados = this.productos.filter((el) => el.id === id)[0];
+      if (productosFiltrados.selected) {
+        this.object.producto.push(productosFiltrados);
+      } else {
+        const object = this.object.producto.filter(
+          (el) => el.id !== productosFiltrados.id
+        );
+        this.object.producto = object;
+      }
+    },
+
     save() {
-      this.$refs.form.validate();
       this.object.sucursales = [this.loguedUser.sucursal];
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)

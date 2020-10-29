@@ -27,17 +27,17 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Depósito</th>
+            <th>Descripción</th>
+            <th>Productos</th>
+            <th>Monto devolución</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
             <td>{{object.id}}</td>
-            <td>{{object.producto.nombre}}</td>
-            <td>{{object.cantidad}}</td>
+            <td>{{object.descripcion}}</td>
+            <td><v-btn class="success" @click="seeDetails(object.productos)">VER DETALLES</v-btn></td>
             <td>{{object.deposito.nombre}}</td>
             <td>
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
