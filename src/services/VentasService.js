@@ -8,13 +8,6 @@ export default (tenant,service,token) =>{
             })
         },
 
-        getUser(){
-            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/usuarios/getLogued`, {
-                  headers: { Authorization: "Bearer " + token },
-                }
-              )
-        },
-
         getAfipModuleAuthorization(){
             const user = {
                 "username":"marcelo",

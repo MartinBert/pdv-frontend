@@ -252,6 +252,8 @@ import axios from "axios";
 import ReportsService from "../../services/ReportsService";
 import StocksService from "../../services/StocksService";
 import DepositosService from "../../services/DepositosService";
+import ClientesService from "../../services/ClientesService";
+import MediosPagosService from "../../services/MediosPagosService";
 
 export default {
   data: () => ({
@@ -265,7 +267,6 @@ export default {
     databaseItems: {
       clientes: [],
       medios_de_pago: [],
-      empresa: [],
     },
     productos: [],
     products: [],
@@ -317,38 +318,40 @@ export default {
   mounted() {
     this.$store.commit("ventas/resetStates");
     this.tenant = this.$route.params.tenant;
-    GenericService(this.tenant, "clientes", this.token)
-      .getAll(this.page, this.size)
-      .then((data) => {
-        this.databaseItems.clientes = data.data.content;
-      });
-
-    GenericService(this.tenant, "mediosPago", this.token)
-      .getAll(this.page, this.size)
-      .then((data) => {
-        this.databaseItems.medios_de_pago = data.data.content;
-      });
-
-    GenericService(this.tenant, "empresas", this.token)
-      .getAll(this.page, this.size)
-      .then((data) => {
-        this.databaseItems.empresa = data.data.content;
-      });
-
-    VentasService(this.tenant, this.service, this.token)
-      .getUser()
-      .then((data) => {
-        this.user = data.data;
-      });
-
-    VentasService(this.tenant, this.service, this.token)
-      .getAfipModuleAuthorization()
-      .then((data) => {
-        this.afipModuleAuthorization = data.data;
-      });
+    this.getLoguedUser();
   },
 
   methods: {
+
+    getLoguedUser(){
+      GenericService(this.tenant, this.service, this.token)
+      .getLoguedUser()
+      .then((data) => {
+        this.user = data.data;
+
+        const sucursal = this.user.sucursal.id;
+
+        ClientesService(this.tenant, "clientes", this.token)
+        .getClientesForSucursal(sucursal, 0, 100000)
+        .then((data) => {
+          this.databaseItems.clientes = data.data.content;
+        });
+
+        MediosPagosService(this.tenant, "mediosPago", this.token)
+        .getMediosForSucursal(sucursal ,0, 100000)
+        .then((data) => {
+          this.databaseItems.medios_de_pago = data.data.content;
+        });
+
+        VentasService(this.tenant, this.service, this.token)
+        .getAfipModuleAuthorization()
+        .then((data) => {
+          this.afipModuleAuthorization = data.data;
+        });
+
+      });
+    },
+
     processProductsObject(producto) {
       const {
         id,
