@@ -91,7 +91,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import DistribuidoresService from "../../services/DistribuidoresService";
 
 export default {
   data: () => ({
@@ -140,8 +139,8 @@ export default {
     },
 
     getDistribuidoresForSucursal(sucursal, page, size){
-      DistribuidoresService(this.tenant, this.service, this.token)
-      .getDistribuidoresForSucursal(sucursal, page, size)
+      GenericService(this.tenant, this.service, this.token)
+      .getDataForSucursal(sucursal, page, size)
       .then(data => {
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;

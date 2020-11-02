@@ -117,8 +117,8 @@ export default {
       .then(data => {
         this.loguedUser = data.data;
         if(this.loguedUser.perfil.id != 1){
-          const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
-          this.getdevolucionesForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
+          const sucursal = this.loguedUser.sucursal.id;
+          this.getDevolucionesForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
         }else{
           this.getAll(this.paginate.page - 1, this.paginate.size);
         }
@@ -135,6 +135,15 @@ export default {
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+    },
+
+    getDevolucionesForSucursal(sucursalId, page, size){
+      GenericService(this.tenant, this.service, this.token)
+      .getDataForSucursal(sucursalId, page, size)
+      .then(data => {
+        this.objects = data.data.content;
+        this.paginate.totalPages = data.data.totalPages;
+      })
     },
 
     changePage(page, size) {

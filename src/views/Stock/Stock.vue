@@ -87,7 +87,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import StocksService from "../../services/StocksService";
 
 export default {
   data: () => ({
@@ -118,7 +117,7 @@ export default {
       .then(data => {
         this.loguedUser = data.data;
         if(this.loguedUser.perfil.id != 1){
-          const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
+          const sucursal = this.loguedUser.sucursal.id;
           this.getStockForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
         }else{
           this.getAll(this.paginate.page - 1, this.paginate.size);
@@ -127,8 +126,8 @@ export default {
     },
 
     getStockForSucursal(sucursal, page, size){
-      StocksService(this.tenant, this.service, this.token)
-      .getStockForSucursal(sucursal, page, size)
+      GenericService(this.tenant, this.service, this.token)
+      .getDataForSucursal(sucursal, page, size)
       .then(data => {
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;

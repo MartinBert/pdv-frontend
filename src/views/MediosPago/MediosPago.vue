@@ -120,7 +120,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import MediosPagosService from "../../services/MediosPagosService";
 import XLSX from 'xlsx';
 
 export default {
@@ -163,8 +162,8 @@ export default {
     },
 
     getMediosForSucursal(id, page, size){
-      MediosPagosService(this.tenant, this.service, this.token)
-      .getMediosForSucursal(id, page, size)
+      GenericService(this.tenant, this.service, this.token)
+      .getDataForSucursal(id, page, size)
       .then(data => {
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;

@@ -46,7 +46,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import PlanesService from "../../services/PlanesService";
 
 export default {
   data: () => ({
@@ -87,8 +86,8 @@ export default {
     },
 
     getPlansForSucursal(id, page, size){
-      PlanesService(this.tenant, "planesPago", this.token)
-      .getPlansForSucursal(id, page, size)
+      GenericService(this.tenant, "planesPago", this.token)
+      .getDataForSucursal(id, page, size)
       .then(data => {
         this.planes_pago = data.data.content;
       })

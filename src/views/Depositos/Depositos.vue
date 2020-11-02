@@ -97,7 +97,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import DepositosService from "../../services/DepositosService";
 import XLSX from 'xlsx';
 
 export default {
@@ -136,8 +135,8 @@ export default {
     },
 
     getDepositosForSucursal(id, page, size){
-      DepositosService(this.tenant, this.service, this.token)
-      .getDepositosForSucursal(id, page, size)
+      GenericService(this.tenant, this.service, this.token)
+      .getDataForSucursal(id, page, size)
       .then(data => {
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;

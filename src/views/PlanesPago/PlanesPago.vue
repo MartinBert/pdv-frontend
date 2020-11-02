@@ -96,7 +96,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import PlanesService from "../../services/PlanesService";
 import XLSX from 'xlsx';
 
 export default {
@@ -137,8 +136,8 @@ export default {
     },
 
     getPlansForSucursal(id, page, size){
-      PlanesService(this.tenant, this.service, this.token)
-      .getPlansForSucursal(id, page, size)
+      GenericService(this.tenant, this.service, this.token)
+      .getDataForSucursal(id, page, size)
       .then(data => {
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;

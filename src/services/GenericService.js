@@ -53,5 +53,11 @@ export default (tenant,service,token) =>{
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/usuarios/getLogued`,
               { headers: { Authorization: "Bearer " + token }});
         },
+
+        getDataForSucursal: function(sucursalId,page,size){
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getForSucursal/${sucursalId}/${page}/${size}`, {
+                headers: { Authorization: "Bearer " + token }
+            })
+        },
     }
 }

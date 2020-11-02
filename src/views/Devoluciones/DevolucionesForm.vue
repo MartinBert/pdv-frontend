@@ -10,12 +10,15 @@
               v-model="tipoOperacion"
               item-text="text"
               item-value="id"
-              label="Propiedad"
+              label="Tipo de operación"
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-autocomplete>
           </v-col>
         </v-row>
         <v-row class="ma-1" v-if="tipoOperacion">
+          <v-col cols="12">
+
+          </v-col>
           <v-col>
             <v-text-field
               type="text"
@@ -119,8 +122,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import StocksService from "../../services/StocksService";
-import ClientesService from "../../services/ClientesService";
 
 export default {
   data: () => ({
@@ -131,6 +132,7 @@ export default {
     tipoOperacion: null,
     productos: [],
     clientes: [],
+    depositos: [],
     object: {
       producto: []
     },
@@ -207,8 +209,6 @@ export default {
     },
 
     getModels(sucursalId, page, size){
-      const sucursal = { sucursal:{ id:sucursalId } };
-
       GenericService(this.tenant, "productos", this.token)
       .getAll(page, size)
       .then(data => {
@@ -227,17 +227,27 @@ export default {
         this.paginate.totalPages = data.data.totalPages;
       });
 
-      ClientesService(this.tenant, "clientes", this.token)
-      .getClientesForSucursal(sucursalId, 0, 100000)
+      GenericService(this.tenant, "clientes", this.token)
+      .getDataForSucursal(sucursalId, 0, 100000)
       .then(data => {
         this.clientes = data.data.content;
+        console.log(this.clientes);
       })
 
-      StocksService(this.tenant, "stock", this.token)
-      .getStockForSucursal(sucursal, 0, 100000)
+      GenericService(this.tenant, "stock", this.token)
+      .getDataForSucursal(sucursalId, 0, 100000)
       .then(data => {
         this.stocks = data.data.content;
+        console.log(this.stocks);
       })
+
+      GenericService(this.tenant, "depositos", this.token)
+      .getDataForSucursal(sucursalId, 0, 100000)
+      .then(data => {
+        this.depositos = data.data.content;
+        console.log(this.depositos);
+      })
+
     },
 
     changePage(sucursalId, page, size) {
