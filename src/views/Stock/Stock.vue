@@ -149,7 +149,7 @@ export default {
 
     changePage(page, size) {
       if(this.loguedUser.perfil.id != 1){
-        const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
+        const sucursal = this.loguedUser.sucursal.id;
         this.getStockForSucursal(sucursal, page, size);
       }else{
         this.getAll(page, size);
