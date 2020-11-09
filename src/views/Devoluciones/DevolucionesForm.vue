@@ -15,15 +15,11 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
-        <v-row class="ma-1" v-if="tipoOperacion">
-          <v-col cols="12">
-
-          </v-col>
+        <v-row class="ma-3" v-if="tipoOperacion">
           <v-col>
             <v-text-field
               type="text"
               v-model="object.descripcion"
-              :counter="50"
               label="Descripción"
               required
               :rules="[v => !!v || 'Campo requerido...']"
@@ -101,15 +97,30 @@
               v-if="paginate.totalPages > 1"
             ></v-pagination>
           </v-col>
+          <v-row>
+            <v-col></v-col>
+              <v-col class="col-2">
+                <v-text-field
+                  type="text"
+                  v-model="object.totalDevolucion"
+                  label="Total de la operación"
+                  required
+                  :rules="[v => !!v || 'Campo requerido...']"
+                ></v-text-field>
+              </v-col>
+            <v-col></v-col>
+          </v-row>
         </v-row>
         <div class="ma-1">
           <v-col class="col-6">
             <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
             <v-btn color="default" @click="back()">Cancelar</v-btn>
+            <v-btn color="default" @click="openSaveDialog()">Cancelar</v-btn>
           </v-col>
         </div>
       </v-form>
     </div>
+
     <div v-if="!loaded">
       <v-row class="ma-1">
         <v-col class="col-12" style="text-align:center">
@@ -117,11 +128,16 @@
         </v-col>
       </v-row>
     </div>
+
+    <v-dialog v-model="saveDialog">
+      <h1>asdfasdfasdf</h1>
+    </v-dialog>
   </v-card>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
+import { getCurrentDate } from "../../helpers/dateHelper";
 
 export default {
   data: () => ({
@@ -134,7 +150,8 @@ export default {
     clientes: [],
     depositos: [],
     object: {
-      producto: []
+      fecha: getCurrentDate(),
+      productos: []
     },
     valid: true,
     loaded: false,
@@ -152,6 +169,7 @@ export default {
     radioGroup: "",
     filterString: "",
     checked: false,
+    saveDialog: false
   }),
 
   mounted() {
@@ -212,9 +230,9 @@ export default {
       GenericService(this.tenant, "productos", this.token)
       .getAll(page, size)
       .then(data => {
-        if (this.object.producto.length > 0) {
+        if (this.object.productos.length > 0) {
           data.data.content.forEach((el) => {
-            this.object.producto.forEach((e) => {
+            this.object.productos.forEach((e) => {
               if (el.id == e.id) {
                 el.selected = true;
               }
@@ -252,13 +270,11 @@ export default {
 
     changePage(sucursalId, page, size) {
       const perfil = this.loguedUser.perfil.id;
-
       if(perfil < 2){
         this.getAll(page, size);
       }else{
         this.getModels(sucursalId, page, size);
       }
-
     },
 
     filterObjects(filter, radio) {
@@ -282,9 +298,9 @@ export default {
         GenericService(this.tenant, "productos", this.token)
           .filter(filt)
           .then((data) => {
-            if (this.object.producto.length > 0) {
+            if (this.object.productos.length > 0) {
               data.data.content.forEach((el) => {
-                this.object.producto.forEach((e) => {
+                this.object.productos.forEach((e) => {
                   if (el.id == e.id) {
                     el.selected = true;
                   }
@@ -301,17 +317,18 @@ export default {
     checkProduct(id) {
       const productosFiltrados = this.productos.filter((el) => el.id === id)[0];
       if (productosFiltrados.selected) {
-        this.object.producto.push(productosFiltrados);
+        this.object.productos.push(productosFiltrados);
       } else {
-        const object = this.object.producto.filter(
+        const object = this.object.productos.filter(
           (el) => el.id !== productosFiltrados.id
         );
-        this.object.producto = object;
+        this.object.productos = object;
       }
     },
-
+ 
     save() {
-      this.object.sucursales = [this.loguedUser.sucursal];
+      this.object.sucursal = this.loguedUser.sucursal;
+      this.object.empresa = this.loguedUser.empresa;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
@@ -327,7 +344,11 @@ export default {
 
     back() {
       this.$router.push({ name: "devoluciones" });
-    }
+    },
+
+    openSaveDialog() {
+      this.saveDialog = true;
+    },
   }
 };
 </script>
