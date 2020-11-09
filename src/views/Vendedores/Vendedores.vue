@@ -67,7 +67,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page(paginate.page - 1, paginate.size)"
       :total-visible="8"
-      @input="changePage"
+      @input="getLoguedUser()"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -148,15 +148,6 @@ export default {
       })
     },
 
-    changePage(page, size) {
-      if(this.loguedUser.perfil.id != 1){
-        const sucursal = this.loguedUser.sucursal.id;
-        this.getVendedoresForSucursal(sucursal, page, size);
-      }else{
-        this.getAll(page, size);
-      }
-    },
-
     newObject() {
       this.$router.push({ name: "vendedoresForm", params: { id: 0 } });
     },
@@ -187,7 +178,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getAll(this.paginate.page - 1, this.paginate.size);
+          this.getLoguedUser;
         });
     }
   }

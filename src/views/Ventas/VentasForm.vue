@@ -6,7 +6,7 @@
         <v-col cols="3">
           <v-btn
             color="primary"
-            @click="$store.commit('ventas/dialogProductosMutation')"
+            @click="$store.commit('productos/dialogProductosMutation')"
             >BUSCAR PRODUCTO</v-btn
           >
         </v-col>
@@ -180,31 +180,8 @@
             </v-col>
             <v-col cols="11">
               <Calculator />
-              <div class="mt-3">
-                <div
-                  class="cleanslate w24tz-current-time w24tz-middle"
-                  style="
-                    display: inline-block !important;
-                    visibility: hidden !important;
-                    min-width: 300px !important;
-                    min-height: 145px !important;
-                  "
-                >
-                  <p>
-                    <a
-                      href="//24timezones.com/Argentina/hora"
-                      style="text-decoration: none"
-                      class="clock24"
-                      id="tz24-1600967960-cc10022-eyJob3VydHlwZSI6IjI0Iiwic2hvd2RhdGUiOiIxIiwic2hvd3NlY29uZHMiOiIxIiwiY29udGFpbmVyX2lkIjoiY2xvY2tfYmxvY2tfY2I1ZjZjZDUxOGU0MTE2IiwidHlwZSI6ImRiIiwibGFuZyI6ImVzIn0="
-                      title="Hora Mundial - Argentina"
-                      target="_blank"
-                      rel="nofollow"
-                      >Hora actual en Argentina</a
-                    >
-                  </p>
-                  <div id="clock_block_cb5f6cd518e4116"></div>
-                </div>
-              </div>
+              <div style="text-align:center;padding:1em 0;"> 
+                <h3><a style="text-decoration:none;" href="https://www.zeitverschiebung.net/es/city/3435910"><span style="color:gray;">Hora actual en</span><br />Argentina</a></h3> <iframe src="https://www.zeitverschiebung.net/clock-widget-iframe-v2?language=es&size=medium&timezone=America%2FArgentina%2FBuenos_Aires" width="100%" height="115" frameborder="0" seamless></iframe> </div>
             </v-col>
           </v-row>
         </v-col>
@@ -312,7 +289,7 @@ export default {
   },
 
   mounted() {
-    this.$store.commit("ventas/resetStates");
+    this.$store.commit("productos/resetStates");
     this.tenant = this.$route.params.tenant;
     this.getLoguedUser();
   },
@@ -432,7 +409,10 @@ export default {
 
     deleteLine(id) {
       const filter = this.products.filter((el) => el.id !== id);
+      const filterForStore = this.products.filter((el) => el.id === id);
+
       this.products = filter;
+      this.$store.commit("productos/removeProductsToList", filterForStore);
     },
 
     applyModification(modificator, priceModificationPorcent) {
@@ -472,9 +452,11 @@ export default {
 
     addProduct(data) {
       let processObjects = [];
-      data.forEach((el) => {
+
+      data.forEach((el) => { 
         processObjects.push(this.processProductsObject(el));
       });
+
       this.products = processObjects;
     },
 
@@ -696,7 +678,7 @@ export default {
 
                     this.object = {};
                     this.products = [];
-                    this.$store.commit("ventas/resetStates");
+                    this.$store.commit("productos/resetStates");
                   } else {
                     this.errorAlert(detalleAfip[0].observaciones[0].msg);
                   }
@@ -812,7 +794,7 @@ export default {
 
           this.object = {};
           this.products = [];
-          this.$store.commit("ventas/resetStates");
+          this.$store.commit("productos/resetStates");
         } else {
           this.errorAlert("No hay productos seleccionados en la venta");
         }

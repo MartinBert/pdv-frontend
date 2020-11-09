@@ -70,7 +70,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage(paginate.page - 1, paginate.size)"
+      @input="getLoguedUser()"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -183,15 +183,6 @@ export default {
         });
     },
 
-    changePage(page, size) {
-      if(this.loguedUser.perfil.id != 1){
-        const sucursalId = this.loguedUser.sucursal.id;
-        this.getMediosForSucursal(sucursalId, page, size);
-      }else{
-        this.getAll(page, size);
-      }
-    },
-
     newObject() {
       this.$router.push({ name: "mediosPagoForm", params: { id: 0 } });
     },
@@ -227,7 +218,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getAll(this.paginate.page - 1, this.paginate.size);
+          this.getLoguedUser()
         });
     },
 
@@ -253,7 +244,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(() => {
-              this.getAll(this.paginate.page - 1, this.paginate.size);
+              this.getLoguedUser();
               this.loaderStatus = true;
               window.setTimeout(()=>{
                 this.loader = false
@@ -279,7 +270,8 @@ export default {
             nombre: element.nombre,
             planPago: this.getPlanesPago(
               String(element.idPlanes)
-            )
+            ),
+            sucursal: this.loguedUser.sucursal
           };
           importacion.data.push(obj);
         } else {

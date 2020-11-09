@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="$store.state.ventas.dialogProd" scrollable max-width="700px">
+    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px" @input="getStore()">
       <v-card>
         <v-row>
             <v-col>
@@ -76,73 +76,68 @@
 <script>
 import GenericService from "../services/GenericService";
 export default {
-    name: "ProductDialog",
+  name: "ProductDialog",
 
-    data(){
-      return {
-        dialog: null,
-        productos: [],
-        radioGroup: "",
-        filterString: ""
+  data(){
+    return {
+      productos: [],
+      radioGroup: "",
+      filterString: ""
+    }
+  },
+
+  mounted(){
+    this.tenant = this.$route.params.tenant;
+    this.token = localStorage.getItem('token');
+    this.getAllProducts();
+  },
+
+  methods:{
+    filterObjects(filter, radio) {
+      var filt = {};
+      switch (radio) {
+        case "nombre":
+          filt = { nombre: filter };
+          break;
+        case "codigodebarras":
+          filt = { codigoBarra: filter };
+          break;
+        default:
+          filt = { codigoProducto: filter };
+          break;
       }
-    },
 
-    watch:{
-      setDialog(){
-          this.dialog = this.$store.state.ventas.dialogProd
-      }
-    },
-
-    mounted(){
-      this.tenant = this.$route.params.tenant;
-      this.token = localStorage.getItem('token');
       GenericService(this.tenant, "productos", this.token)
-          .getAll(this.page, this.size)
-          .then((data) => {
+        .filter(filt)
+        .then((data) => {
           this.productos = data.data.content;
         });
     },
 
-    methods:{
-      filterObjects(filter, radio) {
-        var filt = {};
-        switch (radio) {
-          case "nombre":
-            filt = { nombre: filter };
-            break;
-          case "codigodebarras":
-            filt = { codigoBarra: filter };
-            break;
-          default:
-            filt = { codigoProducto: filter };
-            break;
-        }
-
-        GenericService(this.tenant, "productos", this.token)
-          .filter(filt)
-          .then((data) => {
-            this.productos = data.data.content;
-          });
-      },
-
-      checkProduct(id) {
-        const productosFiltrados = this.productos.filter((el) => el.id === id)[0];
-        if (productosFiltrados.selected) {
-          productosFiltrados.cantUnidades = 1;
-          productosFiltrados.total = productosFiltrados.precioTotal;
-          this.$store.commit('ventas/addProductsToSale', productosFiltrados);
-          this.$emit('productList', this.$store.state.ventas.products);
-        } else {
-          this.$store.commit('ventas/removeProductsToSale', id);
-          this.$emit('productList', this.$store.state.ventas.products);
-        }
-      },
-
-      refreshProducts(){
-        this.productos.forEach(el => {
-          el.selected = false;
-        })
+    checkProduct(id) {
+      const productosFiltrados = this.productos.filter((el) => el.id === id)[0];
+      if (productosFiltrados.selected) {
+        productosFiltrados.cantUnidades = 1;
+        productosFiltrados.total = productosFiltrados.precioTotal;
+        this.$store.commit('productos/addProductsToList', productosFiltrados);
+        this.$emit('productList', this.$store.state.productos.products);
+      } else {
+        this.$store.commit('productos/removeProductsToList', id);
+        this.$emit('productList', this.$store.state.productos.products);
       }
+    },
+
+    getAllProducts(){
+      GenericService(this.tenant, "productos", this.token)
+        .getAll(this.page, this.size)
+        .then((data) => {
+        this.productos = data.data.content;
+      });
+    },
+
+    getStore(){
+      this.getAllProducts();
     }
+  }
 }
 </script>

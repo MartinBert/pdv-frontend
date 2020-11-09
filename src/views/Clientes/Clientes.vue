@@ -22,7 +22,7 @@
     </v-form>
 
     <!-- List -->
-    <v-simple-table style="background-color: transparent;">
+    <v-simple-table style="background-color: transparent">
       <template v-slot:default>
         <thead>
           <tr>
@@ -36,16 +36,30 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{object.id}}</td>
-            <td>{{object.nombre}}</td>
-            <td>{{object.razonSocial}}</td>
-            <td>{{object.cuit}}</td>
+            <td>{{ object.id }}</td>
+            <td>{{ object.nombre }}</td>
+            <td>{{ object.razonSocial }}</td>
+            <td>{{ object.cuit }}</td>
             <td>
-                <v-icon title="Stock" @click="showStock(object.id)">mdi-text-box</v-icon>
+              <v-icon title="Stock" @click="showStock(object.id)"
+                >mdi-text-box</v-icon
+              >
             </td>
             <td>
-              <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
-              <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
+              <a title="Editar"
+                ><img
+                  src="/../../images/icons/ico_10.svg"
+                  @click="edit(object.id)"
+                  width="40"
+                  height="40"
+              /></a>
+              <a title="Eliminar"
+                ><img
+                  src="/../../images/icons/ico_11.svg"
+                  @click="openDelete(object.id)"
+                  width="40"
+                  height="40"
+              /></a>
             </td>
           </tr>
         </tbody>
@@ -54,7 +68,7 @@
     <!-- End List -->
 
     <!-- Loader -->
-    <div class="text-center" style="margin-top:15px" v-if="!loaded">
+    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <!-- End Loader -->
@@ -67,7 +81,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage(paginate.page - 1, paginate.size)"
+      @input="getLoguedUser()"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -78,10 +92,16 @@
         <v-toolbar class="d-flex justify-center" color="primary" dark>
           <v-toolbar-title>Eliminar objeto</v-toolbar-title>
         </v-toolbar>
-        <v-card-title class="d-flex justify-center">¿Está seguro que desea realizar esta acción?</v-card-title>
+        <v-card-title class="d-flex justify-center"
+          >¿Está seguro que desea realizar esta acción?</v-card-title
+        >
         <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject">Si</v-btn>
-          <v-btn small color="disabled" @click="dialogDeleteObject = false">No</v-btn>
+          <v-btn small color="disabled" class="mr-5" @click="deleteObject"
+            >Si</v-btn
+          >
+          <v-btn small color="disabled" @click="dialogDeleteObject = false"
+            >No</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -99,41 +119,45 @@ export default {
     paginate: {
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
     service: "clientes",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false
+    dialogDeleteObject: false,
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getLoguedUser();
   },
   methods: {
-    getLoguedUser(){
+    getLoguedUser() {
       GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id != 1){
-          const sucursal = this.loguedUser.sucursal.id
-          this.getClientesForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
-        }else{
-          this.getAll(this.paginate.page - 1, this.paginate.size);
-        }
-      })
+        .getLoguedUser()
+        .then((data) => {
+          this.loguedUser = data.data;
+          if (this.loguedUser.perfil.id != 1) {
+            const sucursal = this.loguedUser.sucursal.id;
+            this.getClientesForSucursal(
+              sucursal,
+              this.paginate.page - 1,
+              this.paginate.size
+            );
+          } else {
+            this.getAll(this.paginate.page - 1, this.paginate.size);
+          }
+        });
     },
 
-    getClientesForSucursal(sucursal, page, size){
+    getClientesForSucursal(sucursal, page, size) {
       GenericService(this.tenant, this.service, this.token)
-      .getDataForSucursal(sucursal, page, size)
-      .then(data => {
-        this.objects = data.data.content;
-        this.paginate.totalPages = data.data.totalPages;
-        this.loaded = true;
-      })
+        .getDataForSucursal(sucursal, page, size)
+        .then((data) => {
+          this.objects = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
     },
 
     getAll(page, size) {
@@ -141,20 +165,11 @@ export default {
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
         .getAll(page, size)
-        .then(data => {
+        .then((data) => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-    },
-
-    changePage(page, size) {
-      if(this.loguedUser.perfil.id != 1){
-        const sucursal = this.loguedUser.sucursal.id;
-        this.getClientesForSucursal(sucursal, page, size);
-      }else{
-        this.getAll(page, size);
-      }
     },
 
     newObject() {
@@ -165,11 +180,11 @@ export default {
       this.$router.push({ name: "clientesForm", params: { id: id } });
     },
 
-    filterObjects(filter){
-      var f = { razonSocial:filter }
+    filterObjects(filter) {
+      var f = { razonSocial: filter };
       GenericService(this.tenant, this.service, this.token)
         .filter(f)
-        .then(data => {
+        .then((data) => {
           this.objects = data.data.content;
         });
     },
@@ -185,9 +200,9 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getAll(this.paginate.page - 1, this.paginate.size);
+          this.getLoguedUser();
         });
-    }
-  }
+    },
+  },
 };
 </script>

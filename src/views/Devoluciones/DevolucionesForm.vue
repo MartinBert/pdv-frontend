@@ -2,9 +2,19 @@
   <v-card min-width="100%">
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <div v-if="loaded">
-      <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
+      <v-form ref="form" v-model="valid" :lazy-validation="false">
         <v-row>
-          <v-col class="ma-5">
+          <v-col class="col-12 ml-3">
+              <v-btn 
+              color="primary"
+              @click="$store.commit('productos/dialogProductosMutation')"
+              >AGREGAR PRODUCTO RECIBIDO</v-btn>
+              <v-btn 
+              color="primary"
+              @click="$store.commit('productos/dialogProductosMutation')"
+              >AGREGAR PRODUCTO RECIBIDO</v-btn>
+          </v-col>
+          <v-col class="ml-3 mr-3">
             <v-autocomplete
               :items="tiposOperacion"
               v-model="tipoOperacion"
@@ -14,9 +24,7 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-autocomplete>
           </v-col>
-        </v-row>
-        <v-row class="ma-3" v-if="tipoOperacion">
-          <v-col>
+          <v-col class="mr-3 ml-3" v-if="tipoOperacion">
             <v-text-field
               type="text"
               v-model="object.descripcion"
@@ -25,99 +33,13 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
-          <v-col cols="12">
-            <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
-              <label>Seleccione un parámetro para realizar la búsqueda</label>
-              <v-row>
-                <v-col>
-                  <v-radio label="Nombre" value="nombre"></v-radio>
-                </v-col>
-                <v-col>
-                  <v-radio
-                    label="Código de barras"
-                    value="codigodebarras"
-                  ></v-radio>
-                </v-col>
-                <v-col>
-                  <v-radio
-                    label="Código de producto"
-                    value="codigodeproducto"
-                  ></v-radio>
-                </v-col>
-              </v-row>
-            </v-radio-group>
-            <v-text-field
-              v-if="radioGroup"
-              v-model="filterString"
-              v-on:input="filterObjects(filterString, radioGroup)"
-              dense
-              outlined
-              rounded
-              class="text-left ml-5 mr-5"
-              placeholder="Búsqueda"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-simple-table style="background-color: transparent">
-              <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Nombre</th>
-                    <th>Código de barras</th>
-                    <th>Código de producto</th>
-                    <th>Precio de costo</th>
-                  </tr>
-                </thead>
-                <tbody v-for="producto in productos" :key="producto.id">
-                  <tr>
-                    <td>
-                      <v-checkbox
-                        v-model="producto.selected"
-                        @change="checkProduct(producto.id)"
-                      ></v-checkbox>
-                    </td>
-                    <td>{{ producto.nombre }}</td>
-                    <td>{{ producto.codigoBarra }}</td>
-                    <td>{{ producto.codigoProducto }}</td>
-                    <td>${{ producto.precioCosto }}</td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-            <v-pagination
-              v-model="paginate.page"
-              :length="paginate.totalPages"
-              next-icon="mdi-chevron-right"
-              prev-icon="mdi-chevron-left"
-              :page="paginate.page"
-              :total-visible="8"
-              @input="changePage(loguedUser.sucursal.id, paginate.page - 1, paginate.size)"
-              v-if="paginate.totalPages > 1"
-            ></v-pagination>
-          </v-col>
-          <v-row>
-            <v-col></v-col>
-              <v-col class="col-2">
-                <v-text-field
-                  type="text"
-                  v-model="object.totalDevolucion"
-                  label="Total de la operación"
-                  required
-                  :rules="[v => !!v || 'Campo requerido...']"
-                ></v-text-field>
-              </v-col>
-            <v-col></v-col>
-          </v-row>
         </v-row>
-        <div class="ma-1">
+        <v-row class="ml-3 mr-3 mb-5">
           <v-col class="col-6">
             <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
             <v-btn color="default" @click="back()">Cancelar</v-btn>
-            <v-btn color="default" @click="openSaveDialog()">Cancelar</v-btn>
           </v-col>
-        </div>
+        </v-row>
       </v-form>
     </div>
 
@@ -129,15 +51,14 @@
       </v-row>
     </div>
 
-    <v-dialog v-model="saveDialog">
-      <h1>asdfasdfasdf</h1>
-    </v-dialog>
+    <ProductDialog />
   </v-card>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
 import { getCurrentDate } from "../../helpers/dateHelper";
+import ProductDialog from "../../components/ProductDialog";
 
 export default {
   data: () => ({
@@ -162,7 +83,7 @@ export default {
     errorMessage: "",
     paginate: {
       page: 1,
-      size: 10,
+      size: 5,
       totalPages: 0
     },
     loguedUser: null,
@@ -171,6 +92,10 @@ export default {
     checked: false,
     saveDialog: false
   }),
+
+  components:{
+    ProductDialog
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;

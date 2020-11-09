@@ -3,27 +3,27 @@ export default {
   state: {
     dialogProd: false,
     products: [],
-    detailSalesList: []
+    detailList: []
   },
   getters: {},
   mutations: {
     resetStates(state) {
       state.dialogProd = false;
       state.products = [];
-      state.detailSalesList = []
+      state.detailList = []
     },
     dialogProductosMutation(state) {
       state.dialogProd = !state.dialogProd;
     },
-    addProductsToSale(state, object) {
+    addProductsToList(state, object) {
       state.products.push(object);
     },
-    removeProductsToSale(state, id) {
+    removeProductsToList(state, id) {
       const productos = state.products.filter(el => el.id !== id);
       state.products = productos;
     },
-    addDetailSalesList(state, object){
-      state.detailSalesList = object;
+    addDetailList(state, object){
+      state.detailList = object;
     },
   },
   actions: {}
