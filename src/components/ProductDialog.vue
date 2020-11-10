@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px" @input="getStore()">
+    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px">
       <v-card>
         <v-row>
             <v-col>
@@ -134,10 +134,6 @@ export default {
         this.productos = data.data.content;
       });
     },
-
-    getStore(){
-      this.getAllProducts();
-    }
   }
 }
 </script>

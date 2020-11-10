@@ -225,6 +225,7 @@ import {
   calculatePercentaje,
   sumarNumeros,
 } from "../../helpers/mathHelper";
+import { errorAlert, successAlert } from '../../helpers/alerts';
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
 
@@ -441,7 +442,7 @@ export default {
           this.products.push(obj);
         }
       } else {
-        this.errorAlert("No hay productos seleccionados en la venta");
+        errorAlert("No hay productos seleccionados en la venta");
       }
     },
 
@@ -662,7 +663,7 @@ export default {
                         });
                       })
                       .then(() => {
-                        this.successAlert("Venta realizada");
+                        successAlert("Venta realizada");
                       })
                       .then(() => {
                         ReportsService(tenant, service, token)
@@ -680,14 +681,14 @@ export default {
                     this.products = [];
                     this.$store.commit("productos/resetStates");
                   } else {
-                    this.errorAlert(detalleAfip[0].observaciones[0].msg);
+                    errorAlert(detalleAfip[0].observaciones[0].msg);
                   }
                 });
             } else {
-              this.errorAlert("No hay productos seleccionados en la venta");
+              errorAlert("No hay productos seleccionados en la venta");
             }
           } else {
-            this.errorAlert("Debe seleccionar un medio de pago");
+            errorAlert("Debe seleccionar un medio de pago");
           }
         });
     },
@@ -778,7 +779,7 @@ export default {
               });
             })
             .then(() => {
-              this.successAlert("Venta realizada");
+              successAlert("Venta realizada");
             })
             .then(() => {
               ReportsService(tenant, service, token)
@@ -796,10 +797,10 @@ export default {
           this.products = [];
           this.$store.commit("productos/resetStates");
         } else {
-          this.errorAlert("No hay productos seleccionados en la venta");
+          errorAlert("No hay productos seleccionados en la venta");
         }
       } else {
-        this.errorAlert("Debe seleccionar un medio de pago");
+        errorAlert("Debe seleccionar un medio de pago");
       }
     },
 
@@ -813,38 +814,10 @@ export default {
           this.saveNoFiscal();
         }
       } else {
-        this.errorAlert(
+        errorAlert(
           "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
         );
       }
-    },
-
-    errorAlert(str) {
-      return this.$swal({
-        html:
-          "<div class='text-alert-error'>" +
-          "<img src='/../../images/messages/error_1.svg' />" +
-          "<h1>¡Error!<h1>" +
-          "<p>¡" +
-          str +
-          "!</p>" +
-          "</div>",
-        showConfirmButton: false,
-      });
-    },
-
-    successAlert(str) {
-      return this.$swal({
-        width: 300,
-        html:
-          "<div class='text-alert-success'>" +
-          "<img src='/../../images/messages/success_1.svg' />" +
-          "<h1>¡" +
-          str +
-          "!<h1>" +
-          "</div>",
-        showConfirmButton: false,
-      });
     },
   },
 };

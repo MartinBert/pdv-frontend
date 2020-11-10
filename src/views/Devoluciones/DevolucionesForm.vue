@@ -1,70 +1,168 @@
 <template>
   <v-card min-width="100%">
-    <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
+    <v-snackbar
+      v-model="snackError"
+      :color="'#E53935'"
+      :timeout="3000"
+      :top="true"
+      >{{ errorMessage }}</v-snackbar
+    >
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false">
         <v-row>
-          <v-col class="col-12 ml-3">
-              <v-btn 
+          <v-col class="col-12 ml-5">
+            <v-btn
               color="primary"
               @click="$store.commit('productos/dialogProductosMutation')"
-              >AGREGAR PRODUCTO RECIBIDO</v-btn>
-              <v-btn 
-              color="primary"
-              @click="$store.commit('productos/dialogProductosMutation')"
-              >AGREGAR PRODUCTO RECIBIDO</v-btn>
+            >AGREGAR PRODUCTOS</v-btn>
           </v-col>
-          <v-col class="ml-3 mr-3">
-            <v-autocomplete
-              :items="tiposOperacion"
-              v-model="tipoOperacion"
-              item-text="text"
-              item-value="id"
-              label="Tipo de operación"
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-autocomplete>
+        </v-row>
+        <v-row>
+          <v-col class="mr-5 ml-5">
+            <div class="horizontalSeparator"></div>
           </v-col>
-          <v-col class="mr-3 ml-3" v-if="tipoOperacion">
-            <v-text-field
-              type="text"
-              v-model="object.descripcion"
-              label="Descripción"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
+        </v-row>
+        <v-row>
+          <v-col cols="5" class="ml-5">
+            <v-row>
+              <v-col class="text-center">
+                <label>Productos devueltos</label>
+              </v-col>
+            </v-row>
+            <v-simple-table style="background-color: transparent" fixed-header>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">Producto</th>
+                    <th class="text-left">Cantidad</th>
+                    <th class="text-left">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="p in object.productosEntrantes" :key="p.id">
+                    <td>{{ p.nombre }}</td>
+                    <td>
+                      <input type="number" v-model="p.cantUnidades" />
+                    </td>
+                    <td>
+                      <div class="d-flex mt-1">
+                        <button type="button">
+                        <img
+                          src="/../../images/icons/ico_11.svg"
+                          @click="deleteLine(p.id, 'entrante')"
+                          width="40"
+                          height="40"
+                        />
+                      </button>
+                      <button type="button">
+                        <img
+                          src="/../../images/icons/adelante.svg"
+                          @click="changeStatus(p, 'entrante')"
+                          width="40"
+                          height="40"
+                        />
+                      </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-col>
+          <v-col class="d-flex justify-center"><div class="verticalSeparator"></div></v-col>
+          <v-col cols="5" class="mr-5">
+            <v-row>
+              <v-col class="text-center">
+                <label>Productos cedidos</label>
+              </v-col>
+            </v-row>
+            <v-simple-table style="background-color: transparent" fixed-header>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">Acciones</th>
+                    <th class="text-left">Producto</th>
+                    <th class="text-left">Cantidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="p in object.productosSalientes" :key="p.id">
+                    <td>
+                      <div class="d-flex mt-1">
+                        <button type="button">
+                        <img
+                          src="/../../images/icons/ico_11.svg"
+                          @click="deleteLine(p.id, 'saliente')"
+                          width="40"
+                          height="40"
+                        />
+                      </button>
+                      <button type="button">
+                        <img
+                          src="/../../images/icons/atras.svg"
+                          @click="changeStatus(p, 'saliente')"
+                          width="40"
+                          height="40"
+                        />
+                      </button>
+                      </div>
+                    </td>
+                    <td>{{ p.nombre }}</td>
+                    <td>
+                      <input type="number" v-model="p.cantUnidades" />
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
           </v-col>
         </v-row>
         <v-row class="ml-3 mr-3 mb-5">
           <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
+            <v-btn class="mr-4" color="primary" @click="openSaveDialog" :disabled="!valid"
+              >Guardar</v-btn
+            >
             <v-btn color="default" @click="back()">Cancelar</v-btn>
           </v-col>
         </v-row>
       </v-form>
     </div>
-
     <div v-if="!loaded">
       <v-row class="ma-1">
-        <v-col class="col-12" style="text-align:center">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        <v-col class="col-12" style="text-align: center">
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
         </v-col>
       </v-row>
     </div>
+    <ProductDialog v-on:productList="addProduct" />
 
-    <ProductDialog />
+    <v-dialog v-model="saveDialog" width="400px">
+      <v-card>
+        <v-card-title class="text-center">¿Desea emitir un comprobante?</v-card-title>
+        <v-card-actions class="text-center w-100">
+          <v-btn class="success">Si</v-btn>
+          <v-btn class="error">No</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
 import { getCurrentDate } from "../../helpers/dateHelper";
+import { errorAlert } from "../../helpers/alerts";
 import ProductDialog from "../../components/ProductDialog";
+
 
 export default {
   data: () => ({
     tiposOperacion: [
-      {id: 1, text: "Devolución"},
-      {id: 2, text: "Cambio de artículo"}
+      { id: 1, text: "Devolución" },
+      { id: 2, text: "Cambio de artículo" },
     ],
     tipoOperacion: null,
     productos: [],
@@ -72,7 +170,8 @@ export default {
     depositos: [],
     object: {
       fecha: getCurrentDate(),
-      productos: []
+      productosEntrantes: [],
+      productosSalientes: [],
     },
     valid: true,
     loaded: false,
@@ -84,17 +183,17 @@ export default {
     paginate: {
       page: 1,
       size: 5,
-      totalPages: 0
+      totalPages: 0,
     },
     loguedUser: null,
     radioGroup: "",
     filterString: "",
     checked: false,
-    saveDialog: false
+    saveDialog: false,
   }),
 
-  components:{
-    ProductDialog
+  components: {
+    ProductDialog,
   },
 
   mounted() {
@@ -111,94 +210,84 @@ export default {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
-        .then(data => {
+        .then((data) => {
           this.object = data.data;
           this.loaded = true;
         });
     },
 
-    getLoguedUser(){
+    getLoguedUser() {
       GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id < 2){
-          this.getAll(this.paginate.page - 1, this.paginate.size);
-        }else{
-          this.getModels(this.loguedUser.sucursal.id, this.paginate.page - 1, this.paginate.size);
-        }
-      })
-    },
-    
-    getAll(page, size){
-      GenericService(this.tenant, "productos", this.token)
-      .getAll(page, size)
-      .then(data => {
-        this.productos = data.data.content;
-        this.paginate.totalPages = data.data.totalPages;
-      })
-
-      GenericService(this.tenant, "clientes", this.token)
-      .getAll(0, 100000)
-      .then(data => {
-        this.clientes = data.data.content;
-      })
-
-      GenericService(this.tenant, "stock", this.token)
-      .getAll(0, 100000)
-      .then(data => {
-        this.stocks = data.data;
-      })
+        .getLoguedUser()
+        .then((data) => {
+          this.loguedUser = data.data;
+          if (this.loguedUser.perfil.id < 2) {
+            this.getAll(this.paginate.page - 1, this.paginate.size);
+          } else {
+            this.getModels(
+              this.loguedUser.sucursal.id,
+              this.paginate.page - 1,
+              this.paginate.size
+            );
+          }
+        });
     },
 
-    getModels(sucursalId, page, size){
+    getAll(page, size) {
       GenericService(this.tenant, "productos", this.token)
-      .getAll(page, size)
-      .then(data => {
-        if (this.object.productos.length > 0) {
-          data.data.content.forEach((el) => {
-            this.object.productos.forEach((e) => {
-              if (el.id == e.id) {
-                el.selected = true;
-              }
-            });
-          });
+        .getAll(page, size)
+        .then((data) => {
           this.productos = data.data.content;
-        } else {
-          this.productos = data.data.content;
-        }
-        this.paginate.totalPages = data.data.totalPages;
-      });
+          this.paginate.totalPages = data.data.totalPages;
+        });
 
       GenericService(this.tenant, "clientes", this.token)
-      .getDataForSucursal(sucursalId, 0, 100000)
-      .then(data => {
-        this.clientes = data.data.content;
-        console.log(this.clientes);
-      })
+        .getAll(0, 100000)
+        .then((data) => {
+          this.clientes = data.data.content;
+        });
 
       GenericService(this.tenant, "stock", this.token)
-      .getDataForSucursal(sucursalId, 0, 100000)
-      .then(data => {
-        this.stocks = data.data.content;
-        console.log(this.stocks);
-      })
+        .getAll(0, 100000)
+        .then((data) => {
+          this.stocks = data.data;
+        });
+    },
+
+    getModels(sucursalId, page, size) {
+      GenericService(this.tenant, "productos", this.token)
+        .getAll(page, size)
+        .then((data) => {
+          this.productos = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+        });
+
+      GenericService(this.tenant, "clientes", this.token)
+        .getDataForSucursal(sucursalId, 0, 100000)
+        .then((data) => {
+          this.clientes = data.data.content;
+        });
+
+      GenericService(this.tenant, "stock", this.token)
+        .getDataForSucursal(sucursalId, 0, 100000)
+        .then((data) => {
+          this.stocks = data.data.content;
+        });
 
       GenericService(this.tenant, "depositos", this.token)
-      .getDataForSucursal(sucursalId, 0, 100000)
-      .then(data => {
-        this.depositos = data.data.content;
-        console.log(this.depositos);
-      })
-
+        .getDataForSucursal(sucursalId, 0, 100000)
+        .then((data) => {
+          this.depositos = data.data.content;
+        });
     },
 
-    changePage(sucursalId, page, size) {
-      const perfil = this.loguedUser.perfil.id;
-      if(perfil < 2){
-        this.getAll(page, size);
-      }else{
-        this.getModels(sucursalId, page, size);
+    deleteLine(id, status) {
+      if (status === "entrante") {
+        const filter = this.object.productosEntrantes.filter((el) => el.id !== id);
+        this.object.productosEntrantes = filter;
+      } else {
+        const filter = this.object.productosSalientes.filter((el) => el.id !== id);
+        this.object.productosSalientes = filter;
       }
     },
 
@@ -250,7 +339,17 @@ export default {
         this.object.productos = object;
       }
     },
- 
+
+    addProduct(data) {
+      let processObjects = [];
+
+      data.forEach((el) => {
+        processObjects.push(el);
+      });
+
+      this.object.productosEntrantes = processObjects;
+    },
+
     save() {
       this.object.sucursal = this.loguedUser.sucursal;
       this.object.empresa = this.loguedUser.empresa;
@@ -259,7 +358,7 @@ export default {
         .then(() => {
           this.$router.push({ name: "devoluciones" });
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status == 500) {
             this.snackError = true;
             this.errorMessage = "Ocurrio un error";
@@ -271,9 +370,23 @@ export default {
       this.$router.push({ name: "devoluciones" });
     },
 
-    openSaveDialog() {
-      this.saveDialog = true;
+    changeStatus(product, status){
+      if(status === 'entrante'){
+        this.object.productosEntrantes = this.object.productosEntrantes.filter(el => el.id !== product.id);
+        this.object.productosSalientes.push(product);
+      }else{
+        this.object.productosSalientes = this.object.productosSalientes.filter(el => el.id !== product.id);
+        this.object.productosEntrantes.push(product);
+      }
     },
-  }
+
+    openSaveDialog() {
+      if (this.object.productosEntrantes.length === 0) {
+        errorAlert('Debe seleccionar al menos un producto devuelto');
+      }else{
+        this.saveDialog = true;
+      }
+    },
+  },
 };
 </script>

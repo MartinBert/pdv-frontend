@@ -44,7 +44,7 @@
     </v-form>
 
     <!-- List -->
-    <v-simple-table style="background-color: transparent">
+    <v-simple-table style="background-color: transparent" v-if="loaded">
       <template v-slot:default>
         <thead>
           <tr>
@@ -104,7 +104,7 @@
       :page="paginate.page"
       :total-visible="8"
       @input="changePage"
-      v-if="paginate.totalPages > 1"
+      v-if="paginate.totalPages > 1 && loaded"
     ></v-pagination>
     <!-- End Paginate -->
 
@@ -174,6 +174,7 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import { generateBarCode } from "../../helpers/mathHelper";
+import { successAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
 
 export default {
@@ -365,6 +366,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(() => {
+              successAlert('Importación exitosa');
               this.getAll(this.paginate.page - 1, this.paginate.size);
               this.loaderStatus = true;
               this.loaded = true;
