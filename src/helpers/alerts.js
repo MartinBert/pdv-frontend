@@ -27,3 +27,25 @@ export function successAlert(str) {
         showConfirmButton: false,
     });
 }
+
+export function questionAlert(strTitle, strText) {
+    return Swal.fire({
+        width: 400,
+        html:
+            "<div class='text-alert-question'>" +
+            "<img src='/../../images/messages/question_1.svg' />" +
+            "<h1>¡" +
+            strTitle +
+            "!<h1>" +
+            "<p>¿" +
+            strText +
+            "?</p>" +
+            "</div>",
+        showConfirmButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'SI',
+        denyButtonText: 'NO',
+        confirmButtonColor: 'rgb(0, 146, 90)',
+        denyButtonColor: 'rgb(209, 50, 50)'
+    });
+}

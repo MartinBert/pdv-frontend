@@ -1,12 +1,15 @@
 <template>
-    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px">
+    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px" @input="refresh()">
       <v-card>
-        <v-row>
+        <v-card-title>
+          <v-row>
             <v-col>
-                <v-card-title>Seleccione un parámetro para realizar la búsqueda</v-card-title>
+                <h2>Seleccione un parámetro para realizar la búsqueda</h2>
             </v-col>
-        </v-row>
-        <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
+          </v-row>
+        </v-card-title>
+        <v-card-text>
+          <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
           <v-row>
             <v-col>
               <v-radio label="Nombre" value="nombre"></v-radio>
@@ -37,7 +40,6 @@
           append-icon="mdi-magnify"
         ></v-text-field>
         <v-divider></v-divider>
-        <v-card-text style="height: 300px">
           <v-container fluid>
             <v-row>
               <v-col>
@@ -134,6 +136,11 @@ export default {
         this.productos = data.data.content;
       });
     },
+
+    refresh(){
+      this.$store.commit('productos/resetStates');
+      this.getAllProducts();
+    }
   }
 }
 </script>
