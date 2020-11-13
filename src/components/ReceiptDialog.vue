@@ -28,6 +28,7 @@
                 </v-col>
                 <v-col cols="6">
                   <v-autocomplete
+                    @change="getComprobantesList()"
                     class="button-ventas comprobante"
                     v-model="dialogObject.documento"
                     :items="databaseItems.documentos"
@@ -51,6 +52,7 @@
                 </v-col>
                 <v-col cols="6">
                   <v-autocomplete
+                    required
                     class="button-ventas plan-pago"
                     v-model="dialogObject.planPago"
                     :items="databaseItems.planes"
@@ -70,6 +72,86 @@
                 </v-col>
                 <v-col></v-col>
               </v-row>
+              <v-row v-if="dialogObject.documento">
+                <v-col cols="12" class="ml-5 text-center">
+                  <span class="title">
+                    Seleccione un comprobante asociado a "{{dialogObject.documento.nombre}}"
+                  </span>
+                </v-col>
+                <v-col class="d-flex">
+                  <v-text-field
+                    type="date"
+                    v-model="filterStringDate"
+                    v-on:input="filterObjects('fechaEmision',filterStringDate)"
+                    dense
+                    outlined
+                    rounded
+                    class="text-left"
+                    append-icon="mdi-magnify"
+                  ></v-text-field>
+                  <v-text-field
+                    type="number"
+                    v-model="filterStringTotalVenta"
+                    v-on:input="filterObjects('totalVenta',filterStringTotalVenta)"
+                    dense
+                    outlined
+                    rounded
+                    class="text-left"
+                    placeholder="Búsqueda por total facturado"
+                    append-icon="mdi-magnify"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-simple-table style="background-color: transparent" ref="tab">
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">Fecha de emisión</th>
+                          <th class="text-left">Número de comprobante</th>
+                          <th class="text-left">Tipo</th>
+                          <th class="text-left">Productos relacionados</th>
+                          <th class="text-left">Agregar</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="c in comprobantes" :key="c.id">
+                          <td>{{ c.fechaEmision }}</td>
+                          <td>{{ c.numeroCbte }}</td>
+                          <td>{{ c.nombreDocumento }}</td>
+                          <td>
+                            <button type="button">
+                              <img
+                                src="/../../images/icons/eye.svg"
+                                @click="seeDetail(c)"
+                                width="40"
+                                height="40"
+                              />
+                            </button>
+                          </td>
+                          <td>
+                            <button type="button" v-if="!c.selected">
+                              <img
+                                src="/../../images/icons/add.svg"
+                                @click="addRelationateReceipt(c)"
+                                width="40"
+                                height="40"
+                              />
+                            </button>
+                            <button type="button" v-if="c.selected === true">
+                              <img
+                                src="/../../images/icons/success.svg"
+                                @click="remove(c)"
+                                width="40"
+                                height="40"
+                              />
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
           </v-container>
         </v-card-text>
         <v-card-actions>
@@ -78,11 +160,46 @@
           </v-col>
         </v-card-actions>
       </form>
+      <v-dialog v-if="activeDetailDialog" v-model="activeDetailDialog" width="800px" @input="activeDetailDialog = false">
+        <v-card>
+          <v-card-title>
+            <span class="title text-center">Productos</span>
+          </v-card-title>
+          <v-card-text>
+            <v-simple-table>
+              <template>
+                <thead>
+                  <tr>
+                    <th class="text-left">Nombre</th>
+                    <th class="text-left">Cantidad de unidades</th>
+                    <th class="text-left">Precio Unitario</th>
+                    <th class="text-left">Precio Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="p in detailRelationateReceipt" :key="p.nombre">
+                    <td>{{ p.nombre }}</td>
+                    <td>{{ p.cantUnidades }}</td>
+                    <td>{{ p.precioUnitario }}</td>
+                    <td>{{ p.precioTotal }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+            <v-col class="text-center">
+              <span class="title">Total: ${{totalDetail}}</span>
+            </v-col>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </v-card>
   </v-dialog>
 </template>
 <script>
 import GenericService from "../services/GenericService";
+import VentasService from "../services/VentasService";
+import { errorAlert } from "../helpers/alerts";
+import { formatDate } from "../helpers/dateHelper";
 
 export default {
   name: "ReceiptDialog",
@@ -98,7 +215,13 @@ export default {
         mediosPago: "",
         planPago: "",
         totalVenta: "",
+        comprobanteAsociado: ""
       },
+      filterStringDate: "",
+      filterStringTotalVenta: "",
+      activeDetailDialog: false,
+      detailRelationateReceipt: null,
+      comprobantes: [],
       databaseItems: {
         clientes: [],
         documentos: [],
@@ -111,6 +234,17 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getAllObjects();
+  },
+
+  computed: {
+    totalDetail(){
+      let total = 0;
+      this.detailRelationateReceipt.forEach(el => {
+        total = total + el.precioTotal;
+      })
+
+      return total;
+    }
   },
 
   methods: {
@@ -181,9 +315,89 @@ export default {
     },
 
     handleSubmit(){
-      this.$store.commit('receipt/addReceipt', this.dialogObject);
-      this.$emit('receipt', this.$store.state.receipt.receipt);
-      this.$store.commit('receipt/receiptDialogMutation');
+      if(this.dialogObject.documento.tipo === false){
+        this.$store.commit('receipt/addReceipt', this.dialogObject);
+        this.$emit('receipt', this.$store.state.receipt.receipt);
+        this.$store.commit('receipt/receiptDialogMutation');
+      }else{
+        if(!this.dialogObject.comprobanteAsociado){
+          errorAlert('Si emite un comprobante fiscal debe seleccionar un documento fiscal relacionado');
+        }else{
+          this.$store.commit('receipt/addReceipt', this.dialogObject);
+          this.$emit('receipt', this.$store.state.receipt.receipt);
+          this.$store.commit('receipt/receiptDialogMutation');
+        }
+      }
+    },
+
+    getComprobantesList(){
+      const sucursalId = this.loguedUser.sucursal.id;
+
+      GenericService(this.tenant, "ventas",this.token)
+      .getDataForSucursal(sucursalId, 0, 5)
+      .then(data => {
+        this.comprobantes = data.data.content;
+      })
+    },
+
+    seeDetail(receipt){
+      this.detailRelationateReceipt = receipt.productos;
+      this.activeDetailDialog = true;
+    },
+
+    addRelationateReceipt(comprobante){
+      const check = this.comprobantes.filter(el => el.selected === true);
+      if(check.length > 0){
+        this.comprobantes.filter(el => el.id === check[0].id)[0].selected = false;
+      }
+      this.dialogObject.comprobanteAsociado = comprobante;
+      this.comprobantes.filter(el => el.id === comprobante.id)[0].selected = true;
+      this.$refs.tab.$forceUpdate();
+    },
+
+    remove(comprobante){
+      this.comprobantes.filter(el => el.id === comprobante.id)[0].selected = false;
+      this.dialogObject.comprobanteAsociado = [];
+      this.$refs.tab.$forceUpdate();
+    },
+
+    filterObjects(filterParam, filter){
+      if(this.loguedUser.perfil.id !== 1){
+        const sucursal = this.loguedUser.sucursal.id;
+        const page = 0;
+        const size = 5;
+        let year;
+        let month;
+        let day;
+
+        if(filter === ''){
+          this.getVentasForSucursal(sucursal, page, size);
+        }else{
+          if(filterParam === 'fechaEmision'){
+          if(this.filterStringTotalVenta !== ""){
+            this.filterStringTotalVenta = "";
+          }
+          year = filter.slice(0, filter.indexOf('-'));
+          month = filter.slice(filter.indexOf('-') + 1, filter.lastIndexOf('-'));
+          day = filter.slice(filter.lastIndexOf('-') + 1, filter.length);
+          filter = formatDate(year+month+day);
+        }else{
+          if(this.filterStringDate !== ""){
+            this.filterStringDate = "";
+          }
+        }
+
+        let object = { sucursal, filterParam, filter, page, size }
+        
+        VentasService(this.tenant, "ventas", this.token)
+          .filter(object)
+          .then(data => {
+            this.comprobantes = data.data.content;
+          });
+        }
+      }else{
+        console.log("asdf");
+      }
     },
   },
 };

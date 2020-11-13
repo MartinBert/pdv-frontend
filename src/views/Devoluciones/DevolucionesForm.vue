@@ -14,7 +14,8 @@
             <v-btn
               color="primary"
               @click="$store.commit('productos/dialogProductosMutation')"
-            >AGREGAR PRODUCTOS</v-btn>
+              >AGREGAR PRODUCTOS</v-btn
+            >
           </v-col>
         </v-row>
         <v-row>
@@ -47,21 +48,21 @@
                     <td>
                       <div class="d-flex mt-1">
                         <button type="button">
-                        <img
-                          src="/../../images/icons/ico_11.svg"
-                          @click="deleteLine(p.id, 'entrante')"
-                          width="40"
-                          height="40"
-                        />
-                      </button>
-                      <button type="button">
-                        <img
-                          src="/../../images/icons/adelante.svg"
-                          @click="changeStatus(p, 'entrante')"
-                          width="40"
-                          height="40"
-                        />
-                      </button>
+                          <img
+                            src="/../../images/icons/ico_11.svg"
+                            @click="deleteLine(p.id, 'entrante')"
+                            width="40"
+                            height="40"
+                          />
+                        </button>
+                        <button type="button">
+                          <img
+                            src="/../../images/icons/adelante.svg"
+                            @click="changeStatus(p, 'entrante')"
+                            width="40"
+                            height="40"
+                          />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -69,7 +70,9 @@
               </template>
             </v-simple-table>
           </v-col>
-          <v-col class="d-flex justify-center"><div class="verticalSeparator"></div></v-col>
+          <v-col class="d-flex justify-center"
+            ><div class="verticalSeparator"></div
+          ></v-col>
           <v-col cols="5" class="mr-5">
             <v-row>
               <v-col class="text-center">
@@ -90,21 +93,21 @@
                     <td>
                       <div class="d-flex mt-1">
                         <button type="button">
-                        <img
-                          src="/../../images/icons/ico_11.svg"
-                          @click="deleteLine(p.id, 'saliente')"
-                          width="40"
-                          height="40"
-                        />
-                      </button>
-                      <button type="button">
-                        <img
-                          src="/../../images/icons/atras.svg"
-                          @click="changeStatus(p, 'saliente')"
-                          width="40"
-                          height="40"
-                        />
-                      </button>
+                          <img
+                            src="/../../images/icons/ico_11.svg"
+                            @click="deleteLine(p.id, 'saliente')"
+                            width="40"
+                            height="40"
+                          />
+                        </button>
+                        <button type="button">
+                          <img
+                            src="/../../images/icons/atras.svg"
+                            @click="changeStatus(p, 'saliente')"
+                            width="40"
+                            height="40"
+                          />
+                        </button>
                       </div>
                     </td>
                     <td>{{ p.nombre }}</td>
@@ -118,19 +121,44 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="d-flex justify-center"> 
-              <v-btn class="mr-4" 
-              color="primary" 
-              @click="$store.commit('receipt/receiptDialogMutation')" 
+          <v-col class="ml-5 mr-5">
+            <v-text-field
+              required
+              placeholder="Ingrese una descripción de la operación"
+              v-model="object.descripcion"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="d-flex justify-center">
+            <v-btn
+              class="mr-4"
+              color="primary"
+              @click="$store.commit('receipt/receiptDialogMutation')"
               :disabled="!valid"
               v-if="!receiptDialogData"
-              >AGREGAR COMPROBANTE</v-btn>
-              <v-btn v-if="receiptDialogData" icon @click="$store.commit('receipt/receiptDialogMutation')"><img src="/../../images/icons/success.svg" width="40" height="40"/></v-btn>
+              >AGREGAR COMPROBANTE</v-btn
+            >
+            <v-btn
+              v-if="receiptDialogData"
+              icon
+              @click="$store.commit('receipt/receiptDialogMutation')"
+              ><img
+                src="/../../images/icons/success.svg"
+                width="40"
+                height="40"
+            /></v-btn>
           </v-col>
         </v-row>
         <v-row class="ml-3 mr-3 mb-5">
           <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save()" :disabled="!valid">Guardar</v-btn>
+            <v-btn
+              class="mr-4"
+              color="primary"
+              @click="save()"
+              :disabled="!valid"
+              >Guardar</v-btn
+            >
             <v-btn color="default" @click="back()">Cancelar</v-btn>
           </v-col>
         </v-row>
@@ -149,8 +177,9 @@
 
     <!-- Dialog Components -->
     <ProductDialog v-on:productList="addProduct" />
-    <ReceiptDialog v-on:receipt="receiptDialogData = $store.state.receipt.receipt"/>
-
+    <ReceiptDialog
+      v-on:receipt="receiptDialogData = $store.state.receipt.receipt"
+    />
   </v-card>
 </template>
 
@@ -161,10 +190,12 @@ import ReportsService from "../../services/ReportsService";
 import VentasService from "../../services/VentasService";
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 import { successAlert, errorAlert, questionAlert } from "../../helpers/alerts";
-import { calculateAlicIvaBaseImpVentas, calculateAlicIvaImporteVentas } from "../../helpers/mathHelper";
+import {
+  calculateAlicIvaBaseImpVentas,
+  calculateAlicIvaImporteVentas,
+} from "../../helpers/mathHelper";
 import ProductDialog from "../../components/ProductDialog";
 import ReceiptDialog from "../../components/ReceiptDialog";
-
 
 export default {
   data: () => ({
@@ -179,6 +210,7 @@ export default {
       fecha: getCurrentDate(),
       productosEntrantes: [],
       productosSalientes: [],
+      descripcion: "",
     },
     valid: true,
     loaded: false,
@@ -197,16 +229,16 @@ export default {
     filterString: "",
     checked: false,
     saveDialog: false,
-    receiptDialogData: null
+    receiptDialogData: null,
   }),
 
   components: {
     ProductDialog,
-    ReceiptDialog
+    ReceiptDialog,
   },
 
   mounted() {
-    this.$store.commit('receipt/resetStates');
+    this.$store.commit("receipt/resetStates");
     this.tenant = this.$route.params.tenant;
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
@@ -273,7 +305,7 @@ export default {
         });
 
       VentasService(this.tenant, "ventas", this.token)
-      .getAfipModuleAuthorization()
+        .getAfipModuleAuthorization()
         .then((data) => {
           this.afipModuleAuthorization = data.data;
         });
@@ -281,10 +313,14 @@ export default {
 
     deleteLine(id, status) {
       if (status === "entrante") {
-        const filter = this.object.productosEntrantes.filter((el) => el.id !== id);
+        const filter = this.object.productosEntrantes.filter(
+          (el) => el.id !== id
+        );
         this.object.productosEntrantes = filter;
       } else {
-        const filter = this.object.productosSalientes.filter((el) => el.id !== id);
+        const filter = this.object.productosSalientes.filter(
+          (el) => el.id !== id
+        );
         this.object.productosSalientes = filter;
       }
     },
@@ -339,31 +375,37 @@ export default {
     },
 
     addProduct(data) {
-      data.forEach(el => {
-        this.object.productosEntrantes = this.object.productosEntrantes.filter(e => e.id !== el.id);
+      data.forEach((el) => {
+        this.object.productosEntrantes = this.object.productosEntrantes.filter(
+          (e) => e.id !== el.id
+        );
         this.object.productosEntrantes.push(el);
-      })
+      });
 
-      this.object.productosEntrantes = [...new Set(this.object.productosEntrantes)];
+      this.object.productosEntrantes = [
+        ...new Set(this.object.productosEntrantes),
+      ];
     },
 
     save() {
       if (this.object.productosEntrantes.length === 0) {
-        errorAlert('Debe seleccionar al menos un producto devuelto');
-      }else{
-        if(!this.receiptDialogData){
-          questionAlert('Atención, no agregó un comprobante', 'Desea continuar de todos modos')
-          .then(result => {
-            if(result.isConfirmed){
-              console.log('asdf');
-            }else{
-              this.$store.commit('receipt/receiptDialogMutation');
+        errorAlert("Debe seleccionar al menos un producto devuelto");
+      } else {
+        if (!this.receiptDialogData) {
+          questionAlert(
+            "Atención, no agregó un comprobante",
+            "Desea continuar de todos modos"
+          ).then((result) => {
+            if (result.isConfirmed) {
+              console.log("asdf");
+            } else {
+              this.$store.commit("receipt/receiptDialogMutation");
             }
-          })
-        }else{
-          if(this.receiptDialogData.documento.tipo === true){
+          });
+        } else {
+          if (this.receiptDialogData.documento.tipo === true) {
             this.processAndSaveFiscal();
-          }else{
+          } else {
             this.processAndSaveNoFiscal();
           }
         }
@@ -374,17 +416,22 @@ export default {
       this.$router.push({ name: "devoluciones" });
     },
 
-    changeStatus(product, status){
-      if(status === 'entrante'){
-        this.object.productosEntrantes = this.object.productosEntrantes.filter(el => el.id !== product.id);
+    changeStatus(product, status) {
+      if (status === "entrante") {
+        this.object.productosEntrantes = this.object.productosEntrantes.filter(
+          (el) => el.id !== product.id
+        );
         this.object.productosSalientes.push(product);
-      }else{
-        this.object.productosSalientes = this.object.productosSalientes.filter(el => el.id !== product.id);
+      } else {
+        this.object.productosSalientes = this.object.productosSalientes.filter(
+          (el) => el.id !== product.id
+        );
         this.object.productosEntrantes.push(product);
       }
+      console.log(this.object);
     },
 
-    processAndSaveFiscal(){
+    processAndSaveFiscal() {
       /* Constants */
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
@@ -400,8 +447,15 @@ export default {
       const totalVenta = this.receiptDialogData.totalVenta;
       const tenant = this.tenant;
       const token = this.token;
-      const service = this.service;
+      const service = "ventas";
       const afipAuthorization = this.afipModuleAuthorization;
+      const comprobanteAsociado = this.receiptDialogData.comprobanteAsociado;
+
+      const comprobanteAsociadoDetalle = {
+        nro: comprobanteAsociado.numeroCbte,
+        ptoVta: comprobanteAsociado.puntoVenta.idFiscal,
+        tipo: documento.codigoDocumento,
+      };
 
       /* Mutable vars */
       let tipoDoc;
@@ -414,6 +468,14 @@ export default {
       let fileURL;
       let productos;
       let condVenta;
+      let devolucion = {
+        fecha: fecha,
+        descripcion: this.object.descripcion,
+        productos: productosEntrantes,
+        productosSalientes: productosSalientes,
+        empresa: empresa,
+        sucursal: sucursal,
+      };
 
       if (planesPago) {
         if (planesPago.length < 2) {
@@ -455,7 +517,7 @@ export default {
       //Instance body from AFIP ws-services
       let body = {
         alicIva: [alicIva],
-        asociados: [],
+        asociados: [comprobanteAsociadoDetalle],
         cbteTipo: documento.codigoDocumento,
         concepto: 1,
         cotizMoneda: 1,
@@ -506,7 +568,7 @@ export default {
                 fechaEmision: formatDate(cabeceraAfip.fchProceso),
                 fechaVto: formatDate(detalleAfip[0].caefchVto),
                 condicionVenta: condVenta,
-                productos: detail,
+                productos: [detail],
                 barCode: detalleAfip[0].barcode,
                 cae: detalleAfip[0].cae,
                 puntoVenta: ptoVenta,
@@ -521,48 +583,68 @@ export default {
               };
 
               if (comprobante.cae) {
-                GenericService(tenant, "comprobantesFiscales", token).save(
-                  comprobante
-                );
-
-                GenericService(tenant, "stock", token)
-                  .getDataForSucursal(sucursal.id, 0, 100000)
+                GenericService(tenant, "comprobantesFiscales", token)
+                  .save(comprobante)
                   .then((data) => {
-                    productos = data.data.content;
-                    productos.forEach((el) => {
-                      productosEntrantes.forEach((e) => {
-                        if (
-                          el.producto.id === e.id &&
-                          el.deposito.id === this.depositos[0].id
-                        ) { el.cantidad =
-                            parseInt(el.cantidad) +
-                            parseInt(e.cantUnidades);
-                            GenericService(tenant, "stock", token).save(el);
-                          }
-                      });
+                    let comprobanteGenerado = data.data;
 
-                      if(productosSalientes){
-                        productosSalientes.forEach(e => {
-                          el.cantidad =
-                          parseInt(el.cantidad) -
-                          parseInt(e.cantUnidades);
-                          GenericService(tenant, "stock", token).save(el);
-                        })
-                      }
-                    });
-                  })
-                  .then(() => {
-                    successAlert("Devolución realizada");
-                  })
-                  .then(() => {
-                    ReportsService(tenant, service, token)
-                      .onCloseSaleReport(comprobante)
-                      .then((res) => {
-                        file = new Blob([res["data"]], {
-                          type: "application/pdf",
+                    GenericService(tenant, "stock", token)
+                      .getDataForSucursal(sucursal.id, 0, 100000)
+                      .then((data) => {
+                        productos = data.data.content;
+                        productos.forEach((el) => {
+                          productosEntrantes.forEach((e) => {
+                            if (
+                              el.producto.id === e.id &&
+                              el.deposito.id === this.depositos[0].id
+                            ) {
+                              el.cantidad =
+                                parseInt(el.cantidad) +
+                                parseInt(e.cantUnidades);
+                              GenericService(tenant, "stock", token).save(el);
+                            }
+                          });
+
+                          if (productosSalientes.length > 0) {
+                            productosSalientes.forEach((e) => {
+                              if (
+                                el.producto.id === e.id &&
+                                el.deposito.id === this.depositos[0].id
+                              ) {
+                                el.cantidad =
+                                  parseInt(el.cantidad) -
+                                  parseInt(e.cantUnidades);
+                                GenericService(tenant, "stock", token).save(el);
+                              }
+                            });
+                          }
                         });
-                        fileURL = URL.createObjectURL(file);
-                        window.open(fileURL, "_blank");
+                      })
+                      .then(() => {
+                        devolucion.comprobante = comprobanteGenerado;
+                        devolucion.totalDevolucion =
+                          comprobanteGenerado.totalVenta;
+                        GenericService(tenant, this.service, token).save(
+                          devolucion
+                        );
+                      })
+                      .then(() => {
+                        successAlert("Devolución realizada").then((result) => {
+                          if (result.dismiss) {
+                            this.$router.push({ name: "devoluciones" });
+                          }
+                        });
+                      })
+                      .then(() => {
+                        ReportsService(tenant, service, token)
+                          .onCloseSaleReport(comprobante)
+                          .then((res) => {
+                            file = new Blob([res["data"]], {
+                              type: "application/pdf",
+                            });
+                            fileURL = URL.createObjectURL(file);
+                            window.open(fileURL, "_blank");
+                          });
                       });
                   });
 
@@ -576,28 +658,28 @@ export default {
         });
     },
 
-    processAndSaveNoFiscal(){
+    processAndSaveNoFiscal() {},
 
-    },
-
-    processDetailReceipt(codigoDocumento){
+    processDetailReceipt(codigoDocumento) {
       const creditCode = ["003", "008", "013", "112", "113", "114"];
-      let evaluation = creditCode.filter(el => el === codigoDocumento);
-      if(evaluation){
-        evaluation = "CREDITO"
-      }else{
-        evaluation = "DEBITO"
+      let evaluation = creditCode.filter((el) => el === codigoDocumento);
+      if (evaluation) {
+        evaluation = "CREDITO";
+      } else {
+        evaluation = "DEBITO";
       }
 
       let object = {
         nombre: evaluation,
         cantUnidades: 1,
-        precioUnitario: parseFloat(this.receiptDialogData.totalVenta).toFixed(2),
+        precioUnitario: parseFloat(this.receiptDialogData.totalVenta).toFixed(
+          2
+        ),
         precioTotal: parseFloat(this.receiptDialogData.totalVenta).toFixed(2),
       };
 
       return object;
-    }
+    },
   },
 };
 </script>

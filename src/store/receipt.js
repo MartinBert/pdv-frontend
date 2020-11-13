@@ -15,7 +15,6 @@ export default {
       },
       addReceipt(state, object){
         state.receipt = object;
-        console.log(object);
       }
     },
     actions: {}

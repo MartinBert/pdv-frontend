@@ -28,20 +28,43 @@
           <tr>
             <th>ID</th>
             <th>Descripción</th>
-            <th>Productos</th>
-            <th>Monto devolución</th>
+            <th>Fecha</th>
+            <th>Productos devueltos</th>
+            <th>Productos cedidos</th>
+            <th>Monto de operación</th>
+            <th>Comprobante</th>
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody v-for="object in objects" :key="object.id">
+        <tbody v-for="o in objects" :key="o.id">
           <tr>
-            <td>{{object.id}}</td>
-            <td>{{object.descripcion}}</td>
-            <td><v-btn class="success" @click="seeDetails(object.productos)">VER DETALLES</v-btn></td>
-            <td>{{object.deposito.nombre}}</td>
+            <td>{{o.id}}</td>
+            <td>{{o.descripcion}}</td>
+            <td>{{o.fecha}}</td>
             <td>
-              <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
-              <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
+              <button type="button">
+                <img
+                  src="/../../images/icons/eye.svg"
+                  @click="seeDetail('devueltos', o)"
+                  width="40"
+                  height="40"
+                />
+              </button>
+            </td>
+            <td>
+              <button type="button">
+                <img
+                  src="/../../images/icons/eye.svg"
+                  @click="seeDetail('cedidos', o)"
+                  width="40"
+                  height="40"
+                />
+              </button>
+            </td>
+            <td>{{o.totalDevolucion}}</td>
+            <td>{{o.comprobante.nombreDocumento}}</td>
+            <td>
+              <a title="Reimprimir comprobante"><img src="/../../images/icons/impresora.svg" @click="print(o.comprobante)" width="40" height="40"/></a>
             </td>
           </tr>
         </tbody>
@@ -63,23 +86,41 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage(paginate.page - 1, paginate.size)"
+      @input="getLoguedUser()"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
 
     <!-- Dialog Delete-->
-    <v-dialog v-model="dialogDeleteObject" width="500">
+    <v-dialog v-model="activeDetailDialog" width="500">
       <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center">¿Está seguro que desea realizar esta acción?</v-card-title>
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject">Si</v-btn>
-          <v-btn small color="disabled" @click="dialogDeleteObject = false">No</v-btn>
-        </v-card-actions>
+        <v-card-title class="d-flex">
+          <span class="text-center">Productos {{details[0]}}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-simple-table style="background-color: transparent" ref="tab">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Nombre</th>
+                  <th class="text-left">Cantidad de unidades</th>
+                  <th class="text-left">Precio Unitario</th>
+                  <th class="text-left">Precio Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="p in details[1]" :key="p.id">
+                  <td>{{ p.nombre }}</td>
+                  <td>{{ p.cantUnidades }}</td>
+                  <td>{{ p.precioUnitario }}</td>
+                  <td>{{ p.precioTotal }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-card-text>
       </v-card>
+        
     </v-dialog>
     <!-- End Dialog Delete -->
   </v-container>
@@ -87,6 +128,8 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import ReportsService from "../../services/ReportsService";
+import { formatDate } from "../../helpers/dateHelper";
 
 export default {
   data: () => ({
@@ -102,7 +145,8 @@ export default {
     tenant: "",
     service: "devoluciones",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false
+    details: {},
+    activeDetailDialog: false
   }),
 
   mounted() {
@@ -141,21 +185,18 @@ export default {
       GenericService(this.tenant, this.service, this.token)
       .getDataForSucursal(sucursalId, page, size)
       .then(data => {
+        data.data.content.forEach(el => {
+          el.fecha = formatDate(el.fecha);
+        });
+
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;
+        this.loaded = true;
       })
-    },
-
-    changePage(page, size) {
-      console.log(page, size);
     },
 
     newObject() {
       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
-    },
-
-    edit(id) {
-      this.$router.push({ name: "devolucionesForm", params: { id: id } });
     },
 
     filterObjects(filter){
@@ -167,19 +208,26 @@ export default {
         });
     },
 
-    openDelete(id) {
-      this.idObjet = id;
-      this.dialogDeleteObject = true;
+    print(object){
+      ReportsService(this.tenant, "ventas", this.token)
+      .onCloseSaleReport(object)
+      .then((res) => {
+        let file = new Blob([res["data"]], {
+          type: "application/pdf",
+        });
+        let fileURL = URL.createObjectURL(file);
+        window.open(fileURL, "_blank");
+      });
     },
 
-    deleteObject() {
-      this.dialog = true;
-      this.dialogDeleteObject = false;
-      GenericService(this.tenant, this.service, this.token)
-        .delete(this.idObjet)
-        .then(() => {
-          this.getAll(this.paginate.page - 1, this.paginate.size);
-        });
+    seeDetail(type, object){
+      console.log(object)
+      if(type === "devueltos"){
+        this.details = ['devueltos por clientes', object.productos];
+      }else{
+        this.details = ['cedidos a clientes', object.productosSalientes];
+      }
+      this.activeDetailDialog = true;
     },
   }
 };

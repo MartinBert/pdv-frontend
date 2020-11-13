@@ -9,6 +9,7 @@ export default (tenant,service,token) =>{
         },
 
         get: function(id){
+            console.log(id);
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/${id}`, {
                 headers: { Authorization: "Bearer " + token }
             })

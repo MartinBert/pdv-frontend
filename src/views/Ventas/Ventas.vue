@@ -81,7 +81,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage(paginate.page - 1, paginate.size)"
+      @input="getLoguedUser()"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -158,7 +158,7 @@ export default {
   }),
 
   mounted() {
-    this.$store.commit('ventas/resetStates');
+    this.$store.commit('productos/resetStates');
     this.tenant = this.$route.params.tenant;
     this.getLoguedUser();
   },
@@ -171,7 +171,7 @@ export default {
       .then(data => {
         this.loguedUser = data.data;
         if(this.loguedUser.perfil.id != 1){
-          const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
+          const sucursal = this.loguedUser.sucursal.id
           this.getVentasForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
         }else{
           this.getAll(this.paginate.page - 1, this.paginate.size);
@@ -180,8 +180,8 @@ export default {
     },
 
     getVentasForSucursal(sucursal, page, size){
-      VentasService(this.tenant, "ventas", this.token)
-      .getVentasForSucursal(sucursal, page, size)
+      GenericService(this.tenant, "ventas", this.token)
+      .getDataForSucursal(sucursal, page, size)
       .then(data => {
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;
@@ -203,8 +203,7 @@ export default {
 
     filterObjects(filterParam, filter){
       if(this.loguedUser.perfil.id !== 1){
-        const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } };
-        const sucursalId = this.loguedUser.sucursal.id;
+        const sucursal = this.loguedUser.sucursal.id;
         const page = this.paginate.page - 1;
         const size = this.paginate.size;
         let year;
@@ -228,7 +227,7 @@ export default {
           }
         }
 
-        let object = { sucursalId, filterParam, filter, page, size }
+        let object = { sucursal, filterParam, filter, page, size }
         
         VentasService(this.tenant, "ventas", this.token)
           .filter(object)
@@ -240,24 +239,6 @@ export default {
         }
       }else{
         console.log("asdf");
-      }
-    },
-
-    changePage(page, size) {
-      if(this.loguedUser.perfil.id != 1){
-        const sucursal = { sucursal:{ id:this.loguedUser.sucursal.id } }
-        if(this.filterStringDate === "" && this.filterStringTotalVenta === ""){
-          this.getVentasForSucursal(sucursal, page, size);
-        }else{
-          if(this.filterStringDate.length > 0){
-            this.filterObjects('fechaEmision', this.filterStringDate);
-          }else{
-            this.filterObjects('totalVenta', this.filterStringTotalVenta);
-          }
-          
-        }
-      }else{
-        this.getAll(page, size);
       }
     },
 
