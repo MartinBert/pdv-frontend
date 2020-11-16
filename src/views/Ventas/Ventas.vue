@@ -106,7 +106,7 @@
                   <th v-if="dialogMode === 3">Precio Total</th>
                 </tr>
               </thead>
-              <tbody v-for="object in $store.state.ventas.detailSalesList" :key="object.id">
+              <tbody v-for="object in $store.state.eventual.eventual" :key="object.id">
                 <tr>
                   <td v-if="dialogMode !== 3">{{object.id}}</td>
                   <td>{{object.nombre}}</td>
@@ -119,9 +119,9 @@
               </tbody>
             </template>
           </v-simple-table>
-        <v-card-actions>
-          <v-btn color="primary" @click="closeDialog()">
-            <i class="material-icons">mdi-pencil</i>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn icon @click="closeDialog()">
+            <img src="/../../images/icons/success.svg" width="40px" height="40px">
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -132,6 +132,7 @@
 
 <script>
 import { formatDate } from '../../helpers/dateHelper';
+import { infoAlert } from '../../helpers/alerts';
 import GenericService from "../../services/GenericService";
 import ReportsService from '../../services/ReportsService';
 import VentasService from '../../services/VentasService';
@@ -158,7 +159,7 @@ export default {
   }),
 
   mounted() {
-    this.$store.commit('productos/resetStates');
+    this.$store.commit('eventual/resetStates');
     this.tenant = this.$route.params.tenant;
     this.getLoguedUser();
   },
@@ -253,19 +254,19 @@ export default {
           this.openDialog(object, 3);
         }
       }else{
-        console.log("Undefined data");
+        infoAlert("Sin datos...")
       }
       
     },
 
     closeDialog(){
       this.dialog = false;
-      this.$store.commit('ventas/resetStates');
+      this.$store.commit('eventual/resetStates');
     },
 
     openDialog(object, type){
       this.dialogMode = type;
-      this.$store.commit('ventas/addDetailSalesList', object);
+      this.$store.commit('eventual/addEventual', object);
       this.dialog = true; 
     },
 

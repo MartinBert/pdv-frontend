@@ -681,7 +681,11 @@ export default {
                     this.products = [];
                     this.$store.commit("productos/resetStates");
                   } else {
-                    errorAlert(detalleAfip[0].observaciones[0].msg);
+                    if(detalleAfip[0].observaciones){
+                      errorAlert(detalleAfip[0].observaciones[0].msg)
+                    }else{
+                      errorAlert("Tipo de comprobante no disponible");
+                    }
                   }
                 });
             } else {

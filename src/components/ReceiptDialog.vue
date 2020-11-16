@@ -72,7 +72,7 @@
                 </v-col>
                 <v-col></v-col>
               </v-row>
-              <v-row v-if="dialogObject.documento">
+              <v-row v-if="dialogObject.documento.tipo === true">
                 <v-col cols="12" class="ml-5 text-center">
                   <span class="title">
                     Seleccione un comprobante asociado a "{{dialogObject.documento.nombre}}"

@@ -147,6 +147,15 @@
     font-size: 24px;
 }
 
+.text-alert-info h1 {
+    margin-top: 5px;
+    color: rgb(14, 147, 235);
+    font-family: Cocogose;
+    font-size: 24px;
+}
+
+
+
 /*******/
 
 /***IMAGES***/
@@ -180,6 +189,16 @@
 }
 
 .text-alert-question img{
+    width: 150px;
+    height: 150px;
+    margin-top: 5%;
+    -webkit-animation: 3s rotate linear infinite;
+    animation: 3s rotate linear infinite;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+}
+
+.text-alert-info img{
     width: 150px;
     height: 150px;
     margin-top: 5%;

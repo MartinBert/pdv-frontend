@@ -189,10 +189,12 @@ import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import VentasService from "../../services/VentasService";
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
+import { processDetailReceipt } from "../../helpers/processObjectsHelper";
 import { successAlert, errorAlert, questionAlert } from "../../helpers/alerts";
 import {
   calculateAlicIvaBaseImpVentas,
   calculateAlicIvaImporteVentas,
+  generateBarCode,
 } from "../../helpers/mathHelper";
 import ProductDialog from "../../components/ProductDialog";
 import ReceiptDialog from "../../components/ReceiptDialog";
@@ -397,7 +399,7 @@ export default {
             "Desea continuar de todos modos"
           ).then((result) => {
             if (result.isConfirmed) {
-              console.log("asdf");
+              this.saveWithoutReceipt();
             } else {
               this.$store.commit("receipt/receiptDialogMutation");
             }
@@ -428,7 +430,6 @@ export default {
         );
         this.object.productosEntrantes.push(product);
       }
-      console.log(this.object);
     },
 
     processAndSaveFiscal() {
@@ -436,7 +437,6 @@ export default {
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const documento = this.receiptDialogData.documento;
-      const detail = this.processDetailReceipt(documento.codigoDocumento);
       const productosEntrantes = this.object.productosEntrantes;
       const productosSalientes = this.object.productosSalientes;
       const empresa = this.loguedUser.empresa;
@@ -450,6 +450,10 @@ export default {
       const service = "ventas";
       const afipAuthorization = this.afipModuleAuthorization;
       const comprobanteAsociado = this.receiptDialogData.comprobanteAsociado;
+      const detail = processDetailReceipt(
+        documento.codigoDocumento,
+        totalVenta
+      );
 
       const comprobanteAsociadoDetalle = {
         nro: comprobanteAsociado.numeroCbte,
@@ -469,7 +473,7 @@ export default {
       let productos;
       let condVenta;
       let devolucion = {
-        fecha: fecha,
+        fecha: formatDate(fecha),
         descripcion: this.object.descripcion,
         productos: productosEntrantes,
         productosSalientes: productosSalientes,
@@ -649,36 +653,221 @@ export default {
                   });
 
                 this.object = {};
-                this.detail = [];
                 this.$store.commit("productos/resetStates");
               } else {
-                errorAlert(detalleAfip[0].observaciones[0].msg);
+                if (detalleAfip[0].observaciones) {
+                  errorAlert(detalleAfip[0].observaciones[0].msg);
+                } else {
+                  errorAlert("Tipo de comprobante no disponible");
+                }
               }
             });
         });
     },
 
-    processAndSaveNoFiscal() {},
+    processAndSaveNoFiscal() {
+      /* Constants */
+      const mediosPago = this.receiptDialogData.mediosPago;
+      const planesPago = this.receiptDialogData.planPago;
+      const totalVenta = this.receiptDialogData.totalVenta;
+      const cliente = this.receiptDialogData.cliente;
+      const empresa = this.loguedUser.empresa;
+      const documento = this.receiptDialogData.documento;
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
+      const productosEntrantes = this.object.productosEntrantes;
+      const productosSalientes = this.object.productosSalientes;
+      const tenant = this.tenant;
+      const token = this.token;
+      const service = "ventas";
+      const fecha = getCurrentDate();
+      const detail = processDetailReceipt(
+        documento.codigoDocumento,
+        totalVenta
+      );
 
-    processDetailReceipt(codigoDocumento) {
-      const creditCode = ["003", "008", "013", "112", "113", "114"];
-      let evaluation = creditCode.filter((el) => el === codigoDocumento);
-      if (evaluation) {
-        evaluation = "CREDITO";
-      } else {
-        evaluation = "DEBITO";
-      }
-
-      let object = {
-        nombre: evaluation,
-        cantUnidades: 1,
-        precioUnitario: parseFloat(this.receiptDialogData.totalVenta).toFixed(
-          2
-        ),
-        precioTotal: parseFloat(this.receiptDialogData.totalVenta).toFixed(2),
+      /* Mutable vars */
+      let file;
+      let fileURL;
+      let productos;
+      let comprobante;
+      let condVenta;
+      let devolucion = {
+        fecha: formatDate(fecha),
+        descripcion: this.object.descripcion,
+        productos: productosEntrantes,
+        productosSalientes: productosSalientes,
+        empresa: empresa,
+        sucursal: sucursal,
       };
 
-      return object;
+      GenericService(tenant, "depositos", token)
+        .getDataForSucursal(sucursal.id, 0, 100000)
+        .then((data) => {
+          this.depositos = data.data.content;
+        });
+
+      if (planesPago) {
+        if (planesPago.length < 2) {
+          if (planesPago[0].cuotas > 1) {
+            condVenta = true;
+          } else {
+            condVenta = false;
+          }
+        } else {
+          condVenta = false;
+        }
+      } else {
+        condVenta = true;
+      }
+
+      comprobante = {
+        letra: "NX",
+        numeroCbte: 0,
+        fechaEmision: formatDate(fecha),
+        fechaVto: formatDate(fecha),
+        condicionVenta: condVenta,
+        productos: [detail],
+        barCode: generateBarCode(),
+        cae: "",
+        puntoVenta: ptoVenta,
+        sucursal: sucursal,
+        documentoComercial: documento,
+        empresa: empresa,
+        cliente: cliente,
+        totalVenta: totalVenta,
+        mediosPago: [mediosPago],
+        planesPago: [planesPago],
+        nombreDocumento: documento.nombre,
+      };
+
+      GenericService(tenant, "comprobantesFiscales", token)
+        .save(comprobante)
+        .then((data) => {
+          let comprobanteGenerado = data.data;
+
+          GenericService(tenant, "stock", token)
+            .getDataForSucursal(sucursal.id, 0, 100000)
+            .then((data) => {
+              productos = data.data.content;
+              productos.forEach((el) => {
+                productosEntrantes.forEach((e) => {
+                  if (
+                    el.producto.id === e.id &&
+                    el.deposito.id === this.depositos[0].id
+                  ) {
+                    el.cantidad =
+                      parseInt(el.cantidad) + parseInt(e.cantUnidades);
+                    GenericService(tenant, "stock", token).save(el);
+                  }
+                });
+
+                if (productosSalientes.length > 0) {
+                  productosSalientes.forEach((e) => {
+                    if (
+                      el.producto.id === e.id &&
+                      el.deposito.id === this.depositos[0].id
+                    ) {
+                      el.cantidad =
+                        parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                      GenericService(tenant, "stock", token).save(el);
+                    }
+                  });
+                }
+              });
+            })
+            .then(() => {
+              devolucion.comprobante = comprobanteGenerado;
+              devolucion.totalDevolucion = comprobanteGenerado.totalVenta;
+              GenericService(tenant, this.service, token).save(devolucion);
+            })
+            .then(() => {
+              successAlert("Devolución realizada").then((result) => {
+                if (result.dismiss) {
+                  this.$router.push({ name: "devoluciones" });
+                }
+              });
+            })
+            .then(() => {
+              ReportsService(tenant, service, token)
+                .onCloseSaleReport(comprobante)
+                .then((res) => {
+                  file = new Blob([res["data"]], {
+                    type: "application/pdf",
+                  });
+                  fileURL = URL.createObjectURL(file);
+                  window.open(fileURL, "_blank");
+                });
+            });
+        });
+
+      this.object = {};
+      this.$store.commit("productos/resetStates");
+    },
+
+    saveWithoutReceipt() {
+      const sucursal = this.loguedUser.sucursal;
+      const empresa = this.loguedUser.empresa;
+      const productosEntrantes = this.object.productosEntrantes;
+      const productosSalientes = this.object.productosSalientes;
+      const tenant = this.tenant;
+      const token = this.token;
+
+      let productos;
+      let devolucion = {
+        fecha: formatDate(getCurrentDate()),
+        descripcion: this.object.descripcion,
+        productos: productosEntrantes,
+        productosSalientes: productosSalientes,
+        empresa: empresa,
+        sucursal: sucursal,
+      };
+
+      GenericService(tenant, "depositos", token)
+        .getDataForSucursal(sucursal.id, 0, 100)
+        .then((data) => {
+          this.depositos = data.data.content;
+        });
+
+      GenericService(tenant, "stock", token)
+        .getDataForSucursal(sucursal.id, 0, 100000)
+        .then((data) => {
+          productos = data.data.content;
+          productos.forEach((el) => {
+            productosEntrantes.forEach((e) => {
+              if (
+                el.producto.id === e.id &&
+                el.deposito.id === this.depositos[0].id
+              ) {
+                el.cantidad = parseInt(el.cantidad) + parseInt(e.cantUnidades);
+                GenericService(tenant, "stock", token).save(el);
+              }
+            });
+
+            if (productosSalientes.length > 0) {
+              productosSalientes.forEach((e) => {
+                if (
+                  el.producto.id === e.id &&
+                  el.deposito.id === this.depositos[0].id
+                ) {
+                  el.cantidad =
+                    parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                  GenericService(tenant, "stock", token).save(el);
+                }
+              });
+            }
+          });
+        })
+        .then(() => {
+          GenericService(tenant, this.service, token).save(devolucion);
+        })
+        .then(() => {
+          successAlert("Devolución realizada").then((result) => {
+            if (result.dismiss) {
+              this.$router.push({ name: "devoluciones" });
+            }
+          });
+        });
     },
   },
 };

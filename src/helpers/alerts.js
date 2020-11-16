@@ -49,3 +49,17 @@ export function questionAlert(strTitle, strText) {
         denyButtonColor: 'rgb(209, 50, 50)'
     });
 }
+export function infoAlert(str) {
+    return Swal.fire({
+        width: 400,
+        html:
+            "<div class='text-alert-info'>" +
+            "<img src='/../../images/messages/info_1.svg' />" +
+            "<h1>" +
+            str +
+            "...</h1>" +
+            "</div>",
+        showConfirmButton: false,
+        showDenyButton: false,
+    });
+}

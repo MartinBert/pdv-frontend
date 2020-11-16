@@ -33,7 +33,6 @@
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
-            v-btn
           </v-col>
         </v-row>
         <v-row class="ma-1">          
@@ -113,7 +112,6 @@
               required
               class="mr-3"
               v-on:input="calculations"
-              :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -124,7 +122,6 @@
               label="Precio de costo"
               required
               class="mr-3"
-              :rules="[v => !!v || 'Campo requerido...']"
               disabled
             ></v-text-field>
           </v-col>
@@ -137,7 +134,6 @@
               required
               class="mr-3"
               disabled
-              :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -160,7 +156,6 @@
               required
               class="mr-3"
               v-on:input="calculations"
-              :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -172,7 +167,6 @@
               required
               class="mr-3"
               disabled
-              :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -184,7 +178,6 @@
               required
               class="mr-3"
               disabled
-              :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -195,7 +188,6 @@
               label="Precio total"
               required
               @input="gainCalculations"
-              :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
         </v-row>

@@ -61,10 +61,14 @@
                 />
               </button>
             </td>
-            <td>{{o.totalDevolucion}}</td>
-            <td>{{o.comprobante.nombreDocumento}}</td>
+            <td>${{o.totalDevolucion}}</td>
             <td>
-              <a title="Reimprimir comprobante"><img src="/../../images/icons/impresora.svg" @click="print(o.comprobante)" width="40" height="40"/></a>
+              <span v-if="o.comprobante">{{o.comprobante.nombreDocumento}}</span>
+              <span v-if="!o.comprobante">SIN COMPROBANTE</span>
+            </td>
+            <td>
+              <a title="Reimprimir comprobante" v-if="o.comprobante"><img src="/../../images/icons/impresora.svg" @click="print(o.comprobante)" width="40" height="40"/></a>
+              <a title="Reimprimir comprobante" v-if="!o.comprobante"><img src="/../../images/icons/add.svg" @click="addReceipt(o)" width="40" height="40"/></a>
             </td>
           </tr>
         </tbody>
@@ -91,7 +95,7 @@
     ></v-pagination>
     <!-- End Paginate -->
 
-    <!-- Dialog Delete-->
+    <!-- Dialog Detail-->
     <v-dialog v-model="activeDetailDialog" width="500">
       <v-card>
         <v-card-title class="d-flex">
@@ -122,14 +126,22 @@
       </v-card>
         
     </v-dialog>
-    <!-- End Dialog Delete -->
+    <!-- End Dialog Detail -->
+
+    <ReceiptDialog v-on:receipt="saveChanges"/>
   </v-container>
 </template>
 
 <script>
+import axios from "axios";
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-import { formatDate } from "../../helpers/dateHelper";
+import { formatDate, getCurrentDate } from "../../helpers/dateHelper";
+import ReceiptDialog from "../../components/ReceiptDialog";
+import { questionAlert, errorAlert, successAlert } from "../../helpers/alerts";
+import { calculateAlicIvaBaseImpVentas, calculateAlicIvaImporteVentas, generateBarCode } from "../../helpers/mathHelper";
+import { processDetailReceipt } from "../../helpers/processObjectsHelper";
+import VentasService from '../../services/VentasService';
 
 export default {
   data: () => ({
@@ -146,8 +158,15 @@ export default {
     service: "devoluciones",
     token: localStorage.getItem("token"),
     details: {},
-    activeDetailDialog: false
+    activeDetailDialog: false,
+    receiptDialogData: null,
+    temporalObject: null,
+    afipModuleAuthorization: null
   }),
+
+  components: {
+    ReceiptDialog
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -167,6 +186,8 @@ export default {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         }
       })
+
+      this.getAfipAuthorization();
     },
 
     getAll(page, size) {
@@ -185,13 +206,17 @@ export default {
       GenericService(this.tenant, this.service, this.token)
       .getDataForSucursal(sucursalId, page, size)
       .then(data => {
-        data.data.content.forEach(el => {
-          el.fecha = formatDate(el.fecha);
-        });
-
         this.objects = data.data.content;
         this.paginate.totalPages = data.data.totalPages;
         this.loaded = true;
+      })
+    },
+
+    getAfipAuthorization(){
+      VentasService(this.tenant, "ventas", this.token)
+      .getAfipModuleAuthorization()
+      .then(data => {
+        this.afipModuleAuthorization = data.data;
       })
     },
 
@@ -221,13 +246,287 @@ export default {
     },
 
     seeDetail(type, object){
-      console.log(object)
       if(type === "devueltos"){
         this.details = ['devueltos por clientes', object.productos];
       }else{
         this.details = ['cedidos a clientes', object.productosSalientes];
       }
       this.activeDetailDialog = true;
+    },
+
+    addReceipt(o){
+      this.temporalObject = o;
+      this.$store.commit('receipt/receiptDialogMutation');
+    },
+
+    saveChanges(){
+      this.receiptDialogData = this.$store.state.receipt.receipt;
+      questionAlert('Atención, esta acción generará un comprobante en el sistema', 'Desea continuar')
+      .then(result =>{
+        if(result.isConfirmed){
+          if(this.receiptDialogData.documento.tipo === true){
+            this.processAndSaveFiscal();
+          }else{
+            this.processAndSaveNoFiscal();
+          }
+        }else{
+          this.$store.commit('receipt/resetStates');
+        }
+      })
+    },
+
+    processAndSaveFiscal() {
+      /* Constants */
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
+      const documento = this.receiptDialogData.documento;
+      const empresa = this.loguedUser.empresa;
+      const cliente = this.receiptDialogData.cliente;
+      const mediosPago = this.receiptDialogData.mediosPago;
+      const planesPago = this.receiptDialogData.planPago;
+      const fecha = getCurrentDate();
+      const totalVenta = this.receiptDialogData.totalVenta;
+      const tenant = this.tenant;
+      const token = this.token;
+      const service = "ventas";
+      const afipAuthorization = this.afipModuleAuthorization;
+      const comprobanteAsociado = this.receiptDialogData.comprobanteAsociado;
+      const detail = processDetailReceipt(documento.codigoDocumento, totalVenta);
+      const comprobanteAsociadoDetalle = {
+        nro: comprobanteAsociado.numeroCbte,
+        ptoVta: comprobanteAsociado.puntoVenta.idFiscal,
+        tipo: documento.codigoDocumento,
+      };
+
+      /* Mutable vars */
+      let tipoDoc;
+      let alicIva = { baseImp: 0, id: 5, importe: 0 };
+      let impNeto;
+      let comprobante;
+      let cabeceraAfip;
+      let detalleAfip;
+      let file;
+      let fileURL;
+      let condVenta;
+      let devolucion = this.temporalObject;
+
+      /****End declarations****/
+
+      if (planesPago) {
+        if (planesPago.length < 2) {
+          if (planesPago[0].cuotas > 1) {
+            condVenta = true;
+          } else {
+            condVenta = false;
+          }
+        } else {
+          condVenta = false;
+        }
+      } else {
+        condVenta = true;
+      }
+
+      if (documento.ivaCat == 2 || documento.ivaCat == 1) {
+        alicIva.baseImp = calculateAlicIvaBaseImpVentas(totalVenta);
+        alicIva.importe = calculateAlicIvaImporteVentas(
+          totalVenta,
+          alicIva.baseImp
+        );
+        impNeto = alicIva.baseImp;
+      } else {
+        alicIva = [];
+      }
+
+      //Instance body from AFIP ws-services
+      let body = {
+        alicIva: [alicIva],
+        asociados: [comprobanteAsociadoDetalle],
+        cbteTipo: documento.codigoDocumento,
+        concepto: 1,
+        cotizMoneda: 1,
+        cuit: sucursal.cuit,
+        fecha: fecha,
+        fechaServicioHasta: fecha,
+        fechaServicioVenc: fecha,
+        fechaServiciodesde: fecha,
+        fechaVencimientoPago: "0",
+        idMoneda: "PES",
+        impNeto: impNeto,
+        name: sucursal.razonSocial,
+        nroDesde: "",
+        nroDoc: cliente.cuit,
+        nroHasta: "",
+        opcionales: [],
+        ptoVenta: ptoVenta.idFiscal,
+        tipoDoc: tipoDoc,
+        tributos: [],
+      };
+
+      //Get authorized voucher number
+      axios
+        .get(
+          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${body.name}/${body.cuit}/${body.ptoVenta}/${body.cbteTipo}`,
+          {
+            headers: afipAuthorization,
+          }
+        )
+        .then((data) => {
+          body.nroDesde = data.data + 1;
+          body.nroHasta = body.nroDesde;
+          axios
+            .post(
+              `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/generarComprobante/${sucursal.razonSocial}`,
+              body,
+              {
+                headers: afipAuthorization,
+              }
+            )
+            .then((data) => {
+              cabeceraAfip = data.data.feCabResp;
+              detalleAfip = data.data.feDetResp;
+
+              comprobante = {
+                letra: documento.letra,
+                numeroCbte: body.nroDesde,
+                fechaEmision: formatDate(cabeceraAfip.fchProceso),
+                fechaVto: formatDate(detalleAfip[0].caefchVto),
+                condicionVenta: condVenta,
+                productos: [detail],
+                barCode: detalleAfip[0].barcode,
+                cae: detalleAfip[0].cae,
+                puntoVenta: ptoVenta,
+                sucursal: sucursal,
+                documentoComercial: documento,
+                empresa: empresa,
+                cliente: cliente,
+                totalVenta: totalVenta,
+                mediosPago: [mediosPago],
+                planesPago: [planesPago],
+                nombreDocumento: documento.nombre,
+              };
+
+              if (comprobante.cae) {
+                GenericService(tenant, "comprobantesFiscales", token)
+                  .save(comprobante)
+                  .then((data) => {
+                    let comprobanteGenerado = data.data;
+                    devolucion.comprobante = comprobanteGenerado;
+                    devolucion.totalDevolucion = comprobanteGenerado.totalVenta;
+                    
+                    GenericService(tenant, this.service, token).save(devolucion)
+                      .then(() => {
+                        successAlert("Comprobante agregado");
+                      })
+                      .then(() => {
+                        ReportsService(tenant, service, token)
+                          .onCloseSaleReport(comprobante)
+                          .then((res) => {
+                            file = new Blob([res["data"]], {
+                              type: "application/pdf",
+                            });
+                            fileURL = URL.createObjectURL(file);
+                            window.open(fileURL, "_blank");
+                          });
+                      });
+                  });
+
+                this.temporalObject = null;
+                this.$store.commit("productos/resetStates");
+              } else {
+                if(detalleAfip[0].observaciones){
+                  errorAlert(detalleAfip[0].observaciones[0].msg)
+                }else{
+                  errorAlert("Tipo de comprobante no disponible");
+                }
+              }
+            });
+        });
+    },
+
+    processAndSaveNoFiscal() {
+      /* Constants */ 
+      const mediosPago = this.receiptDialogData.mediosPago;
+      const planesPago = this.receiptDialogData.planPago;
+      const totalVenta = this.receiptDialogData.totalVenta;
+      const cliente = this.receiptDialogData.cliente;
+      const empresa = this.loguedUser.empresa;
+      const documento = this.receiptDialogData.documento;
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
+      const tenant = this.tenant;
+      const token = this.token;
+      const service = "ventas";
+      const fecha = getCurrentDate();
+      const detail = processDetailReceipt(documento.codigoDocumento, totalVenta);
+
+      /* Mutable vars */ 
+      let file;
+      let fileURL;
+      let comprobante;
+      let condVenta;
+      let devolucion = this.temporalObject;
+
+      /**** End declarations ****/
+
+      if (planesPago) {
+        if (planesPago.length < 2) {
+          if (planesPago[0].cuotas > 1) {
+            condVenta = true;
+          } else {
+            condVenta = false;
+          }
+        } else {
+          condVenta = false;
+        }
+      } else {
+        condVenta = true;
+      }
+
+      comprobante = {
+        letra: "NX",
+        numeroCbte: 0,
+        fechaEmision: formatDate(fecha),
+        fechaVto: formatDate(fecha),
+        condicionVenta: condVenta,
+        productos: [detail],
+        barCode: generateBarCode(),
+        cae: "",
+        puntoVenta: ptoVenta,
+        sucursal: sucursal,
+        documentoComercial: documento,
+        empresa: empresa,
+        cliente: cliente,
+        totalVenta: totalVenta,
+        mediosPago: [mediosPago],
+        planesPago: [planesPago],
+        nombreDocumento: documento.nombre,
+      };
+
+      GenericService(tenant, "comprobantesFiscales", token).save(comprobante)
+      .then((data) => {
+        let comprobanteGenerado = data.data;
+        devolucion.comprobante = comprobanteGenerado;
+        devolucion.totalDevolucion = comprobanteGenerado.totalVenta;
+        
+        GenericService(tenant, this.service, token).save(devolucion)
+          .then(() => {
+            successAlert("Comprobante agregado");
+          })
+          .then(() => {
+            ReportsService(tenant, service, token)
+              .onCloseSaleReport(comprobante)
+              .then((res) => {
+                file = new Blob([res["data"]], {
+                  type: "application/pdf",
+                });
+                fileURL = URL.createObjectURL(file);
+                window.open(fileURL, "_blank");
+              });
+          });
+      })
+
+      this.temporalObject = null;
+      this.$store.commit("productos/resetStates");
     },
   }
 };
