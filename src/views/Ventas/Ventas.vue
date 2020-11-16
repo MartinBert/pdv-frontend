@@ -3,7 +3,7 @@
     <v-form class="mb-3">
       <v-row>
         <v-col cols="1">
-          <v-btn class="primary" raised>Reporte de Ventas</v-btn>
+          <v-btn class="primary" @click="seeReports()" raised>Reporte de Ventas</v-btn>
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="3">
@@ -127,15 +127,19 @@
       </v-card>
     </v-dialog>
 
+    <VentasReportsDialog />
+
   </v-container>
 </template>
 
 <script>
 import { formatDate } from '../../helpers/dateHelper';
 import { infoAlert } from '../../helpers/alerts';
-import GenericService from "../../services/GenericService";
+import GenericService from '../../services/GenericService';
 import ReportsService from '../../services/ReportsService';
 import VentasService from '../../services/VentasService';
+import VentasReportsDialog from '../../components/VentasReportsDialog';
+
 export default {
    
   data: () => ({
@@ -157,6 +161,10 @@ export default {
     dialog: false,
     loguedUser: {}
   }),
+
+  components:{
+    VentasReportsDialog
+  },
 
   mounted() {
     this.$store.commit('eventual/resetStates');
@@ -280,6 +288,10 @@ export default {
         let fileURL = URL.createObjectURL(file);
         window.open(fileURL, "_blank");
       });
+    },
+
+    seeReports(){
+      this.$store.commit('eventual/mutateEventualDialog');
     }
 
   },
