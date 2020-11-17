@@ -11,15 +11,20 @@ export function formatDate(str) {
 }
 
 export function getCurrentDate() {
-    var generatedFecha = new Date();
-    var day = generatedFecha.getDate().toString();
+    let generatedFecha = new Date();
+    let day = generatedFecha.getDate().toString();
     if (day.length === 1) {
         day = "0" + day;
     }
-    var month = (generatedFecha.getMonth() + 1).toString();
+    let month = (generatedFecha.getMonth() + 1).toString();
     if (month.length === 1) {
         month = "0" + month;
     }
-    var fecha = generatedFecha.getFullYear().toString() + month + day;
+    let fecha = generatedFecha.getFullYear().toString() + month + day;
     return fecha;
+}
+
+export function generateMilisecondsDate(date) {
+    const milisecondsDate = new Date(date).getFullYear();
+    console.log(milisecondsDate);
 }
