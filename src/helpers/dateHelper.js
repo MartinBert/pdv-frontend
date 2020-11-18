@@ -24,7 +24,7 @@ export function getCurrentDate() {
     return fecha;
 }
 
-export function generateMilisecondsDate(date) {
-    const milisecondsDate = new Date(date).getFullYear();
-    console.log(milisecondsDate);
+export function generateIntegerDate(date) {
+    const integerDate = new Date(date).getTime();
+    return integerDate;
 }

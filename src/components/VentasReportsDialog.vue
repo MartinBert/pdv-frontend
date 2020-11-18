@@ -16,12 +16,12 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForReceipt(loguedUser.sucursal.id, documento.codigoDocumento)" class="ml-5">
+              <form @submit.prevent="salesForReceipt(loguedUser.sucursal.id, object.documento.codigoDocumento)" class="ml-5">
                 <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR COMPROBANTE</v-btn>
                 <div class="d-block">
                   <v-autocomplete
                     :items="documentos"
-                    v-model="documento"
+                    v-model="object.documento"
                     item-text="nombre"
                     :return-object="true"
                     placeholder="Seleccione un comprobante"
@@ -31,12 +31,12 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, cliente.id)">
+              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, object.cliente.id)">
                 <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR CLIENTE</v-btn>
                 <div class="d-block">
                   <v-autocomplete
                     :items="clientes"
-                    v-model="cliente"
+                    v-model="object.cliente"
                     item-text="nombre"
                     :return-object="true"
                     placeholder="Seleccione un cliente"
@@ -53,7 +53,7 @@
           </v-row>
           <v-row>
             <v-col>
-              <form @submit.prevent="salesForDate(loguedUser.sucursal.id, fechaDesde, fechaHasta)">
+              <form @submit.prevent="salesForDate(loguedUser.sucursal.id, object.fechaDesde, object.fechaHasta)">
                 <v-btn class="primary v-btn--block" type="submit">VENTAS POR FECHA</v-btn>
                 <div class="d-block">
                   <label for="input1">Fecha desde</label>
@@ -62,7 +62,7 @@
                   name="input1"
                   type="date"
                   v-model="fechaDesde"
-                  @input="createDate(fechaDesde)"
+                  @input="createDate(fechaDesde, 'fechaDesde')"
                   required
                   >
                   </v-text-field>
@@ -74,6 +74,7 @@
                   name="input2"
                   type="date"
                   v-model="fechaHasta"
+                  @input="createDate(fechaHasta, 'fechaHasta')"
                   required
                   >
                   </v-text-field>
@@ -91,7 +92,7 @@
                 <div class="d-block">
                   <v-autocomplete
                     :items="clientes"
-                    v-model="cliente"
+                    v-model="object.cliente"
                     item-text="nombre"
                     :return-object="true"
                     placeholder="Seleccione un cliente"
@@ -110,7 +111,7 @@
 import ReportsService from '../services/ReportsService';
 import GenericService from '../services/GenericService';
 import DocumentosService from '../services/DocumentosService';
-import { generateMilisecondsDate } from '../helpers/dateHelper';
+import { generateIntegerDate } from '../helpers/dateHelper';
 
 export default {
   name: "VentasReportsDialog",
@@ -121,9 +122,13 @@ export default {
       token: localStorage.getItem("token"),
       loguedUser: null,
       documentos: [],
-      documento: {},
       clientes: [],
-      cliente: {},
+      object:{
+        documento: {},
+        cliente: {},
+        fechaDesde: null,
+        fechaHasta: null
+      },
       fechaDesde: null,
       fechaHasta: null
     }
@@ -200,10 +205,14 @@ export default {
     /****REPORTS****/
 
     /**** Transform data functions ****/
-    createDate(fechaDesde){
-      generateMilisecondsDate(fechaDesde);
+    createDate(date, param){
+      const integerDate = generateIntegerDate(date);
+      if(param === 'fechaDesde'){
+        this.object.fechaDesde = integerDate;
+      }else{
+        this.object.fechaHasta = integerDate;
+      }
     }
-
   }
 };
 </script>
