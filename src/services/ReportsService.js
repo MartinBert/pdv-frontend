@@ -51,5 +51,15 @@ export default (tenant,service,token) =>{
                 dataType: 'blob'
             })
         },
+
+        allSalesGroupBy(id, type){
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/allSalesGroupBy/${tenant}/${id}/${type}`, {
+                headers: { Authorization: "Bearer " + token },
+                responseType: 'arraybuffer',
+                dataType: 'blob'
+            })
+        },
+
+        
     }
 }

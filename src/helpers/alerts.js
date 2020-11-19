@@ -13,7 +13,6 @@ export function errorAlert(str) {
         showConfirmButton: false,
     });
 }
-
 export function successAlert(str) {
     return Swal.fire({
         width: 300,
@@ -27,7 +26,6 @@ export function successAlert(str) {
         showConfirmButton: false,
     });
 }
-
 export function questionAlert(strTitle, strText) {
     return Swal.fire({
         width: 400,
@@ -58,6 +56,19 @@ export function infoAlert(str) {
             "<h1>" +
             str +
             "...</h1>" +
+            "</div>",
+        showConfirmButton: false,
+        showDenyButton: false,
+    });
+}
+export function infoAlert2(str) {
+    return Swal.fire({
+        html:
+            "<div class='text-alert-info'>" +
+            "<img src='/../../images/messages/info_2.svg' />" +
+            "<h1>¡" +
+            str +
+            "!</h1>" +
             "</div>",
         showConfirmButton: false,
         showDenyButton: false,

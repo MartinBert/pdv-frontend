@@ -16,35 +16,47 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForReceipt(loguedUser.sucursal.id, object.documento.codigoDocumento)" class="ml-5">
-                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR COMPROBANTE</v-btn>
-                <div class="d-block">
-                  <v-autocomplete
-                    :items="documentos"
-                    v-model="object.documento"
-                    item-text="nombre"
-                    :return-object="true"
-                    placeholder="Seleccione un comprobante"
-                    required
-                  ></v-autocomplete>
+              <form @submit.prevent="comingSoon()">
+                <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR COMPROBANTE</v-btn>
+                <div class="d-flex justify-center mt-3">
+                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
                 </div>
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, object.cliente.id)">
-                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR CLIENTE</v-btn>
-                <div class="d-block">
-                  <v-autocomplete
-                    :items="clientes"
-                    v-model="object.cliente"
-                    item-text="nombre"
-                    :return-object="true"
-                    placeholder="Seleccione un cliente"
-                    required
-                  ></v-autocomplete>
+              <form @submit.prevent="comingSoon()">
+                <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR CLIENTE</v-btn>
+                <div class="d-flex justify-center mt-3">
+                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
                 </div>
               </form>
             </v-col>
+          </v-row>
+          <v-row>
+             <v-col>
+              <form @submit.prevent="comingSoon()">
+                <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR MEDIOS DE PAGO</v-btn>
+                <div class="d-flex justify-center mt-3">
+                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
+                </div>
+              </form>
+            </v-col>
+            <v-col>
+              <form @submit.prevent="comingSoon()">
+                <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR MARCAS</v-btn>
+                <div class="d-flex justify-center mt-3">
+                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
+                </div>
+              </form>
+            </v-col>
+            <v-col>
+              <form @submit.prevent="comingSoon()">
+                <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR RUBROS</v-btn>
+                <div class="d-flex justify-center mt-3">
+                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
+                </div>
+              </form>
+            </v-col> 
           </v-row>
           <v-row>
             <v-col>
@@ -82,12 +94,22 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForReceipt(loguedUser.sucursal.id, documento.codigoDocumento)" class="ml-5">
+              <form @submit.prevent="salesForReceipt(loguedUser.sucursal.id, object.documento.codigoDocumento)" class="ml-5">
                 <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR COMPROBANTE</v-btn>
+                <div class="d-block">
+                  <v-autocomplete
+                    :items="documentos"
+                    v-model="object.documento"
+                    item-text="nombre"
+                    :return-object="true"
+                    placeholder="Seleccione un comprobante"
+                    required
+                  ></v-autocomplete>
+                </div>
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, cliente.id)">
+              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, object.cliente.id)">
                 <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR CLIENTE</v-btn>
                 <div class="d-block">
                   <v-autocomplete
@@ -112,6 +134,7 @@ import ReportsService from '../services/ReportsService';
 import GenericService from '../services/GenericService';
 import DocumentosService from '../services/DocumentosService';
 import { generateIntegerDate } from '../helpers/dateHelper';
+import { infoAlert2 } from '../helpers/alerts';
 
 export default {
   name: "VentasReportsDialog",
@@ -173,6 +196,16 @@ export default {
         });
     },
 
+    allSalesGroupBy(id, type){
+      ReportsService(this.tenant, "ventas", this.token)
+      .allSalesGroupBy(id, type)
+      .then((res) => {
+          var file = new Blob([res["data"]], { type: "application/pdf" });
+          var fileURL = URL.createObjectURL(file);
+          window.open(fileURL, "_blank");
+        });
+    },
+
     salesForReceipt(id, receipt) {
       ReportsService(this.tenant, this.service, this.token)
         .salesForReceipt(id, receipt)
@@ -202,6 +235,7 @@ export default {
           window.open(fileURL, "_blank");
         });
     },
+
     /****REPORTS****/
 
     /**** Transform data functions ****/
@@ -212,6 +246,10 @@ export default {
       }else{
         this.object.fechaHasta = integerDate;
       }
+    },
+
+    comingSoon(){
+      infoAlert2("Disponible muy pronto");
     }
   }
 };
