@@ -28,3 +28,32 @@ export function generateIntegerDate(date) {
     const integerDate = new Date(date).getTime();
     return integerDate;
 }
+
+export function getYearsList(){
+    const currentYear = new Date().getFullYear()
+    let years = []
+    if(currentYear > 2020){
+        for(var i = currentYear; i >= 2020; i--){
+            years.push(i);
+        }
+    }else{
+        years.push(currentYear);
+    }
+
+    return years;
+}
+
+export const monthsList = [
+    {'value': '01','text': 'Enero',},
+    {'value': '02','text': 'Febrero',},
+    {'value': '03','text': 'Marzo',},
+    {'value': '04','text': 'Abril',},
+    {'value': '05','text': 'Mayo',},
+    {'value': '06','text': 'Junio',},
+    {'value': '07','text': 'Julio',},
+    {'value': '08','text': 'Agosto',},
+    {'value': '09','text': 'Septiembre',},
+    {'value': '10','text': 'Octubre',},
+    {'value': '11','text': 'Noviembre',},
+    {'value': '12','text': 'Diciembre'}
+]

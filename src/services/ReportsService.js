@@ -52,6 +52,14 @@ export default (tenant,service,token) =>{
             })
         },
 
+        salesForMonth(id, year, month){
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/salesForMonthReport/${tenant}/${id}/${year}/${month}`, {
+                headers: { Authorization: "Bearer " + token },
+                responseType: 'arraybuffer',
+                dataType: 'blob'
+            })
+        },
+
         allSalesGroupBy(id, type){
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/allSalesGroupBy/${tenant}/${id}/${type}`, {
                 headers: { Authorization: "Bearer " + token },

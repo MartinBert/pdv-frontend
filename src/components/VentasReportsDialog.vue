@@ -16,16 +16,16 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="comingSoon()">
-                <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR COMPROBANTE</v-btn>
+              <form @submit.prevent="allSalesGroupBy(loguedUser.sucursal.id, 'Receipts')">
+                <v-btn class="primary v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR COMPROBANTE</v-btn>
                 <div class="d-flex justify-center mt-3">
                   <img src="/../../images/messages/happy_1.svg" width="40" height="40">
                 </div>
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="comingSoon()">
-                <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR CLIENTE</v-btn>
+              <form @submit.prevent="allSalesGroupBy(loguedUser.sucursal.id, 'Clients')">
+                <v-btn class="primary v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR CLIENTE</v-btn>
                 <div class="d-flex justify-center mt-3">
                   <img src="/../../images/messages/happy_1.svg" width="40" height="40">
                 </div>
@@ -124,6 +124,63 @@
               </form>
             </v-col>
           </v-row>
+          <v-row>
+            <v-col>
+              <div class="horizontalSeparator"></div>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <form @submit.prevent="salesForMonth(loguedUser.sucursal.id, object.year, object.month)">
+                <v-btn class="primary v-btn--block" type="submit">VENTAS POR MES</v-btn>
+                <div class="d-block">
+                  <v-autocomplete
+                    :items="years"
+                    v-model="object.year"
+                    placeholder="Seleccione un año"
+                    required
+                  ></v-autocomplete>
+                  <v-autocomplete
+                    :items="months"
+                    item-value="value"
+                    v-model="object.month"
+                    placeholder="Seleccione un mes"
+                    required
+                  ></v-autocomplete>
+                </div>
+              </form>
+            </v-col>
+            <v-col>
+              <form @submit.prevent="salesForYear(loguedUser.sucursal.id, object.documento.codigoDocumento)" class="ml-5">
+                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR COMPROBANTE</v-btn>
+                <div class="d-block">
+                  <v-autocomplete
+                    :items="documentos"
+                    v-model="object.documento"
+                    item-text="nombre"
+                    :return-object="true"
+                    placeholder="Seleccione un comprobante"
+                    required
+                  ></v-autocomplete>
+                </div>
+              </form>
+            </v-col>
+            <v-col>
+              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, object.cliente.id)">
+                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR CLIENTE</v-btn>
+                <div class="d-block">
+                  <v-autocomplete
+                    :items="clientes"
+                    v-model="object.cliente"
+                    item-text="nombre"
+                    :return-object="true"
+                    placeholder="Seleccione un cliente"
+                    required
+                  ></v-autocomplete>
+                </div>
+              </form>
+            </v-col>
+          </v-row>
         </v-container>
       </v-card-text>
     </v-card>
@@ -133,7 +190,7 @@
 import ReportsService from '../services/ReportsService';
 import GenericService from '../services/GenericService';
 import DocumentosService from '../services/DocumentosService';
-import { generateIntegerDate } from '../helpers/dateHelper';
+import { generateIntegerDate, getYearsList, monthsList } from '../helpers/dateHelper';
 import { infoAlert2 } from '../helpers/alerts';
 
 export default {
@@ -143,6 +200,8 @@ export default {
       tenant: null,
       service: "ventas",
       token: localStorage.getItem("token"),
+      months: null,
+      years: getYearsList(),
       loguedUser: null,
       documentos: [],
       clientes: [],
@@ -150,7 +209,8 @@ export default {
         documento: {},
         cliente: {},
         fechaDesde: null,
-        fechaHasta: null
+        fechaHasta: null,
+        mes: null
       },
       fechaDesde: null,
       fechaHasta: null
@@ -159,6 +219,7 @@ export default {
 
   mounted(){
     this.tenant = this.$route.params.tenant;
+    this.months = monthsList;
     this.getLoguedUser();
   },
 
@@ -229,6 +290,16 @@ export default {
     salesForDate(id, fechaDesde, fechaHasta) {
       ReportsService(this.tenant, this.service, this.token)
         .salesForDate(id, fechaDesde, fechaHasta)
+        .then((res) => {
+          var file = new Blob([res["data"]], { type: "application/pdf" });
+          var fileURL = URL.createObjectURL(file);
+          window.open(fileURL, "_blank");
+        });
+    },
+
+    salesForMonth(id, year, month){
+      ReportsService(this.tenant, this.service, this.token)
+        .salesForMonth(id, year, month)
         .then((res) => {
           var file = new Blob([res["data"]], { type: "application/pdf" });
           var fileURL = URL.createObjectURL(file);

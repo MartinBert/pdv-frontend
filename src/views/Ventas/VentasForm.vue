@@ -223,7 +223,7 @@ import {
   calculateAlicIvaImporteVentas,
   generateBarCode,
   calculatePercentaje,
-  sumarNumeros,
+  decimalPercent,
 } from "../../helpers/mathHelper";
 import { errorAlert, successAlert } from '../../helpers/alerts';
 import axios from "axios";
@@ -269,22 +269,22 @@ export default {
 
   computed: {
     totalVenta() {
-      let tot = 0;
-      let porcentajePlan = 0;
-      if (this.object.planPago) {
-        porcentajePlan = this.object.planPago.porcentaje;
-      }
-      this.products.forEach((el) => {
-        tot = this.acumularRecargo(porcentajePlan, el.precioTotal, tot);
-      });
-      return parseFloat(tot).toFixed(2);
+      const total = this.products.reduce((acc, el) => {
+        if(this.object.planPago){
+          const cleanPorcent = decimalPercent(this.object.planPago.porcentaje);
+          const impPorcent = (el.precioTotal * cleanPorcent).toFixed(2);
+          const totalValue = acc + Number(el.precioTotal) + Number(impPorcent);
+          return totalValue;
+        }else{
+          return acc + Number(el.precioTotal);
+        }
+      }, 0);
+
+      return total;
     },
 
     totalItems() {
-      let totItems = 0;
-      this.products.forEach((el) => {
-        totItems = sumarNumeros([Number(totItems), Number(el.cantUnidades)]);
-      });
+      const totItems = this.products.reduce((acc, el) => acc + Number(el.cantUnidades), 0);
       return totItems;
     },
   },
@@ -296,6 +296,7 @@ export default {
   },
 
   methods: {
+
     getLoguedUser() {
       GenericService(this.tenant, this.service, this.token)
         .getLoguedUser()
@@ -353,44 +354,30 @@ export default {
             data.data.total = data.data.precioTotal;
             this.products.push(this.processProductsObject(data.data));
           } else {
-            let count = 0;
-            for (let i = 0; i < this.products.length; i++) {
-              if (this.products[i].id == data.data.id) {
-                this.products[i].cantUnidades =
-                  parseInt(this.products[i].cantUnidades) + 1;
-                this.products[i].precioTotal =
-                  this.products[i].precioUnitario *
-                  this.products[i].cantUnidades;
-                break;
-              } else if (
-                this.products[i].id != data.data.id &&
-                count == this.products.length - 1
-              ) {
-                data.data.cantUnidades = 1;
-                data.data.total = data.data.precioTotal;
-                this.products.push(this.processProductsObject(data.data));
-                break;
-              } else {
-                count += 1;
-              }
+            if(this.products.filter(el => el.id === data.data.id).length > 0){
+              this.products.filter(el => el.id === data.data.id)[0].cantUnidades++;
+              this.products.filter(el => el.id === data.data.id)[0].precioTotal = 
+              this.products.filter(el => el.id === data.data.id)[0].precioUnitario *
+              this.products.filter(el => el.id === data.data.id)[0].cantUnidades;
+            }else{
+              data.data.cantUnidades = 1;
+              data.data.total = data.data.precioTotal;
+              this.products.push(this.processProductsObject(data.data));
             }
           }
         })
-        .catch((error) => {
-          if (error.response.status == 500) {
-            this.snackError = true;
-            this.errorMessage = "Ocurrio un error";
-          }
+        .catch(() => {
+          errorAlert("No existe un producto con ese código de barras");
         });
     },
 
     updateTotal(id) {
-      this.products.forEach((el) => {
+      return this.products.reduce((acc, el) => {
         if (el.id == id) {
-          el.precioTotal = 0;
+          el.precioTotal = acc;
           el.precioTotal = parseFloat(el.precioUnitario) * el.cantUnidades;
         }
-      });
+      }, 0);
     },
 
     getComercialDocuments(clientCond, businessCond) {
@@ -418,21 +405,29 @@ export default {
 
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
-        const percent = calculatePercentaje(
+        let percent = calculatePercentaje(
           this.totalVenta,
           priceModificationPorcent
         );
         if (modificator === "descuento") {
+          if(Math.sign(percent) === 1){
+            percent = percent * -1;
+          }
           let obj = {
+            id:this.products.length + 1,
             nombre: "DESCUENTO",
             codigoBarra: 1111111111,
             cantUnidades: 0,
-            precioUnitario: -percent,
-            precioTotal: -percent,
+            precioUnitario: percent,
+            precioTotal: percent,
           };
           this.products.push(obj);
         } else {
+          if(Math.sign(percent) === -1){
+            percent = percent * -1;
+          }
           let obj = {
+            id:this.products.length + 1,
             nombre: "RECARGO",
             codigoBarra: 2222222222,
             cantUnidades: 0,
@@ -461,36 +456,25 @@ export default {
       this.products = processObjects;
     },
 
-    acumularRecargo(porcentaje, precioProducto, acumulado) {
-      let cleanPorcent = parseFloat(porcentaje / 100).toFixed(2);
-      let impPorcent = (precioProducto * cleanPorcent).toFixed(2);
-      let total = sumarNumeros([
-        Number(acumulado),
-        Number(precioProducto),
-        Number(impPorcent),
-      ]);
-
-      return total;
-    },
-
     applyToLine(percent) {
-      const type = percent.search("-");
       let object = {};
-      if (type === 0) {
+      if (Math.sign(percent) === -1) {
         object = {
-          nombre: "DESCUENTO EN RENGLÓN " + this.renglon.id,
-          codigoBarra: 3333333333,
+          id: this.products.length + 1,
+          nombre: "DESCUENTO - " + this.renglon.nombre,
+          codigoBarra: generateBarCode(),
           cantUnidades: 0,
-          precioUnitario: -calculatePercentaje(
+          precioUnitario: calculatePercentaje(
             this.renglon.precioTotal,
             percent
           ),
-          precioTotal: -calculatePercentaje(this.renglon.precioTotal, percent),
+          precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
         };
       } else {
         object = {
-          nombre: "RECARGO EN RENGLÓN " + this.renglon.id,
-          codigoBarra: 4444444444,
+          id: this.products.length + 1,
+          nombre: "RECARGO - " + this.renglon.nombre,
+          codigoBarra: generateBarCode(),
           cantUnidades: 0,
           precioUnitario: calculatePercentaje(
             this.renglon.precioTotal,
