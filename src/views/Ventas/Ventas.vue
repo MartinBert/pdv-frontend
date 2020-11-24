@@ -42,6 +42,7 @@
             <th>ID</th>
             <th>Fecha de venta</th>
             <th>Código de barras</th>
+            <th>Comprobante</th>
             <th>Productos</th>
             <th>Medios de pago empleados</th>
             <th>Planes de pago</th>
@@ -54,6 +55,7 @@
             <td>{{object.id}}</td>
             <td>{{object.fechaEmision}}</td>
             <td>{{object.barCode}}</td>
+            <td>{{object.nombreDocumento}}</td>
             <td class="text-center">
               <button @click="seeDetails(object.productos)"><img
                 src="/../../images/icons/eye.svg"
@@ -197,11 +199,23 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id != 1){
-          const sucursal = this.loguedUser.sucursal.id
-          this.getVentasForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
-        }else{
-          this.getAll(this.paginate.page - 1, this.paginate.size);
+        const sucursal = this.loguedUser.sucursal.id
+        switch (this.loguedUser.perfil.id) {
+          case 1:
+            this.getAll(this.paginate.page - 1, this.paginate.size);
+            break;
+
+          case 2:
+            this.getAll(this.paginate.page - 1, this.paginate.size);
+            break;
+
+          case 3:
+            this.getVentasForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
+            break;
+        
+          default:
+            this.getVentasForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
+            break;
         }
       })
     },
@@ -223,7 +237,6 @@ export default {
         .then(data => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
-          console.log(data);
           this.loaded = true;
         });
     },

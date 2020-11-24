@@ -60,5 +60,11 @@ export default (tenant,service,token) =>{
                 headers: { Authorization: "Bearer " + token }
             })
         },
+
+        getDataForBussiness(empresaId, page, size){
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getForBussiness/${empresaId}/${page}/${size}`, {
+                headers: { Authorization: "Bearer " + token }
+            })
+        }
     }
 }

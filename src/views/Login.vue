@@ -72,7 +72,7 @@ export default {
                 res.data.Authorization
               );
               this.$emit("authenticated", true);
-              this.$router.push({ path: "/" + this.$route.params.tenant });
+              this.$router.push({ path: "/" + this.$route.params.tenant });          
             }
           })
           .catch((err) => { console.log(err);
