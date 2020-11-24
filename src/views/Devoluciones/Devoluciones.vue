@@ -68,7 +68,7 @@
             </td>
             <td>
               <a title="Reimprimir comprobante" v-if="o.comprobante"><img src="/../../images/icons/impresora.svg" @click="print(o.comprobante)" width="40" height="40"/></a>
-              <a title="Reimprimir comprobante" v-if="!o.comprobante"><img src="/../../images/icons/add.svg" @click="addReceipt(o)" width="40" height="40"/></a>
+              <a title="Agregar comprobante" v-if="!o.comprobante"><img src="/../../images/icons/add.svg" @click="addReceipt(o)" width="40" height="40"/></a>
             </td>
           </tr>
         </tbody>

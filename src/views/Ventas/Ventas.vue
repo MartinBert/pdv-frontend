@@ -54,9 +54,27 @@
             <td>{{object.id}}</td>
             <td>{{object.fechaEmision}}</td>
             <td>{{object.barCode}}</td>
-            <td><v-btn class="success" @click="seeDetails(object.productos)">VER DETALLES</v-btn></td>
-            <td><v-btn class="success" @click="seeDetails(object.mediosPago)">VER DETALLES</v-btn></td>
-            <td><v-btn class="success" @click="seeDetails(object.planesPago)">VER DETALLES</v-btn></td>
+            <td class="text-center">
+              <button @click="seeDetails(object.productos)"><img
+                src="/../../images/icons/eye.svg"
+                width="40"
+                height="40"
+              /></button>
+            </td>
+            <td class="text-center">
+              <button @click="seeDetails(object.mediosPago)"><img
+                src="/../../images/icons/eye.svg"
+                width="40"
+                height="40"
+              /></button>
+            </td>
+            <td class="text-center">
+              <button @click="seeDetails(object.planesPago)"><img
+                src="/../../images/icons/eye.svg"
+                width="40"
+                height="40"
+              /></button>
+            </td>
             <td>${{object.totalVenta}}</td>
             <td>
               <a title="Reimprimir comprobante"><img src="/../../images/icons/impresora.svg" @click="print(object)" width="40" height="40"/></a>

@@ -68,23 +68,23 @@
               <form @submit.prevent="salesForDate(loguedUser.sucursal.id, object.fechaDesde, object.fechaHasta)">
                 <v-btn class="primary v-btn--block" type="submit">VENTAS POR FECHA</v-btn>
                 <div class="d-block">
-                  <label for="input1">Fecha desde</label>
                   <v-text-field
                   id="input1"
                   name="input1"
                   type="date"
                   v-model="fechaDesde"
+                  label="Fecha desde"
                   @input="createDate(fechaDesde, 'fechaDesde')"
                   required
                   >
                   </v-text-field>
                 </div>
                 <div class="d-block">
-                  <label for="input2">Fecha hasta</label>
                   <v-text-field
                   id="input2"
                   name="input2"
                   type="date"
+                  label="Fecha hasta"
                   v-model="fechaHasta"
                   @input="createDate(fechaHasta, 'fechaHasta')"
                   required
@@ -94,30 +94,35 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForReceipt(loguedUser.sucursal.id, object.documento.codigoDocumento)" class="ml-5">
-                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR COMPROBANTE</v-btn>
+              <form @submit.prevent="salesForMonth(loguedUser.sucursal.id, object.year, object.month)">
+                <v-btn class="primary v-btn--block" type="submit">VENTAS POR MES</v-btn>
                 <div class="d-block">
                   <v-autocomplete
-                    :items="documentos"
-                    v-model="object.documento"
-                    item-text="nombre"
-                    :return-object="true"
-                    placeholder="Seleccione un comprobante"
+                    label="Seleccione un año"
+                    :items="years"
+                    v-model="object.year"
+                    required
+                  ></v-autocomplete>
+                  <v-autocomplete
+                    label="Seleccione un mes"
+                    :items="months"
+                    item-value="value"
+                    v-model="object.month"
                     required
                   ></v-autocomplete>
                 </div>
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, object.cliente.id)">
-                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR CLIENTE</v-btn>
+              <form @submit.prevent="salesForYear(loguedUser.sucursal.id, object.year2)" class="ml-5">
+                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR AÑO</v-btn>
                 <div class="d-block">
                   <v-autocomplete
-                    :items="clientes"
-                    v-model="object.cliente"
+                    :items="years"
+                    v-model="object.year2"
                     item-text="nombre"
                     :return-object="true"
-                    placeholder="Seleccione un cliente"
+                    placeholder="Seleccione un año"
                     required
                   ></v-autocomplete>
                 </div>
@@ -131,53 +136,18 @@
           </v-row>
           <v-row>
             <v-col>
-              <form @submit.prevent="salesForMonth(loguedUser.sucursal.id, object.year, object.month)">
-                <v-btn class="primary v-btn--block" type="submit">VENTAS POR MES</v-btn>
-                <div class="d-block">
-                  <v-autocomplete
-                    :items="years"
-                    v-model="object.year"
-                    placeholder="Seleccione un año"
-                    required
-                  ></v-autocomplete>
-                  <v-autocomplete
-                    :items="months"
-                    item-value="value"
-                    v-model="object.month"
-                    placeholder="Seleccione un mes"
-                    required
-                  ></v-autocomplete>
-                </div>
+              <form @submit.prevent="comingSoon()">
+                <v-btn class="default v-btn--block" type="submit">VENTAS POR MES Y COMPROBANTE</v-btn>
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForYear(loguedUser.sucursal.id, object.documento.codigoDocumento)" class="ml-5">
-                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR COMPROBANTE</v-btn>
-                <div class="d-block">
-                  <v-autocomplete
-                    :items="documentos"
-                    v-model="object.documento"
-                    item-text="nombre"
-                    :return-object="true"
-                    placeholder="Seleccione un comprobante"
-                    required
-                  ></v-autocomplete>
-                </div>
+              <form @submit.prevent="comingSoon()" class="ml-5">
+                <v-btn class="default v-btn--block" type="submit" raised>VENTAS POR MES Y CLIENTE</v-btn>
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, object.cliente.id)">
-                <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR CLIENTE</v-btn>
-                <div class="d-block">
-                  <v-autocomplete
-                    :items="clientes"
-                    v-model="object.cliente"
-                    item-text="nombre"
-                    :return-object="true"
-                    placeholder="Seleccione un cliente"
-                    required
-                  ></v-autocomplete>
-                </div>
+              <form @submit.prevent="comingSoon()">
+                <v-btn class="default v-btn--block" type="submit" raised>VENTAS POR MES Y MEDIOS DE PAGO</v-btn>
               </form>
             </v-col>
           </v-row>
@@ -210,7 +180,9 @@ export default {
         cliente: {},
         fechaDesde: null,
         fechaHasta: null,
-        mes: null
+        mes: null,
+        year: null,
+        year2: null
       },
       fechaDesde: null,
       fechaHasta: null
@@ -300,6 +272,16 @@ export default {
     salesForMonth(id, year, month){
       ReportsService(this.tenant, this.service, this.token)
         .salesForMonth(id, year, month)
+        .then((res) => {
+          var file = new Blob([res["data"]], { type: "application/pdf" });
+          var fileURL = URL.createObjectURL(file);
+          window.open(fileURL, "_blank");
+        });
+    },
+
+    salesForYear(id, year){
+      ReportsService(this.tenant, this.service, this.token)
+        .salesForYear(id, year)
         .then((res) => {
           var file = new Blob([res["data"]], { type: "application/pdf" });
           var fileURL = URL.createObjectURL(file);
