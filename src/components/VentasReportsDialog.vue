@@ -130,6 +130,43 @@
             </v-col>
           </v-row>
           <v-row>
+             <v-col>
+              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, object.cliente.id)">
+                <v-btn class="primary v-btn--block" type="submit">VENTAS POR CLIENTE</v-btn>
+                <div class="d-block">
+                  <v-autocomplete
+                    :items="clientes"
+                    v-model="object.cliente"
+                    item-text="nombre"
+                    :return-object="true"
+                    placeholder="Seleccione un año"
+                    required
+                  ></v-autocomplete>
+                </div>
+              </form>
+            </v-col>
+            <v-col>
+              <form @submit.prevent="salesForReceipt(loguedUser.sucursal.id, object.documento.codigoDocumento)">
+                <v-btn class="primary v-btn--block" type="submit">VENTAS POR COMPROBANTE</v-btn>
+                <div class="d-block">
+                  <v-autocomplete
+                    label="Seleccione un comprobante"
+                    :items="documentos"
+                    v-model="object.documento"
+                    item-text="nombre"
+                    :return-object="true"
+                    required
+                  ></v-autocomplete>
+                </div>
+              </form>
+            </v-col>
+            <v-col>
+              <form @submit.prevent="comingSoon()" class="ml-5">
+                <v-btn class="default v-btn--block" type="submit" raised>VENTAS POR MEDIO DE PAGO</v-btn>
+              </form>
+            </v-col>
+          </v-row>
+          <v-row>
             <v-col>
               <div class="horizontalSeparator"></div>
             </v-col>
