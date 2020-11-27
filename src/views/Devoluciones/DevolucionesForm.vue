@@ -454,6 +454,7 @@ export default {
         documento.codigoDocumento,
         totalVenta
       );
+      const filterParam = { id: sucursal.id, param: "", page: 0, size: 100000 }
 
       const comprobanteAsociadoDetalle = {
         nro: comprobanteAsociado.numeroCbte,
@@ -496,7 +497,7 @@ export default {
       }
 
       GenericService(tenant, "depositos", token)
-        .getDataForSucursal(sucursal.id, 0, 100)
+        .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
         });
@@ -685,6 +686,7 @@ export default {
         documento.codigoDocumento,
         totalVenta
       );
+      const filterParam = { id: sucursal.id, param: "", page: 0, size: 100000 }
 
       /* Mutable vars */
       let file;
@@ -702,7 +704,7 @@ export default {
       };
 
       GenericService(tenant, "depositos", token)
-        .getDataForSucursal(sucursal.id, 0, 100000)
+        .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
         });
@@ -812,6 +814,7 @@ export default {
       const productosSalientes = this.object.productosSalientes;
       const tenant = this.tenant;
       const token = this.token;
+      const filterParam = {id: sucursal.id, param: "", page: 0, size: 10000}
 
       let productos;
       let devolucion = {
@@ -824,7 +827,7 @@ export default {
       };
 
       GenericService(tenant, "depositos", token)
-        .getDataForSucursal(sucursal.id, 0, 100)
+        .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
         });

@@ -240,8 +240,10 @@ export default {
       .then(data => {
         this.loguedUser = data.data;
       }).then(() => {
+        const filterParam = {id: this.loguedUser.sucursal.id, param: "", page: 0, size: 100000}
+
         GenericService(this.tenant, "clientes", this.token)
-        .getDataForSucursal(this.loguedUser.sucursal.id, 0, 100000)
+        .filter(filterParam)
         .then(data => {
           this.clientes = data.data.content;
         })

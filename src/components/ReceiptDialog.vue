@@ -28,7 +28,7 @@
                 </v-col>
                 <v-col cols="6">
                   <v-autocomplete
-                    @change="getComprobantesList()"
+                    @input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
                     class="button-ventas comprobante"
                     v-model="dialogObject.documento"
                     :items="databaseItems.documentos"
@@ -81,8 +81,8 @@
                 <v-col class="d-flex">
                   <v-text-field
                     type="date"
-                    v-model="filterStringDate"
-                    v-on:input="filterObjects('fechaEmision',filterStringDate)"
+                    v-model="filterString"
+                    v-on:input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
                     dense
                     outlined
                     rounded
@@ -91,8 +91,8 @@
                   ></v-text-field>
                   <v-text-field
                     type="number"
-                    v-model="filterStringTotalVenta"
-                    v-on:input="filterObjects('totalVenta',filterStringTotalVenta)"
+                    v-model="filterDouble"
+                    v-on:input="filterObjects(loguedUser.sucursal.id, filterDouble, paginate.page - 1, paginate.size)"
                     dense
                     outlined
                     rounded
@@ -101,7 +101,7 @@
                     append-icon="mdi-magnify"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12">
+                  <v-col cols="12">
                   <v-simple-table style="background-color: transparent" ref="tab">
                     <template v-slot:default>
                       <thead>
@@ -109,6 +109,7 @@
                           <th class="text-left">Fecha de emisión</th>
                           <th class="text-left">Número de comprobante</th>
                           <th class="text-left">Tipo</th>
+                          <th class="text-left">Total facturado</th>
                           <th class="text-left">Productos relacionados</th>
                           <th class="text-left">Agregar</th>
                         </tr>
@@ -118,6 +119,7 @@
                           <td>{{ c.fechaEmision }}</td>
                           <td>{{ c.numeroCbte }}</td>
                           <td>{{ c.nombreDocumento }}</td>
+                          <td>{{ c.totalVenta }}</td>
                           <td>
                             <button type="button">
                               <img
@@ -150,6 +152,15 @@
                       </tbody>
                     </template>
                   </v-simple-table>
+                  <v-pagination
+                      v-model="paginate.page"
+                      :length="paginate.totalPages"
+                      next-icon="mdi-chevron-right"
+                      prev-icon="mdi-chevron-left"
+                      :page="paginate.page"
+                      :total-visible="8"
+                      @input="changePage(paginate.page - 1, paginate.size)"
+                  ></v-pagination>
                 </v-col>
               </v-row>
           </v-container>
@@ -197,8 +208,8 @@
 </template>
 <script>
 import GenericService from "../services/GenericService";
-import VentasService from "../services/VentasService";
 import { errorAlert } from "../helpers/alerts";
+import { checkDocuments } from "../helpers/processObjectsHelper";
 import { formatDate } from "../helpers/dateHelper";
 
 export default {
@@ -206,6 +217,11 @@ export default {
 
   data() {
     return {
+      paginate: {
+        page: 1,
+        size: 5,
+        totalPages: 0
+      },
       loguedUser: null,
       tenant: null,
       token: localStorage.getItem("token"),
@@ -217,8 +233,8 @@ export default {
         totalVenta: "",
         comprobanteAsociado: ""
       },
-      filterStringDate: "",
-      filterStringTotalVenta: "",
+      filterString: "",
+      filterDouble: "",
       activeDetailDialog: false,
       detailRelationateReceipt: null,
       comprobantes: [],
@@ -238,12 +254,7 @@ export default {
 
   computed: {
     totalDetail(){
-      let total = 0;
-      this.detailRelationateReceipt.forEach(el => {
-        total = total + el.precioTotal;
-      })
-
-      return total;
+      return this.detailRelationateReceipt.reduce((acc, el) => acc + el.precioTotal, 0);
     }
   },
 
@@ -254,15 +265,16 @@ export default {
         .then((data) => {
           this.loguedUser = data.data;
           const sucursalId = this.loguedUser.sucursal.id;
+          const filterParam = {id: sucursalId, param: "", page: 0, size: 100000}
 
           GenericService(this.tenant, "clientes", this.token)
-            .getDataForSucursal(sucursalId, 0, 100000)
+            .filter(filterParam)
             .then((data) => {
               this.databaseItems.clientes = data.data.content;
             });
 
           GenericService(this.tenant, "mediosPago", this.token)
-            .getDataForSucursal(sucursalId, 0, 100000)
+            .filter(filterParam)
             .then((data) => {
               this.databaseItems.medios_de_pago = data.data.content;
             });
@@ -283,35 +295,8 @@ export default {
         });
       }
 
-      const notas = this.checkDocuments(documentos);
+      const notas = checkDocuments(documentos);
       return (this.databaseItems.documentos = notas);
-    },
-
-    checkDocuments(docs) {
-      const arr = [
-        "002",
-        "003",
-        "007",
-        "008",
-        "012",
-        "013",
-        "112",
-        "113",
-        "114",
-        "115",
-        "116",
-        "117",
-        "9999",
-      ];
-      const filteredDocs = docs.filter((el) => {
-        for (let i = 0; i < arr.length; i++) {
-          if (el.codigoDocumento === arr[i]) {
-            return el;
-          }
-        }
-      });
-
-      return filteredDocs;
     },
 
     handleSubmit(){
@@ -328,16 +313,6 @@ export default {
           this.$store.commit('receipt/receiptDialogMutation');
         }
       }
-    },
-
-    getComprobantesList(){
-      const sucursalId = this.loguedUser.sucursal.id;
-
-      GenericService(this.tenant, "ventas",this.token)
-      .getDataForSucursal(sucursalId, 0, 5)
-      .then(data => {
-        this.comprobantes = data.data.content;
-      })
     },
 
     seeDetail(receipt){
@@ -361,44 +336,41 @@ export default {
       this.$refs.tab.$forceUpdate();
     },
 
-    filterObjects(filterParam, filter){
-      if(this.loguedUser.perfil.id !== 1){
-        const sucursal = this.loguedUser.sucursal.id;
-        const page = 0;
-        const size = 5;
-        let year;
-        let month;
-        let day;
-
-        if(filter === ''){
-          this.getVentasForSucursal(sucursal, page, size);
-        }else{
-          if(filterParam === 'fechaEmision'){
-          if(this.filterStringTotalVenta !== ""){
-            this.filterStringTotalVenta = "";
-          }
-          year = filter.slice(0, filter.indexOf('-'));
-          month = filter.slice(filter.indexOf('-') + 1, filter.lastIndexOf('-'));
-          day = filter.slice(filter.lastIndexOf('-') + 1, filter.length);
-          filter = formatDate(year+month+day);
-        }else{
-          if(this.filterStringDate !== ""){
-            this.filterStringDate = "";
-          }
+    filterObjects(id, param, page, size){
+      let filterParam;
+      if(this.filterString === param){
+        param = formatDate(param);
+        if(param === "//"){
+          param = "";
         }
+        filterParam = {id, param, page, size};
+      }else{
+        filterParam = {id, doubleParam: param, page, size};
+      }
+      GenericService(this.tenant, "ventas", this.token)
+        .filter(filterParam)
+        .then(data => {
+          this.comprobantes = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
+        });
+    },
 
-        let object = { sucursal, filterParam, filter, page, size }
-        
-        VentasService(this.tenant, "ventas", this.token)
-          .filter(object)
-          .then(data => {
-            this.comprobantes = data.data.content;
-          });
+    changePage(page, size){
+      const id = this.loguedUser.sucursal.id;
+      if(this.filterString || this.filterDouble){
+        if(this.filterString){
+          this.filterObjects(id, this.filterString, page, size);
+        }else{
+          this.filterObjects(id, this.filterDouble, page, size);
         }
       }else{
-        console.log("asdf");
+        this.filterObjects(id, "", page, size);
       }
-    },
+
+    }
   },
 };
 </script>

@@ -31,7 +31,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -103,7 +103,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="changePage(paginate.page -1, paginate.size)"
       v-if="paginate.totalPages > 1 && loaded"
     ></v-pagination>
     <!-- End Paginate -->
@@ -266,8 +266,12 @@ export default {
         });
     },
 
-    changePage(page) {
-      this.getAll(page - 1, this.paginate.size);
+    changePage(page, size) {
+       if(this.filterString){
+         this.filterObjects(this.filterString, page, size)
+       }else{
+         this.getAll(page - 1, this.paginate.size);
+       }
     },
 
     newObject() {
@@ -278,12 +282,13 @@ export default {
       this.$router.push({ name: "productosForm", params: { id: id } });
     },
 
-    filterObjects(filter) {
-      var f = { nombre: filter };
+    filterObjects(param, page, size) {
+      const filterParam = { param, page, size }
       GenericService(this.tenant, "productos", this.token)
-        .filter(f)
+        .filter(filterParam)
         .then((data) => {
           this.objects = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
         });
     },
 

@@ -17,4 +17,31 @@ export function processDetailReceipt(codigoDocumento, totalVenta) {
     };
 
     return object;
-  }
+}
+
+export function checkDocuments(docs) {
+  const arr = [
+    "002",
+    "003",
+    "007",
+    "008",
+    "012",
+    "013",
+    "112",
+    "113",
+    "114",
+    "115",
+    "116",
+    "117",
+    "9999",
+  ];
+  const filteredDocs = docs.filter((el) => {
+    for (let i = 0; i < arr.length; i++) {
+      if (el.codigoDocumento === arr[i]) {
+        return el;
+      }
+    }
+  });
+
+  return filteredDocs;
+}

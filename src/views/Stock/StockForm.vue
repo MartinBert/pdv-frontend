@@ -9,63 +9,23 @@
     >
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
-        <v-row class="ma-1" v-if="urlId == 0">
-          <v-col>
-            <v-autocomplete
-              :items="depositos"
-              v-model="object.deposito"
-              multiple
-              item-text="nombre"
-              label="Seleccione el o los depositos donde se encuentra su stock"
-              :return-object="true"
-              :rules="[(v) => !!v || 'Campo requerido...']"
-            ></v-autocomplete>
-          </v-col>
-          <v-col>
-            <v-text-field
-              type="number"
-              :counter="50"
-              v-model="object.cantidad"
-              placeholder="Cantidad de stock"
-              required
-              :rules="[(v) => !!v || 'Campo requerido...']"
-            ></v-text-field>
-          </v-col>
+        <v-row v-if="urlId == 0" class="ml-5 mr-5">
           <v-col cols="12">
-            <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
-              <label>Seleccione un parámetro para realizar la búsqueda</label>
-              <v-row>
-                <v-col>
-                  <v-radio label="Nombre" value="nombre"></v-radio>
-                </v-col>
-                <v-col>
-                  <v-radio
-                    label="Código de barras"
-                    value="codigodebarras"
-                  ></v-radio>
-                </v-col>
-                <v-col>
-                  <v-radio
-                    label="Código de producto"
-                    value="codigodeproducto"
-                  ></v-radio>
-                </v-col>
-              </v-row>
-            </v-radio-group>
             <v-text-field
-              v-if="radioGroup"
               v-model="filterString"
-              v-on:input="filterObjects(filterString, radioGroup)"
+              v-on:input="filterObjects(filterString, paginateProducts.page - 1, paginateProducts.size)"
               dense
               outlined
               rounded
-              class="text-left ml-5 mr-5"
-              placeholder="Búsqueda"
+              class="text-left"
+              label="Puede buscar un artículo escribiendo su nombre, código o código de barras aquí"
               append-icon="mdi-magnify"
             ></v-text-field>
           </v-col>
-          <v-col cols="12">
-            <v-simple-table style="background-color: transparent">
+        </v-row>
+        <v-row class="ml-5 mr-5">
+          <v-col cols="7">
+            <v-simple-table style="background-color: transparent" ref="tab">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -103,8 +63,61 @@
               v-if="paginateProducts.totalPages > 1"
             ></v-pagination>
           </v-col>
+          <v-col cols="1" class="d-flex justify-center">
+              <div class="verticalSeparator"></div>
+          </v-col>
+          <v-col cols="3">
+            <v-simple-table style="background-color: transparent">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody v-for="producto in object.producto" :key="producto.id">
+                  <tr>
+                    <td>{{ producto.nombre }}</td>
+                    <td>
+                      <button type="button">
+                        <img
+                          src="/../../images/icons/ico_11.svg"
+                          @click="deleteLine(producto.id)"
+                          width="40"
+                          height="40"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-col>
         </v-row>
-        <v-row class="ma-1" v-if="urlId > 0">
+        <v-row class="ma-5" v-if="urlId == 0">
+          <v-col>
+            <v-autocomplete
+              :items="depositos"
+              v-model="object.deposito"
+              multiple
+              item-text="nombre"
+              label="Seleccione el o los depositos donde se encuentra su stock"
+              :return-object="true"
+              :rules="[(v) => !!v || 'Campo requerido...']"
+            ></v-autocomplete>
+          </v-col>
+          <v-col>
+            <v-text-field
+              type="number"
+              :counter="50"
+              v-model="object.cantidad"
+              placeholder="Cantidad de stock"
+              required
+              :rules="[(v) => !!v || 'Campo requerido...']"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row class="ma-1" v-if="urlId != 0">
           <v-col>
             <v-autocomplete
               disabled
@@ -161,6 +174,7 @@
   </v-card>
 </template>
 <script>
+import { errorAlert } from '../../helpers/alerts';
 import GenericService from "../../services/GenericService";
 
 export default {
@@ -185,7 +199,7 @@ export default {
     },
     paginateProducts: {
       page: 1,
-      size: 10,
+      size: 5,
       totalPages: 0,
     },
     radioGroup: "",
@@ -220,59 +234,67 @@ export default {
       if (productosFiltrados.selected) {
         this.object.producto.push(productosFiltrados);
       } else {
-        const object = this.object.producto.filter(
+        this.object.producto = this.object.producto.filter(
           (el) => el.id !== productosFiltrados.id
         );
-        this.object.producto = object;
       }
     },
 
     getDepositosForSucursal(id,page,size) {
+      const filterParam = {id, param: "", page, size}
       GenericService(this.tenant, "depositos", this.token)
-        .getDataForSucursal(id,page,size)
+        .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
         });
     },
 
     changePage(page, size) {
-      this.getOtherModels(page, size);
+      if(this.filterString){
+        this.filterObjects(this.filterString, page, size);
+      }else{
+        this.getOtherModels(page, size);
+      }
     },
 
     save() {
-      this.$refs.form.validate();
-      if (this.urlId > 0) {
-        GenericService(this.tenant, this.service, this.token)
-          .save(this.object)
-          .then(() => {
-            this.$router.push({ name: "stock" });
-          })
-          .catch((error) => {
-            if (error.response.status == 500) {
-              this.snackError = true;
-              this.errorMessage = "Ocurrio un error";
-            }
+      if(this.object.producto.length < 1){
+        errorAlert("No ha seleccionado productos");
+      }else{
+        this.$refs.form.validate();
+        if (this.urlId > 0) {
+          GenericService(this.tenant, this.service, this.token)
+            .save(this.object)
+            .then(() => {
+              this.$router.push({ name: "stock" });
+            })
+            .catch((error) => {
+              if (error.response.status == 500) {
+                this.snackError = true;
+                this.errorMessage = "Ocurrio un error";
+              }
+            });
+        } else {
+          var stocks = [];
+          this.object.deposito.forEach((ele) => {
+            this.object.producto.forEach((el) => {
+              let obj = {
+                producto: el,
+                deposito: ele,
+                cantidad: this.object.cantidad,
+                sucursal: this.loguedUser.sucursal,
+                algorim: el.nombre + ele.id,
+              };
+              stocks.push(obj);
+            });
           });
-      } else {
-        var stocks = [];
-        this.object.deposito.forEach((ele) => {
-          this.object.producto.forEach((el) => {
-            let obj = {
-              producto: el,
-              deposito: ele,
-              cantidad: this.object.cantidad,
-              sucursal: this.loguedUser.sucursal,
-              algorim: el.nombre + ele.id,
-            };
-            stocks.push(obj);
-          });
-        });
 
-        GenericService(this.tenant, this.service, this.token)
-          .saveAll(stocks)
-          .then(() => {
-            this.$router.push({ name: "stock" });
-          });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(stocks)
+            .then(() => {
+              this.$router.push({ name: "stock" });
+            });
+        }
       }
     },
 
@@ -301,37 +323,28 @@ export default {
         });
     },
 
-    filterObjects(filter, radio) {
-      var filt = "";
-      switch (radio) {
-        case "nombre":
-          filt = { nombre: filter };
-          break;
-        case "codigodebarras":
-          filt = { codigoBarra: filter };
-          break;
-        default:
-          filt = { codigoProducto: filter };
-          break;
-      }
-
+    filterObjects(param, page, size) {
+      const filterParam = { param, page, size };
       if (!this.filterString) {
-        this.getOtherModels(this.paginate.page - 1, this.paginate.size);
+        this.getOtherModels(this.paginateProducts.page - 1, this.paginateProducts.size);
       } else {
         GenericService(this.tenant, "productos", this.token)
-          .filter(filt)
+          .filter(filterParam)
           .then((data) => {
-            if (this.object.producto.length > 0) {
-              data.data.content.forEach((el) => {
-                this.object.producto.forEach((e) => {
-                  if (el.id == e.id) {
-                    el.selected = true;
+            if(this.object.producto.length > 0){
+              this.object.producto.forEach(el => {
+                data.data.content.forEach(e => {
+                  if(e.id === el.id){
+                    e.selected = true;
                   }
-                });
-              });
+                })
+              })
+            }
+            this.paginateProducts.totalPages = data.data.totalPages;
+            if(this.paginateProducts.totalPages < this.paginateProducts.page){
+              this.paginateProducts.page = 1;
             }
             this.productos = data.data.content;
-            this.paginate.totalPages = data.data.totalPages;
             this.loaded = true;
           });
       }
@@ -342,8 +355,15 @@ export default {
         .getLoguedUser()
         .then((data) => {
           this.loguedUser = data.data;
-          this.getDepositosForSucursal(this.loguedUser.sucursal.id, this.paginate.page - 1, this.paginate.size);
+          this.getDepositosForSucursal(this.loguedUser.sucursal.id, 0, 100000);
         });
+    },
+
+    deleteLine(id) {
+      this.object.producto = this.object.producto.filter((el) => el.id !== id);
+      if(this.productos.filter(el => el.id === id)[0]){
+        this.productos.filter(el => el.id === id)[0].selected = false; 
+      }
     },
   },
 };

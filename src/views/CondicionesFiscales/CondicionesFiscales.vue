@@ -9,7 +9,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -59,7 +59,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="filterObjects(filterString, paginate.page -1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -101,50 +101,39 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
   methods: {
-    getAll: function(page, size) {
-      this.objects = [];
+
+    newObject() {
+      this.$router.push({ name: "condicionesFiscalesForm", params: { id: 0 } });
+    },
+
+    edit(id) {
+      this.$router.push({ name: "condicionesFiscalesForm", params: { id: id } });
+    },
+
+    filterObjects(param, page, size){
       this.loaded = false;
+      const filterParam ={ param, page, size }
       GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
+        .filter(filterParam)
         .then(data => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
           this.loaded = true;
         });
     },
 
-    changePage: function(page) {
-      this.getAll(page - 1, this.paginate.size);
-    },
-
-    newObject: function() {
-      this.$router.push({ name: "condicionesFiscalesForm", params: { id: 0 } });
-    },
-
-    edit: function(id) {
-      this.$router.push({ name: "condicionesFiscalesForm", params: { id: id } });
-    },
-
-    filterObjects: function(filter){
-      var f ={
-        nombre:filter
-      }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
-    },
-
-    openDelete: function(id) {
+    openDelete(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
     },
 
-    deleteObject: function() {
+    deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
       GenericService(this.tenant, this.service, this.token)

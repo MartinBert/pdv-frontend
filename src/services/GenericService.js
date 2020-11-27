@@ -33,8 +33,8 @@ export default (tenant,service,token) =>{
             })
         },
 
-        filter: function(body){
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, body, {
+        filter: function(object){
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
                 headers: { Authorization: "Bearer " + token }
             })
         },

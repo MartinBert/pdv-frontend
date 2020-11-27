@@ -304,15 +304,16 @@ export default {
           this.user = data.data;
 
           const sucursal = this.user.sucursal.id;
-
+          const filterParam = { id: sucursal, param: "", page: 0, size: 100000};
+          
           GenericService(this.tenant, "clientes", this.token)
-            .getDataForSucursal(sucursal, 0, 100000)
+            .filter(filterParam)
             .then((data) => {
               this.databaseItems.clientes = data.data.content;
             });
 
           GenericService(this.tenant, "mediosPago", this.token)
-            .getDataForSucursal(sucursal, 0, 100000)
+            .filter(filterParam)
             .then((data) => {
               this.databaseItems.medios_de_pago = data.data.content;
             });
@@ -503,6 +504,7 @@ export default {
       const token = this.token;
       const service = this.service;
       const afipAuthorization = this.afipModuleAuthorization;
+      const filterParam = {id: sucursal.id, param: "", page: 0, size: 100000}
 
       /* Mutable vars */
       let tipoDoc;
@@ -531,7 +533,7 @@ export default {
       }
 
       GenericService(tenant, "depositos", token)
-        .getDataForSucursal(sucursal.id, 0, 100)
+        .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
         });

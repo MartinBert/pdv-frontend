@@ -9,7 +9,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -181,7 +181,7 @@ export default {
         this.loguedUser = data.data;
         if(this.loguedUser.perfil.id != 1){
           const sucursal = this.loguedUser.sucursal.id;
-          this.getDevolucionesForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
+          this.filterObjects(sucursal, this.filterString, this.paginate.page - 1, this.paginate.size);
         }else{
           this.getAll(this.paginate.page - 1, this.paginate.size);
         }
@@ -202,14 +202,17 @@ export default {
         });
     },
 
-    getDevolucionesForSucursal(sucursalId, page, size){
+    filterObjects(id, param, page, size){
       GenericService(this.tenant, this.service, this.token)
-      .getDataForSucursal(sucursalId, page, size)
-      .then(data => {
-        this.objects = data.data.content;
-        this.paginate.totalPages = data.data.totalPages;
-        this.loaded = true;
-      })
+        .filter({id, param, page, size})
+        .then(data => {
+          this.objects = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
+          this.loaded = true;
+        });
     },
 
     getAfipAuthorization(){
@@ -222,15 +225,6 @@ export default {
 
     newObject() {
       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
-    },
-
-    filterObjects(filter){
-      let f = { razonSocial:filter }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
     },
 
     print(object){

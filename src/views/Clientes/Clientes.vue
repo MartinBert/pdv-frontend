@@ -9,7 +9,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -139,20 +139,17 @@ export default {
           this.loguedUser = data.data;
           if (this.loguedUser.perfil.id != 1) {
             const sucursal = this.loguedUser.sucursal.id;
-            this.getClientesForSucursal(
-              sucursal,
-              this.paginate.page - 1,
-              this.paginate.size
-            );
+            this.filterObjects(sucursal, this.filterString, this.paginate.page - 1, this.paginate.size)
           } else {
             this.getAll(this.paginate.page - 1, this.paginate.size);
           }
         });
     },
 
-    getClientesForSucursal(sucursal, page, size) {
+    filterObjects(id, param, page, size) {
+      const filterParam = { id, param, page, size };
       GenericService(this.tenant, this.service, this.token)
-        .getDataForSucursal(sucursal, page, size)
+        .filter(filterParam)
         .then((data) => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
@@ -178,15 +175,6 @@ export default {
 
     edit(id) {
       this.$router.push({ name: "clientesForm", params: { id: id } });
-    },
-
-    filterObjects(filter) {
-      var f = { razonSocial: filter };
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then((data) => {
-          this.objects = data.data.content;
-        });
     },
 
     openDelete(id) {

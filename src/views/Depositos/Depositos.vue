@@ -19,7 +19,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -128,21 +128,25 @@ export default {
       .then(data => {
         this.loguedUser = data.data;
         if(this.loguedUser.perfil.id != 1){
-          this.getDepositosForSucursal(this.loguedUser.sucursal.id, this.paginate.page - 1, this.paginate.size);
+          this.filterObjects(this.loguedUser.sucursal.id, this.filterString, this.paginate.page - 1, this.paginate.size);
         }else{
           this.getAll(this.paginate.page - 1, this.paginate.size);
         }
       })
     },
 
-    getDepositosForSucursal(id, page, size){
+    filterObjects(id, param, page, size){
+      this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
-      .getDataForSucursal(id, page, size)
-      .then(data => {
-        this.objects = data.data.content;
-        this.paginate.totalPages = data.data.totalPages;
-        this.loaded = true;
-      })
+        .filter({ id, param, page, size })
+        .then(data => {
+          this.objects = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
+          this.loaded = true;
+        });
     },
 
     getAll(page, size) {
@@ -163,17 +167,6 @@ export default {
 
     edit(id) {
       this.$router.push({ name: "depositosForm", params: { id: id } });
-    },
-
-    filterObjects(filter){
-      var f ={
-        nombre:filter
-      }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
     },
 
     openDelete(id) {
