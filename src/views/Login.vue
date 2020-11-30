@@ -75,11 +75,33 @@ export default {
               this.$router.push({ path: "/" + this.$route.params.tenant });          
             }
           })
+          .then(()=>{
+            axios.get(`${process.env.VUE_APP_SERVER}/${this.$route.params.tenant}/api/usuarios/getLogued`,
+            { headers: { Authorization: "Bearer " + localStorage.getItem('token') }})
+            .then(data => {
+              if(data.data.perfil.id > 2){
+
+                const userData = {
+                  "perfil": data.data.perfil.id,
+                  "sucursal": data.data.sucursal.id
+                }
+
+                localStorage.setItem("userData", JSON.stringify(userData));
+                this.clearConsole();            
+              }
+            })
+          })
           .catch((err) => { console.log(err);
             this.errors = "Credenciales inválidas"
           });
       }
     },
+
+    clearConsole(){
+      if(window.console || window.firebug){
+        console.clear();
+      }
+    }
   },
 }
 </script>

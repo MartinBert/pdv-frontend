@@ -77,15 +77,18 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id !== 1){
-          this.filterObjects(this.loguedUser.sucursal.id, "", 0, 100000);
-        }else{
-          this.getAllPlanes();
-        }
+        this.filterObjects("", 0, 100000)
       })
     },
 
-    filterObjects(id, param, page, size){
+    filterObjects(param, page, size){
+      let id;
+      if(this.loguedUser.perfil.id < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+      
       GenericService(this.tenant, "planesPago", this.token)
       .filter({id, param, page, size})
       .then(data => {

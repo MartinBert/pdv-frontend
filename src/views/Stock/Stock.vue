@@ -9,7 +9,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -117,23 +117,28 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id != 1){
-          const sucursal = this.loguedUser.sucursal.id;
-          this.getStockForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
-        }else{
-          this.getAll(this.paginate.page - 1, this.paginate.size);
-        }
+        this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
       })
     },
 
-    getStockForSucursal(sucursal, page, size){
+    filterObjects(param, page, size){
+      let id;
+      if(this.loguedUser.perfil.id < 3){
+        id = "";
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
       GenericService(this.tenant, this.service, this.token)
-      .getDataForSucursal(sucursal, page, size)
-      .then(data => {
-        this.objects = data.data.content;
-        this.paginate.totalPages = data.data.totalPages;
-        this.loaded = true
-      })
+        .filter({id, param, page, size})
+        .then(data => {
+          this.objects = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
+          this.loaded = true;
+        });
     },
 
     getAll(page, size) {
@@ -154,15 +159,6 @@ export default {
 
     edit(id) {
       this.$router.push({ name: "stockForm", params: { id: id } });
-    },
-
-    filterObjects(filter){
-      let f = { razonSocial:filter }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
     },
 
     openDelete(id) {

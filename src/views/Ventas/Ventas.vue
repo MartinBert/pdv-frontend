@@ -9,11 +9,12 @@
         <v-col cols="3">
           <v-text-field
             type="date"
-            v-model="filterStringDate"
-            v-on:input="filterObjects('fechaEmision',filterStringDate)"
+            v-model="filterString"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
+            label="Búsqueda por fecha"
             class="text-left"
             append-icon="mdi-magnify"
           ></v-text-field>
@@ -21,18 +22,25 @@
         <v-col cols="3">
           <v-text-field
             type="number"
-            v-model="filterStringTotalVenta"
-            v-on:input="filterObjects('totalVenta',filterStringTotalVenta)"
+            v-model="filterDouble"
+            v-on:input="filterObjects(filterDouble, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
             class="text-left"
-            placeholder="Búsqueda por total facturado"
+            label="Búsqueda por total facturado"
+            placeholder=" "
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
       </v-row>
     </v-form>
+
+    <v-row>
+      <v-col>
+        <h2>Lista de comprobantes emitidos</h2>
+      </v-col>
+    </v-row>
 
     <!-- List -->
     <v-simple-table style="background-color: transparent;">
@@ -157,7 +165,6 @@ import { formatDate } from '../../helpers/dateHelper';
 import { infoAlert } from '../../helpers/alerts';
 import GenericService from '../../services/GenericService';
 import ReportsService from '../../services/ReportsService';
-import VentasService from '../../services/VentasService';
 import VentasReportsDialog from '../../components/VentasReportsDialog';
 
 export default {
@@ -166,8 +173,8 @@ export default {
     icon: "mdi-check-circle",
     file: null,
     objects: null,
-    filterStringDate: "",
-    filterStringTotalVenta: "",
+    filterString: "",
+    filterDouble: "",
     paginate: {
       page: 1,
       size: 10,
@@ -199,87 +206,42 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        const sucursal = this.loguedUser.sucursal.id
-        switch (this.loguedUser.perfil.id) {
-          case 1:
-            this.getAll(this.paginate.page - 1, this.paginate.size);
-            break;
+        this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+      })
+    },
 
-          case 2:
-            this.getAll(this.paginate.page - 1, this.paginate.size);
-            break;
+    filterObjects(param, page, size){
+      let filterParam;
+      let idsuc;
 
-          case 3:
-            this.getVentasForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
-            break;
-        
-          default:
-            this.getVentasForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
-            break;
+      if(this.loguedUser.perfil.id < 3){
+        idsuc = "";
+      }else{
+        idsuc = this.loguedUser.sucursal.id;
+      }
+
+      if(this.filterString === param){
+        this.filterDouble = "";
+        param = formatDate(param);
+        if(param === "//"){
+          param = "";
         }
-      })
-    },
+        filterParam = {id: idsuc, param, page, size};
+      }else{
+        this.filterString = "";
+        filterParam = {id: idsuc, doubleParam: param, page, size};
+      }
 
-    getVentasForSucursal(sucursal, page, size){
       GenericService(this.tenant, "ventas", this.token)
-      .getDataForSucursal(sucursal, page, size)
-      .then(data => {
-        this.objects = data.data.content;
-        this.paginate.totalPages = data.data.totalPages;
-        this.loaded = true;
-      })
-    },
-
-    getAll(page, size) {
-      this.loaded = false;
-      GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
+        .filter(filterParam)
         .then(data => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
           this.loaded = true;
         });
-    },
-
-    filterObjects(filterParam, filter){
-      if(this.loguedUser.perfil.id !== 1){
-        const sucursal = this.loguedUser.sucursal.id;
-        const page = this.paginate.page - 1;
-        const size = this.paginate.size;
-        let year;
-        let month;
-        let day;
-
-        if(filter === ''){
-          this.getVentasForSucursal(sucursal, page, size);
-        }else{
-          if(filterParam === 'fechaEmision'){
-          if(this.filterStringTotalVenta !== ""){
-            this.filterStringTotalVenta = "";
-          }
-          year = filter.slice(0, filter.indexOf('-'));
-          month = filter.slice(filter.indexOf('-') + 1, filter.lastIndexOf('-'));
-          day = filter.slice(filter.lastIndexOf('-') + 1, filter.length);
-          filter = formatDate(year+month+day);
-        }else{
-          if(this.filterStringDate !== ""){
-            this.filterStringDate = "";
-          }
-        }
-
-        let object = { sucursal, filterParam, filter, page, size }
-        
-        VentasService(this.tenant, "ventas", this.token)
-          .filter(object)
-          .then(data => {
-            this.objects = data.data.content;
-            this.paginate.totalPages = data.data.totalPages;
-            this.loaded = true;
-          });
-        }
-      }else{
-        console.log("asdf");
-      }
     },
 
     seeDetails(object){

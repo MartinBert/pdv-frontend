@@ -23,7 +23,7 @@
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row class="ml-5 mr-5">
+        <v-row class="ml-5 mr-5" v-if="urlId == 0">
           <v-col cols="7">
             <v-simple-table style="background-color: transparent" ref="tab">
               <template v-slot:default>
@@ -67,7 +67,9 @@
               <div class="verticalSeparator"></div>
           </v-col>
           <v-col cols="3">
-            <v-simple-table style="background-color: transparent">
+            <v-layout column style="height: 400px">
+              <v-flex style="overflow: auto">
+                <v-simple-table style="background-color: transparent">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -91,7 +93,9 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
+              </v-simple-table>
+            </v-flex>
+          </v-layout>
           </v-col>
         </v-row>
         <v-row class="ma-5" v-if="urlId == 0">

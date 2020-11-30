@@ -264,8 +264,14 @@ export default {
         .getLoguedUser()
         .then((data) => {
           this.loguedUser = data.data;
-          const sucursalId = this.loguedUser.sucursal.id;
-          const filterParam = {id: sucursalId, param: "", page: 0, size: 100000}
+          let id;
+          if(this.loguedUser.perfil.id < 3){
+            id = ""
+          }else{
+            id = this.loguedUser.sucursal.id;
+          }
+
+          const filterParam = {id, param: "", page: 0, size: 100000}
 
           GenericService(this.tenant, "clientes", this.token)
             .filter(filterParam)
@@ -339,12 +345,14 @@ export default {
     filterObjects(id, param, page, size){
       let filterParam;
       if(this.filterString === param){
+        this.filterDouble = "";
         param = formatDate(param);
         if(param === "//"){
           param = "";
         }
         filterParam = {id, param, page, size};
       }else{
+        this.filterString = "";
         filterParam = {id, doubleParam: param, page, size};
       }
       GenericService(this.tenant, "ventas", this.token)

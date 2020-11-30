@@ -303,7 +303,13 @@ export default {
         .then((data) => {
           this.user = data.data;
 
-          const sucursal = this.user.sucursal.id;
+          let sucursal;
+          if(this.user.perfil.id < 3){
+            sucursal = ""
+          }else{
+            sucursal = this.user.sucursal.id;
+          }
+          
           const filterParam = { id: sucursal, param: "", page: 0, size: 100000};
           
           GenericService(this.tenant, "clientes", this.token)
@@ -631,7 +637,7 @@ export default {
                     );
 
                     GenericService(tenant, "stock", token)
-                      .getDataForSucursal(sucursal.id, 0, 100000)
+                      .filter(filterParam)
                       .then((data) => {
                         productos = data.data.content;
                         productos.forEach((el) => {
@@ -697,6 +703,7 @@ export default {
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
+      const filterParam = {id: sucursal.id, param: "", page: 0, size: 100000}
 
       //Mutable vars
       let file;
@@ -704,7 +711,7 @@ export default {
       let productos;
 
       GenericService(tenant, "depositos", token)
-        .getDataForSucursal(sucursal.id, 0, 100000)
+        .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
         });
@@ -752,7 +759,7 @@ export default {
           );
 
           GenericService(tenant, "stock", token)
-            .getDataForSucursal(sucursal.id, 0, 100000)
+            .filter(filterParam)
             .then((data) => {
               productos = data.data.content;
               productos.forEach((el) => {

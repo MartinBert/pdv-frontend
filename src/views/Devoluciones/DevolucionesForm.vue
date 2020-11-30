@@ -1,4 +1,4 @@
-<template>
+`<template>
   <v-card min-width="100%">
     <v-snackbar
       v-model="snackError"
@@ -265,54 +265,15 @@ export default {
         .getLoguedUser()
         .then((data) => {
           this.loguedUser = data.data;
-          if (this.loguedUser.perfil.id < 2) {
-            this.getAll(this.paginate.page - 1, this.paginate.size);
-          } else {
-            this.getModels(
-              this.loguedUser.sucursal.id,
-              this.paginate.page - 1,
-              this.paginate.size
-            );
-          }
+
+          VentasService(this.tenant, "ventas", this.token)
+          .getAfipModuleAuthorization()
+          .then((data) => {
+            this.afipModuleAuthorization = data.data;
+          });
+
         });
     },
-
-    getAll(page, size) {
-      GenericService(this.tenant, "productos", this.token)
-        .getAll(page, size)
-        .then((data) => {
-          this.productos = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-        });
-
-      GenericService(this.tenant, "stock", this.token)
-        .getAll(0, 100000)
-        .then((data) => {
-          this.stocks = data.data;
-        });
-    },
-
-    getModels(sucursalId, page, size) {
-      GenericService(this.tenant, "productos", this.token)
-        .getAll(page, size)
-        .then((data) => {
-          this.productos = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-        });
-
-      GenericService(this.tenant, "stock", this.token)
-        .getDataForSucursal(sucursalId, 0, 100000)
-        .then((data) => {
-          this.stocks = data.data.content;
-        });
-
-      VentasService(this.tenant, "ventas", this.token)
-        .getAfipModuleAuthorization()
-        .then((data) => {
-          this.afipModuleAuthorization = data.data;
-        });
-    },
-
     deleteLine(id, status) {
       if (status === "entrante") {
         const filter = this.object.productosEntrantes.filter(
@@ -324,43 +285,6 @@ export default {
           (el) => el.id !== id
         );
         this.object.productosSalientes = filter;
-      }
-    },
-
-    filterObjects(filter, radio) {
-      const sucursalId = this.loguedUser.sucursal.id;
-      var filt = "";
-      switch (radio) {
-        case "nombre":
-          filt = { nombre: filter };
-          break;
-        case "codigodebarras":
-          filt = { codigoBarra: filter };
-          break;
-        default:
-          filt = { codigoProducto: filter };
-          break;
-      }
-
-      if (!this.filterString) {
-        this.getModels(sucursalId, this.paginate.page - 1, this.paginate.size);
-      } else {
-        GenericService(this.tenant, "productos", this.token)
-          .filter(filt)
-          .then((data) => {
-            if (this.object.productos.length > 0) {
-              data.data.content.forEach((el) => {
-                this.object.productos.forEach((e) => {
-                  if (el.id == e.id) {
-                    el.selected = true;
-                  }
-                });
-              });
-            }
-            this.productos = data.data.content;
-            this.paginate.totalPages = data.data.totalPages;
-            this.loaded = true;
-          });
       }
     },
 
@@ -594,7 +518,7 @@ export default {
                     let comprobanteGenerado = data.data;
 
                     GenericService(tenant, "stock", token)
-                      .getDataForSucursal(sucursal.id, 0, 100000)
+                      .filter(filterParam)
                       .then((data) => {
                         productos = data.data.content;
                         productos.forEach((el) => {
@@ -749,7 +673,7 @@ export default {
           let comprobanteGenerado = data.data;
 
           GenericService(tenant, "stock", token)
-            .getDataForSucursal(sucursal.id, 0, 100000)
+            .filter(filterParam)
             .then((data) => {
               productos = data.data.content;
               productos.forEach((el) => {
@@ -833,7 +757,7 @@ export default {
         });
 
       GenericService(tenant, "stock", token)
-        .getDataForSucursal(sucursal.id, 0, 100000)
+        .filter(filterParam)
         .then((data) => {
           productos = data.data.content;
           productos.forEach((el) => {

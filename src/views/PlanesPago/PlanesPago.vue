@@ -18,7 +18,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -126,17 +126,19 @@ export default {
       .getLoguedUser()
       .then(data => {
         this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id != 1){
-          const sucursalId = this.loguedUser.sucursal.id;
-          this.filterObjects(sucursalId, this.filterString, this.paginate.page - 1, this.paginate.size);
-        }else{
-          this.getAll(this.paginate.page - 1, this.paginate.size);
-        }
+        this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size)
       })
     },
 
-    filterObjects(id, param, page, size){
+    filterObjects(param, page, size){
       this.loaded = false;
+      let id;
+      if(this.loguedUser.perfil.id < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
       GenericService(this.tenant, this.service, this.token)
         .filter({id, param, page, size})
         .then(data => {
@@ -145,18 +147,6 @@ export default {
           if(this.paginate.totalPages < this.paginate.page){
               this.paginate.page = 1;
           }
-          this.loaded = true;
-        });
-    },
-
-    getAll(page, size) {
-      this.objects = [];
-      this.loaded = false;
-      GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
