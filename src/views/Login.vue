@@ -83,11 +83,16 @@ export default {
 
                 const userData = {
                   "perfil": data.data.perfil.id,
-                  "sucursal": data.data.sucursal.id
+                  "sucursal": data.data.sucursal,
                 }
-
                 localStorage.setItem("userData", JSON.stringify(userData));
                 this.clearConsole();            
+              }else{
+                const userData = {
+                  "perfil": data.data.perfil.id,
+                }
+                localStorage.setItem("userData", JSON.stringify(userData));
+                this.clearConsole();
               }
             })
           })

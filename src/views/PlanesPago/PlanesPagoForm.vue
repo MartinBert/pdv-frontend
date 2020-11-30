@@ -63,7 +63,7 @@ export default {
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-    loguedUser: null
+    loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
 
   mounted() {
@@ -76,14 +76,6 @@ export default {
     this.getLoguedUser();
   },
   methods: {
-
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-      })
-    },
 
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)

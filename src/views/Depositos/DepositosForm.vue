@@ -65,13 +65,14 @@ export default {
     valid:true,
     object: {},
     loaded: false,
-    loguedUser: "",
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     tenant: "",
     service: "depositos",
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: ""
   }),
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     if (this.$route.params.id && this.$route.params.id > 0) {
@@ -79,9 +80,8 @@ export default {
     } else {
       this.loaded = true;
     }
-
-    this.getUserLogued();
   },
+
   methods: {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
@@ -111,14 +111,6 @@ export default {
     back() {
       this.$router.push({ name: "depositos" });
     },
-
-    getUserLogued(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-      })
-    }
   }
 };
 </script>

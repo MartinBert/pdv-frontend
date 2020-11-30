@@ -13,7 +13,7 @@
           <v-col cols="12">
             <v-text-field
               v-model="filterString"
-              v-on:input="filterObjects(filterString, paginateProducts.page - 1, paginateProducts.size)"
+              v-on:input="filterProducts(filterString, paginate.page - 1, paginate.size)"
               dense
               outlined
               rounded
@@ -53,14 +53,14 @@
               </template>
             </v-simple-table>
             <v-pagination
-              v-model="paginateProducts.page"
-              :length="paginateProducts.totalPages"
+              v-model="paginate.page"
+              :length="paginate.totalPages"
               next-icon="mdi-chevron-right"
               prev-icon="mdi-chevron-left"
-              :page="paginateProducts.page"
+              :page="paginate.page"
               :total-visible="8"
-              @input="changePage(paginateProducts.page - 1, paginateProducts.size)"
-              v-if="paginateProducts.totalPages > 1"
+              @input="filterProducts(filterString, paginate.page - 1, paginate.size)"
+              v-if="paginate.totalPages > 1"
             ></v-pagination>
           </v-col>
           <v-col cols="1" class="d-flex justify-center">
@@ -190,7 +190,7 @@ export default {
     },
     depositos: [],
     productos: [],
-    loguedUser: "",
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     loaded: false,
     tenant: "",
     service: "stock",
@@ -198,10 +198,6 @@ export default {
     snackError: false,
     errorMessage: "",
     paginate: {
-      page: 1,
-      size: 100000,
-    },
-    paginateProducts: {
       page: 1,
       size: 5,
       totalPages: 0,
@@ -218,8 +214,8 @@ export default {
     if (this.urlId && this.urlId > 0) {
       this.getObject(this.urlId);
     } else {
-      this.getOtherModels(this.paginateProducts.page - 1, this.paginateProducts.size);
-      this.getUserLogued();
+      this.filterDepositos('', 0, 100000);
+      this.filterProducts(this.filterString, this.paginate.page - 1, this.paginate.size);
     }
   },
 
@@ -232,6 +228,45 @@ export default {
           this.loaded = true;
         });
     },
+    
+    filterProducts(param, page, size) {
+      const id = '';
+      GenericService(this.tenant, "productos", this.token)
+        .filter({id, param, page, size})
+        .then((data) => {
+          if(this.object.producto.length > 0){
+            this.object.producto.forEach(el => {
+              data.data.content.forEach(e => {
+                if(e.id === el.id){
+                  e.selected = true;
+                }
+              })
+            })
+          }
+          this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+            this.paginate.page = 1;
+          }
+          this.productos = data.data.content;
+          this.loaded = true;
+        });
+    },
+
+    filterDepositos(param, page, size){
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = "";
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
+      GenericService(this.tenant, "depositos", this.token)
+        .filter({id, param: '', page, size})
+        .then((data) => {
+          this.depositos = data.data.content;
+          this.loaded = true;
+        });
+    },
 
     checkProduct(id) {
       const productosFiltrados = this.productos.filter((el) => el.id === id)[0];
@@ -241,23 +276,6 @@ export default {
         this.object.producto = this.object.producto.filter(
           (el) => el.id !== productosFiltrados.id
         );
-      }
-    },
-
-    getDepositosForSucursal(id,page,size) {
-      const filterParam = {id, param: "", page, size}
-      GenericService(this.tenant, "depositos", this.token)
-        .filter(filterParam)
-        .then((data) => {
-          this.depositos = data.data.content;
-        });
-    },
-
-    changePage(page, size) {
-      if(this.filterString){
-        this.filterObjects(this.filterString, page, size);
-      }else{
-        this.getOtherModels(page, size);
       }
     },
 
@@ -302,73 +320,16 @@ export default {
       }
     },
 
-    back() {
-      this.$router.push({ name: "stock" });
-    },
-
-    getOtherModels(page, size) {
-      GenericService(this.tenant, "productos", this.token)
-        .getAll(page, size)
-        .then((data) => {
-          if (this.object.producto.length > 0) {
-            data.data.content.forEach((el) => {
-              this.object.producto.forEach((e) => {
-                if (el.id == e.id) {
-                  el.selected = true;
-                }
-              });
-            });
-            this.productos = data.data.content;
-          } else {
-            this.productos = data.data.content;
-          }
-          this.paginateProducts.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
-    },
-
-    filterObjects(param, page, size) {
-      const filterParam = { param, page, size };
-      if (!this.filterString) {
-        this.getOtherModels(this.paginateProducts.page - 1, this.paginateProducts.size);
-      } else {
-        GenericService(this.tenant, "productos", this.token)
-          .filter(filterParam)
-          .then((data) => {
-            if(this.object.producto.length > 0){
-              this.object.producto.forEach(el => {
-                data.data.content.forEach(e => {
-                  if(e.id === el.id){
-                    e.selected = true;
-                  }
-                })
-              })
-            }
-            this.paginateProducts.totalPages = data.data.totalPages;
-            if(this.paginateProducts.totalPages < this.paginateProducts.page){
-              this.paginateProducts.page = 1;
-            }
-            this.productos = data.data.content;
-            this.loaded = true;
-          });
-      }
-    },
-
-    getUserLogued() {
-      GenericService(this.tenant, this.service, this.token)
-        .getLoguedUser()
-        .then((data) => {
-          this.loguedUser = data.data;
-          this.getDepositosForSucursal(this.loguedUser.sucursal.id, 0, 100000);
-        });
-    },
-
     deleteLine(id) {
       this.object.producto = this.object.producto.filter((el) => el.id !== id);
       if(this.productos.filter(el => el.id === id)[0]){
         this.productos.filter(el => el.id === id)[0].selected = false; 
       }
     },
-  },
+
+    back() {
+      this.$router.push({ name: "stock" });
+    },
+  }, 
 };
 </script>

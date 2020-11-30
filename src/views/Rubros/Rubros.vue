@@ -115,7 +115,7 @@ export default {
     this.getAll(this.paginate.page - 1, this.paginate.size);
   },
   methods: {
-    getAll: function(page, size) {
+    getAll(page, size) {
       this.objects = [];
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
@@ -127,19 +127,19 @@ export default {
         });
     },
 
-    changePage: function(page) {
+    changePage(page) {
       this.getAll(page - 1, this.paginate.size);
     },
 
-    newObject: function() {
+    newObject() {
       this.$router.push({ name: "rubrosForm", params: { id: 0 } });
     },
 
-    edit: function(id) {
+    edit(id) {
       this.$router.push({ name: "rubrosForm", params: { id: id } });
     },
 
-    filterObjects: function(filter){
+    filterObjects(filter){
       var f ={
         nombre:filter
       }
@@ -150,12 +150,12 @@ export default {
         });
     },
 
-    openDelete: function(id) {
+    openDelete(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
     },
 
-    deleteObject: function() {
+    deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
       GenericService(this.tenant, this.service, this.token)
@@ -165,7 +165,7 @@ export default {
         });
     },
 
-    importDocuments: function(event) {
+    importDocuments(event) {
       this.file = event;
       var excel = [];
       var reader = new FileReader();
@@ -199,7 +199,7 @@ export default {
       reader.readAsBinaryString(this.file);
     },
 
-    validateImport: function(objects) {
+    validateImport(objects) {
       this.loader = true;
       var importacion = {
         status: true,

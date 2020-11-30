@@ -58,7 +58,7 @@ export default {
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-    loguedUser: null
+    loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
 
   mounted() {
@@ -68,22 +68,13 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getLoguedUser();
+    this.filterObjects('', 0, 100000);
   },
+
   methods: {
-
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        this.filterObjects("", 0, 100000)
-      })
-    },
-
     filterObjects(param, page, size){
       let id;
-      if(this.loguedUser.perfil.id < 3){
+      if(this.loguedUser.perfil < 3){
         id = ""
       }else{
         id = this.loguedUser.sucursal.id;
@@ -103,14 +94,6 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
-    },
-
-    getAllPlanes(){
-      GenericService(this.tenant, "planesPago", this.token)
-      .getAll(0, 1000)
-      .then(data => {
-        this.planes_pago = data.data.content;
-      })
     },
 
     save() {

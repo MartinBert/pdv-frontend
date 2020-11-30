@@ -180,7 +180,7 @@ import XLSX from "xlsx";
 export default {
   data: () => ({
     icon: "mdi-check-circle",
-    perfil: 0,
+    perfil: '',
     loader: false,
     loaderStatus: false,
     filterString: "",
@@ -208,14 +208,14 @@ export default {
     token: localStorage.getItem("token"),
     dialogStock: false,
     dialogDeleteObject: false,
-    loguedUser: "",
+    loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
 
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getAll(this.paginate.page - 1, this.paginate.size);
-    this.getLoguedUser();
-    this.getOtherModels(0, 200000);
+    this.getOtherModels(0, 100000);
+    this.perfil = this.loguedUser.perfil;
   },
 
   methods: {
@@ -231,15 +231,6 @@ export default {
         });
     },
 
-    getLoguedUser() {
-      GenericService(this.tenant, this.service, this.token)
-        .getLoguedUser()
-        .then((data) => {
-          this.loguedUser = data.data;
-          this.perfil = this.loguedUser.perfil.id;
-        });
-    },
-
     getOtherModels(page, size) {
       GenericService(this.tenant, "marcas", this.token)
         .getAll(page, size)
@@ -251,12 +242,6 @@ export default {
         .getAll(page, size)
         .then((data) => {
           this.distribuidores = data.data.content;
-        });
-
-      GenericService(this.tenant, "depositos", this.token)
-        .getAll(page, size)
-        .then((data) => {
-          this.depositos = data.data.content;
         });
 
       GenericService(this.tenant, "rubros", this.token)
@@ -283,9 +268,8 @@ export default {
     },
 
     filterObjects(param, page, size) {
-      const filterParam = { param, page, size }
       GenericService(this.tenant, "productos", this.token)
-        .filter(filterParam)
+        .filter({ param, page, size })
         .then((data) => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
@@ -304,39 +288,6 @@ export default {
         this.idObjet,
         this.objects
       );
-    },
-
-    updateStock() {
-      var stocks = [];
-      this.stock.forEach((element) => {
-        if (element.stock.cantidad >= 0) {
-          if (element.stock.id) {
-            stocks.push({
-              id: element.stock.id,
-              producto: {
-                id: this.object.id,
-              },
-              deposito: element.deposito,
-              cantidad: element.stock.cantidad,
-            });
-          } else {
-            stocks.push({
-              producto: {
-                id: this.object.id,
-              },
-              deposito: element.deposito,
-              cantidad: element.stock.cantidad,
-            });
-          }
-        }
-      });
-
-      GenericService(this.tenant, "stock", this.token)
-        .saveAll(stocks)
-        .then((data) => {
-          this.object.stocks = data.data;
-          this.showStock(this.object);
-        });
     },
 
     //Load excel
@@ -415,7 +366,6 @@ export default {
               (1 + ganancia) /
               (1 + iva)
             ).toFixed(2),
-            depositos: this.getDepositos(String(element.idDepositos)),
             costoNeto: (
               element.precioTotal /
               (1 + ganancia) /
@@ -495,30 +445,6 @@ export default {
         }
       }
       return distribuidores;
-    },
-
-    getDepositos(d) {
-      var depositos = [];
-      if (this.depositos && d) {
-        var exp = d.match("-");
-        if (exp) {
-          var stringIds = d.split("-");
-          this.depositos.forEach((element) => {
-            stringIds.forEach((s) => {
-              if (element.id == Number(s)) {
-                depositos.push(element);
-              }
-            });
-          });
-        } else {
-          this.depositos.forEach((element) => {
-            if (element.id == d) {
-              depositos.push(element);
-            }
-          });
-        }
-      }
-      return depositos;
     },
 
     getReport() {

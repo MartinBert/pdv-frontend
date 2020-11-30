@@ -63,7 +63,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="getLoguedUser()"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -91,7 +91,7 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     objects: [],
-    loguedUser: null,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterString: "",
     paginate: {
       page: 1,
@@ -107,23 +107,14 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
 
   methods: {
-    
-     getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
-      })
-    },
 
     filterObjects(param, page, size){
       let id;
-      if(this.loguedUser.perfil.id < 3){
+      if(this.loguedUser.perfil < 3){
         id = "";
       }else{
         id = this.loguedUser.sucursal.id;
@@ -172,7 +163,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getLoguedUser();
+          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
         });
     },
   }

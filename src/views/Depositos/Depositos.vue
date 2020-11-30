@@ -73,7 +73,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="getLoguedUser()"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -114,27 +114,19 @@ export default {
     service: "depositos",
     token: localStorage.getItem("token"),
     dialogDeleteObject: false,
-    loguedUser: ""
+    loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
+
   methods: {
-    
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
-      })
-    },
 
     filterObjects(param, page, size){
       this.loaded = false;
       let id;
-      if(this.loguedUser.perfil.id < 3){
+      if(this.loguedUser.perfil < 3){
         id = ""
       }else{
         id = this.loguedUser.sucursal.id;
@@ -148,18 +140,6 @@ export default {
           if(this.paginate.totalPages < this.paginate.page){
               this.paginate.page = 1;
           }
-          this.loaded = true;
-        });
-    },
-
-    getAll(page, size) {
-      this.objects = [];
-      this.loaded = false;
-      GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
@@ -183,7 +163,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.loguedUser();
+          this.filterObjects(this.filterParams);
         });
     },
 
@@ -209,7 +189,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(doc.data)
             .then(() => {
-              this.getLoguedUser();
+              this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
               this.loaderStatus = true;
               window.setTimeout(()=>{
                 this.loader = false
@@ -247,7 +227,7 @@ export default {
         }
       });
       return importacion;
-    }
+    },
   }
 };
 </script>

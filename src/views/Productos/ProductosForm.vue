@@ -47,28 +47,6 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-autocomplete>
           </v-col> 
-          <v-col>
-            <v-autocomplete
-              :items="depositos"
-              v-model="object.depositos"
-              multiple
-              item-text="nombre"
-              label="Depositos"
-              :return-object="true"
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-autocomplete>
-          </v-col>
-          <v-col v-for="o in object.depositos" :key="o.id" style="display: inline-block;">
-            <v-text-field
-            v-bind:id="`deposito${o.id}`"
-            type="number"
-            :counter="50"
-            v-bind:label="`Cantidad de unidades en ${o.nombre}`"
-            required
-            :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
-            <v-btn @click="Apply(o.id)">Aplicar</v-btn>
-          </v-col>
         </v-row>
         <v-row class="ma-1">
           <v-col>
@@ -230,10 +208,8 @@ export default {
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-
     marcas: [],
     distribuidores: [],
-    depositos: [],
     rubros: []
   }),
   mounted() {
@@ -269,12 +245,6 @@ export default {
           this.distribuidores = data.data.content;
         });
 
-      GenericService(this.tenant, "depositos", this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.depositos = data.data.content;
-        });
-
       GenericService(this.tenant, "rubros", this.token)
         .getAll(page, size)
         .then(data => {
@@ -282,12 +252,7 @@ export default {
         });
     },
 
-    Apply(id){
-      this.cantidad.push(document.getElementById(`deposito${id}`).value);
-      document.getElementById(`deposito${id}`).setAttribute("disabled", true);
-    },
-   
-    calculations: function() {
+    calculations() {
       this.object.costoNeto = (this.object.costoBruto * (1 - 0.21)).toFixed(2);
       this.object.ivaCompra = (
         this.object.costoBruto - this.object.costoNeto
@@ -307,7 +272,7 @@ export default {
       this.object.precioCosto = this.object.costoBruto;
     },
 
-    gainCalculations: function() {
+    gainCalculations() {
       this.object.ganancia = (
         this.object.precioTotal / 1.21 -
         this.object.costoBruto
@@ -319,24 +284,8 @@ export default {
     },
 
     save() {
-      var depositos = this.object.depositos;
-      var cantidad = this.cantidad;
-      var tenant = this.tenant;
-      var token = this.token;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
-        .then(
-          function(data){
-            depositos.forEach((el, index)=>{
-              var stock = {
-              producto: data.data,
-              deposito: el,
-              cantidad:cantidad[index]
-              }
-              GenericService(tenant, "stock",token)
-              .save(stock)
-            });
-          })
         .catch(error => {
           if (error.response.status == 500) {
             this.snackError = true;

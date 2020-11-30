@@ -4,39 +4,20 @@
         <v-card-title>
           <v-row>
             <v-col>
-                <h2>Seleccione un parámetro para realizar la búsqueda</h2>
+                <h2>Búsqueda de productos</h2>
             </v-col>
           </v-row>
         </v-card-title>
         <v-card-text>
-          <v-radio-group class="ml-5 mr-5" v-model="radioGroup">
-          <v-row>
-            <v-col>
-              <v-radio label="Nombre" value="nombre"></v-radio>
-            </v-col>
-            <v-col>
-              <v-radio
-                label="Código de barras"
-                value="codigodebarras"
-              ></v-radio>
-            </v-col>
-            <v-col>
-              <v-radio
-                label="Código de producto"
-                value="codigodeproducto"
-              ></v-radio>
-            </v-col>
-          </v-row>
-        </v-radio-group>
         <v-text-field
-          v-if="radioGroup"
           v-model="filterString"
-          v-on:input="filterObjects(filterString, radioGroup)"
+          v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
           dense
           outlined
           rounded
-          class="text-left ml-5 mr-5"
-          placeholder="Búsqueda"
+          class="text-left ml-5 mr-5 mt-5"
+          label="Escriba el nombre, código de artículo o código de barras del artículo que desea buscar"
+          placeholder=" "
           append-icon="mdi-magnify"
         ></v-text-field>
         <v-divider></v-divider>
@@ -67,7 +48,18 @@
                       </tr>
                     </tbody>
                   </template>
+                  
                 </v-simple-table>
+                <v-pagination
+                  v-model="paginate.page"
+                  :length="paginate.totalPages"
+                  next-icon="mdi-chevron-right"
+                  prev-icon="mdi-chevron-left"
+                  :page="paginate.page"
+                  :total-visible="8"
+                  @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
+                  v-if="paginate.totalPages > 1"
+                ></v-pagination>
               </v-col>
             </v-row>
           </v-container>
@@ -83,36 +75,34 @@ export default {
   data(){
     return {
       productos: [],
-      radioGroup: "",
-      filterString: ""
+      filterString: "",
+      paginate: {
+        page: 1,
+        size: 7,
+        totalPages: 0
+      }
     }
   },
 
   mounted(){
     this.tenant = this.$route.params.tenant;
     this.token = localStorage.getItem('token');
-    this.getAllProducts();
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
 
   methods:{
-    filterObjects(filter, radio) {
-      var filt = {};
-      switch (radio) {
-        case "nombre":
-          filt = { nombre: filter };
-          break;
-        case "codigodebarras":
-          filt = { codigoBarra: filter };
-          break;
-        default:
-          filt = { codigoProducto: filter };
-          break;
-      }
-
-      GenericService(this.tenant, "productos", this.token)
-        .filter(filt)
-        .then((data) => {
+    filterObjects(param, page, size) {
+      this.loaded = false;
+      
+      GenericService(this.tenant, 'productos', this.token)
+        .filter({ param, page, size })
+        .then(data => {
           this.productos = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
+          this.loaded = true;
         });
     },
 
@@ -129,17 +119,9 @@ export default {
       }
     },
 
-    getAllProducts(){
-      GenericService(this.tenant, "productos", this.token)
-        .getAll(this.page, this.size)
-        .then((data) => {
-        this.productos = data.data.content;
-      });
-    },
-
     refresh(){
       this.$store.commit('productos/resetStates');
-      this.getAllProducts();
+      this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
     }
   }
 }

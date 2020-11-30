@@ -281,6 +281,7 @@ export default {
   methods: {
     go: function(to) {
       this.$router.push({ name: to });
+      console.log(this.$router);
       this.nameRouter = to;
     },
     logout: function() {
