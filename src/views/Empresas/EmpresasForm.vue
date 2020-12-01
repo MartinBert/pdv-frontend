@@ -102,7 +102,7 @@ export default {
     object: {
       tipoPersona: 2,
     },
-    loguedUser: {},
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     loaded: false,
     tenant: "",
     service: "empresas",
@@ -119,7 +119,6 @@ export default {
       this.loaded = true;
     }
     this.getCondicionesIva();
-    this.getLoguedUser();
   },
   methods: {
     getObject(id) {
@@ -152,14 +151,6 @@ export default {
             this.errorMessage = "Ocurrio un error";
           }
         });
-    },
-
-    getLoguedUser(){
-      GenericService(this.tenant,this.service,this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-      })
     },
 
     back() {

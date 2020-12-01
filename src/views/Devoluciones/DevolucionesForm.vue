@@ -226,7 +226,7 @@ export default {
       size: 5,
       totalPages: 0,
     },
-    loguedUser: null,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     radioGroup: "",
     filterString: "",
     checked: false,
@@ -247,7 +247,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getLoguedUser();
+    this.getAfipAuthorization();
   },
 
   methods: {
@@ -260,20 +260,14 @@ export default {
         });
     },
 
-    getLoguedUser() {
-      GenericService(this.tenant, this.service, this.token)
-        .getLoguedUser()
-        .then((data) => {
-          this.loguedUser = data.data;
-
-          VentasService(this.tenant, "ventas", this.token)
-          .getAfipModuleAuthorization()
-          .then((data) => {
-            this.afipModuleAuthorization = data.data;
-          });
-
-        });
+    getAfipAuthorization() {
+      VentasService(this.tenant, "ventas", this.token)
+      .getAfipModuleAuthorization()
+      .then((data) => {
+        this.afipModuleAuthorization = data.data;
+      });
     },
+
     deleteLine(id, status) {
       if (status === "entrante") {
         const filter = this.object.productosEntrantes.filter(

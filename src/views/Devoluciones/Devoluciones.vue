@@ -9,7 +9,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -90,7 +90,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="getLoguedUser()"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -146,7 +146,7 @@ import VentasService from '../../services/VentasService';
 export default {
   data: () => ({
     objects: [],
-    loguedUser: null,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterString: "",
     paginate: {
       page: 1,
@@ -170,39 +170,19 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
 
   methods: {
-     getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id != 1){
-          const sucursal = this.loguedUser.sucursal.id;
-          this.filterObjects(sucursal, this.filterString, this.paginate.page - 1, this.paginate.size);
-        }else{
-          this.getAll(this.paginate.page - 1, this.paginate.size);
-        }
-      })
+    filterObjects(param, page, size){
+      this.loaded = false
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
 
-      this.getAfipAuthorization();
-    },
-
-    getAll(page, size) {
-      this.objects = [];
-      this.loaded = false;
-      GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
-    },
-
-    filterObjects(id, param, page, size){
       GenericService(this.tenant, this.service, this.token)
         .filter({id, param, page, size})
         .then(data => {

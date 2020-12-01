@@ -3,13 +3,13 @@
     <v-form class="mb-3">
       <v-row>
         <v-col cols="6">
-          <v-btn v-if="perfil != 3" class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          <v-btn v-if="loguedUser.perfil < 3" class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
         <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -42,12 +42,16 @@
             <td>{{object.telefono}}</td>
             <td>{{object.email}}</td>
             <td>{{object.direccion}}</td>
-            <td>
-                <v-icon title="Stock" @click="showStock(object.id)">mdi-text-box</v-icon>
+            <td class="text-center">
+              <button @click="seeDetails(object)"><img
+                src="/../../images/icons/eye.svg"
+                width="40"
+                height="40"
+              /></button>
             </td>
             <td>
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
-              <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
+              <a title="Eliminar" v-if="loguedUser.perfil < 3"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
             </td>
           </tr>
         </tbody>
@@ -69,7 +73,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -88,6 +92,34 @@
       </v-card>
     </v-dialog>
     <!-- End Dialog Delete -->
+
+    <!-- Dialog Details-->
+    <v-dialog v-model="detailsDialog" width="500">
+      <v-card>
+        <v-card-title class="d-flex justify-center">Detalles de sucursal</v-card-title>
+        <v-card-text>
+          <v-simple-table style="background-color: transparent;">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th>Provincia</th>
+                  <th>Ciudad</th>
+                  <th>Teléfono alternativo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{$store.state.eventual.eventual.provincia}}</td>
+                  <td>{{$store.state.eventual.eventual.ciudad}}</td>
+                  <td>{{$store.state.eventual.eventual.telefonoAlternativo}}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog Details -->
   </v-container>
 </template>
 
@@ -98,7 +130,7 @@ export default {
   data: () => ({
     objects: [],
     perfil: 0,
-    loguedUser: null,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterString: "",
     paginate: {
       page: 1,
@@ -109,49 +141,36 @@ export default {
     tenant: "",
     service: "sucursales",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false
+    dialogDeleteObject: false,
+    detailsDialog: false
   }),
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
 
   methods: {
 
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id == 2){
-          this.perfil = 2;
-          this.objects = this.loguedUser.empresa.sucursales;
-          this.loaded = true;
-        }else if(this.loguedUser.perfil.id == 3){
-          this.perfil = 3;
-          this.objects = [this.loguedUser.sucursal];
-          this.loaded = true;
-        }else{
-          this.getAll(0, 100000);
-        }
-      })
-    },
+    filterObjects(param, page, size){
+      this.loaded = false
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
 
-    getAll(page, size) {
-      this.objects = [];
-      this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
+        .filter({id, param, page, size})
         .then(data => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
           this.loaded = true;
         });
-    },
-
-    changePage(page) {
-      this.getAll(page - 1, this.paginate.size);
     },
 
     newObject() {
@@ -160,17 +179,6 @@ export default {
 
     edit(id) {
       this.$router.push({ name: "sucursalesForm", params: { id: id } });
-    },
-
-    filterObjects(filter){
-      var f ={
-        razonSocial:filter
-      }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
     },
 
     openDelete(id) {
@@ -187,6 +195,12 @@ export default {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         });
     },
+
+    seeDetails(object){
+      this.$store.commit('eventual/addEventual', object);
+      this.detailsDialog = true;
+    },
+
   }
 };
 </script>

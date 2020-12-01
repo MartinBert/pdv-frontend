@@ -43,7 +43,7 @@
                       @change="
                         getComercialDocuments(
                           object.cliente.condicionIva.documentos,
-                          user.empresa.condicionIva.documentos
+                          loguedUser.empresa.condicionIva.documentos
                         )
                       "
                       v-model="object.cliente"
@@ -231,7 +231,7 @@ import ReportsService from "../../services/ReportsService";
 
 export default {
   data: () => ({
-    user: "",
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     fecha: getCurrentDate(),
     valid: true,
     barcode: "",
@@ -272,8 +272,8 @@ export default {
       const total = this.products.reduce((acc, el) => {
         if(this.object.planPago){
           const cleanPorcent = decimalPercent(this.object.planPago.porcentaje);
-          const impPorcent = (el.precioTotal * cleanPorcent).toFixed(2);
-          const totalValue = acc + Number(el.precioTotal) + Number(impPorcent);
+          const impPorcent = el.precioTotal * cleanPorcent;
+          const totalValue = Math.round((acc + Number(el.precioTotal) + Number(impPorcent)) * 100) / 100;
           return totalValue;
         }else{
           return acc + Number(el.precioTotal);
@@ -292,43 +292,37 @@ export default {
   mounted() {
     this.$store.commit("productos/resetStates");
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.getObjects();
   },
 
   methods: {
 
-    getLoguedUser() {
-      GenericService(this.tenant, this.service, this.token)
-        .getLoguedUser()
+    getObjects() {
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+      
+      const filterParam = { id, param: "", page: 0, size: 100000};
+      
+      GenericService(this.tenant, "clientes", this.token)
+        .filter(filterParam)
         .then((data) => {
-          this.user = data.data;
+          this.databaseItems.clientes = data.data.content;
+        });
 
-          let sucursal;
-          if(this.user.perfil.id < 3){
-            sucursal = ""
-          }else{
-            sucursal = this.user.sucursal.id;
-          }
-          
-          const filterParam = { id: sucursal, param: "", page: 0, size: 100000};
-          
-          GenericService(this.tenant, "clientes", this.token)
-            .filter(filterParam)
-            .then((data) => {
-              this.databaseItems.clientes = data.data.content;
-            });
+      GenericService(this.tenant, "mediosPago", this.token)
+        .filter(filterParam)
+        .then((data) => {
+          this.databaseItems.medios_de_pago = data.data.content;
+        });
 
-          GenericService(this.tenant, "mediosPago", this.token)
-            .filter(filterParam)
-            .then((data) => {
-              this.databaseItems.medios_de_pago = data.data.content;
-            });
-
-          VentasService(this.tenant, this.service, this.token)
-            .getAfipModuleAuthorization()
-            .then((data) => {
-              this.afipModuleAuthorization = data.data;
-            });
+      VentasService(this.tenant, this.service, this.token)
+        .getAfipModuleAuthorization()
+        .then((data) => {
+          this.afipModuleAuthorization = data.data;
         });
     },
 
@@ -496,11 +490,11 @@ export default {
 
     save() {
       /* Constants */
-      const sucursal = this.user.sucursal;
-      const ptoVenta = this.user.puntoVenta;
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
       const documento = this.object.documento;
-      const empresa = this.user.empresa;
+      const empresa = this.loguedUser.empresa;
       const cliente = this.object.cliente;
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
@@ -694,10 +688,10 @@ export default {
       const planesPago = this.object.planPago;
       const totalVenta = this.totalVenta;
       const cliente = this.object.cliente;
-      const empresa = this.user.empresa;
+      const empresa = this.loguedUser.empresa;
       const documento = this.object.documento;
-      const sucursal = this.user.sucursal;
-      const ptoVenta = this.user.puntoVenta;
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
       const fecha = this.fecha;
       const tenant = this.tenant;

@@ -109,7 +109,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="getLoguedUser()"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -172,6 +172,7 @@ export default {
   data: () => ({
     icon: "mdi-check-circle",
     file: null,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     objects: null,
     filterString: "",
     filterDouble: "",
@@ -186,7 +187,6 @@ export default {
     token: localStorage.getItem("token"),
     dialogMode: "",
     dialog: false,
-    loguedUser: {}
   }),
 
   components:{
@@ -196,40 +196,43 @@ export default {
   mounted() {
     this.$store.commit('eventual/resetStates');
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
 
   methods: {
 
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
-      })
-    },
-
     filterObjects(param, page, size){
       let filterParam;
-      let idsuc;
+      let id;
 
-      if(this.loguedUser.perfil.id < 3){
-        idsuc = "";
+      if(this.loguedUser.perfil < 3){
+        id = "";
       }else{
-        idsuc = this.loguedUser.sucursal.id;
+        id = this.loguedUser.sucursal.id;
       }
 
-      if(this.filterString === param){
-        this.filterDouble = "";
-        param = formatDate(param);
-        if(param === "//"){
-          param = "";
-        }
-        filterParam = {id: idsuc, param, page, size};
-      }else{
-        this.filterString = "";
-        filterParam = {id: idsuc, doubleParam: param, page, size};
+      switch (param) {
+        case undefined:
+            if(this.filterDouble !== ""){
+              filterParam = {id, doubleParam: this.doubleParam, page, size};
+            }else{
+              filterParam = {id, param, page, size}
+            }
+          break;
+        
+        default:
+            if(param === this.filterString){
+              this.filterDouble = "";
+              param = formatDate(param);
+              if(param === "//"){
+                param = "";
+              }
+              filterParam = {id, param, page, size};
+            }else{
+              this.filterString = "";
+              filterParam = {id, doubleParam: param, page, size};
+            }
+          break;
       }
 
       GenericService(this.tenant, "ventas", this.token)

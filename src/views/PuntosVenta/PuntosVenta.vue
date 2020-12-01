@@ -9,7 +9,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -61,7 +61,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -90,7 +90,7 @@ export default {
   data: () => ({
     objects: [],
     empresas: [],
-    loguedUser: null,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterString: "",
     paginate: {
       page: 1,
@@ -105,26 +105,10 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
 
   methods: {
-    getAll(page, size) {
-      this.objects = [];
-      this.loaded = false;
-      GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
-    },
-
-    changePage(page) {
-      this.getAll(page - 1, this.paginate.size);
-    },
-
     newObject() {
       this.$router.push({ name: "puntosVentaForm", params: { id: 0 } });
     },
@@ -133,14 +117,24 @@ export default {
       this.$router.push({ name: "puntosVentaForm", params: { id: id } });
     },
 
-    filterObjects(filter){
-      var f ={
-        razonSocial:filter
+    filterObjects(param, page, size){
+      this.loaded = false
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.sucursal.id;
       }
+
       GenericService(this.tenant, this.service, this.token)
-        .filter(f)
+        .filter({id, param, page, size})
         .then(data => {
           this.objects = data.data.content;
+          this.paginate.totalPages = data.data.totalPages;
+          if(this.paginate.totalPages < this.paginate.page){
+              this.paginate.page = 1;
+          }
+          this.loaded = true;
         });
     },
 
@@ -158,28 +152,6 @@ export default {
           this.getAll(this.paginate.page - 1, this.paginate.size);
         });
     },
-
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id == 2){
-          var obj = this.loguedUser.empresa.sucursales;
-          obj.forEach(el => {
-              el.puntosVenta.forEach(e => {
-                this.objects.push(e);
-              })
-          })
-          this.loaded = true;
-        }else if(this.loguedUser.perfil.id == 3){
-          this.objects = this.loguedUser.sucursal.puntosVenta;
-          this.loaded = true;
-        }else{
-          this.getAll(0, 100000);
-        }
-      })
-    }
   }
 };
 </script>

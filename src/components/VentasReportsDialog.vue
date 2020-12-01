@@ -209,7 +209,7 @@ export default {
       token: localStorage.getItem("token"),
       months: null,
       years: getYearsList(),
-      loguedUser: null,
+      loguedUser: JSON.parse(localStorage.getItem("userData")),
       documentos: [],
       clientes: [],
       object:{
@@ -229,23 +229,21 @@ export default {
   mounted(){
     this.tenant = this.$route.params.tenant;
     this.months = monthsList;
-    this.getLoguedUser();
+    this.getObjects();
   },
 
   methods:{
     /****USER****/
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-      }).then(() => {
-        let filterParam;
-        if(this.loguedUser.perfil.id < 2){
-          filterParam = {id: '', param: '', page: 0, size: 100000}
+    getObjects(){
+
+        let id;
+        if(this.loguedUser.perfil < 3){
+          id = "";
         }else{
-          filterParam = {id: this.loguedUser.sucursal.id, param: "", page: 0, size: 100000};
+          id = this.loguedUser.sucursal.id;
         }
+
+        const filterParam = {id, param: '', page: 0, size: 100000}
 
         GenericService(this.tenant, "clientes", this.token)
         .filter(filterParam)
@@ -258,7 +256,7 @@ export default {
         .then(data => {
           this.documentos = data.data;
         })
-      })
+
     },
     /****USER****/
 

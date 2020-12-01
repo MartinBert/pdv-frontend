@@ -1,6 +1,6 @@
 <template>
     <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px" @input="refresh()">
-      <v-card>
+      <v-card height="780px">
         <v-card-title>
           <v-row>
             <v-col>

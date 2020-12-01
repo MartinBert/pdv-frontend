@@ -280,8 +280,8 @@ export default {
   },
   methods: {
     go: function(to) {
+      if(this.$router.currentRoute.name !== to)
       this.$router.push({ name: to });
-      console.log(this.$router);
       this.nameRouter = to;
     },
     logout: function() {

@@ -222,7 +222,7 @@ export default {
         size: 5,
         totalPages: 0
       },
-      loguedUser: null,
+      loguedUser: JSON.parse(localStorage.getItem("userData")),
       tenant: null,
       token: localStorage.getItem("token"),
       dialogObject: {
@@ -260,30 +260,25 @@ export default {
 
   methods: {
     getAllObjects() {
-      GenericService(this.tenant, this.service, this.token)
-        .getLoguedUser()
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
+      const filterParam = {id, param: "", page: 0, size: 100000}
+
+      GenericService(this.tenant, "clientes", this.token)
+        .filter(filterParam)
         .then((data) => {
-          this.loguedUser = data.data;
-          let id;
-          if(this.loguedUser.perfil.id < 3){
-            id = ""
-          }else{
-            id = this.loguedUser.sucursal.id;
-          }
+          this.databaseItems.clientes = data.data.content;
+        });
 
-          const filterParam = {id, param: "", page: 0, size: 100000}
-
-          GenericService(this.tenant, "clientes", this.token)
-            .filter(filterParam)
-            .then((data) => {
-              this.databaseItems.clientes = data.data.content;
-            });
-
-          GenericService(this.tenant, "mediosPago", this.token)
-            .filter(filterParam)
-            .then((data) => {
-              this.databaseItems.medios_de_pago = data.data.content;
-            });
+      GenericService(this.tenant, "mediosPago", this.token)
+        .filter(filterParam)
+        .then((data) => {
+          this.databaseItems.medios_de_pago = data.data.content;
         });
     },
 

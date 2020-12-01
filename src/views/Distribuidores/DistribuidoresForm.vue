@@ -122,7 +122,8 @@ export default {
     service: "distribuidores",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: ""
+    errorMessage: "",
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
   mounted() {
@@ -133,7 +134,6 @@ export default {
       this.loaded = true;
     }
     this.getCondicionesIva();
-    this.getLoguedUser();
   },
   methods: {
     getObject(id) {
@@ -143,14 +143,6 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
-    },
-
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-      })
     },
 
     getCondicionesIva(){

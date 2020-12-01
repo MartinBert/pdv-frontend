@@ -158,11 +158,11 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import EmpresasService from "../../services/EmpresasService";
 
 export default {
   data: () => ({
     valid: true,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     tipopersona: [
       { id: 1, text: "Física" },
       { id: 2, text: "Jurídica" }
@@ -180,13 +180,12 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
       this.loaded = true;
     }
-    this.getCondicionesIva();
+    this.filterObjects("", 0, 100000)
   },
   methods: {
     getObject(id) {
@@ -198,41 +197,29 @@ export default {
         });
     },
 
-    getCondicionesIva(){
-      EmpresasService(this.tenant, "empresas", this.token)
-        .getIvaConditions()
-        .then(data => {
-          this.condicioniva = data.data;
-        });
-    },
+    filterObjects(param, page, size){
+      this.loaded = false
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.empresa.id;
+      }
 
-    getEmpresas() {
+      const filterParam = {id, param, page, size}
+
       GenericService(this.tenant, "empresas", this.token)
-        .getAll(0, 100)
+        .filter(filterParam)
         .then(data => {
           this.empresas = data.data.content;
         });
-    },
 
-    getEmpresasForId(id){
-      GenericService(this.tenant, "empresas", this.token)
-      .get(id)
-      .then(data => {
-        this.empresas = [data.data];
-      })
-    },
-
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id != 1){
-          this.getEmpresasForId(this.loguedUser.empresa.id);
-        }else{
-          this.getEmpresas();
-        }
-      })
+      GenericService(this.tenant, "condicionesFiscales", this.token)
+        .filter(filterParam)
+        .then(data => {
+          this.condicioniva = data.data.content.filter(el => el.id !== 3)
+          this.loaded = true;
+        });
     },
 
     save() {

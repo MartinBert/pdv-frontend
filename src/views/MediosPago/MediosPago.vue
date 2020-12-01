@@ -45,7 +45,13 @@
           <tr>
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
-            <td><v-icon title="Ver planes" @click="openPlans(object.planPago)">mdi-clipboard-list</v-icon></td>
+            <td class="text-center">
+              <button @click="openPlans(object.planPago)"><img
+                src="/../../images/icons/eye.svg"
+                width="40"
+                height="40"
+              /></button>
+            </td>
             <td>
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
               <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
@@ -96,7 +102,7 @@
         <v-toolbar class="d-flex justify-center" color="primary" dark>
           <v-toolbar-title>Planes</v-toolbar-title>
         </v-toolbar>
-        <div v-if="plans != ''" align="center" justify="center">
+        <div align="center" justify="center">
           <v-list>
             <v-list-item v-for="p in plans" :key="p.id">
                 <v-list-item-icon>
@@ -105,11 +111,6 @@
                 {{p.nombre}}
             </v-list-item>
           </v-list>
-        </div>
-        <div v-if="plans == ''" align="center" justify="center">
-          <img id="ghostImage" src="/../../images/mediosPago/ghost.png"><br>
-          <img src="/../../images/mediosPago/shadow.png"><br>
-          Nada por aquí...
         </div>
       </v-card>
     </v-dialog>
@@ -120,6 +121,7 @@
 
 <script>
 import GenericService from "../../services/GenericService";
+import {infoAlert} from "../../helpers/alerts";
 import XLSX from 'xlsx';
 
 export default {
@@ -182,8 +184,13 @@ export default {
     },
 
     openPlans(plans){
-      this.plans = plans;
-      this.seePlansDialog = true;
+      if(plans.length > 0){
+        this.plans = plans;
+        this.seePlansDialog = true;
+      }else{
+        infoAlert("Sin planes asociados");
+      }
+      
     },
 
     deleteObject() {
