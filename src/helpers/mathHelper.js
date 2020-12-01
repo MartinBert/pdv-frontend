@@ -27,3 +27,11 @@ export function sumarNumeros(array){
     const result = array.reduce(reducer);
     return result;
 }
+
+export function generateFiveDecimalCode(){
+    const minm = 10000;
+    const maxm = 99999;
+    const fiveDecimalCode = Math.floor(Math.random() * (maxm - minm + 1)) + minm;
+    
+    return fiveDecimalCode;
+}

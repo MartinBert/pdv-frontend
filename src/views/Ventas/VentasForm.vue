@@ -224,6 +224,7 @@ import {
   generateBarCode,
   calculatePercentaje,
   decimalPercent,
+  generateFiveDecimalCode
 } from "../../helpers/mathHelper";
 import { errorAlert, successAlert } from '../../helpers/alerts';
 import axios from "axios";
@@ -728,7 +729,7 @@ export default {
 
       comprobante = {
         letra: "X",
-        numeroCbte: 0,
+        numeroCbte: generateFiveDecimalCode(),
         fechaEmision: formatDate(fecha),
         fechaVto: formatDate(fecha),
         condicionVenta: condVenta,
