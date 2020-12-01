@@ -22,6 +22,20 @@
         <v-col cols="3">
           <v-text-field
             type="number"
+            v-model="filterStringReceiptNumber"
+            v-on:input="filterObjects(filterStringReceiptNumber, paginate.page - 1, paginate.size)"
+            dense
+            outlined
+            rounded
+            label="Búsqueda por número de comprobante"
+            placeholder=" "
+            class="text-left"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="3">
+          <v-text-field
+            type="number"
             v-model="filterDouble"
             v-on:input="filterObjects(filterDouble, paginate.page - 1, paginate.size)"
             dense
@@ -176,6 +190,7 @@ export default {
     objects: null,
     filterString: "",
     filterDouble: "",
+    filterStringReceiptNumber: "",
     paginate: {
       page: 1,
       size: 10,
@@ -215,6 +230,8 @@ export default {
         case undefined:
             if(this.filterDouble !== ""){
               filterParam = {id, doubleParam: this.doubleParam, page, size};
+            }else if(this.filterStringReceiptNumber !== ""){
+              filterParam = {id, param: this.filterStringReceiptNumber, page, size}
             }else{
               filterParam = {id, param, page, size}
             }
@@ -223,14 +240,20 @@ export default {
         default:
             if(param === this.filterString){
               this.filterDouble = "";
+              this.filterStringReceiptNumber = "";
               param = formatDate(param);
               if(param === "//"){
                 param = "";
               }
               filterParam = {id, param, page, size};
-            }else{
+            }else if(param === this.filterDouble){
               this.filterString = "";
+              this.filterStringReceiptNumber = "";
               filterParam = {id, doubleParam: param, page, size};
+            }else{
+              this.filterString = "",
+              this.filterDouble = "",
+              filterParam = {id, param, page, size}
             }
           break;
       }
