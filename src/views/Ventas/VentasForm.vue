@@ -268,6 +268,10 @@ export default {
     this.$barcodeScanner.init(this.onBarcodeScanned);
   },
 
+  destroyed () {
+      this.$barcodeScanner.destroy()
+  },
+
   computed: {
     totalVenta() {
       const total = this.products.reduce((acc, el) => {
@@ -348,23 +352,31 @@ export default {
     },
 
     onBarcodeScanned(barcode) {
-      VentasService(this.tenant, "productos", this.token)
-        .getForBarCode(barcode)
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = '';
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
+      GenericService(this.tenant, "productos", this.token)
+        .filter({id, param: barcode, page: 0, size: 1})
         .then((data) => {
+          let databaseItem = data.data.content[0];
           if (this.products.length == 0) {
-            data.data.cantUnidades = 1;
-            data.data.total = data.data.precioTotal;
-            this.products.push(this.processProductsObject(data.data));
+            databaseItem.cantUnidades = 1;
+            databaseItem.total = databaseItem.precioTotal;
+            this.products.push(this.processProductsObject(databaseItem));
           } else {
-            if(this.products.filter(el => el.id === data.data.id).length > 0){
-              this.products.filter(el => el.id === data.data.id)[0].cantUnidades++;
-              this.products.filter(el => el.id === data.data.id)[0].precioTotal = 
-              this.products.filter(el => el.id === data.data.id)[0].precioUnitario *
-              this.products.filter(el => el.id === data.data.id)[0].cantUnidades;
+            if(this.products.filter(el => el.id === databaseItem.id).length > 0){
+              this.products.filter(el => el.id === databaseItem.id)[0].cantUnidades++;
+              this.products.filter(el => el.id === databaseItem.id)[0].precioTotal = 
+              this.products.filter(el => el.id === databaseItem.id)[0].precioUnitario *
+              this.products.filter(el => el.id === databaseItem.id)[0].cantUnidades;
             }else{
-              data.data.cantUnidades = 1;
-              data.data.total = data.data.precioTotal;
-              this.products.push(this.processProductsObject(data.data));
+              databaseItem.cantUnidades = 1;
+              databaseItem.total = databaseItem.precioTotal;
+              this.products.push(this.processProductsObject(databaseItem));
             }
           }
         })

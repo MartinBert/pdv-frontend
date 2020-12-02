@@ -171,6 +171,7 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+    this.getAfipAuthorization();
   },
 
   methods: {

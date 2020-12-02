@@ -33,7 +33,6 @@
           <v-row class="ma-1">
           <v-col class="d-flex col-6">
             <v-select
-              @input="getSucursales"
               :items="empresas"
               v-model="object.empresa"
               item-text="alias"
@@ -46,7 +45,6 @@
         <v-row class="ma-1">
           <v-col class="d-flex col-6">
             <v-select
-              @input="getPuntosVenta"
               :items="sucursales"
               v-model="object.sucursal"
               item-text="nombre"
@@ -128,6 +126,7 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     valid:true,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     perfiles: [],
     object: {},
     perfil: {},
@@ -140,18 +139,17 @@ export default {
     service: "usuarios",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: "",
-    loguedUser: {}
+    errorMessage: ""
   }),
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
       this.loaded = true;
     }
+    this.getAllObjects('', 0, 100000);
   },
 
   methods: {
@@ -164,44 +162,30 @@ export default {
         });
     },
 
-    getPerfiles() {
+    getAllObjects(param, page, size){
+      let id;
+      if(this.loguedUser.perfil !== 1){
+        id = this.loguedUser.empresa.id;
+      }else{
+        id = '';
+      }
+
+      const filterParam = {id, param, page, size}
+
       GenericService(this.tenant, "perfiles", this.token)
-        .getAll(0, 100)
-        .then(data => {
-          this.perfiles = data.data.content;
-        });
-    },
-
-    getPerfilesForId(id){
-      GenericService(this.tenant, "perfiles", this.token)
-      .get(id)
+      .filter(filterParam)
       .then(data => {
-        this.perfiles.push(data.data);
-      })
-    },
+        this.perfiles = data.data.content;
+      });
 
-    getEmpresas() {
       GenericService(this.tenant, "empresas", this.token)
-        .getAll(0, 100)
-        .then(data => {
-          this.empresas = data.data.content;
-        });
-    },
-
-    getEmpresasForId(id){
-      GenericService(this.tenant, "empresas", this.token)
-      .get(id)
+      .filter(filterParam)
       .then(data => {
-        this.empresas = [data.data];
-      })
-    },
+        this.empresas = data.data.content;
+        this.sucursales = this.empresa.sucursales;
+        this.puntos_venta = this.sucursales.puntosVenta;
+      });
 
-    getSucursales(){
-      this.sucursales = this.object.empresa.sucursales;
-    },
-
-    getPuntosVenta(){
-      this.puntos_venta = this.object.sucursal.puntosVenta
     },
 
     save() {
@@ -224,25 +208,9 @@ export default {
       this.$router.push({ name: "usuarios" });
     },
 
-    resetPassword: function() {
+    resetPassword() {
       this.changePassword = !this.changePassword;
     },
-
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id != 1){
-          this.getEmpresasForId(this.loguedUser.empresa.id);
-          this.getPerfilesForId(3);
-          this.getPerfilesForId(4);
-        }else{
-          this.getPerfiles();
-          this.getEmpresas();
-        }
-      })
-    }
   }
 };
 </script>

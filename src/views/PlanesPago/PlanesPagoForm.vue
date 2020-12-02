@@ -73,7 +73,6 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getLoguedUser();
   },
   methods: {
 

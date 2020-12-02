@@ -89,7 +89,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import EmpresasService from "../../services/EmpresasService";
 
 export default {
   data: () => ({
@@ -118,7 +117,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getCondicionesIva();
+    this.getIvaConditions('', 0, 100000);
   },
   methods: {
     getObject(id) {
@@ -130,11 +129,12 @@ export default {
         });
     },
 
-    getCondicionesIva(){
-      EmpresasService(this.tenant, this.service, this.token)
-        .getIvaConditions()
+    getIvaConditions(param, page, size){
+      let id = '';
+      GenericService(this.tenant, "condicionesFiscales", this.token)
+        .filter({id, param, page, size})
         .then(data => {
-          this.condicioniva = data.data;
+          this.condicioniva = data.data.content.filter(el => el.id !== 3);
         });
     },
 

@@ -19,6 +19,7 @@
               rounded
               class="text-left"
               label="Puede buscar un artículo escribiendo su nombre, código o código de barras aquí"
+              placeholder=" "
               append-icon="mdi-magnify"
             ></v-text-field>
           </v-col>
@@ -106,6 +107,7 @@
               multiple
               item-text="nombre"
               label="Seleccione el o los depositos donde se encuentra su stock"
+              placeholder=" "
               :return-object="true"
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-autocomplete>
@@ -115,7 +117,8 @@
               type="number"
               :counter="50"
               v-model="object.cantidad"
-              placeholder="Cantidad de stock"
+              label="Cantidad de stock"
+              placeholder=" "
               required
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
@@ -219,6 +222,14 @@ export default {
     }
   },
 
+  created() {
+    this.$barcodeScanner.init(this.onBarcodeScanned);
+  },
+
+  destroyed () {
+      this.$barcodeScanner.destroy()
+  },
+
   methods: {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
@@ -316,6 +327,67 @@ export default {
             .then(() => {
               this.$router.push({ name: "stock" });
             });
+        }
+      }
+    },
+
+    onBarcodeScanned(barcode) {
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = '';
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
+      GenericService(this.tenant, "productos", this.token)
+        .filter({id, param: barcode, page: 0, size: 1})
+        .then((data) => {
+          const databaseItem = data.data.content[0];
+          const productInList = this.productos.filter(el => el.id === databaseItem.id)[0];
+
+          if(this.object.producto.length > 0){
+            if(productInList){
+              if(productInList.selected === true){
+                this.productos.filter(el => el.id === databaseItem.id)[0].selected = false;
+                this.$refs.tab.$forceUpdate();
+              }else{
+                this.productos.filter(el => el.id === databaseItem.id)[0].selected = true;
+                this.$refs.tab.$forceUpdate();
+              }
+            }
+
+            const checkInAddedProductsList = this.object.producto.filter(el => el.id === databaseItem.id)[0];
+            
+            if(checkInAddedProductsList){
+              this.object.producto = this.object.producto.filter(el => el.id !== databaseItem.id);
+            }else{
+              this.object.producto.push(databaseItem);
+            }
+
+          }else{
+            this.object.producto.push(databaseItem);
+            if(productInList){
+              this.productos.filter(el => el.id === databaseItem.id)[0].selected = true;
+              this.$refs.tab.$forceUpdate();
+            }
+          }
+        })
+        .catch(() => {
+          errorAlert("No existe un producto con ese código de barras");
+        });
+    },
+
+    evalCheck(id){
+      const productosFiltrados = this.productos.filter((el) => el.id === id);
+      if(productosFiltrados.length > 0){
+        switch (productosFiltrados[0].selected) {
+          case (false || undefined):
+              this.productos.filter((el) => el.id === id)[0].selected = true;
+            break;
+        
+          default:
+              this.productos.filter((el) => el.id === id)[0].selected = false;
+            break;
         }
       }
     },

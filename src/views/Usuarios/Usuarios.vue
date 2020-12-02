@@ -5,73 +5,19 @@
         <v-col cols="1">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-col cols="2">
-          <v-autocomplete
-          :items="empresas"
-          v-model="empresa"
-          item-text="razonSocial"
-          label="Filtrar por empresa"
-          :return-object="true"
-          @change="
-            filterOptions(
-              'c.empresa.id',
-              empresa.id,
-              paginate.page - 1,
-              paginate.size
-            )
-          "
-          ></v-autocomplete>
-        </v-col>
-        <v-col cols="2">
-          <v-autocomplete
-            :items="sucursales"
-            v-model="sucursal"
-            item-text="razonSocial"
-            label="Filtrar por sucursal"
-            :return-object="true"
-            @change="
-              filterOptions(
-                'c.sucursal.id',
-                sucursal.id,
-                paginate.page - 1,
-                paginate.size
-              )
-            "
-          ></v-autocomplete>
-        </v-col>
-        <v-col cols="3">
-          <v-autocomplete
-            :items="puntosVenta"
-            v-model="puntoVenta"
-            item-text="nombre"
-            label="Filtrar por punto de venta"
-            :return-object="true"
-            @change="
-              filterOptions(
-                'c.puntoVenta.id',
-                puntoVenta.id,
-                paginate.page - 1,
-                paginate.size
-              )
-            "
-          ></v-autocomplete>
-        </v-col>
-        <v-col cols="3">
+        <v-spacer></v-spacer>
+        <v-col cols="5">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
             class="text-left"
-            placeholder="Búsqueda"
+            label="Búsqueda"
+            placeholder=" "
             append-icon="mdi-magnify"
           ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-btn class="success" @click="cleanFilters()">Limpiar filtros</v-btn>
         </v-col>
       </v-row>
 
@@ -90,55 +36,15 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td
-              v-if="
-                loguedUser.perfil.id === 1 ||
-                loguedUser.empresa.id === object.empresa.id
-              "
-            >
-              {{ object.id }}
-            </td>
-            <td
-              v-if="
-                loguedUser.perfil.id === 1 ||
-                loguedUser.empresa.id === object.empresa.id
-              "
-            >
-              {{ object.nombre }}
-            </td>
-            <td
-              v-if="
-                loguedUser.perfil.id === 1 ||
-                loguedUser.empresa.id === object.empresa.id
-              "
-            >
-              {{ object.username }}
-            </td>
-            <td
-              v-if="
-                loguedUser.perfil.id === 1 ||
-                loguedUser.empresa.id === object.empresa.id
-              "
-            >
-              {{ object.perfil.nombre }}
-            </td>
-            <td
-              v-if="
-                loguedUser.perfil.id === 1 ||
-                loguedUser.empresa.id === object.empresa.id
-              "
-            >
+            <td>{{ object.id }}</td>
+            <td>{{ object.nombre }}</td>
+            <td>{{ object.username }}</td>
+            <td>{{ object.perfil.nombre }}</td>
+            <td>
               <span v-if="object.empresa == null">Todas</span>
-              <span v-if="object.empresa != null">{{
-                object.empresa.alias
-              }}</span>
+              <span v-if="object.empresa != null">{{object.empresa.alias}}</span>
             </td>
-            <td
-              v-if="
-                loguedUser.perfil.id === 1 ||
-                loguedUser.empresa.id === object.empresa.id
-              "
-            >
+            <td>
               <a title="Editar"
                 ><img
                   src="/../../images/icons/ico_10.svg"
@@ -174,7 +80,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage(paginate.page - 1, paginate.size)"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -204,7 +110,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import UsuariosService from "../../services/UsuariosService";
 
 export default {
   data: () => ({
@@ -220,59 +125,35 @@ export default {
     service: "usuarios",
     token: localStorage.getItem("token"),
     dialogDeleteObject: false,
-    loguedUser: {},
-    empresas: [],
-    sucursales: [],
-    puntosVenta: [],
-    empresa: null,
-    sucursal: null,
-    puntoVenta: null,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getUserLogued();
-    this.getModels();
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
 
   methods: {
-    getAll(page, size) {
-      this.objects = [];
-      this.loaded = false;
-      GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then((data) => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
-    },
 
-    getModels() {
-      GenericService(this.tenant, "empresas", this.token)
-        .getAll()
-        .then((data) => {
-          this.empresas = data.data.content;
-        });
-      GenericService(this.tenant, "sucursales", this.token)
-        .getAll()
-        .then((data) => {
-          this.sucursales = data.data.content;
-        });
-      GenericService(this.tenant, "punto_ventas", this.token)
-        .getAll()
-        .then((data) => {
-          this.puntosVenta = data.data.content;
-        });
-    },
-
-    changePage(page, size) {
-      if (this.sucursal) {
-        this.filterUsersForSucursal(this.sucursal.id, page, size);
-      } else {
-        this.getAll(page, size);
+    filterObjects(param, page, size){
+      let id;
+      if(this.loguedUser.perfil !== 1){
+        id = this.loguedUser.empresa.id;
+      }else{
+        id = '';
       }
+
+      GenericService(this.tenant, this.service, this.token)
+      .filter({id, param, page, size})
+      .then(data => {
+        this.objects = data.data.content;
+        console.log(this.objects)
+        this.paginate.totalPages = data.data.totalPages;
+        if(this.paginate.totalPages < this.paginate.page){
+          this.paginate.page = 1;
+        }
+        this.loaded = true;
+      })
     },
 
     newObject() {
@@ -281,23 +162,6 @@ export default {
 
     edit(id) {
       this.$router.push({ name: "usuariosForm", params: { id: id } });
-    },
-
-    filterObjects(filter) {
-      this.empresa = null;
-      this.sucursal = null;
-      this.puntoVenta = null;
-      
-      if(filter === ""){
-        this.getAll(this.paginate.page - 1, this.paginate.size);
-      }
-      
-      let f = { nombre: filter };
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then((data) => {
-          this.objects = data.data.content;
-        });
     },
 
     openDelete(id) {
@@ -311,34 +175,10 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getAll(this.paginate.page - 1, this.paginate.size);
+          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
         });
     },
 
-    getUserLogued() {
-      GenericService(this.tenant, this.service, this.token)
-        .getLoguedUser()
-        .then((data) => {
-          this.loguedUser = data.data;
-        });
-    },
-
-    filterOptions(filterParam, id, page, size) {
-      UsuariosService(this.tenant, this.service, this.token)
-        .filterUsersForSucursal(filterParam, id, page, size)
-        .then((data) => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-        });
-    },
-
-    cleanFilters(){
-      this.empresa = null;
-      this.sucursal = null;
-      this.puntoVenta = null;
-      this.filterString = "";
-      this.getAll(this.paginate.page - 1, this.paginate.size)
-    }
   },
 };
 </script>
