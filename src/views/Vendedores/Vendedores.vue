@@ -9,7 +9,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -67,7 +67,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page(paginate.page - 1, paginate.size)"
       :total-visible="8"
-      @input="getLoguedUser()"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -105,47 +105,31 @@ export default {
     tenant: "",
     service: "vendedores",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false
+    dialogDeleteObject: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getLoguedUser();
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
   methods: {
-    getLoguedUser(){
-      GenericService(this.tenant, this.service, this.token)
-      .getLoguedUser()
-      .then(data => {
-        this.loguedUser = data.data;
-        if(this.loguedUser.perfil.id != 1){
-          const sucursal = this.loguedUser.sucursal.id
-          this.getVendedoresForSucursal(sucursal, this.paginate.page - 1, this.paginate.size);
-        }else{
-          this.getAll(this.paginate.page - 1, this.paginate.size);
-        }
-      })
-    },
 
-    getAll(page, size) {
-      this.objects = [];
+    filterObjects(param, page, size){
       this.loaded = false;
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = "";
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
       GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then(data => {
+        .filter({id, param, page, size})
+        .then((data) => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-    },
-
-    getVendedoresForSucursal(sucursal, page, size){
-      GenericService(this.tenant, this.service, this.token)
-      .getDataForSucursal(sucursal, page, size)
-      .then(data => {
-        this.objects = data.data.content;
-        this.paginate.totalPages = data.data.totalPages;
-        this.loaded = true;
-      })
     },
 
     newObject() {
@@ -156,16 +140,7 @@ export default {
       this.$router.push({ name: "vendedoresForm", params: { id: id } });
     },
 
-    filterObjects(filter){
-      var f ={
-        razonSocial:filter
-      }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
-    },
+    
 
     openDelete(id) {
       this.idObjet = id;

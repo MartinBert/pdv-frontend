@@ -10,7 +10,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -60,7 +60,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -100,57 +100,45 @@ export default {
     token: localStorage.getItem("token"),
     dialogDeleteObject: false
   }),
+
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
+
   methods: {
-    getAll: function(page, size) {
-      this.loaded = false;
+
+    filterObjects(param, page, size){
+      let id = 1;
       GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
+      .filter({id, param, page, size})
+      .then(data => {
+        this.objects = data.data.content;
+        this.paginate.totalPages = data.data.totalPages;
+        this.loaded = true;
+      })
     },
 
-    changePage: function(page) {
-      this.getAll(page - 1, this.paginate.size);
-    },
-
-    newObject: function() {
+    newObject() {
       this.$router.push({ name: "perfilesForm", params: { id: 0 } });
     },
 
-    edit: function(id) {
+    edit(id) {
       this.$router.push({ name: "perfilesForm", params: { id: id } });
     },
 
-    filterObjects: function(filter){
-      var f ={
-        nombre:filter
-      }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
-    },
-
-    openDelete: function(id) {
+    openDelete(id) {
       this.idObjet = id;
       this.dialogDeleteObject = true;
     },
 
-    deleteObject: function() {
+    deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getAll(this.paginate.page - 1, this.paginate.size);
+          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
         });
     }
   }

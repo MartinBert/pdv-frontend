@@ -30,7 +30,7 @@
             </v-select>
           </v-col>
         </v-row>
-          <v-row class="ma-1">
+          <v-row v-if="loguedUser.perfil === 1" class="ma-1">
           <v-col class="d-flex col-6">
             <v-select
               :items="empresas"
@@ -38,6 +38,7 @@
               item-text="alias"
               label="Empresa"
               :return-object="true"
+              @change="get('sucursales')"
             >
             </v-select>
           </v-col>
@@ -45,11 +46,12 @@
         <v-row class="ma-1">
           <v-col class="d-flex col-6">
             <v-select
-              :items="sucursales"
+              :items="listenenItems.sucursales"
               v-model="object.sucursal"
               item-text="nombre"
               label="Sucursal"
-              :return-object="true"              
+              :return-object="true"
+              @change="get('puntos_venta')"              
             >
             </v-select>
           </v-col>
@@ -57,7 +59,7 @@
         <v-row class="ma-1">
           <v-col class="d-flex col-6">
             <v-select
-              :items="puntos_venta"
+              :items="listenenItems.puntos_venta"
               v-model="object.puntoVenta"
               item-text="nombre"
               label="Punto de venta"
@@ -131,8 +133,7 @@ export default {
     object: {},
     perfil: {},
     empresas: [],
-    sucursales: [],
-    puntos_venta: [],
+    listenenItems: { sucursales: [], puntos_venta: [] },
     loaded: false,
     changePassword: false,
     tenant: "",
@@ -163,6 +164,7 @@ export default {
     },
 
     getAllObjects(param, page, size){
+
       let id;
       if(this.loguedUser.perfil !== 1){
         id = this.loguedUser.empresa.id;
@@ -170,22 +172,30 @@ export default {
         id = '';
       }
 
-      const filterParam = {id, param, page, size}
-
       GenericService(this.tenant, "perfiles", this.token)
-      .filter(filterParam)
+      .filter({id: this.loguedUser.perfil , param, page, size})
       .then(data => {
         this.perfiles = data.data.content;
       });
 
       GenericService(this.tenant, "empresas", this.token)
-      .filter(filterParam)
+      .filter({id, param, page, size})
       .then(data => {
         this.empresas = data.data.content;
-        this.sucursales = this.empresa.sucursales;
-        this.puntos_venta = this.sucursales.puntosVenta;
+        if(this.loguedUser.perfil !== 1){
+          this.object.empresa = this.empresas[0];
+          this.get('sucursales');
+        }
       });
 
+    },
+
+    get(param){
+      if(param === "sucursales"){
+        this.listenenItems.sucursales = this.object.empresa.sucursales;
+      }else{
+        this.listenenItems.puntos_venta = this.object.sucursal.puntosVenta;
+      }
     },
 
     save() {

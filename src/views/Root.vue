@@ -269,6 +269,32 @@ export default {
             title: "Puntos de venta",
             visible: false
           },
+          {
+            path: "/modulos",
+            name: "modulos",
+            title: "Modulos",
+            visible: false
+          },
+        ]
+      },
+      {
+        name: "soporte",
+        title: "Soporte",
+        visible: false,
+        icon: "/../images/icons/ico_12.svg",
+        childs: [
+          {
+            path: "/preguntas_frecuentes",
+            name: "preguntasFrecuentes",
+            title: "Preguntas Frecuentes",
+            visible: false
+          },
+          {
+            path: "/manuales",
+            name: "manuales",
+            title: "Manuales e instructivos",
+            visible: false
+          },
         ]
       }
     ],

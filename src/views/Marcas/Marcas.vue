@@ -18,7 +18,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
-            v-on:input="filterObjects(filterString)"
+            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -68,7 +68,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -108,46 +108,39 @@ export default {
     tenant: "",
     service: "marcas",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false
+    dialogDeleteObject: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
   },
   methods: {
-    getAll: function(page, size) {
-      this.objects = [];
+
+    filterObjects(param, page, size){
       this.loaded = false;
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = "";
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
       GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then(data => {
+        .filter({id, param, page, size})
+        .then((data) => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
-
-    changePage(page) {
-      this.getAll(page - 1, this.paginate.size);
-    },
-
+    
     newObject() {
       this.$router.push({ name: "marcasForm", params: { id: 0 } });
     },
 
     edit(id) {
       this.$router.push({ name: "marcasForm", params: { id: id } });
-    },
-
-    filterObjects(filter){
-      var f ={
-        nombre:filter
-      }
-      GenericService(this.tenant, this.service, this.token)
-        .filter(f)
-        .then(data => {
-          this.objects = data.data.content;
-        });
     },
 
     openDelete(id) {
@@ -161,7 +154,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getAll(this.paginate.page - 1, this.paginate.size);
+          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
         });
     },
 

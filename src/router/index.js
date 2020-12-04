@@ -43,6 +43,11 @@ import Stock from '../views/Stock/Stock.vue';
 import StockForm from '../views/Stock/StockForm.vue';
 import Devoluciones from "../views/Devoluciones/Devoluciones.vue";
 import DevolucionesForm from "../views/Devoluciones/DevolucionesForm.vue";
+import Modulos from "../views/Modulos/Modulos.vue";
+import ModulosForm from "../views/Modulos/ModulosForm.vue";
+import PreguntasFrecuentes from "../views/PreguntasFrecuentes/PreguntasFrecuentes.vue";
+import PreguntasFrecuentesForm from "../views/PreguntasFrecuentes/PreguntasFrecuentesForm.vue";
+import Manuales from "../views/Manuales/Manuales.vue";
 
 Vue.use(VueRouter)
 
@@ -302,6 +307,36 @@ const routes = [
                 path: 'sucursales/form/:id',
                 name: 'sucursalesForm',
                 component: SucursalesForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'modulos',
+                name: 'modulos',
+                component: Modulos,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'modulos/form/:id',
+                name: 'modulosForm',
+                component: ModulosForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'preguntas_frecuentes',
+                name: 'preguntasFrecuentes',
+                component: PreguntasFrecuentes,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'preguntas_frecuentes/form/:id',
+                name: 'preguntasFrecuentesForm',
+                component: PreguntasFrecuentesForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'manuales',
+                name: 'manuales',
+                component: Manuales,
                 meta: { requiresAuth: true }
             },
             {

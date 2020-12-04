@@ -147,7 +147,6 @@ export default {
       .filter({id, param, page, size})
       .then(data => {
         this.objects = data.data.content;
-        console.log(this.objects)
         this.paginate.totalPages = data.data.totalPages;
         if(this.paginate.totalPages < this.paginate.page){
           this.paginate.page = 1;

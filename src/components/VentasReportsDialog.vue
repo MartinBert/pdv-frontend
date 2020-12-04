@@ -8,7 +8,23 @@
         <v-container>
           <v-row>
             <v-col>
-              <form @submit.prevent="allSalesReport(loguedUser.sucursal.id)">
+              <v-select
+                v-if="loguedUser.perfil < 3"
+                outlined
+                rounded
+                label="Seleccione la sucursal sobre la que desea obtener información"
+                placeholder=" "
+                :items="sucursales"
+                item-text="nombre"
+                v-model="loguedUser.sucursal"
+                :return-object="true"
+                required
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <form @submit.prevent="allSalesReport(loguedUser.sucursal)">
                 <v-btn class="primary v-btn--block" type="submit">TODAS LAS VENTAS</v-btn>
                 <div class="d-flex justify-center mt-3">
                   <img src="/../../images/messages/happy_1.svg" width="40" height="40">
@@ -16,7 +32,7 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="allSalesGroupBy(loguedUser.sucursal.id, 'Receipts')">
+              <form @submit.prevent="allSalesGroupBy(loguedUser.sucursal, 'Receipts')">
                 <v-btn class="primary v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR COMPROBANTE</v-btn>
                 <div class="d-flex justify-center mt-3">
                   <img src="/../../images/messages/happy_1.svg" width="40" height="40">
@@ -24,7 +40,7 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="allSalesGroupBy(loguedUser.sucursal.id, 'Clients')">
+              <form @submit.prevent="allSalesGroupBy(loguedUser.sucursal, 'Clients')">
                 <v-btn class="primary v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR CLIENTE</v-btn>
                 <div class="d-flex justify-center mt-3">
                   <img src="/../../images/messages/happy_1.svg" width="40" height="40">
@@ -65,7 +81,7 @@
           </v-row>
           <v-row>
             <v-col>
-              <form @submit.prevent="salesForDate(loguedUser.sucursal.id, object.fechaDesde, object.fechaHasta)">
+              <form @submit.prevent="salesForDate(loguedUser.sucursal, object.fechaDesde, object.fechaHasta)">
                 <v-btn class="primary v-btn--block" type="submit">VENTAS POR FECHA</v-btn>
                 <div class="d-block">
                   <v-text-field
@@ -94,7 +110,7 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForMonth(loguedUser.sucursal.id, object.year, object.month)">
+              <form @submit.prevent="salesForMonth(loguedUser.sucursal, object.year, object.month)">
                 <v-btn class="primary v-btn--block" type="submit">VENTAS POR MES</v-btn>
                 <div class="d-block">
                   <v-autocomplete
@@ -114,7 +130,7 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForYear(loguedUser.sucursal.id, object.year2)" class="ml-5">
+              <form @submit.prevent="salesForYear(loguedUser.sucursal, object.year2)" class="ml-5">
                 <v-btn class="primary v-btn--block" type="submit" raised>VENTAS POR AÑO</v-btn>
                 <div class="d-block">
                   <v-autocomplete
@@ -131,7 +147,7 @@
           </v-row>
           <v-row>
              <v-col>
-              <form @submit.prevent="salesForClient(loguedUser.sucursal.id, object.cliente.id)">
+              <form @submit.prevent="salesForClient(loguedUser.sucursal, object.cliente.id)">
                 <v-btn class="primary v-btn--block" type="submit">VENTAS POR CLIENTE</v-btn>
                 <div class="d-block">
                   <v-autocomplete
@@ -146,7 +162,7 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="salesForReceipt(loguedUser.sucursal.id, object.documento.codigoDocumento)">
+              <form @submit.prevent="salesForReceipt(loguedUser.sucursal, object.documento.codigoDocumento)">
                 <v-btn class="primary v-btn--block" type="submit">VENTAS POR COMPROBANTE</v-btn>
                 <div class="d-block">
                   <v-autocomplete
@@ -198,7 +214,8 @@ import ReportsService from '../services/ReportsService';
 import GenericService from '../services/GenericService';
 import DocumentosService from '../services/DocumentosService';
 import { generateIntegerDate, getYearsList, monthsList } from '../helpers/dateHelper';
-import { infoAlert2 } from '../helpers/alerts';
+import { exportPDF } from '../helpers/exportFileHelper';
+import { errorAlert, infoAlert2 } from '../helpers/alerts';
 
 export default {
   name: "VentasReportsDialog",
@@ -211,6 +228,7 @@ export default {
       years: getYearsList(),
       loguedUser: JSON.parse(localStorage.getItem("userData")),
       documentos: [],
+      sucursales: [],
       clientes: [],
       object:{
         documento: {},
@@ -233,7 +251,7 @@ export default {
   },
 
   methods:{
-    /****USER****/
+    /****USER AND MODELS****/
     getObjects(){
 
         let id;
@@ -244,90 +262,99 @@ export default {
         }
 
         const filterParam = {id, param: '', page: 0, size: 100000}
+        
+        if(this.loguedUser.perfil < 3){
+          GenericService(this.tenant, "sucursales", this.token)
+          .filter(filterParam)
+          .then(data => {
+            this.sucursales = data.data.content;
+          });
+        }
 
         GenericService(this.tenant, "clientes", this.token)
         .filter(filterParam)
         .then(data => {
           this.clientes = data.data.content;
-        })
+        });
+
 
         DocumentosService(this.tenant, "documentosComerciales", this.token)
         .getInvoices()
         .then(data => {
           this.documentos = data.data;
-        })
+        });
 
     },
-    /****USER****/
+    /****USER AND MODELS****/
 
     /****REPORTS****/
-    allSalesReport(id) {
+    allSalesReport(sucursal) {
+      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .allSalesReport(id)
         .then((res) => {
-          var file = new Blob([res["data"]], { type: "application/pdf" });
-          var fileURL = URL.createObjectURL(file);
-          window.open(fileURL, "_blank");
+          exportPDF(res);
         });
     },
 
-    allSalesGroupBy(id, type){
+    allSalesGroupBy(sucursal, type){
+      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      let id = sucursal.id;
       ReportsService(this.tenant, "ventas", this.token)
       .allSalesGroupBy(id, type)
       .then((res) => {
-          var file = new Blob([res["data"]], { type: "application/pdf" });
-          var fileURL = URL.createObjectURL(file);
-          window.open(fileURL, "_blank");
+          exportPDF(res);
         });
     },
 
-    salesForReceipt(id, receipt) {
+    salesForReceipt(sucursal, receipt) {
+      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForReceipt(id, receipt)
         .then((res) => {
-          var file = new Blob([res["data"]], { type: "application/pdf" });
-          var fileURL = URL.createObjectURL(file);
-          window.open(fileURL, "_blank");
+          exportPDF(res);
         });
     },
 
-    salesForClient(id, client) {
+    salesForClient(sucursal, client) {
+      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForClient(id, client)
         .then((res) => {
-          var file = new Blob([res["data"]], { type: "application/pdf" });
-          var fileURL = URL.createObjectURL(file);
-          window.open(fileURL, "_blank");
+          exportPDF(res);
         });
     },
 
-    salesForDate(id, fechaDesde, fechaHasta) {
+    salesForDate(sucursal, fechaDesde, fechaHasta) {
+      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForDate(id, fechaDesde, fechaHasta)
         .then((res) => {
-          var file = new Blob([res["data"]], { type: "application/pdf" });
-          var fileURL = URL.createObjectURL(file);
-          window.open(fileURL, "_blank");
+          exportPDF(res);
         });
     },
 
-    salesForMonth(id, year, month){
+    salesForMonth(sucursal, year, month){
+      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForMonth(id, year, month)
         .then((res) => {
-          var file = new Blob([res["data"]], { type: "application/pdf" });
-          var fileURL = URL.createObjectURL(file);
-          window.open(fileURL, "_blank");
+          exportPDF(res);
         });
     },
 
-    salesForYear(id, year){
+    salesForYear(sucursal, year){
+      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForYear(id, year)
         .then((res) => {
-          var file = new Blob([res["data"]], { type: "application/pdf" });
-          var fileURL = URL.createObjectURL(file);
-          window.open(fileURL, "_blank");
+          exportPDF(res);
         });
     },
 
