@@ -48,6 +48,7 @@ import ModulosForm from "../views/Modulos/ModulosForm.vue";
 import PreguntasFrecuentes from "../views/PreguntasFrecuentes/PreguntasFrecuentes.vue";
 import PreguntasFrecuentesForm from "../views/PreguntasFrecuentes/PreguntasFrecuentesForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
+import Mensajes from "../views/Mensajes/Mensajes.vue";
 
 Vue.use(VueRouter)
 
@@ -337,6 +338,12 @@ const routes = [
                 path: 'manuales',
                 name: 'manuales',
                 component: Manuales,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'mensajes',
+                name: 'mensajes',
+                component: Mensajes,
                 meta: { requiresAuth: true }
             },
             {

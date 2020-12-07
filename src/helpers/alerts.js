@@ -26,6 +26,21 @@ export function successAlert(str) {
         showConfirmButton: false,
     });
 }
+export function successAlert2(str, str2) {
+    return Swal.fire({
+        html:
+            "<div class='text-alert-success'>" +
+            "<img src='/../../images/messages/success_1.svg' />" +
+            "<h1>¡" +
+            str +
+            "!<h1>" +
+            "<p>¡"+
+            str2 +
+            "!</p>"+
+            "</div>",
+        showConfirmButton: false,
+    });
+}
 export function questionAlert(strTitle, strText) {
     return Swal.fire({
         width: 400,

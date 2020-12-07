@@ -292,7 +292,13 @@ export default {
           {
             path: "/manuales",
             name: "manuales",
-            title: "Manuales e instructivos",
+            title: "Manuales y contacto",
+            visible: false
+          },
+          {
+            path: "/mensajes",
+            name: "mensajes",
+            title: "Mensajes",
             visible: false
           },
         ]
