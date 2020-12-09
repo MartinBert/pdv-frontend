@@ -11,14 +11,14 @@ export default (tenant,service,token) =>{
             return axios.post(`${process.env.VUE_APP_API_AFIP}/login`, user)
         },
 
-        getVentasForSucursal(sucursal, page, size){
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getForSucursal/${page}/${size}`,sucursal,{
+        filter(object){
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
                 headers: { Authorization: "Bearer " + token }
             })
         },
 
-        filter(object){
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
+        filterNotCloseReceipts(object){
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filterNotCloseReceipts`, object, {
                 headers: { Authorization: "Bearer " + token }
             })
         }

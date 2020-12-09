@@ -47,6 +47,8 @@ import Modulos from "../views/Modulos/Modulos.vue";
 import ModulosForm from "../views/Modulos/ModulosForm.vue";
 import PreguntasFrecuentes from "../views/PreguntasFrecuentes/PreguntasFrecuentes.vue";
 import PreguntasFrecuentesForm from "../views/PreguntasFrecuentes/PreguntasFrecuentesForm.vue";
+import Caja from "../views/Caja/Caja.vue";
+import CajaForm from "../views/Caja/CajaForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
 import Mensajes from "../views/Mensajes/Mensajes.vue";
 
@@ -344,6 +346,18 @@ const routes = [
                 path: 'mensajes',
                 name: 'mensajes',
                 component: Mensajes,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'caja',
+                name: 'caja',
+                component: Caja,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'cajaForm',
+                name: 'cajaForm',
+                component: CajaForm,
                 meta: { requiresAuth: true }
             },
             {

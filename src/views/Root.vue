@@ -105,6 +105,12 @@ export default {
             title: "Devoluciones y cambios",
             visible: false
           },
+          {
+            path: "/caja",
+            name: "caja",
+            title: "Caja",
+            visible: false
+          },
         ]
       },
       {
