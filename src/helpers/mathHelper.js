@@ -23,9 +23,11 @@ export function calculatePercentaje(number, percent){
 }
 
 export function sumarNumeros(array){
-    const reducer = (accumulator, currentValue) => accumulator + currentValue;
-    const result = array.reduce(reducer);
-    return result;
+    return Math.round((array.reduce((acc, el) => acc + el))*100)/100;
+}
+
+export function restarNumeros(array){
+    return Math.round((array.reduce((acc, el) => acc - el))*100)/100;
 }
 
 export function generateFiveDecimalCode(){

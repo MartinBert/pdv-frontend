@@ -31,7 +31,7 @@
             <v-text-field 
                 type="number"
                 v-model="object.salidasNoContabilizadas" 
-                label="Egresos" 
+                label="Egresos"
                 required
             ></v-text-field>
           </v-col>
@@ -48,7 +48,7 @@
           <v-col>
             <v-text-field
                 type="number"
-                v-model="object.diferencia"
+                v-model="diferencia"
                 label="Diferencia"
                 required
                 :rules="[v => !!v || 'Campo requerido...']"
@@ -77,6 +77,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
+import { restarNumeros } from "../../helpers/mathHelper";
 export default {
   data: () => ({
     valid: true,
@@ -86,7 +87,11 @@ export default {
     ],
     operation: "",
     ventas: [],
-    object: {},
+    object: {
+      existenciaFisica: 0,
+      salidasNoContabilizadas: 0,
+      montoFacturado: 0
+    },
     loaded: false,
     tenant: "",
     service: "caja",
@@ -104,7 +109,13 @@ export default {
       this.loaded = true;
     }
 
-    this.getSalesList('', 0, 100000);
+    this.getSalesList("", 0, 100000);
+  },
+
+  computed:{
+    diferencia(){
+      return restarNumeros([this.object.existenciaFisica, this.object.salidasNoContabilizadas, this.object.montoFacturado]);
+    }
   },
 
   methods: {
@@ -128,14 +139,13 @@ export default {
         VentasService(this.tenant, this.service, this.token)
         .filterNotCloseReceipts({id, param, page, size})
         .then(data => {
-            console.log(data.data);
-            this.object.totalFacturado = data.data.content.reduce((acc, el) =>  {
-                return acc + Number(el.totalVenta)}, 0)
-            console.log(this.object.totalFacturado);
+            this.ventas = data.data.content;
+            this.object.montoFacturado = this.ventas.reduce((acc, el) => Math.round((acc + Number(el.totalVenta))*100)/100, 0);
         })
     },
 
     save() {
+      this.object.diferencia = this.diferencia();
       this.$refs.form.validate();
       this.object.sucursales = [this.loguedUser.sucursal];
       GenericService(this.tenant, this.service, this.token)
@@ -153,7 +163,7 @@ export default {
 
     back() {
       this.$router.push({ name: "caja" });
-    }
+    },
   }
 };
 </script>
