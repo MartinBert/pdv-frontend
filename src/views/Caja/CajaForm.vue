@@ -18,7 +18,7 @@
             </v-col>
         </v-row>
         <v-row class="ma-1" v-if="operation === 1">
-          <v-col>
+          <v-col cols="3">
             <v-text-field
                 type="number"
                 v-model="object.existenciaFisica"
@@ -27,7 +27,7 @@
                 :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="3">
             <v-text-field 
                 type="number"
                 v-model="object.salidasNoContabilizadas" 
@@ -35,7 +35,7 @@
                 required
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="3">
             <v-text-field
                 type="number"
                 v-model="object.montoFacturado"
@@ -45,7 +45,7 @@
                 disabled
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="3">
             <v-text-field
                 type="number"
                 v-model="diferencia"
@@ -55,10 +55,13 @@
                 disabled
             ></v-text-field>
           </v-col>
+          <v-col class="text-right">
+            <span v-bind:class="detailMessage.classType">{{detailMessage.message}}</span>
+          </v-col>
         </v-row>
         <div class="ma-1">
           <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
+            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Procesar</v-btn>
             <v-btn color="default" @click="back()">Cancelar</v-btn>
           </v-col>
         </div>
@@ -115,6 +118,16 @@ export default {
   computed:{
     diferencia(){
       return restarNumeros([this.object.existenciaFisica, this.object.salidasNoContabilizadas, this.object.montoFacturado]);
+    },
+
+    detailMessage(){
+      if(this.diferencia < 0){
+        return {classType: 'errorArqueo', message: 'Faltante de caja'};
+      }else if(this.diferencia > 0){
+        return {classType: 'errorArqueo', message: 'Sobrante de caja'};
+      }else{
+        return {classType: 'successArqueo', message: 'Los montos computados y el recuento son coincidentes'};
+      }
     }
   },
 
@@ -145,7 +158,14 @@ export default {
     },
 
     save() {
+      this.object.sucursal = this.loguedUser.sucursal;
       this.object.diferencia = this.diferencia();
+      this.ventas.forEach(el => {
+        el.cerrado = "cerrado";
+      })
+
+      GenericService(this.tenant, "comprobantesFiscales")
+
       this.$refs.form.validate();
       this.object.sucursales = [this.loguedUser.sucursal];
       GenericService(this.tenant, this.service, this.token)
@@ -167,3 +187,19 @@ export default {
   }
 };
 </script>
+<style>
+.errorArqueo{
+  font-size: 1.2rem;
+  border: solid 1px;
+  border-radius: 15px;
+  padding: 15px;
+  color: red;
+}
+.successArqueo{
+  border: solid 1px;
+  border-radius: 15px;
+  padding: 15px;
+  font-size: 1.2rem;
+  color:green;
+}
+</style>
