@@ -2,7 +2,7 @@
   <v-card min-width="100%">
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <div v-if="loaded">
-      <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
+      <v-form ref="form" class="mt-5">
         <v-row class="ml-1 mr-1">
             <v-col cols="12">
                 <v-select
@@ -18,7 +18,14 @@
             </v-col>
         </v-row>
         <v-row class="ma-1" v-if="operation === 1">
-          <v-col cols="3">
+          <v-col cols="12">
+            <v-text-field
+              type="text"
+              v-model="object.descripcion"
+              label="Descripción (puede dejar referencias de los egresos o información que considere útil para sus evaluaciones)"
+            ></v-text-field>
+          </v-col>
+          <v-col>
             <v-text-field
                 type="number"
                 v-model="object.existenciaFisica"
@@ -27,7 +34,15 @@
                 :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
-          <v-col cols="3">
+          <v-col>
+            <v-text-field 
+                type="number"
+                v-model="object.existenciaInicial" 
+                label="Dinero inicial en caja"
+                required
+            ></v-text-field>
+          </v-col>
+          <v-col>
             <v-text-field 
                 type="number"
                 v-model="object.salidasNoContabilizadas" 
@@ -35,7 +50,7 @@
                 required
             ></v-text-field>
           </v-col>
-          <v-col cols="3">
+          <v-col>
             <v-text-field
                 type="number"
                 v-model="object.montoFacturado"
@@ -45,7 +60,7 @@
                 disabled
             ></v-text-field>
           </v-col>
-          <v-col cols="3">
+          <v-col>
             <v-text-field
                 type="number"
                 v-model="diferencia"
@@ -55,7 +70,7 @@
                 disabled
             ></v-text-field>
           </v-col>
-          <v-col class="text-right">
+          <v-col class="text-right" cols="12">
             <span v-bind:class="detailMessage.classType">{{detailMessage.message}}</span>
           </v-col>
         </v-row>
@@ -81,6 +96,7 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import { restarNumeros } from "../../helpers/mathHelper";
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 export default {
   data: () => ({
     valid: true,
@@ -91,9 +107,10 @@ export default {
     operation: "",
     ventas: [],
     object: {
-      existenciaFisica: 0,
-      salidasNoContabilizadas: 0,
-      montoFacturado: 0
+      existenciaFisica: Number(0),
+      existenciaInicial: Number(0),
+      salidasNoContabilizadas: Number(0),
+      montoFacturado: Number(0)
     },
     loaded: false,
     tenant: "",
@@ -112,12 +129,12 @@ export default {
       this.loaded = true;
     }
 
-    this.getSalesList("", 0, 100000);
+    this.getSalesList("cerrado", 0, 100000);
   },
 
   computed:{
     diferencia(){
-      return restarNumeros([this.object.existenciaFisica, this.object.salidasNoContabilizadas, this.object.montoFacturado]);
+      return Number(restarNumeros([this.object.existenciaFisica, this.object.existenciaInicial, this.object.salidasNoContabilizadas, this.object.montoFacturado]));
     },
 
     detailMessage(){
@@ -152,22 +169,22 @@ export default {
         VentasService(this.tenant, this.service, this.token)
         .filterNotCloseReceipts({id, param, page, size})
         .then(data => {
-            this.ventas = data.data.content;
+            this.ventas = data.data;
             this.object.montoFacturado = this.ventas.reduce((acc, el) => Math.round((acc + Number(el.totalVenta))*100)/100, 0);
         })
     },
 
     save() {
+      this.$refs.form.validate();
       this.object.sucursal = this.loguedUser.sucursal;
-      this.object.diferencia = this.diferencia();
+      this.object.diferencia = this.diferencia;
       this.ventas.forEach(el => {
         el.cerrado = "cerrado";
       })
+      this.object.fecha = formatDate(getCurrentDate());
 
-      GenericService(this.tenant, "comprobantesFiscales")
+      GenericService(this.tenant, "comprobantesFiscales", this.token).saveAll(this.ventas);
 
-      this.$refs.form.validate();
-      this.object.sucursales = [this.loguedUser.sucursal];
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {

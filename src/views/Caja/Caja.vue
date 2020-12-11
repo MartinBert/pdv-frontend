@@ -27,9 +27,8 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Nombre</th>
-            <th>Razón Social</th>
-            <th>CUIT</th>
+            <th>Fecha</th>
+            <th>Descripción</th>
             <th>Detalles</th>
             <th>Acciones</th>
           </tr>
@@ -37,13 +36,17 @@
         <tbody v-for="object in objects" :key="object.id">
           <tr>
             <td>{{ object.id }}</td>
-            <td>{{ object.nombre }}</td>
-            <td>{{ object.razonSocial }}</td>
-            <td>{{ object.cuit }}</td>
+            <td>{{ object.fecha }}</td>
+            <td>{{ object.descripcion }}</td>
             <td>
-              <v-icon title="Stock" @click="showStock(object.id)"
-                >mdi-text-box</v-icon
-              >
+              <button type="button">
+                <img
+                  src="/../../images/icons/eye.svg"
+                  @click="seeDetail(object)"
+                  width="40"
+                  height="40"
+                />
+              </button>
             </td>
             <td>
               <a title="Editar"
@@ -86,31 +89,13 @@
     ></v-pagination>
     <!-- End Paginate -->
 
-    <!-- Dialog Delete-->
-    <v-dialog v-model="dialogDeleteObject" width="500">
-      <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center"
-          >¿Está seguro que desea realizar esta acción?</v-card-title
-        >
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject"
-            >Si</v-btn
-          >
-          <v-btn small color="disabled" @click="dialogDeleteObject = false"
-            >No</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog Delete -->
+    <CajaDetails />
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
+import CajaDetails from '../../components/CajaDetails';
 
 export default {
   data: () => ({
@@ -128,6 +113,11 @@ export default {
     dialogDeleteObject: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
+
+  components:{
+    CajaDetails
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size)
@@ -174,6 +164,11 @@ export default {
         .then(() => {
           this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
         });
+    },
+
+    seeDetail(object){
+      this.$store.commit('eventual/mutateEventualDialog');
+      this.$store.commit('eventual/addEventual', object);
     },
   },
 };
