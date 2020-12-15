@@ -103,7 +103,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="changePage(paginate.page -1, paginate.size)"
+      @input="filterObjects(fiterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1 && loaded"
     ></v-pagination>
     <!-- End Paginate -->
@@ -174,7 +174,7 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import { generateBarCode } from "../../helpers/mathHelper";
-import { successAlert } from "../../helpers/alerts";
+// import { successAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
 
 export default {
@@ -192,6 +192,8 @@ export default {
     distribuidores: [],
     depositos: [],
     rubros: [],
+    propiedades: [],
+    atributos: [],
     estados: [
       { id: 1, text: "Activos" },
       { id: 2, text: "Inactivos" },
@@ -213,17 +215,15 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAll(this.paginate.page - 1, this.paginate.size);
+    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
     this.getOtherModels(0, 100000);
     this.perfil = this.loguedUser.perfil;
   },
 
   methods: {
-    getAll(page, size) {
-      this.objects = [];
-      this.loaded = false;
-      GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
+    filterObjects(param, page, size) {
+      GenericService(this.tenant, "productos", this.token)
+        .filter({ param, page, size })
         .then((data) => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
@@ -249,14 +249,18 @@ export default {
         .then((data) => {
           this.rubros = data.data.content;
         });
-    },
 
-    changePage(page, size) {
-       if(this.filterString){
-         this.filterObjects(this.filterString, page, size)
-       }else{
-         this.getAll(page - 1, this.paginate.size);
-       }
+      GenericService(this.tenant, "propiedades", this.token)
+        .getAll(page, size)
+        .then((data) => {
+          this.propiedades = data.data.content;
+        });
+
+      GenericService(this.tenant, "atributos", this.token)
+        .getAll(page, size)
+        .then((data) => {
+          this.atributos = data.data.content;
+        });
     },
 
     newObject() {
@@ -265,15 +269,6 @@ export default {
 
     edit(id) {
       this.$router.push({ name: "productosForm", params: { id: id } });
-    },
-
-    filterObjects(param, page, size) {
-      GenericService(this.tenant, "productos", this.token)
-        .filter({ param, page, size })
-        .then((data) => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-        });
     },
 
     openDelete(id) {
@@ -318,16 +313,16 @@ export default {
         });
         var prod = this.validateImport(excel);
         console.log(prod);
-        if (prod.status) {
-          GenericService(this.tenant, this.service, this.token)
-            .saveAll(prod.data)
-            .then(() => {
-              successAlert('Importación exitosa');
-              this.getAll(this.paginate.page - 1, this.paginate.size);
-              this.loaderStatus = true;
-              this.loaded = true;
-            });
-        }
+        // if (prod.status) {
+        //   GenericService(this.tenant, this.service, this.token)
+        //     .saveAll(prod.data)
+        //     .then(() => {
+        //       successAlert('Importación exitosa');
+        //       this.getAll(this.paginate.page - 1, this.paginate.size);
+        //       this.loaderStatus = true;
+        //       this.loaded = true;
+        //     });
+        // }
       };
       reader.readAsBinaryString(this.file);
     },
@@ -357,7 +352,8 @@ export default {
             codigoProducto: String(element.codigoProducto),
             marca: this.getMarca(element.idMarca),
             rubro: this.getRubro(element.idRubro),
-            propiedad: element.propiedad,
+            propiedad: this.getPropiedades(element.propiedades),
+            atributos: this.getAtributos(element),
             distribuidores: this.getDistribuidores(
               String(element.idDistribuidores)
             ),
@@ -423,6 +419,36 @@ export default {
       return rubro;
     },
 
+    getPropiedades(){
+      // const propertiesKeys = propiedades.split('-');
+      
+    },
+
+    getAtributos(element){
+      const ArrayAtributes = Object.entries(element).filter(el => el[0].substring(0,8) === 'atributo');
+      // let newAtributes = [];
+
+      ArrayAtributes.forEach(el => {
+        const atributeIdInExcel = el[0];
+        const atributeValueInExcel = el[1];
+        const propertieId = atributeIdInExcel.substring(8);
+        const propertie = this.propiedades.filter(el => el.id == propertieId)[0];
+        if(this.evalPropertie(propertie, atributeValueInExcel)){
+          console.log('Sel prro')
+        }else{
+          console.log(this.evalPropertie(propertie, atributeValueInExcel));
+        }
+        // const newAtribute = {
+        //   valor: atributeValueInExcel,
+        //   valorNumerico: 0
+        // }
+
+        // newAtributes.push(newAtribute);
+      })
+
+      // console.log(newAtributes);
+    },
+
     getDistribuidores(d) {
       var distribuidores = [];
       if (this.distribuidores && d) {
@@ -456,6 +482,10 @@ export default {
           window.open(fileURL, "_blank");
         });
     },
+
+    evalPropertie(propertie, atribute){
+      console.log(atribute);
+    }
   },
 };
 </script>

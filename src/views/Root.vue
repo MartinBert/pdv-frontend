@@ -138,6 +138,18 @@ export default {
             visible: false
           },
           {
+            path: "/atributos",
+            name: "atributos",
+            title: "Atributos",
+            visible: false
+          },
+          {
+            path: "/propiedades",
+            name: "propiedades",
+            title: "Propiedades",
+            visible: false
+          },
+          {
             path: "/depositos",
             name: "depositos",
             title: "Depositos",

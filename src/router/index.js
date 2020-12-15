@@ -39,6 +39,10 @@ import PuntosVenta from '../views/PuntosVenta/PuntosVenta.vue';
 import PuntosVentaForm from '../views/PuntosVenta/PuntosVentaForm.vue';
 import Sucursales from '../views/Sucursales/Sucursales.vue';
 import SucursalesForm from '../views/Sucursales/SucursalesForm.vue';
+import Atributos from '../views/Atributos/Atributos.vue';
+import AtributosForm from '../views/Atributos/AtributosForm.vue';
+import Propiedades from '../views/Propiedades/Propiedades.vue';
+import PropiedadesForm from '../views/Propiedades/PropiedadesForm.vue';
 import Stock from '../views/Stock/Stock.vue';
 import StockForm from '../views/Stock/StockForm.vue';
 import Devoluciones from "../views/Devoluciones/Devoluciones.vue";
@@ -190,6 +194,30 @@ const routes = [
                 path: 'rubros/form/:id',
                 name: 'rubrosForm',
                 component: RubrosForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'atributos',
+                name: 'atributos',
+                component: Atributos,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'atributos/form/:id',
+                name: 'atributosForm',
+                component: AtributosForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'propiedades',
+                name: 'propiedades',
+                component: Propiedades,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'propiedades/form/:id',
+                name: 'propiedadesForm',
+                component: PropiedadesForm,
                 meta: { requiresAuth: true }
             },
             {
