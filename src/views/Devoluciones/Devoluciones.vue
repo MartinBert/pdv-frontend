@@ -139,7 +139,7 @@ import ReportsService from "../../services/ReportsService";
 import { formatDate, getCurrentDate } from "../../helpers/dateHelper";
 import ReceiptDialog from "../../components/ReceiptDialog";
 import { questionAlert, errorAlert, successAlert } from "../../helpers/alerts";
-import { calculateAlicIvaBaseImpVentas, calculateAlicIvaImporteVentas, generateBarCode } from "../../helpers/mathHelper";
+import { calculateAlicIvaBaseImpVentas, calculateAlicIvaImporteVentas, generateBarCode, generateFiveDecimalCode } from "../../helpers/mathHelper";
 import { processDetailReceipt } from "../../helpers/processObjectsHelper";
 import VentasService from '../../services/VentasService';
 
@@ -458,8 +458,8 @@ export default {
       }
 
       comprobante = {
-        letra: "NX",
-        numeroCbte: 0,
+        letra: documento.letra,
+        numeroCbte: generateFiveDecimalCode(),
         fechaEmision: formatDate(fecha),
         fechaVto: formatDate(fecha),
         condicionVenta: condVenta,

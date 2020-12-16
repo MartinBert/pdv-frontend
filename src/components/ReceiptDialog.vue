@@ -209,7 +209,7 @@
 <script>
 import GenericService from "../services/GenericService";
 import { errorAlert } from "../helpers/alerts";
-import { checkDocuments } from "../helpers/processObjectsHelper";
+import { checkIfNote } from "../helpers/processObjectsHelper";
 import { formatDate } from "../helpers/dateHelper";
 
 export default {
@@ -296,7 +296,7 @@ export default {
         });
       }
 
-      const notas = checkDocuments(documentos);
+      const notas = checkIfNote(documentos);
       return (this.databaseItems.documentos = notas);
     },
 

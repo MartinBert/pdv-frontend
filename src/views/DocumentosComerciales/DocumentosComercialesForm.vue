@@ -4,7 +4,7 @@
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-1">
-            <v-col class="col-4"> 
+            <v-col class="col-3"> 
               <v-text-field 
               type="text"
               v-model="object.nombre"
@@ -14,7 +14,7 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
             </v-col>
-            <v-col class="col-4"> 
+            <v-col class="col-3"> 
               <v-text-field 
               type="text"
               v-model="object.codigoDocumento"
@@ -24,12 +24,21 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
             </v-col>
-            <v-col class="col-4"> 
+            <v-col class="col-3"> 
               <v-text-field 
               type="number"
               v-model="object.ivaCat"
               :counter="1"
               label="Tipo IVA"
+              required
+              :rules="[v => !!v || 'Campo requerido...']"
+            ></v-text-field>
+            </v-col>
+            <v-col class="col-3"> 
+              <v-text-field 
+              type="text"
+              v-model="object.letra"
+              label="Letra"
               required
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>

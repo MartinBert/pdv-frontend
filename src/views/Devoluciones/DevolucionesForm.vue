@@ -195,6 +195,7 @@ import {
   calculateAlicIvaBaseImpVentas,
   calculateAlicIvaImporteVentas,
   generateBarCode,
+  generateFiveDecimalCode
 } from "../../helpers/mathHelper";
 import ProductDialog from "../../components/ProductDialog";
 import ReceiptDialog from "../../components/ReceiptDialog";
@@ -642,8 +643,8 @@ export default {
       }
 
       comprobante = {
-        letra: "NX",
-        numeroCbte: 0,
+        letra: documento.letra,
+        numeroCbte: generateFiveDecimalCode(),
         fechaEmision: formatDate(fecha),
         fechaVto: formatDate(fecha),
         condicionVenta: condVenta,

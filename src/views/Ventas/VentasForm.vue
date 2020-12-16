@@ -10,7 +10,7 @@
             >BUSCAR PRODUCTO</v-btn
           >
         </v-col>
-        <v-col cols="3">
+        <v-col cols="3" v-if="loguedUser.perfil == 1">
           <v-btn
             color="primary"
             @click="testCert()"
@@ -50,7 +50,7 @@
                       @change="
                         getComercialDocuments(
                           object.cliente.condicionIva.documentos,
-                          loguedUser.empresa.condicionIva.documentos
+                          loguedUser.sucursal.condicionIva.documentos
                         )
                       "
                       v-model="object.cliente"
@@ -225,6 +225,7 @@ import VentasService from "../../services/VentasService";
 import Calculator from "../../components/Calculator";
 import ProductDialog from "../../components/ProductDialog";
 import { formatDate, getCurrentDate } from "../../helpers/dateHelper";
+import { checkIfInvoice } from "../../helpers/processObjectsHelper";
 import {
   calculateAlicIvaBaseImpVentas,
   calculateAlicIvaImporteVentas,
@@ -249,6 +250,7 @@ export default {
     databaseItems: {
       clientes: [],
       medios_de_pago: [],
+      documentos: []
     },
     productos: [],
     products: [],
@@ -402,14 +404,16 @@ export default {
     },
 
     getComercialDocuments(clientCond, businessCond) {
-      this.databaseItems.documentos = [];
+      let AllDocuments = [];
       for (let i = 0; i < clientCond.length; i++) {
         businessCond.forEach((el) => {
           if (clientCond[i].id == el.id) {
-            this.databaseItems.documentos.push(el);
+            AllDocuments.push(el);
           }
         });
       }
+
+      this.databaseItems.documentos = checkIfInvoice(AllDocuments);
     },
 
     getPaymentPlans(id) {
@@ -599,7 +603,7 @@ export default {
         tipoDoc: tipoDoc,
         tributos: [],
       };
-
+  
       //Get authorized voucher number
       axios
         .get(
