@@ -3,21 +3,7 @@
     <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
     <div v-if="loaded">
       <v-form ref="form" class="mt-5">
-        <v-row class="ml-1 mr-1">
-            <v-col cols="12">
-                <v-select
-                    type="text"
-                    :items="operationType"
-                    item-text="text"
-                    item-value="id"
-                    v-model="operation"
-                    label="Seleccione la operación a realizar"
-                    required
-                    :rules="[v => !!v || 'Campo requerido...']"
-                ></v-select>
-            </v-col>
-        </v-row>
-        <v-row class="ma-1" v-if="operation === 1">
+        <v-row class="ma-1">
           <v-col cols="12">
             <v-text-field
               type="text"

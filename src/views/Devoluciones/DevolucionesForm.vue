@@ -130,7 +130,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="d-flex justify-center">
+          <v-col cols="8" class="d-flex justify-center">
             <v-btn
               class="mr-4"
               color="primary"
@@ -148,6 +148,12 @@
                 width="40"
                 height="40"
             /></v-btn>
+          </v-col>
+          <v-col cols="4">
+              <div class="flex-column" style="color: grey" v-if="montoRecomendado >= 0">Monto recomendado: ${{montoRecomendado}}</div>
+              <div class="flex-column" style="color: grey" v-if="montoRecomendado < 0">Monto recomendado: ${{(montoRecomendado * (-1))}}</div>
+              <div class="flex-column" style="color: grey" v-if="montoRecomendado >= 0">Nota de crédito</div>
+              <div class="flex-column" style="color: grey" v-if="montoRecomendado < 0">Nota de débito</div>
           </v-col>
         </v-row>
         <v-row class="ml-3 mr-3 mb-5">
@@ -195,7 +201,8 @@ import {
   calculateAlicIvaBaseImpVentas,
   calculateAlicIvaImporteVentas,
   generateBarCode,
-  generateFiveDecimalCode
+  generateFiveDecimalCode,
+  restarNumeros
 } from "../../helpers/mathHelper";
 import ProductDialog from "../../components/ProductDialog";
 import ReceiptDialog from "../../components/ReceiptDialog";
@@ -238,6 +245,15 @@ export default {
   components: {
     ProductDialog,
     ReceiptDialog,
+  },
+
+  computed: {
+    montoRecomendado(){
+      const receivedProducts = this.object.productosEntrantes.reduce((acc, el) => acc + Number(el.precioTotal), 0);
+      const cededProducts = this.object.productosSalientes.reduce((acc, el) => acc + Number(el.precioTotal), 0);
+
+      return restarNumeros([receivedProducts, cededProducts]);
+    }
   },
 
   mounted() {

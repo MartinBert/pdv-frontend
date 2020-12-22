@@ -3,7 +3,7 @@
     <v-form class="mb-3">
       <v-row>
         <v-col cols="6">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          <v-btn class="primary" @click="newObject()" raised>REALIZAR ARQUEO</v-btn>
         </v-col>
         <v-col cols="3"></v-col>
         <v-col cols="3">

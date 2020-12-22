@@ -9,17 +9,27 @@
           </v-row>
         </v-card-title>
         <v-card-text>
-        <v-text-field
-          v-model="filterString"
-          v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
-          dense
-          outlined
-          rounded
-          class="text-left ml-5 mr-5 mt-5"
-          label="Escriba el nombre, código de artículo o código de barras del artículo que desea buscar"
-          placeholder=" "
-          append-icon="mdi-magnify"
-        ></v-text-field>
+          <v-row>
+            <v-col cols="10">
+              <v-text-field
+                v-model="filterString"
+                dense
+                outlined
+                rounded
+                class="text-left ml-5 mr-5 mt-5"
+                label="Escriba el nombre, código de artículo o código de barras del artículo que desea buscar"
+                placeholder=" "
+                @keypress.enter="filterObjects(filterString, 0, 100)"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="2">
+              <v-btn class="mt-5 primary"
+                @click="filterObjects(filterString, 0, 100)"
+              >
+                BUSCAR
+              </v-btn>
+            </v-col>
+          </v-row>
         <v-divider></v-divider>
           <v-container fluid>
             <v-row>

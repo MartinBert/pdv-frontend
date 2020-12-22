@@ -10,13 +10,6 @@
             >BUSCAR PRODUCTO</v-btn
           >
         </v-col>
-        <v-col cols="3" v-if="loguedUser.perfil == 1">
-          <v-btn
-            color="primary"
-            @click="testCert()"
-            >TEST CERTIFICADO</v-btn
-          >
-        </v-col>
         <v-col cols="3"></v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">
@@ -274,7 +267,8 @@ export default {
   },
 
   created() {
-    this.$barcodeScanner.init(this.onBarcodeScanned);
+    // this.$barcodeScanner.init(this.onBarcodeScanned);
+    
   },
 
   destroyed () {
@@ -834,52 +828,6 @@ export default {
         );
       }
     },
-
-
-    testCert(){
-      /* Constants */
-      const sucursal = this.loguedUser.sucursal;
-      const ptoVenta = this.loguedUser.puntoVenta;
-      const documento = this.object.documento;
-      const cliente = this.object.cliente;
-      const fecha = this.fecha;
-      const afipAuthorization = this.afipModuleAuthorization;
-
-      //Instance body from AFIP ws-services
-      let body = {
-        asociados: [],
-        cbteTipo: documento.codigoDocumento,
-        concepto: 1,
-        cotizMoneda: 1,
-        cuit: sucursal.cuit,
-        fecha: fecha,
-        fechaServicioHasta: fecha,
-        fechaServicioVenc: fecha,
-        fechaServiciodesde: fecha,
-        fechaVencimientoPago: "0",
-        idMoneda: "PES",
-        name: sucursal.razonSocial,
-        nroDesde: "",
-        nroDoc: cliente.cuit,
-        nroHasta: "",
-        opcionales: [],
-        ptoVenta: ptoVenta.idFiscal,
-        tributos: [],
-      };
-
-      //Get authorized voucher number
-      axios
-        .get(
-          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${body.name}/${body.cuit}/${body.ptoVenta}/${body.cbteTipo}`,
-          {
-            headers: afipAuthorization,
-          }
-        )
-        .then((data) => {
-          console.log(data);
-        });
-    }
-
   },
 };
 </script>
