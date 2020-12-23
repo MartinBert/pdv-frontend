@@ -9,6 +9,11 @@
             @click="$store.commit('productos/dialogProductosMutation')"
             >BUSCAR PRODUCTO</v-btn
           >
+          <!-- <v-btn
+            color="primary"
+            @click="testcert()"
+            >BUSCAR PRODUCTO</v-btn
+          > -->
         </v-col>
         <v-col cols="3"></v-col>
         <v-col class="text-right">
@@ -472,7 +477,19 @@ export default {
         processObjects.push(this.processProductsObject(el));
       });
 
-      this.products = processObjects;
+      processObjects.forEach(el => {
+        if(this.products.length > 0){
+          this.products.forEach(e => {
+            if(e.nombre != el.nombre){
+              this.products.push(el);
+            }
+          })
+        }else{
+          this.products.push(el);
+        }
+      })
+
+      this.products = [...new Set(this.products)];
     },
 
     applyToLine(percent) {
@@ -828,6 +845,25 @@ export default {
         );
       }
     },
+
+    testcert(){
+      /* Constants */
+      const afipAuthorization = this.afipModuleAuthorization;
+      console.log(afipAuthorization);
+      //Get authorized voucher number
+      axios
+        .get(
+          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/SOLER PEDRO ERNESTO/20163675804/3/006`,
+          {
+            headers: {
+              Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNjA4NzI4ODY4LCJpc3MiOiJJU1NVRVIifQ.aA5czgoTxGTZfnQOBmBNme6e7vxXsGlN86EeNNc9Dgs"
+            },
+          }
+        )
+        .then((data) => {
+          console.log(data);
+        });
+    }
   },
 };
 </script>
