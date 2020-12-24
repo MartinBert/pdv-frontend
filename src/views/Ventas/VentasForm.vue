@@ -273,7 +273,6 @@ export default {
 
   created() {
     // this.$barcodeScanner.init(this.onBarcodeScanned);
-    
   },
 
   destroyed () {
@@ -424,7 +423,7 @@ export default {
       const filterForStore = this.products.filter((el) => el.id === id);
 
       this.products = filter;
-      this.$store.commit("productos/removeProductsToList", filterForStore);
+      this.$store.commit("productos/removeProductsToList", filterForStore[0].id);
     },
 
     applyModification(modificator, priceModificationPorcent) {
@@ -471,25 +470,13 @@ export default {
     },
 
     addProduct(data) {
+      data = [...new Set(data)];
       let processObjects = [];
-
       data.forEach((el) => { 
         processObjects.push(this.processProductsObject(el));
       });
 
-      processObjects.forEach(el => {
-        if(this.products.length > 0){
-          this.products.forEach(e => {
-            if(e.nombre != el.nombre){
-              this.products.push(el);
-            }
-          })
-        }else{
-          this.products.push(el);
-        }
-      })
-
-      this.products = [...new Set(this.products)];
+      this.products = processObjects;
     },
 
     applyToLine(percent) {

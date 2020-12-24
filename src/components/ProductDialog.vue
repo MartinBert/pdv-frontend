@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px" @input="refresh()">
+    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px">
       <v-card height="780px">
         <v-card-title>
           <v-row>
@@ -19,7 +19,7 @@
                 class="text-left ml-5 mr-5 mt-5"
                 label="Escriba el nombre, código de artículo o código de barras del artículo que desea buscar"
                 placeholder=" "
-                @keypress.enter="filterObjects(filterString, 0, 100)"
+                @keypress.enter="filterObjects(filterString, paginate.page - 1, paginate.size)"
               ></v-text-field>
             </v-col>
             <v-col cols="2">
@@ -34,7 +34,7 @@
           <v-container fluid>
             <v-row>
               <v-col>
-                <v-simple-table style="background-color: transparent">
+                <v-simple-table style="background-color: transparent" ref="pTable">
                   <template v-slot:default>
                     <thead>
                       <tr>
@@ -129,9 +129,16 @@ export default {
       }
     },
 
-    refresh(){
-      this.$store.commit('productos/resetStates');
-      this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+    checkSelected(){
+      this.productos.forEach(el => {
+        el.selected = false;
+      })
+
+      this.$store.state.productos.products.forEach(el => {
+        this.productos.filter(e => e.id == el.id)[0].selected = true;
+      })
+
+      this.$refs.pTable.$forceUpdate();
     }
   }
 }

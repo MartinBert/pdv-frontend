@@ -103,7 +103,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="filterObjects(fiterString, paginate.page - 1, paginate.size)"
+      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1 && loaded"
     ></v-pagination>
     <!-- End Paginate -->

@@ -10,10 +10,9 @@
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row v-if="urlId == 0" class="ml-5 mr-5">
-          <v-col cols="12">
+          <v-col cols="10">
             <v-text-field
               v-model="filterString"
-              v-on:input="filterProducts(filterString, paginate.page - 1, paginate.size)"
               dense
               outlined
               rounded
@@ -22,6 +21,14 @@
               placeholder=" "
               append-icon="mdi-magnify"
             ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-btn
+             class="primary"
+             @click="filterProducts(filterString, paginate.page - 1, paginate.size)"
+            >
+              BUSCAR
+            </v-btn>
           </v-col>
         </v-row>
         <v-row class="ml-5 mr-5" v-if="urlId == 0">

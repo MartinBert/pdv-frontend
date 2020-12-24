@@ -3,7 +3,7 @@ export default {
   state: {
     dialogProd: false,
     products: [],
-    detailList: []
+    detailList: [],
   },
   getters: {},
   mutations: {
