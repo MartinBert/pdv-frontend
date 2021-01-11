@@ -174,7 +174,7 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import { generateBarCode } from "../../helpers/mathHelper";
-// import { successAlert } from "../../helpers/alerts";
+import { successAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
 
 export default {
@@ -313,16 +313,16 @@ export default {
         });
         var prod = this.validateImport(excel);
         console.log(prod);
-        // if (prod.status) {
-        //   GenericService(this.tenant, this.service, this.token)
-        //     .saveAll(prod.data)
-        //     .then(() => {
-        //       successAlert('Importación exitosa');
-        //       this.getAll(this.paginate.page - 1, this.paginate.size);
-        //       this.loaderStatus = true;
-        //       this.loaded = true;
-        //     });
-        // }
+        if (prod.status) {
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(prod.data)
+            .then(() => {
+              successAlert('Importación exitosa');
+              this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+              this.loaderStatus = true;
+              this.loaded = true;
+            });
+        }
       };
       reader.readAsBinaryString(this.file);
     },

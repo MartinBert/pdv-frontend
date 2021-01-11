@@ -836,15 +836,12 @@ export default {
     testcert(){
       /* Constants */
       const afipAuthorization = this.afipModuleAuthorization;
-      console.log(afipAuthorization);
       //Get authorized voucher number
       axios
         .get(
           `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/SOLER PEDRO ERNESTO/20163675804/3/006`,
           {
-            headers: {
-              Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJjZWxvIiwiQ0xBSU1fVE9LRU4iOiJST0xFX0FETUlOIiwiaWF0IjoxNjA4NzI4ODY4LCJpc3MiOiJJU1NVRVIifQ.aA5czgoTxGTZfnQOBmBNme6e7vxXsGlN86EeNNc9Dgs"
-            },
+            headers: afipAuthorization
           }
         )
         .then((data) => {
