@@ -32,7 +32,7 @@
     </v-form>
 
     <!-- List -->
-    <v-simple-table style="background-color: transparent;">
+    <v-simple-table style="background-color: transparent;" ref="tab">
       <template v-slot:default>
         <thead>
           <tr>
@@ -41,6 +41,7 @@
             <th>Dirección</th>
             <th>Telefono</th>
             <th>Acciones</th>
+            <th>Depósito predeterminado</th>
           </tr>
         </thead>
         <tbody v-for="object in objects" :key="object.id">
@@ -52,6 +53,14 @@
             <td>
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
               <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
+            </td>
+            <td>
+              <span v-if="object.defaultDeposit == '1'">
+                <v-alert type="success">Definido para descontar stock en ventas</v-alert>
+              </span>
+              <span v-if="object.defaultDeposit !== '1'">
+                <v-btn class="primary" @click="selectDefaultDeposit(object.id)">Elegir como deposito predeterminado</v-btn>
+              </span>
             </td>
           </tr>
         </tbody>
@@ -154,8 +163,13 @@ export default {
     },
 
     openDelete(id) {
-      this.idObjet = id;
-      this.dialogDeleteObject = true;
+      const checkObjectPriority = this.objects.filter(el => el.defaultDeposit === '1')[0];
+      if(checkObjectPriority.id !== id){
+        this.idObjet = id;
+        this.dialogDeleteObject = true;
+      }else{
+        errorAlert("No puede eliminar el depósito predeterminado para descontar stock en las ventas");
+      }
     },
 
     deleteObject() {
@@ -233,6 +247,45 @@ export default {
       });
       return importacion;
     },
+
+    selectDefaultDeposit(idDeposit){
+      this.loaded = false;
+      const param = '';
+      const page = 0;
+      const size = 100000;
+
+      let id;
+
+      if(this.loguedUser.perfil < 3){
+        id = ""
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
+      GenericService(this.tenant, this.service, this.token)
+      .filter({id, param, page, size})
+      .then(data => {
+        let allDeposits = data.data.content;
+
+        let currentDefaultDeposit = allDeposits.filter(el => el.defaultDeposit === '1')[0];
+        if(currentDefaultDeposit){
+          currentDefaultDeposit.defaultDeposit = null;
+
+          GenericService(this.tenant, this.service, this.token)
+          .save(currentDefaultDeposit)
+          .then(()=>{
+            let defaultDeposit = allDeposits.filter(el => el.id === idDeposit)[0];
+            defaultDeposit.defaultDeposit = '1';
+  
+            GenericService(this.tenant, this.service, this.token)
+            .save(defaultDeposit);
+          })
+          .then(()=>{
+            this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+          })
+        }
+      })
+    }
   }
 };
 </script>

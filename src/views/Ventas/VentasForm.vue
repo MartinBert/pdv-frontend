@@ -253,6 +253,7 @@ export default {
     productos: [],
     products: [],
     depositos: [],
+    defaultDeposit: {},
     tenant: "",
     service: "ventas",
     token: localStorage.getItem("token"),
@@ -559,6 +560,7 @@ export default {
         .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
+          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
         });
 
       if (documento.ivaCat == 1) {
@@ -661,7 +663,7 @@ export default {
                           comprobante.productos.forEach((e) => {
                             if (
                               el.producto.id === e.id &&
-                              el.deposito.id == this.depositos[0].id
+                              el.deposito.id == this.defaultDeposit.id
                             ) {
                               el.cantidad =
                                 parseInt(el.cantidad) -
@@ -745,6 +747,7 @@ export default {
         .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
+          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
         });
       let comprobante;
       let condVenta;
@@ -793,19 +796,22 @@ export default {
             .filter(filterParam)
             .then((data) => {
               productos = data.data.content;
+              console.log(productos);
+              console.log(this.defaultDeposit);
               productos.forEach((el) => {
                 comprobante.productos.forEach((e) => {
-                  if (
-                    el.producto.id === e.id &&
-                    el.deposito.id == this.depositos[0].id
-                  ) {
-                    el.cantidad =
-                      parseInt(el.cantidad) - parseInt(e.cantUnidades);
-                      
-                      if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
-                        checkStock.push(el);
-                      }
-                    GenericService(this.tenant, "stock", this.token).save(el);
+                  if (el.producto.id === e.id){
+                    if(el.deposito.id === this.defaultDeposit.id){
+                      el.cantidad =
+                        parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                        
+                        if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                          checkStock.push(el);
+                        }
+                      GenericService(this.tenant, "stock", this.token).save(el);
+                    }else{
+                      successAlert("asdfasdfas");
+                    }
                   }
                 });
               });
