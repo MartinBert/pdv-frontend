@@ -2,10 +2,12 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="6">
+        <v-col cols="8">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          <v-btn class="primary ml-1" @click="openStocksDialog()" raised>ASIGNACIÓN MASIVA DE EXISTENCIAS MÍNIMAS</v-btn>
+          <v-btn class="primary ml-1" @click="openDepositMigrationDialog()">MIGRAR STOCK ENTRE DEPÓSITOS</v-btn>
         </v-col>
-        <v-col cols="3"></v-col>
+        <v-col cols="1"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
@@ -21,14 +23,15 @@
       </v-row>
     </v-form>
 
-    <!-- List -->
-    <v-simple-table style="background-color: transparent;">
+    <!-- List with pagination-->
+    <v-simple-table style="background-color: transparent;" v-if="loaded" ref="tab">
       <template v-slot:default>
         <thead>
           <tr>
             <th>ID</th>
             <th>Producto</th>
             <th>Cantidad</th>
+            <th>Cantidad mínima</th>
             <th>Depósito</th>
             <th>Acciones</th>
           </tr>
@@ -38,6 +41,10 @@
             <td>{{object.id}}</td>
             <td>{{object.producto.nombre}}</td>
             <td>{{object.cantidad}}</td>
+            <td>
+              <span v-if="!object.cantidadMinima">Sin existencias mínimas asignadas</span>
+              <span v-if="object.cantidadMinima">{{object.cantidadMinima}}</span>
+            </td>
             <td>{{object.deposito.nombre}}</td>
             <td>
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
@@ -47,15 +54,7 @@
         </tbody>
       </template>
     </v-simple-table>
-    <!-- End List -->
 
-    <!-- Loader -->
-    <div class="text-center" style="margin-top:15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- Paginate -->
     <v-pagination
       v-model="paginate.page"
       :length="paginate.totalPages"
@@ -66,7 +65,7 @@
       @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
-    <!-- End Paginate -->
+    <!-- End List with pagination -->
 
     <!-- Dialog Delete-->
     <v-dialog v-model="dialogDeleteObject" width="500">
@@ -82,11 +81,22 @@
       </v-card>
     </v-dialog>
     <!-- End Dialog Delete -->
+
+    <ModifyMinimumStocksDialog v-on:stocksRestrictions="applyMassiveStocksRestrictions()"/>
+    <DepositMigrationDialog v-on:depositsForMigrationProcess="applyMassiveChangesInDeposits()"/>
+
+    <!-- Loader -->
+    <div class="text-center" style="margin-top:15px" v-if="!loaded">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
+    <!-- End Loader -->
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
+import ModifyMinimumStocksDialog from '../../components/ModifyMinimumStocksDialog';
+import DepositMigrationDialog from '../../components/DepositMigrationDialog';
 
 export default {
   data: () => ({
@@ -105,9 +115,15 @@ export default {
     dialogDeleteObject: false
   }),
 
+  components:{
+    ModifyMinimumStocksDialog,
+    DepositMigrationDialog
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+    this.getOtherModels('', 0, 100000);
   },
 
   methods: {
@@ -132,16 +148,19 @@ export default {
         });
     },
 
-    getAll(page, size) {
-      this.objects = [];
-      this.loaded = false;
-      GenericService(this.tenant, this.service, this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
+    getOtherModels(param, page, size){
+      let id;
+      if(this.loguedUser.perfil < 3){
+        id = "";
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
+      GenericService(this.tenant, "depositos", this.token)
+      .filter({id, param, page, size})
+      .then(data => {
+        this.depositos = data.data.content;
+      })
     },
 
     newObject() {
@@ -166,6 +185,84 @@ export default {
           this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
         });
     },
+
+    openStocksDialog(){
+      this.$store.commit('stocks/dialogMutation');
+    },
+
+    openDepositMigrationDialog(){
+      this.$store.commit('stocks/allDepositsMutation', this.depositos);
+      this.$store.commit('stocks/depositMigrationDialogMutation');
+    },
+
+    applyMassiveStocksRestrictions(){
+      this.$store.commit('stocks/dialogMutation');
+      this.loaded = false;
+
+      const param = '';
+      const page = 0;
+      const size = 100000;
+
+      let id;
+
+      if(this.loguedUser.perfil < 3){
+        id = "";
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
+      GenericService(this.tenant, this.service, this.token)
+        .filter({id, param, page, size})
+        .then(data => {
+          let stockWithRestrictions = data.data.content.map(el => {
+            el.cantidadMinima = this.$store.state.stocks.minimumQuantity
+            return el;
+          });
+
+          console.log(stockWithRestrictions);
+
+          stockWithRestrictions.forEach(el => {
+            GenericService(this.tenant, this.service, this.token)
+            .save(el);
+          })
+
+          this.$store.commit('stocks/resetStates');
+          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+        });
+    },
+
+    applyMassiveChangesInDeposits(){
+      this.loaded = false;
+
+      const param = '';
+      const page = 0;
+      const size = 100000;
+
+      let id;
+      let depositToModifyId = this.$store.state.stocks.selectedDeposits[0].id;
+      let newDepositForProducts = this.$store.state.stocks.selectedDeposits[1];
+      
+      if(this.loguedUser.perfil < 3){
+        id = "";
+      }else{
+        id = this.loguedUser.sucursal.id;
+      }
+
+      GenericService(this.tenant, this.service, this.token)
+      .filter({id, param, page, size})
+      .then(data => {
+        let affectedProducts = data.data.content.filter(el => el.deposito.id == depositToModifyId);
+
+        affectedProducts.forEach(el => {
+          el.deposito = newDepositForProducts;
+          GenericService(this.tenant, this.service, this.token)
+          .save(el);
+
+          this.$store.commit('stocks/resetStates');
+          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+        })
+      })
+    }    
   }
 };
 </script>

@@ -232,7 +232,7 @@ import {
   decimalPercent,
   generateFiveDecimalCode
 } from "../../helpers/mathHelper";
-import { errorAlert, successAlert } from '../../helpers/alerts';
+import { errorAlert, infoAlert2, successAlert } from '../../helpers/alerts';
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
 
@@ -539,6 +539,7 @@ export default {
       let fileURL;
       let productos;
       let condVenta;
+      let checkStock = [];
 
       if (planesPago) {
         if (planesPago.length < 2) {
@@ -665,13 +666,26 @@ export default {
                               el.cantidad =
                                 parseInt(el.cantidad) -
                                 parseInt(e.cantUnidades);
+
+                                if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                                  checkStock.push(el);
+                                }
                               GenericService(tenant, "stock", token).save(el);
                             }
                           });
                         });
                       })
                       .then(() => {
-                        successAlert("Venta realizada");
+                        successAlert("Venta realizada")
+                        .then(()=>{
+                          if(checkStock.length > 0){
+                            let productsWithOutStock = '';
+                            checkStock.forEach(el => {
+                              productsWithOutStock += `${el.producto.nombre}, `
+                            });
+                            infoAlert2(`Vaya, parece que te estas quedando sin stock: ${productsWithOutStock}`);
+                          }
+                        })
                       })
                       .then(() => {
                         ReportsService(tenant, service, token)
@@ -725,6 +739,7 @@ export default {
       let file;
       let fileURL;
       let productos;
+      let checkStock = [];
 
       GenericService(tenant, "depositos", token)
         .filter(filterParam)
@@ -786,13 +801,26 @@ export default {
                   ) {
                     el.cantidad =
                       parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                      
+                      if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                        checkStock.push(el);
+                      }
                     GenericService(this.tenant, "stock", this.token).save(el);
                   }
                 });
               });
             })
             .then(() => {
-              successAlert("Venta realizada");
+              successAlert("Venta realizada")
+              .then(()=>{
+                if(checkStock.length > 0){
+                  let productsWithOutStock = '';
+                  checkStock.forEach(el => {
+                    productsWithOutStock += `${el.producto.nombre}, `
+                  });
+                  infoAlert2(`Vaya, parece que te estas quedando sin stock: ${productsWithOutStock}`);
+                }
+              })
             })
             .then(() => {
               ReportsService(tenant, service, token)
@@ -836,16 +864,20 @@ export default {
     testcert(){
       /* Constants */
       const afipAuthorization = this.afipModuleAuthorization;
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
+      
       //Get authorized voucher number
       axios
         .get(
-          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/SOLER PEDRO ERNESTO/20163675804/3/006`,
+          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${sucursal.razonSocial}/${sucursal.cuit}/${ptoVenta.idFiscal}/006`,
           {
             headers: afipAuthorization
           }
         )
         .then((data) => {
           console.log(data);
+          console.log("passed");
         });
     }
   },

@@ -112,45 +112,52 @@
 
 .text-alert-error p {
     color: #2364aa;
-    font-family: Cocogose;
+    font-family: cursive;
+    font-weight: bold;
     font-size: 16px;
 }
 
 .text-alert-error h1 {
     color: red;
-    font-family: Cocogose;
+    font-family: cursive;
+    font-weight: bold;
     font-size: 24px;
 }
 
 .text-alert-success p {
     color: #2364aa;
-    font-family: Cocogose;
+    font-family: cursive;
+    font-weight: bold;
     font-size: 16px;
 }
 
 .text-alert-success h1 {
     color: rgb(0, 146, 90);
-    font-family: Cocogose;
+    font-family: cursive;
+    font-weight: bold;
     font-size: 24px;
 }
 
 .text-alert-question p {
     color: #2364aa;
-    font-family: Cocogose;
+    font-family: cursive;
+    font-weight: bold;
     font-size: 16px;
 }
 
 .text-alert-question h1 {
     margin-top: 5px;
     color: rgb(235, 176, 14);
-    font-family: Cocogose;
+    font-family: cursive;
+    font-weight: bold;
     font-size: 24px;
 }
 
 .text-alert-info h1 {
     margin-top: 5px;
     color: rgb(14, 147, 235);
-    font-family: Cocogose;
+    font-family: cursive;
+    font-weight: bold;
     font-size: 24px;
 }
 

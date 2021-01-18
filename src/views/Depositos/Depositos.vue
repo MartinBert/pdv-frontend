@@ -98,6 +98,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import XLSX from 'xlsx';
+import { errorAlert } from '../../helpers/alerts';
 
 export default {
   data: () => ({
@@ -160,11 +161,15 @@ export default {
     deleteObject() {
       this.dialog = true;
       this.dialogDeleteObject = false;
-      GenericService(this.tenant, this.service, this.token)
+        GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.filterParams);
-        });
+          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+        })
+        .catch(()=>{
+          errorAlert("No se puede eliminar este depósito, todavía tiene productos en stock asociados");
+        })
+      
     },
 
     importDocuments(event) {

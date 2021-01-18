@@ -130,6 +130,14 @@
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
+          <v-col>
+            <v-text-field
+              type="number"
+              v-model="object.cantidadMinima"
+              label="Existencia mínima"
+              placeholder=" "
+            ></v-text-field>
+          </v-col>
         </v-row>
         <v-row class="ma-1" v-if="urlId != 0">
           <v-col>
@@ -158,10 +166,17 @@
             <v-text-field
               type="number"
               v-model="object.cantidad"
-              :counter="50"
               placeholder="Cantidad"
               required
               :rules="[(v) => !!v || 'Campo requerido...']"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              type="number"
+              v-model="object.cantidadMinima"
+              label="Existencia mínima"
+              placeholder=" "
             ></v-text-field>
           </v-col>
         </v-row>
@@ -322,6 +337,7 @@ export default {
                 producto: el,
                 deposito: ele,
                 cantidad: this.object.cantidad,
+                cantidadMinima: this.object.cantidadMinima,
                 sucursal: this.loguedUser.sucursal,
                 algorim: el.nombre + ele.id,
               };
