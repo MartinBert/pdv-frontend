@@ -283,6 +283,15 @@ export default {
           .then(()=>{
             setTimeout(()=>{this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);}, 500);
           })
+        }else{
+          let defaultDeposit = allDeposits.filter(el => el.id === idDeposit)[0];
+            defaultDeposit.defaultDeposit = '1';
+  
+            GenericService(this.tenant, this.service, this.token)
+            .save(defaultDeposit)
+            .then(()=>{
+              setTimeout(()=>{this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);}, 500);
+            })
         }
       })
     }
