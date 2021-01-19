@@ -153,7 +153,6 @@
           </v-col>
           <v-col>
             <v-autocomplete
-              disabled
               :items="depositos"
               v-model="object.deposito"
               item-text="nombre"
@@ -238,6 +237,7 @@ export default {
 
     if (this.urlId && this.urlId > 0) {
       this.getObject(this.urlId);
+      this.filterDepositos('', 0, 100000);
     } else {
       this.filterDepositos('', 0, 100000);
       this.filterProducts(this.filterString, this.paginate.page - 1, this.paginate.size);

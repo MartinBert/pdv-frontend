@@ -281,7 +281,7 @@ export default {
             .save(defaultDeposit);
           })
           .then(()=>{
-            this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+            setTimeout(()=>{this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);}, 500);
           })
         }
       })
