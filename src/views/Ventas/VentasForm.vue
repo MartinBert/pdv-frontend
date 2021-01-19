@@ -12,7 +12,7 @@
           <!-- <v-btn
             color="primary"
             @click="testcert()"
-            >BUSCAR PRODUCTO</v-btn
+            >TEST CERTIFICADO</v-btn
           > -->
         </v-col>
         <v-col cols="3"></v-col>
@@ -667,11 +667,7 @@ export default {
                             ) {
                               el.cantidad =
                                 parseInt(el.cantidad) -
-                                parseInt(e.cantUnidades);
-
-                                if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
-                                  checkStock.push(el);
-                                }
+                                parseInt(e.cantUnidades)
                               GenericService(tenant, "stock", token).save(el);
                             }
                           });
@@ -809,8 +805,6 @@ export default {
                           checkStock.push(el);
                         }
                       GenericService(this.tenant, "stock", this.token).save(el);
-                    }else{
-                      successAlert("asdfasdfas");
                     }
                   }
                 });

@@ -216,6 +216,7 @@ export default {
     tipoOperacion: null,
     productos: [],
     depositos: [],
+    defaultDeposit: {},
     object: {
       fecha: getCurrentDate(),
       productosEntrantes: [],
@@ -435,6 +436,7 @@ export default {
         .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
+          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
         });
 
       if (documento.ivaCat == 1) {
@@ -536,7 +538,7 @@ export default {
                           productosEntrantes.forEach((e) => {
                             if (
                               el.producto.id === e.id &&
-                              el.deposito.id === this.depositos[0].id
+                              el.deposito.id == this.defaultDeposit.id
                             ) {
                               el.cantidad =
                                 parseInt(el.cantidad) +
@@ -549,7 +551,7 @@ export default {
                             productosSalientes.forEach((e) => {
                               if (
                                 el.producto.id === e.id &&
-                                el.deposito.id === this.depositos[0].id
+                                el.deposito.id == this.defaultDeposit.id
                               ) {
                                 el.cantidad =
                                   parseInt(el.cantidad) -
@@ -642,6 +644,7 @@ export default {
         .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
+          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
         });
 
       if (planesPago) {
@@ -691,7 +694,7 @@ export default {
                 productosEntrantes.forEach((e) => {
                   if (
                     el.producto.id === e.id &&
-                    el.deposito.id === this.depositos[0].id
+                    el.deposito.id == this.defaultDeposit.id
                   ) {
                     el.cantidad =
                       parseInt(el.cantidad) + parseInt(e.cantUnidades);
@@ -703,7 +706,7 @@ export default {
                   productosSalientes.forEach((e) => {
                     if (
                       el.producto.id === e.id &&
-                      el.deposito.id === this.depositos[0].id
+                      el.deposito.id == this.defaultDeposit.id
                     ) {
                       el.cantidad =
                         parseInt(el.cantidad) - parseInt(e.cantUnidades);
@@ -765,6 +768,7 @@ export default {
         .filter(filterParam)
         .then((data) => {
           this.depositos = data.data.content;
+          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
         });
 
       GenericService(tenant, "stock", token)
@@ -775,7 +779,7 @@ export default {
             productosEntrantes.forEach((e) => {
               if (
                 el.producto.id === e.id &&
-                el.deposito.id === this.depositos[0].id
+                el.deposito.id == this.defaultDeposit.id
               ) {
                 el.cantidad = parseInt(el.cantidad) + parseInt(e.cantUnidades);
                 GenericService(tenant, "stock", token).save(el);
@@ -786,7 +790,7 @@ export default {
               productosSalientes.forEach((e) => {
                 if (
                   el.producto.id === e.id &&
-                  el.deposito.id === this.depositos[0].id
+                  el.deposito.id == this.defaultDeposit.id
                 ) {
                   el.cantidad =
                     parseInt(el.cantidad) - parseInt(e.cantUnidades);
