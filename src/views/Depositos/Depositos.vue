@@ -32,7 +32,7 @@
     </v-form>
 
     <!-- List -->
-    <v-simple-table style="background-color: transparent;" ref="tab">
+    <v-simple-table style="background-color: transparent;" ref="tab" v-if="loaded">
       <template v-slot:default>
         <thead>
           <tr>
@@ -83,7 +83,7 @@
       :page="paginate.page"
       :total-visible="8"
       @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
-      v-if="paginate.totalPages > 1"
+      v-if="paginate.totalPages > 1 && loaded"
     ></v-pagination>
     <!-- End Paginate -->
 
