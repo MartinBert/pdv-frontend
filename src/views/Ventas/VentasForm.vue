@@ -3,19 +3,20 @@
     <!-- Body -->
     <v-col cols="12">
       <v-row>
-        <v-col cols="3">
+        <v-col cols="4">
           <v-btn
             color="primary"
             @click="$store.commit('productos/dialogProductosMutation')"
             >BUSCAR PRODUCTO</v-btn
           >
           <!-- <v-btn
+            class="ml-1"
             color="primary"
             @click="testcert()"
             >TEST CERTIFICADO</v-btn
           > -->
         </v-col>
-        <v-col cols="3"></v-col>
+        <v-col cols="2"></v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">
             <option value="">Modificar importe total</option>
@@ -861,25 +862,25 @@ export default {
       }
     },
 
-    testcert(){
-      /* Constants */
-      const afipAuthorization = this.afipModuleAuthorization;
-      const sucursal = this.loguedUser.sucursal;
-      const ptoVenta = this.loguedUser.puntoVenta;
+    // testcert(){
+    //   /* Constants */
+    //   const afipAuthorization = this.afipModuleAuthorization;
+    //   const sucursal = this.loguedUser.sucursal;
+    //   const ptoVenta = this.loguedUser.puntoVenta;
       
-      //Get authorized voucher number
-      axios
-        .get(
-          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${sucursal.razonSocial}/${sucursal.cuit}/${ptoVenta.idFiscal}/006`,
-          {
-            headers: afipAuthorization
-          }
-        )
-        .then((data) => {
-          console.log(data);
-          console.log("passed");
-        });
-    }
+    //   //Get authorized voucher number
+    //   axios
+    //     .get(
+    //       `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${sucursal.razonSocial}/${sucursal.cuit}/${ptoVenta.idFiscal}/006`,
+    //       {
+    //         headers: afipAuthorization
+    //       }
+    //     )
+    //     .then((data) => {
+    //       console.log(data);
+    //       console.log("passed");
+    //     });
+    // }
   },
 };
 </script>
