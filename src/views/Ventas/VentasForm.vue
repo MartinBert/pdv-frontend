@@ -3,12 +3,15 @@
     <!-- Body -->
     <v-col cols="12">
       <v-row>
-        <v-col cols="4">
-          <v-btn
-            color="primary"
-            @click="$store.commit('productos/dialogProductosMutation')"
-            >BUSCAR PRODUCTO</v-btn
-          >
+        <v-col cols="6">
+          <div class="d-flex text-left">
+            <v-btn
+              color="primary"
+              @click="$store.commit('productos/dialogProductosMutation')"
+            >BUSCAR PRODUCTOS</v-btn>
+            <h5 class="mt-2 ml-2">Depósito predeterminado: {{defaultDeposit.nombre}}</h5>
+          </div>
+          
           <!-- <v-btn
             class="ml-1"
             color="primary"
@@ -16,7 +19,6 @@
             >TEST CERTIFICADO</v-btn
           > -->
         </v-col>
-        <v-col cols="2"></v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">
             <option value="">Modificar importe total</option>
@@ -174,7 +176,8 @@
             </v-row>
             <v-row>
               <v-col class="text-right">
-                <v-btn type="submit" class="primary">Finalizar venta</v-btn>
+                <v-btn type="submit" class="success">Finalizar venta</v-btn>
+                <v-btn type="button" class="error ml-1" @click="cancelSale()">Cancelar</v-btn>
               </v-col>
             </v-row>
           </v-form>
@@ -195,7 +198,7 @@
     </v-col>
 
     <!-- Add products dialog -->
-    <ProductDialog v-on:productList="addProduct" />
+    <ProductDialog v-on:productList="addProduct" v-on:resetListStatus="resetListOfDialog" :refreshListStatus="listennerOfListChange" />
 
     <!-- Individual percent dialog -->
     <v-dialog v-model="dialogIndividualPercent" width="500">
@@ -266,6 +269,7 @@ export default {
     dialogIndividualPercent: false,
     renglon: {},
     individualPercent: "",
+    listennerOfListChange: 0
   }),
 
   components: {
@@ -331,6 +335,13 @@ export default {
         .filter(filterParam)
         .then((data) => {
           this.databaseItems.medios_de_pago = data.data.content;
+        });
+
+      GenericService(this.tenant, "depositos", this.token)
+        .filter(filterParam)
+        .then((data) => {
+          this.depositos = data.data.content;
+          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
         });
 
       VentasService(this.tenant, this.service, this.token)
@@ -422,10 +433,11 @@ export default {
 
     deleteLine(id) {
       const filter = this.products.filter((el) => el.id !== id);
-      const filterForStore = this.products.filter((el) => el.id === id);
+      const filterForStore = this.products.filter((el) => el.id === id)[0].id;
 
       this.products = filter;
-      this.$store.commit("productos/removeProductsToList", filterForStore[0].id);
+      this.$store.commit("productos/removeProductsToList", filterForStore);
+      this.listennerOfListChange = id;
     },
 
     applyModification(modificator, priceModificationPorcent) {
@@ -512,6 +524,10 @@ export default {
       this.dialogIndividualPercent = false;
     },
 
+    resetListOfDialog(){
+      this.listennerOfListChange = 0;
+    },
+
     save() {
       /* Constants */
       const sucursal = this.loguedUser.sucursal;
@@ -556,13 +572,6 @@ export default {
       } else {
         condVenta = true;
       }
-
-      GenericService(tenant, "depositos", token)
-        .filter(filterParam)
-        .then((data) => {
-          this.depositos = data.data.content;
-          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
-        });
 
       if (documento.ivaCat == 1) {
         tipoDoc = 80;
@@ -700,6 +709,10 @@ export default {
 
                     this.object = {};
                     this.products = [];
+                    this.modificator = "";
+                    this.priceModificationPorcent = 0;
+                    this.individualPercent = "";
+                    this.listennerOfListChange = 999999999;
                     this.$store.commit("productos/resetStates");
                   } else {
                     if(detalleAfip[0].observaciones){
@@ -739,13 +752,6 @@ export default {
       let fileURL;
       let productos;
       let checkStock = [];
-
-      GenericService(tenant, "depositos", token)
-        .filter(filterParam)
-        .then((data) => {
-          this.depositos = data.data.content;
-          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
-        });
       let comprobante;
       let condVenta;
 
@@ -793,8 +799,6 @@ export default {
             .filter(filterParam)
             .then((data) => {
               productos = data.data.content;
-              console.log(productos);
-              console.log(this.defaultDeposit);
               productos.forEach((el) => {
                 comprobante.productos.forEach((e) => {
                   if (el.producto.id === e.id){
@@ -837,6 +841,10 @@ export default {
 
           this.object = {};
           this.products = [];
+          this.modificator = "";
+          this.priceModificationPorcent = 0;
+          this.individualPercent = "";
+          this.listennerOfListChange = 999999999;
           this.$store.commit("productos/resetStates");
         } else {
           errorAlert("No hay productos seleccionados en la venta");
@@ -862,6 +870,16 @@ export default {
       }
     },
 
+    cancelSale(){
+      this.object = {};
+      this.products = [];
+      this.modificator = "";
+      this.priceModificationPorcent = 0;
+      this.individualPercent = "";
+      this.listennerOfListChange = 999999999;
+      this.$store.commit("productos/resetStates");
+    }
+
     // testcert(){
     //   /* Constants */
     //   const afipAuthorization = this.afipModuleAuthorization;
@@ -878,7 +896,6 @@ export default {
     //     )
     //     .then((data) => {
     //       console.log(data);
-    //       console.log("passed");
     //     });
     // }
   },

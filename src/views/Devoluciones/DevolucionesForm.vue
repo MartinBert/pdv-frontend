@@ -36,6 +36,7 @@
                   <tr>
                     <th class="text-left">Producto</th>
                     <th class="text-left">Cantidad</th>
+                    <th class="text-left">Precio</th>
                     <th class="text-left">Acciones</th>
                   </tr>
                 </thead>
@@ -45,6 +46,7 @@
                     <td>
                       <input type="number" v-model="p.cantUnidades" />
                     </td>
+                    <td>${{p.precioTotal}}</td>
                     <td>
                       <div class="d-flex mt-1">
                         <button type="button">
@@ -86,6 +88,7 @@
                     <th class="text-left">Acciones</th>
                     <th class="text-left">Producto</th>
                     <th class="text-left">Cantidad</th>
+                    <th class="text-left">Precio</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -114,6 +117,7 @@
                     <td>
                       <input type="number" v-model="p.cantUnidades" />
                     </td>
+                    <td>${{p.precioTotal}}</td>
                   </tr>
                 </tbody>
               </template>
@@ -182,7 +186,7 @@
     </div>
 
     <!-- Dialog Components -->
-    <ProductDialog v-on:productList="addProduct" />
+    <ProductDialog v-on:productList="addProduct" v-on:resetListStatus="resetListOfDialog" :refreshListStatus="listennerOfListChange"/>
     <ReceiptDialog
       v-on:receipt="receiptDialogData = $store.state.receipt.receipt"
     />
@@ -241,6 +245,7 @@ export default {
     checked: false,
     saveDialog: false,
     receiptDialogData: null,
+    listennerOfListChange: 0
   }),
 
   components: {
@@ -292,11 +297,15 @@ export default {
           (el) => el.id !== id
         );
         this.object.productosEntrantes = filter;
+        this.listennerOfListChange = id;
+        this.$store.commit('productos/removeProductsToList', id);
       } else {
         const filter = this.object.productosSalientes.filter(
           (el) => el.id !== id
         );
         this.object.productosSalientes = filter;
+        this.listennerOfListChange = id;
+        this.$store.commit('productos/removeProductsToList', id);
       }
     },
 
@@ -323,6 +332,14 @@ export default {
       this.object.productosEntrantes = [
         ...new Set(this.object.productosEntrantes),
       ];
+
+      this.object.productosSalientes.filter(el => {
+        this.object.productosEntrantes = this.object.productosEntrantes.filter(e => e.id !== el.id);
+      });
+    },
+
+    resetListOfDialog(){
+      this.listennerOfListChange = 0;
     },
 
     save() {

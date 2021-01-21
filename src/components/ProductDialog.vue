@@ -51,6 +51,7 @@
                         <th>Producto</th>
                         <th>Código de barras</th>
                         <th>Código de producto</th>
+                        <th v-if="typeList !== 1">Cantidad en stock</th>
                       </tr>
                     </thead>
                     <tbody v-for="producto in productos" :key="producto.id">
@@ -64,6 +65,7 @@
                         <td>{{ producto.nombre }}</td>
                         <td>{{ producto.codigoBarra }}</td>
                         <td>{{ producto.codigoProducto }}</td>
+                        <td v-if="typeList !== 1">{{producto.cantidad}}</td>
                       </tr>
                     </tbody>
                   </template>
@@ -83,8 +85,8 @@
             </v-row>
             <v-row>
               <v-col cols="12" class="text-end">
-                <v-btn class="success">CARGAR PRODUCTOS</v-btn>
-                <v-btn class="error ml-1">LIMPIAR</v-btn>
+                <v-btn class="success" @click="loadProducts()">CARGAR PRODUCTOS</v-btn>
+                <v-btn class="error ml-1" @click="clearSelection()">LIMPIAR</v-btn>
               </v-col>
             </v-row>
           </v-container>
@@ -97,6 +99,10 @@ import GenericService from "../services/GenericService";
 import StocksService from "../services/StocksService";
 export default {
   name: "ProductDialog",
+
+  props:{
+    refreshListStatus: Number
+  },
 
   data(){
     return {
@@ -120,12 +126,27 @@ export default {
     this.createtypeProductsList();
   },
 
+  watch:{
+    refreshListStatus(){
+      this.productos.filter(el => {
+        if(this.refreshListStatus === 999999999){
+          el.selected = false;
+        }else{
+          if(el.id === this.refreshListStatus){
+            el.selected = false;
+          }
+        }
+      })
+
+      this.$emit('resetListStatus');
+    }
+  },
+
   methods:{
     filterObjects(param, page, size, typeList) {
       this.loaded = false;
       
       if(typeList === 1){
-        console.log('passed');
         this.generalSearch(param, page, size);
       }else{
         this.searchForDeposit(param, page, size, typeList);
@@ -139,10 +160,8 @@ export default {
         productosFiltrados.cantUnidades = 1;
         productosFiltrados.total = productosFiltrados.precioTotal;
         this.$store.commit('productos/addProductsToList', productosFiltrados);
-        this.$emit('productList', this.$store.state.productos.products);
       } else {
         this.$store.commit('productos/removeProductsToList', id);
-        this.$emit('productList', this.$store.state.productos.products);
       }
     },
 
@@ -183,8 +202,10 @@ export default {
       StocksService(this.tenant, 'stock', this.token)
       .filterStockForDepositId({id, param, page, size, idParam})
       .then(data => {
-        console.log(data);
-        this.productos = data.data.content.map(el => el.producto);
+        this.productos = data.data.content.map(el => {
+          el.producto.cantidad = el.cantidad;
+          return el.producto;
+        });
         this.paginate.totalPages = data.data.totalPages;
         if(this.paginate.totalPages < this.paginate.page){
             this.paginate.page = 1;
@@ -209,6 +230,19 @@ export default {
           this.typeProductsList.push({id: el.id, text: el.nombre});
         })
       })
+    },
+
+    loadProducts(){
+      this.$emit('productList', this.$store.state.productos.products);
+    },
+
+    clearSelection(){
+      this.productos.filter(el => {
+        if(el.selected === true){
+          el.selected = false;
+        }
+      });
+      this.$store.commit('productos/clearProductsState');
     }
   }
 }

@@ -16,6 +16,5 @@ export default (tenant,service,token) =>{
                 headers: { Authorization: "Bearer " + token }
             })
         },
-        
     }
 }
