@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="8">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          <v-btn class="primary ml-1" @click="openStocksDialog()" raised>ASIGNACIÓN MASIVA DE EXISTENCIAS MÍNIMAS</v-btn>
+          <v-btn class="primary ml-1" @click="openStocksDialog()" raised>MANEJO DE EXISTENCIAS MÍNIMAS</v-btn>
           <v-btn class="primary ml-1" @click="openDepositMigrationDialog()">MIGRAR STOCK ENTRE DEPÓSITOS</v-btn>
         </v-col>
         <v-col cols="1"></v-col>

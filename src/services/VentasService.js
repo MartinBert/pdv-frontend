@@ -1,4 +1,5 @@
 import axios from "axios";
+import { infoAlert2 } from '../helpers/alerts';
 
 export default (tenant,service,token) =>{
     return{
@@ -16,5 +17,56 @@ export default (tenant,service,token) =>{
                 headers: { Authorization: "Bearer " + token }
             })
         },
+
+        checkProductsAndDepositsStatus(productsBelowMinimumStock, productsWithoutStockOnDefaultDeposit, productsOutOfStockAndDeposits){
+            if(productsBelowMinimumStock.length > 0){
+                let lowStockProducts = '';
+                productsBelowMinimumStock.forEach(el => {
+                lowStockProducts += `${el.producto.nombre}, `
+                });
+                infoAlert2(`Vaya, parece que te estas quedando sin stock: ${lowStockProducts}`)
+                .then(()=>{
+                if(productsOutOfStockAndDeposits.length > 0){
+                    let productsNotRegisteredInStock = '';
+                    productsOutOfStockAndDeposits.forEach(el => {
+                    productsNotRegisteredInStock += `${el.nombre}, `
+                    });
+                    infoAlert2(`Estos productos no se encuentran en ningún depósito: ${productsNotRegisteredInStock}`);
+                }else{
+                    if(productsWithoutStockOnDefaultDeposit.length > 0){
+                    let productsOnSecondaryDeposits = '';
+                    productsWithoutStockOnDefaultDeposit.forEach(el => {
+                        productsOnSecondaryDeposits += `${el.producto.nombre}, `
+                    });
+                    infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
+                    }
+                }
+                })
+            }else if(productsOutOfStockAndDeposits.length > 0){
+                let productsNotRegisteredInStock = '';
+                productsOutOfStockAndDeposits.forEach(el => {
+                productsNotRegisteredInStock += `${el.nombre}, `
+                });
+                infoAlert2(`Estos productos no se encuentran en ningún depósito: ${productsNotRegisteredInStock}`)
+                .then(()=>{
+                if(productsWithoutStockOnDefaultDeposit.length > 0){
+                    let productsOnSecondaryDeposits = '';
+                    productsWithoutStockOnDefaultDeposit.forEach(el => {
+                    productsOnSecondaryDeposits += `${el.producto.nombre}, `
+                    });
+                    infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
+                }
+                })
+            }else{
+                if(productsWithoutStockOnDefaultDeposit.length > 0){
+                let productsOnSecondaryDeposits = '';
+                productsWithoutStockOnDefaultDeposit.forEach(el => {
+                    console.log(el);
+                    productsOnSecondaryDeposits += `${el.producto.nombre}, `
+                });
+                infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
+                }
+            }
+        }
     }
 }

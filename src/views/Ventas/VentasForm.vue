@@ -236,7 +236,7 @@ import {
   decimalPercent,
   generateFiveDecimalCode
 } from "../../helpers/mathHelper";
-import { errorAlert, infoAlert2, successAlert } from '../../helpers/alerts';
+import { errorAlert, successAlert } from '../../helpers/alerts';
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
 
@@ -557,7 +557,9 @@ export default {
       let fileURL;
       let productos;
       let condVenta;
-      let checkStock = [];
+      let productsBelowMinimumStock = [];
+      let productsOutOfStockAndDeposits = [];
+      let productsWithoutStockOnDefaultDeposit = [];
 
       if (planesPago) {
         if (planesPago.length < 2) {
@@ -669,30 +671,44 @@ export default {
                       .filter(filterParam)
                       .then((data) => {
                         productos = data.data.content;
+
                         productos.forEach((el) => {
                           comprobante.productos.forEach((e) => {
-                            if (
-                              el.producto.id === e.id &&
-                              el.deposito.id == this.defaultDeposit.id
-                            ) {
-                              el.cantidad =
-                                parseInt(el.cantidad) -
-                                parseInt(e.cantUnidades)
-                              GenericService(tenant, "stock", token).save(el);
+                            if (el.producto.id === e.id) {
+                              e.checked = true
+                              switch (el.deposito.id) {
+                                case this.defaultDeposit.id:
+                                    el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
+
+                                    if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                                      productsBelowMinimumStock.push(el);
+                                    }
+                                    GenericService(tenant, "stock", token).save(el);
+                                  break;
+                              
+                                default:
+                                    el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                                    if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                                      productsBelowMinimumStock.push(el);
+                                    }
+                                    GenericService(tenant, "stock", token).save(el);
+                                    productsWithoutStockOnDefaultDeposit.push(el);
+                                  break;
+                              }
                             }
                           });
                         });
+
+                        const viewCheckedProductsInReceipt = comprobante.productos.filter(el => !el.checked);
+                        if(viewCheckedProductsInReceipt.length > 0){
+                          productsOutOfStockAndDeposits = viewCheckedProductsInReceipt;
+                        }
                       })
                       .then(() => {
                         successAlert("Venta realizada")
                         .then(()=>{
-                          if(checkStock.length > 0){
-                            let productsWithOutStock = '';
-                            checkStock.forEach(el => {
-                              productsWithOutStock += `${el.producto.nombre}, `
-                            });
-                            infoAlert2(`Vaya, parece que te estas quedando sin stock: ${productsWithOutStock}`);
-                          }
+                          VentasService(this.tenant, this.service, this.token)
+                          .checkProductsAndDepositsStatus(productsBelowMinimumStock, productsWithoutStockOnDefaultDeposit, productsOutOfStockAndDeposits);
                         })
                       })
                       .then(() => {
@@ -751,9 +767,11 @@ export default {
       let file;
       let fileURL;
       let productos;
-      let checkStock = [];
       let comprobante;
       let condVenta;
+      let productsBelowMinimumStock = [];
+      let productsOutOfStockAndDeposits = [];
+      let productsWithoutStockOnDefaultDeposit = [];
 
       if (planesPago) {
         if (planesPago.length < 2) {
@@ -799,32 +817,45 @@ export default {
             .filter(filterParam)
             .then((data) => {
               productos = data.data.content;
+
               productos.forEach((el) => {
                 comprobante.productos.forEach((e) => {
-                  if (el.producto.id === e.id){
-                    if(el.deposito.id === this.defaultDeposit.id){
-                      el.cantidad =
-                        parseInt(el.cantidad) - parseInt(e.cantUnidades);
-                        
-                        if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
-                          checkStock.push(el);
-                        }
-                      GenericService(this.tenant, "stock", this.token).save(el);
+                  if (el.producto.id === e.id) {
+                    e.checked = true
+                    switch (el.deposito.id) {
+                      case this.defaultDeposit.id:
+                          el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
+
+                          if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                            productsBelowMinimumStock.push(el);
+                          }
+                          GenericService(tenant, "stock", token).save(el);
+                        break;
+                    
+                      default:
+                          el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                          if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                            productsBelowMinimumStock.push(el);
+                          }
+                          GenericService(tenant, "stock", token).save(el);
+                          productsWithoutStockOnDefaultDeposit.push(el);
+                        break;
                     }
+                    
                   }
                 });
               });
+
+              const viewCheckedProductsInReceipt = comprobante.productos.filter(el => !el.checked);
+              if(viewCheckedProductsInReceipt.length > 0){
+                productsOutOfStockAndDeposits = viewCheckedProductsInReceipt;
+              }
             })
             .then(() => {
               successAlert("Venta realizada")
               .then(()=>{
-                if(checkStock.length > 0){
-                  let productsWithOutStock = '';
-                  checkStock.forEach(el => {
-                    productsWithOutStock += `${el.producto.nombre}, `
-                  });
-                  infoAlert2(`Vaya, parece que te estas quedando sin stock: ${productsWithOutStock}`);
-                }
+                VentasService(this.tenant, this.service, this.token)
+                .checkProductsAndDepositsStatus(productsBelowMinimumStock, productsWithoutStockOnDefaultDeposit, productsOutOfStockAndDeposits);
               })
             })
             .then(() => {
@@ -878,7 +909,7 @@ export default {
       this.individualPercent = "";
       this.listennerOfListChange = 999999999;
       this.$store.commit("productos/resetStates");
-    }
+    },
 
     // testcert(){
     //   /* Constants */
