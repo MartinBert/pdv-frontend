@@ -203,6 +203,7 @@
 </template>
 <script>
 import { errorAlert } from '../../helpers/alerts';
+import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
 
 export default {
@@ -321,7 +322,19 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .save(this.object)
             .then(() => {
-              this.$router.push({ name: "stock" });
+              const stockHistory = {
+                stocks: [this.object],
+                descripcion: `Cambio en stock de ${this.object.producto.nombre}`,
+                fecha: formatDate(getCurrentDate()),
+                usuario:this.loguedUser.nombre,
+                sucursal: this.loguedUser.sucursal
+              }
+
+              GenericService(this.tenant, 'historialStock', this.token)
+              .save(stockHistory)
+              .then(()=>{
+                this.$router.push({ name: "stock" });
+              })
             })
             .catch((error) => {
               if (error.response.status == 500) {

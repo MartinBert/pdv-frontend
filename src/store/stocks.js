@@ -3,9 +3,10 @@ export default {
     state: {
       dialog: false,
       depositMigrationDialog: false,
+      stockHistoryDialog: false,
       allDeposits: '',
       selectedDeposits: [],
-      minimumQuantity: ''
+      minimumQuantity: '',
     },
     getters: {},
     mutations: {
@@ -13,12 +14,17 @@ export default {
         state.dialog = false;
         state.depositMigrationDialog = false;
         state.deposits = '';
+        state.stockHistoryDialog = false;
         state.selectedDeposits = [];
         state.minimumQuantity = '';
       },
 
       dialogMutation(state) {
         state.dialog = !state.dialog;
+      },
+
+      stockHistoryDialogMutation(state) {
+        state.stockHistoryDialog = !state.stockHistoryDialog;
       },
 
       depositMigrationDialogMutation(state){
@@ -35,7 +41,7 @@ export default {
 
       minimumQuantityMutation(state, minimunStocksAssigned){
         state.minimumQuantity = minimunStocksAssigned;
-      },
+      }
     },
     actions: {}
   };

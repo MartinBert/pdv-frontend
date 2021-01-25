@@ -82,6 +82,7 @@ export default {
               if(data.data.perfil.id > 2){
 
                 const userData = {
+                  "nombre": data.data.nombre,
                   "perfil": data.data.perfil.id,
                   "sucursal": data.data.sucursal,
                   "puntoVenta": data.data.puntoVenta,
@@ -91,6 +92,7 @@ export default {
                 this.clearConsole();            
               }else if(data.data.perfil.id === 2){
                 const userData = {
+                  "nombre": data.data.nombre,
                   "perfil": data.data.perfil.id,
                   "empresa": data.data.empresa
                 }

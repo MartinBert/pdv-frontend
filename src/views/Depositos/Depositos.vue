@@ -3,8 +3,9 @@
     <h3>Depositos</h3>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="1">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        <v-col cols="3" class="mt-2">
+          <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>
+          <v-btn class="primary ml-1" @click="openStockMovementHistoryDialog()">MOVIMIENTOS DE STOCK</v-btn>
         </v-col>
         <v-col cols="3">
           <v-file-input
@@ -15,7 +16,7 @@
           @change="importDocuments($event)"
           ></v-file-input>
         </v-col>
-        <v-col cols="5"></v-col>
+        <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
@@ -101,6 +102,8 @@
       </v-card>
     </v-dialog>
     <!-- End Dialog Delete -->
+
+    <StockHistoryDialog />
   </v-container>
 </template>
 
@@ -108,6 +111,7 @@
 import GenericService from "../../services/GenericService";
 import XLSX from 'xlsx';
 import { errorAlert } from '../../helpers/alerts';
+import StockHistoryDialog from '../../components/StockHistoryDialog';
 
 export default {
   data: () => ({
@@ -126,6 +130,11 @@ export default {
     dialogDeleteObject: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
+
+  components:{
+    StockHistoryDialog
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
@@ -294,6 +303,10 @@ export default {
             })
         }
       })
+    },
+
+    openStockMovementHistoryDialog(){
+      this.$store.commit('stocks/stockHistoryDialogMutation');
     }
   }
 };
