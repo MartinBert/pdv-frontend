@@ -371,17 +371,18 @@ export default {
             return el;
           });
 
-          console.log(stockWithRestrictions);
-
           stockWithRestrictions.forEach((el) => {
             GenericService(this.tenant, this.service, this.token).save(el);
           });
+
+          this.saveHistorial(stockWithRestrictions, "Cambio masivo en límite de existencias mínimas");
 
           this.$store.commit("stocks/resetStates");
           this.filterObjects(
             this.filterString,
             this.paginate.page - 1,
-            this.paginate.size
+            this.paginate.size,
+            this.typeList
           );
         });
     },
@@ -415,16 +416,7 @@ export default {
             GenericService(this.tenant, this.service, this.token).save(el);
           });
 
-          const stockHistory = {
-            stocks: affectedProducts,
-            descripcion: "Movimiento masivo de stock entre depósitos",
-            fecha: formatDate(getCurrentDate()),
-            usuario:this.loguedUser.nombre,
-            sucursal: this.loguedUser.sucursal
-          }
-
-          GenericService(this.tenant, 'historialStock', this.token)
-          .save(stockHistory);
+          this.saveHistorial(affectedProducts, "Movimiento masivo de stock entre depósitos");
 
           this.$store.commit("stocks/resetStates");
           setTimeout(()=>{this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size, this.typeList);}, 500);
@@ -452,16 +444,7 @@ export default {
           .save(el);
         })
         
-        const stockHistory = {
-          stocks: this.migration,
-          descripcion: "Migración de productos",
-          fecha: formatDate(getCurrentDate()),
-          usuario:this.loguedUser.nombre,
-          sucursal: this.loguedUser.sucursal
-        }
-
-        GenericService(this.tenant, 'historialStock', this.token)
-        .save(stockHistory);
+        this.saveHistorial(this.migration, "Migración de productos");
         
         this.migration = [];
         this.destinationDepositForMigrations = {};
@@ -470,6 +453,19 @@ export default {
       }else{
         errorAlert("Debe seleccionar al menos 1 producto para migrar su stock de depósito");
       }
+    },
+
+    saveHistorial(stocks, str){
+      const stockHistory = {
+        stocks: stocks,
+        descripcion: str,
+        fecha: formatDate(getCurrentDate()),
+        usuario:this.loguedUser.nombre,
+        sucursal: this.loguedUser.sucursal
+      }
+
+      GenericService(this.tenant, 'historialStock', this.token)
+      .save(stockHistory);
     }
   },
 };

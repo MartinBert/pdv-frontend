@@ -295,7 +295,7 @@ export default {
       }
 
       GenericService(this.tenant, "depositos", this.token)
-        .filter({id, param: '', page, size})
+        .filter({id, param, page, size})
         .then((data) => {
           this.depositos = data.data.content;
           this.loaded = true;
@@ -322,16 +322,9 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .save(this.object)
             .then(() => {
-              const stockHistory = {
-                stocks: [this.object],
-                descripcion: `Cambio en stock de ${this.object.producto.nombre}`,
-                fecha: formatDate(getCurrentDate()),
-                usuario:this.loguedUser.nombre,
-                sucursal: this.loguedUser.sucursal
-              }
 
-              GenericService(this.tenant, 'historialStock', this.token)
-              .save(stockHistory)
+              this.saveHistorial([this.object], `Cambio en stock de ${this.object.producto.nombre}`)
+
               .then(()=>{
                 this.$router.push({ name: "stock" });
               })
@@ -438,6 +431,19 @@ export default {
     back() {
       this.$router.push({ name: "stock" });
     },
+
+    saveHistorial(stocks, str){
+      const stockHistory = {
+        stocks: stocks,
+        descripcion: str,
+        fecha: formatDate(getCurrentDate()),
+        usuario:this.loguedUser.nombre,
+        sucursal: this.loguedUser.sucursal
+      }
+
+      GenericService(this.tenant, 'historialStock', this.token)
+      .save(stockHistory);
+    }
   }, 
 };
 </script>
