@@ -1,13 +1,10 @@
 export function calculateAlicIvaBaseImpVentas(totalVenta){
-    const result = Math.round((totalVenta / 1.21) * 100) / 100;
-    return result;
+    return roundTwoDecimals(totalVenta / 1.21);
 } 
 
 export function calculateAlicIvaImporteVentas(totalVenta, baseImp){
-   const result = Math.round((totalVenta - baseImp) * 100) / 100;
-   return result;
+   return roundTwoDecimals(totalVenta - baseImp);
 }
-
 export function generateBarCode(){
     const barCode = Math.floor(1e9 + (Math.random() * 9e9));
     return barCode;
@@ -18,16 +15,31 @@ export function decimalPercent(integerPercent){
 }
 
 export function calculatePercentaje(number, percent){
-    const result = parseFloat(number * decimalPercent(percent)).toFixed(2);
-    return result;
+    return roundTwoDecimals(number * decimalPercent(percent));
+}
+
+export function calculateAmountPlusPercentaje(number, percent){
+    return roundTwoDecimals(number * (1 + decimalPercent(percent)))
+}
+
+export function calculateAmountMinusPercentaje(number, percent){
+    return roundTwoDecimals(number * (1 - decimalPercent(percent)))
+}
+
+export function calculatePercentReductionInAmount(number, percent){
+    return roundTwoDecimals(number / (1 + decimalPercent(percent)));
 }
 
 export function sumarNumeros(array){
-    return Math.round((array.reduce((acc, el) => acc + el))*100)/100;
+    return roundTwoDecimals(array.reduce((acc, el) => acc + el));
 }
 
 export function restarNumeros(array){
-    return Math.round((array.reduce((acc, el) => acc - el))*100)/100;
+    return roundTwoDecimals(array.reduce((acc, el) => acc - el));
+}
+
+export function roundTwoDecimals(number){
+    return Math.round((number)*100)/100;
 }
 
 export function generateFiveDecimalCode(){

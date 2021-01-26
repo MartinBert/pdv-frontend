@@ -80,6 +80,16 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
+        <v-row class="ml-1">
+          <v-col cols="3">
+            <v-autocomplete
+              :items="ivas"
+              item-text="nombre"
+              v-model="object.iva"
+              :return-object="true"
+            />
+          </v-col>
+        </v-row>
         <v-row class="ma-1">
           <v-col>
             <v-text-field
@@ -89,7 +99,7 @@
               label="Costo bruto"
               required
               class="mr-3"
-              v-on:input="calculations"
+              v-on:input="calculations()"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -133,7 +143,7 @@
               label="Ganancia"
               required
               class="mr-3"
-              v-on:input="calculations"
+              v-on:input="calculations()"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -165,7 +175,7 @@
               :counter="10"
               label="Precio total"
               required
-              @input="gainCalculations"
+              @input="gainCalculations()"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -188,6 +198,7 @@
 </template>
 
 <script>
+import { calculateAmountPlusPercentaje, calculateAmountMinusPercentaje, restarNumeros, roundTwoDecimals, calculatePercentReductionInAmount } from '../../helpers/mathHelper';
 import GenericService from "../../services/GenericService";
 
 export default {
@@ -199,7 +210,9 @@ export default {
     ],
     valid: true,
     object: {
-      estado: 1
+      estado: 1,
+      ganancia: 0,
+      iva: {id:1, nombre:"Iva 21%", porcentaje: 21}
     },
     cantidad: [],
     loaded: false,
@@ -210,7 +223,8 @@ export default {
     errorMessage: "",
     marcas: [],
     distribuidores: [],
-    rubros: []
+    rubros: [],
+    ivas: [],
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -250,37 +264,27 @@ export default {
         .then(data => {
           this.rubros = data.data.content;
         });
+
+      GenericService(this.tenant, "ivas", this.token)
+        .getAll(page, size)
+        .then(data => {
+          this.ivas = data.data.content;
+        });
     },
 
     calculations() {
-      this.object.costoNeto = (this.object.costoBruto * (1 - 0.21)).toFixed(2);
-      this.object.ivaCompra = (
-        this.object.costoBruto - this.object.costoNeto
-      ).toFixed(2);
-      this.object.precioSinIva = (
-        this.object.costoBruto *
-        (1 + this.object.ganancia / 100)
-      ).toFixed(2);
-      this.object.precioTotal = (
-        this.object.costoBruto *
-        (1 + this.object.ganancia / 100) *
-        1.21
-      ).toFixed(2);
-      this.object.ivaVenta = (
-        this.object.precioTotal - this.object.precioSinIva
-      ).toFixed(2);
-      this.object.precioCosto = this.object.costoBruto;
+      this.object.costoNeto = calculateAmountMinusPercentaje(this.object.costoBruto, this.object.iva.porcentaje);
+      this.object.precioCosto = this.object.costoNeto;
+      this.object.ivaCompra = restarNumeros([this.object.costoBruto, this.object.costoNeto]);
+      this.object.precioSinIva = calculateAmountPlusPercentaje(this.object.costoBruto, this.object.ganancia);
+      this.object.precioTotal = calculateAmountPlusPercentaje(this.object.precioSinIva, this.object.iva.porcentaje);
+      this.object.ivaVenta = restarNumeros([this.object.precioTotal, this.object.precioSinIva]);
     },
 
     gainCalculations() {
-      this.object.ganancia = (
-        this.object.precioTotal / 1.21 -
-        this.object.costoBruto
-      ).toFixed(2);
-      this.object.precioSinIva = (this.object.precioTotal / 1.21).toFixed(2);
-      this.object.ivaVenta = (
-        this.object.precioTotal - this.object.precioSinIva
-      ).toFixed(2);
+      this.object.ganancia = roundTwoDecimals(calculatePercentReductionInAmount(this.object.precioTotal, this.object.iva.porcentaje) - this.object.costoBruto);
+      this.object.precioSinIva = calculatePercentReductionInAmount(this.object.precioTotal, this.object.iva.porcentaje);
+      this.object.ivaVenta = roundTwoDecimals(restarNumeros([this.object.precioTotal, this.object.precioSinIva]));
     },
 
     save() {

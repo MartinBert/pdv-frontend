@@ -293,6 +293,12 @@ export default {
             title: "Modulos",
             visible: false
           },
+          {
+            path: "/ivas",
+            name: "ivas",
+            title: "Ivas",
+            visible: false
+          },
         ]
       },
       {

@@ -53,6 +53,8 @@ import PreguntasFrecuentes from "../views/PreguntasFrecuentes/PreguntasFrecuente
 import PreguntasFrecuentesForm from "../views/PreguntasFrecuentes/PreguntasFrecuentesForm.vue";
 import Caja from "../views/Caja/Caja.vue";
 import CajaForm from "../views/Caja/CajaForm.vue";
+import Ivas from "../views/Ivas/Ivas.vue";
+import IvasForm from "../views/Ivas/IvasForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
 import Mensajes from "../views/Mensajes/Mensajes.vue";
 
@@ -386,6 +388,18 @@ const routes = [
                 path: 'cajaForm',
                 name: 'cajaForm',
                 component: CajaForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'ivas',
+                name: 'ivas',
+                component: Ivas,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'ivasForm',
+                name: 'ivasForm',
+                component: IvasForm,
                 meta: { requiresAuth: true }
             },
             {
