@@ -107,7 +107,7 @@ export default {
   data(){
     return {
       productos: [],
-      typeList: 1,
+      typeList: 0,
       typeProductsList: [],
       filterString: "",
       paginate: {
@@ -146,7 +146,7 @@ export default {
     filterObjects(param, page, size, typeList) {
       this.loaded = false;
       
-      if(typeList === 1){
+      if(typeList === 0){
         this.generalSearch(param, page, size);
       }else{
         this.searchForDeposit(param, page, size, typeList);
@@ -225,7 +225,7 @@ export default {
       GenericService(this.tenant, 'depositos', this.token)
       .filter({id: id, param: '', page: 0, size: 100000})
       .then(data => {
-        this.typeProductsList.push({id: 1, text: 'Lista general de productos'});
+        this.typeProductsList.push({id: 0, text: 'Lista general de productos'});
         data.data.content.forEach(el => {
           this.typeProductsList.push({id: el.id, text: el.nombre});
         })
