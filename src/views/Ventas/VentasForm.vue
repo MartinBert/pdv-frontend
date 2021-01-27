@@ -2,6 +2,44 @@
   <v-container>
     <!-- Body -->
     <v-col cols="12">
+      <form @submit.prevent="applyChangesInLoguedUserData()" v-if="loguedUser.perfil === 2">
+        <v-row>
+          <v-col cols="2" class="mt-2">
+            <span >
+              Sucursal de facturación:
+            </span>
+          </v-col>
+          <v-col cols="2">
+            <v-autocomplete
+            filled
+            dense
+              v-model="loguedUser.sucursal"
+              :items="loguedUser.empresa.sucursales"
+              :return-object="true"
+              item-text="nombre"
+            />
+          </v-col>
+          <v-col cols="1" class="mt-2 text-end">
+            <span>
+              Punto Vta:
+            </span>
+          </v-col>
+          <v-col cols="2">
+            <v-autocomplete
+            filled
+            dense
+              v-model="loguedUser.puntoVenta"
+              :items="loguedUser.sucursal.puntosVenta"
+              :return-object="true"
+              item-text="nombre"
+            />
+          </v-col>
+          <v-col>
+            <v-btn type="submit" class="success">Aplicar cambios</v-btn>
+          </v-col>
+        </v-row>
+      </form>
+      
       <v-row>
         <v-col cols="6">
           <div class="d-flex text-left">
@@ -929,6 +967,27 @@ export default {
     //       console.log(data);
     //     });
     // }
+
+    applyChangesInLoguedUserData(){
+      const tenant = this.tenant;
+      const service = 'usuarios';
+      const token = this.token;
+
+      GenericService(tenant, service, token)
+      .get(this.loguedUser.id)
+      .then(data => {
+        data.data.sucursal = this.loguedUser.sucursal;
+        data.data.puntoVenta = this.loguedUser.puntoVenta;
+
+        console.log(data);
+        GenericService(tenant, service, token)
+        .save(data)
+        .then(()=>{
+          localStorage.setItem("userData", JSON.stringify(this.loguedUser));
+          successAlert("Proceso exitoso");
+        })
+      })
+    }
   },
 };
 </script>

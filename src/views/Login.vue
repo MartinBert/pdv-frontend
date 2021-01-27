@@ -79,9 +79,9 @@ export default {
             axios.get(`${process.env.VUE_APP_SERVER}/${this.$route.params.tenant}/api/usuarios/getLogued`,
             { headers: { Authorization: "Bearer " + localStorage.getItem('token') }})
             .then(data => {
-              if(data.data.perfil.id > 2){
-
+              if(data.data.perfil.id >= 2){
                 const userData = {
+                  "id": data.data.id,
                   "nombre": data.data.nombre,
                   "perfil": data.data.perfil.id,
                   "sucursal": data.data.sucursal,
@@ -90,14 +90,6 @@ export default {
                 }
                 localStorage.setItem("userData", JSON.stringify(userData));
                 this.clearConsole();            
-              }else if(data.data.perfil.id === 2){
-                const userData = {
-                  "nombre": data.data.nombre,
-                  "perfil": data.data.perfil.id,
-                  "empresa": data.data.empresa
-                }
-                localStorage.setItem("userData", JSON.stringify(userData));
-                this.clearConsole();
               }else{
                 const userData = {
                   "perfil": data.data.perfil.id,
