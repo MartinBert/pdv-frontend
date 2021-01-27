@@ -173,7 +173,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-import { generateBarCode } from "../../helpers/mathHelper";
+import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
 import { successAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
 
@@ -194,6 +194,7 @@ export default {
     rubros: [],
     propiedades: [],
     atributos: [],
+    ivas:[],
     estados: [
       { id: 1, text: "Activos" },
       { id: 2, text: "Inactivos" },
@@ -232,35 +233,39 @@ export default {
     },
 
     getOtherModels(page, size) {
-      GenericService(this.tenant, "marcas", this.token)
-        .getAll(page, size)
-        .then((data) => {
-          this.marcas = data.data.content;
-        });
+      const services = ["marcas", "distribuidores", "rubros", "propiedades", "atributos", "ivas"];
 
-      GenericService(this.tenant, "distribuidores", this.token)
+      services.forEach(service => {
+        GenericService(this.tenant, service, this.token)
         .getAll(page, size)
-        .then((data) => {
-          this.distribuidores = data.data.content;
-        });
+        .then(data => {
+          switch (service) {
+            case "marcas":
+                this.marcas = data.data.content;
+              break;
 
-      GenericService(this.tenant, "rubros", this.token)
-        .getAll(page, size)
-        .then((data) => {
-          this.rubros = data.data.content;
-        });
+            case "distribuidores":
+                this.distribuidores = data.data.content;
+              break;
 
-      GenericService(this.tenant, "propiedades", this.token)
-        .getAll(page, size)
-        .then((data) => {
-          this.propiedades = data.data.content;
-        });
+            case "rubros":
+                this.rubros = data.data.content;
+              break;
 
-      GenericService(this.tenant, "atributos", this.token)
-        .getAll(page, size)
-        .then((data) => {
-          this.atributos = data.data.content;
-        });
+            case "propiedades":
+                this.propiedades = data.data.content;
+              break;
+
+            case "atributos":
+                this.atributos = data.data.content;
+              break;
+          
+            default:
+                this.ivas = data.data.content;
+              break;
+          }
+        })
+      })
     },
 
     newObject() {
@@ -286,7 +291,6 @@ export default {
     },
 
     //Load excel
-
     findFile() {
       this.$refs.uploader.click();
     },
@@ -296,22 +300,22 @@ export default {
       this.loaderStatus = false;
       this.loaded = false;
       this.file = event;
-      var excel = [];
-      var reader = new FileReader();
+      let excel = [];
+      let reader = new FileReader();
       reader.onload = (e) => {
-        var data = e.target.result;
-        var workbook = XLSX.read(data, { type: "binary" });
+        let data = e.target.result;
+        let workbook = XLSX.read(data, { type: "binary" });
 
-        var sheet_name_list = workbook.SheetNames;
+        let sheet_name_list = workbook.SheetNames;
         sheet_name_list.forEach(function (y) {
-          var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+          let exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
           if (exceljson.length > 0) {
-            for (var i = 0; i < exceljson.length; i++) {
+            for (let i = 0; i < exceljson.length; i++) {
               excel.push(exceljson[i]);
             }
           }
         });
-        var prod = this.validateImport(excel);
+        let prod = this.validateImport(excel);
         console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
@@ -328,7 +332,7 @@ export default {
     },
 
     validateImport(objects) {
-      var importacion = {
+      let importacion = {
         status: true,
         data: [],
         message: "",
@@ -344,45 +348,26 @@ export default {
           if (element.codigoBarra == 1) {
             element.codigoBarra = generateBarCode();
           }
-          var iva = 21 / 100;
-          var ganancia = element.ganancia / 100;
-          var obj = {
+
+          let iva = this.getIva(element.idIva).porcentaje;
+          let ganancia = element.ganancia / 100;
+          let obj = {
             nombre: element.nombre,
             codigoBarra: String(element.codigoBarra),
             codigoProducto: String(element.codigoProducto),
             marca: this.getMarca(element.idMarca),
             rubro: this.getRubro(element.idRubro),
-            propiedad: this.getPropiedades(element.propiedades),
+            propiedades: this.getPropiedades(element.propiedades),
             atributos: this.getAtributos(element),
-            distribuidores: this.getDistribuidores(
-              String(element.idDistribuidores)
-            ),
-            precioCosto: (
-              element.precioTotal /
-              (1 + ganancia) /
-              (1 + iva)
-            ).toFixed(2),
-            costoNeto: (
-              element.precioTotal /
-              (1 + ganancia) /
-              (1 + iva) /
-              (1 + iva)
-            ).toFixed(2),
-            costoBruto: (
-              element.precioTotal /
-              (1 + ganancia) /
-              (1 + iva)
-            ).toFixed(2),
-            ivaCompra: (
-              element.precioTotal / (1 + ganancia) / (1 + iva) -
-              element.precioTotal / (1 + ganancia) / (1 + iva) / (1 + iva)
-            ).toFixed(2),
+            distribuidores: this.getDistribuidores(element.idDistribuidores),
+            iva: this.getIva(element.idIva),
+            precioCosto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(iva))),
+            costoNeto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(iva)) / (1 + decimalPercent(iva))),
+            costoBruto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(iva))),
+            ivaCompra: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(iva)) - element.precioTotal / (1 + ganancia) / (1 + iva) / (1 + iva)),
             ganancia: element.ganancia,
-            precioSinIva: (element.precioTotal / (1 + iva)).toFixed(2),
-            ivaVenta: (
-              element.precioTotal -
-              element.precioTotal / (1 + iva)
-            ).toFixed(2),
+            precioSinIva: roundTwoDecimals(element.precioTotal / (1 + iva)),
+            ivaVenta: roundTwoDecimals(element.precioTotal - element.precioTotal / (1 + decimalPercent(iva))),
             precioTotal: element.precioTotal,
             estado: 1,
           };
@@ -396,95 +381,79 @@ export default {
     },
 
     getMarca(id) {
-      var marca = null;
-      if (this.marcas && id) {
-        this.marcas.forEach((element) => {
-          if (element.id == id) {
-            marca = element;
-          }
-        });
-      }
-      return marca;
+      return this.marcas.filter(el => el.id === id)[0];
     },
 
     getRubro(id) {
-      var rubro = null;
-      if (this.rubros && id) {
-        this.rubros.forEach((element) => {
-          if (element.id == id) {
-            rubro = element;
-          }
-        });
-      }
-      return rubro;
+      return this.rubros.filter(el => el.id === id)[0];
     },
 
-    getPropiedades(){
-      // const propertiesKeys = propiedades.split('-');
+    getPropiedades(propiedades){
+      propiedades = propiedades.split(',');
+      let propiedadesArray = [];
       
+      propiedades.filter(el => {
+        this.propiedades.filter(e => {
+          if(el == e.id){
+            propiedadesArray.push(e);
+          }
+        })
+      })
+      
+      return propiedadesArray;
     },
 
     getAtributos(element){
-      const ArrayAtributes = Object.entries(element).filter(el => el[0].substring(0,8) === 'atributo');
-      // let newAtributes = [];
-
-      ArrayAtributes.forEach(el => {
-        const atributeIdInExcel = el[0];
-        const atributeValueInExcel = el[1];
-        const propertieId = atributeIdInExcel.substring(8);
-        const propertie = this.propiedades.filter(el => el.id == propertieId)[0];
-        if(this.evalPropertie(propertie, atributeValueInExcel)){
-          console.log('Sel prro')
-        }else{
-          console.log(this.evalPropertie(propertie, atributeValueInExcel));
-        }
-        // const newAtribute = {
-        //   valor: atributeValueInExcel,
-        //   valorNumerico: 0
-        // }
-
-        // newAtributes.push(newAtribute);
+      const atributes = Object.entries(element).filter(el => el[0].substring(0,8) === 'atributo');
+      const atributesName = atributes.map(el => {return el[1];});
+      let atributesArray = [];
+      atributesName.filter(el => {
+        this.atributos.filter(e => {
+          if(el == e.valor || el == e.valorNumerico){
+            atributesArray.push(e);
+          }
+        })
       })
 
-      // console.log(newAtributes);
+      return atributesArray;
+        
     },
 
-    getDistribuidores(d) {
-      var distribuidores = [];
-      if (this.distribuidores && d) {
-        var exp = d.match("-");
-        if (exp) {
-          var stringIds = d.split("-");
-          this.distribuidores.forEach((element) => {
-            stringIds.forEach((s) => {
-              if (element.id == Number(s)) {
-                distribuidores.push(element);
-              }
-            });
-          });
-        } else {
-          this.distribuidores.forEach((element) => {
-            if (element.id == d) {
-              distribuidores.push(element);
+    getIva(id){
+      return this.ivas.filter(el => el.id === id)[0];
+    },
+
+    getDistribuidores(distribuidores) {
+      if(distribuidores.length > 1){
+        distribuidores = distribuidores.split(",");
+        let distribuidoresArray = [];
+
+        distribuidores.filter(el => {
+          this.distribuidores.fliter(e => {
+            if(el == e.id){
+              distribuidoresArray.push(e);
             }
-          });
-        }
+          })
+        });
+
+        return distribuidoresArray;
+      }else{
+        return this.distribuidores.filter(el => el.id === distribuidores);
       }
-      return distribuidores;
     },
 
     getReport() {
       ReportsService(this.tenant, this.service, this.token)
         .listAllProducts()
         .then((res) => {
-          var file = new Blob([res["data"]], { type: "application/pdf" });
-          var fileURL = URL.createObjectURL(file);
+          let file = new Blob([res["data"]], { type: "application/pdf" });
+          let fileURL = URL.createObjectURL(file);
           window.open(fileURL, "_blank");
         });
     },
 
     evalPropertie(propertie, atribute){
-      console.log(atribute);
+      console.log(propertie, atribute);
     }
   },
 };

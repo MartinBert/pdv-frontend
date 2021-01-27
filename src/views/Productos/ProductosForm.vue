@@ -1,6 +1,12 @@
 <template>
   <v-card min-width="100%">
-    <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
+    <v-snackbar
+      v-model="snackError"
+      :color="'#E53935'"
+      :timeout="3000"
+      :top="true"
+      >{{ errorMessage }}</v-snackbar
+    >
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-1">
@@ -11,7 +17,7 @@
               :counter="50"
               label="Nombre"
               required
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -21,7 +27,7 @@
               :counter="50"
               label="Código de producto"
               required
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -31,11 +37,11 @@
               :counter="50"
               label="Código de barras"
               required
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row class="ma-1">          
+        <v-row class="ma-1">
           <v-col>
             <v-autocomplete
               :items="distribuidores"
@@ -44,9 +50,9 @@
               item-text="razonSocial"
               label="Distribuidores"
               :return-object="true"
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-autocomplete>
-          </v-col> 
+          </v-col>
         </v-row>
         <v-row class="ma-1">
           <v-col>
@@ -56,7 +62,7 @@
               item-text="nombre"
               :return-object="true"
               label="Marca"
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-autocomplete>
           </v-col>
           <v-col>
@@ -66,17 +72,37 @@
               item-text="nombre"
               :return-object="true"
               label="Rubro"
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-autocomplete>
           </v-col>
           <v-col>
             <v-autocomplete
+              multiple
               :items="propiedades"
-              v-model="object.propiedad"
-              item-text="texto"
-              item-value="id"
-              label="Propiedad"
-              :rules="[v => !!v || 'Campo requerido...']"
+              v-model="object.propiedades"
+              item-text="nombre"
+              label="Propiedades"
+              :return-object="true"
+            ></v-autocomplete>
+          </v-col>
+          <v-col>
+            <v-autocomplete
+              multiple
+              :items="atributosDeTexto"
+              v-model="object.atributos"
+              item-text="valor"
+              label="Atributos de tipo texto"
+              :return-object="true"
+            ></v-autocomplete>
+          </v-col>
+          <v-col>
+            <v-autocomplete
+              multiple
+              :items="atributosNumericos"
+              v-model="object.atributos"
+              item-text="valorNumerico"
+              label="Atributos numéricos"
+              :return-object="true"
             ></v-autocomplete>
           </v-col>
         </v-row>
@@ -181,7 +207,9 @@
         </v-row>
         <div class="ma-1">
           <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
+            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid"
+              >Guardar</v-btn
+            >
             <v-btn color="default" @click="back()">Cancelar</v-btn>
           </v-col>
         </div>
@@ -189,8 +217,11 @@
     </div>
     <div v-if="!loaded">
       <v-row class="ma-1">
-        <v-col class="col-12" style="text-align:center">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        <v-col class="col-12" style="text-align: center">
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
         </v-col>
       </v-row>
     </div>
@@ -198,21 +229,29 @@
 </template>
 
 <script>
-import { calculateAmountPlusPercentaje, calculateAmountMinusPercentaje, restarNumeros, roundTwoDecimals, calculatePercentReductionInAmount } from '../../helpers/mathHelper';
+import {
+  calculateAmountPlusPercentaje,
+  calculateAmountMinusPercentaje,
+  restarNumeros,
+  roundTwoDecimals,
+  calculatePercentReductionInAmount,
+} from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
 
 export default {
   data: () => ({
-    propiedades: [
-      { id: 1, texto: "Kilos" },
-      { id: 2, texto: "Gramos" },
-      { id: 3, texto: "Unidades" }
-    ],
+    atributosNumericos: [],
+    atributosDeTexto: [],
+    distribuidores: [],
+    propiedades: [],
+    marcas: [],
+    rubros: [],
+    ivas: [],
     valid: true,
     object: {
       estado: 1,
       ganancia: 0,
-      iva: {id:1, nombre:"Iva 21%", porcentaje: 21}
+      iva: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
     },
     cantidad: [],
     loaded: false,
@@ -221,11 +260,8 @@ export default {
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-    marcas: [],
-    distribuidores: [],
-    rubros: [],
-    ivas: [],
   }),
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     if (this.$route.params.id && this.$route.params.id > 0) {
@@ -240,68 +276,115 @@ export default {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
-        .then(data => {
+        .then((data) => {
           this.object = data.data;
           this.loaded = true;
         });
     },
 
     getOtherModels(page, size) {
-      GenericService(this.tenant, "marcas", this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.marcas = data.data.content;
-        });
+      const services = [
+        "marcas",
+        "distribuidores",
+        "rubros",
+        "ivas",
+        "propiedades",
+        "atributos",
+      ];
+      services.forEach((service) => {
+        GenericService(this.tenant, service, this.token)
+          .getAll(page, size)
+          .then((data) => {
+            switch (service) {
+              case "marcas":
+                this.marcas = data.data.content;
+                break;
 
-      GenericService(this.tenant, "distribuidores", this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.distribuidores = data.data.content;
-        });
+              case "distribuidores":
+                this.distribuidores = data.data.content;
+                break;
 
-      GenericService(this.tenant, "rubros", this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.rubros = data.data.content;
-        });
+              case "rubros":
+                this.rubros = data.data.content;
+                break;
 
-      GenericService(this.tenant, "ivas", this.token)
-        .getAll(page, size)
-        .then(data => {
-          this.ivas = data.data.content;
-        });
+              case "ivas":
+                this.ivas = data.data.content;
+                break;
+
+              case "propiedades":
+                this.propiedades = data.data.content;
+                break;
+
+              default:
+                data.data.content.filter(el => {
+                  if(el.valor === undefined || el.valor === null){
+                    this.atributosNumericos.push(el);
+                    }else{
+                    this.atributosDeTexto.push(el);
+                  }
+                })
+                break;
+            }
+          });
+      });
     },
 
     calculations() {
-      this.object.costoNeto = calculateAmountMinusPercentaje(this.object.costoBruto, this.object.iva.porcentaje);
+      this.object.costoNeto = calculateAmountMinusPercentaje(
+        this.object.costoBruto,
+        this.object.iva.porcentaje
+      );
       this.object.precioCosto = this.object.costoNeto;
-      this.object.ivaCompra = restarNumeros([this.object.costoBruto, this.object.costoNeto]);
-      this.object.precioSinIva = calculateAmountPlusPercentaje(this.object.costoBruto, this.object.ganancia);
-      this.object.precioTotal = calculateAmountPlusPercentaje(this.object.precioSinIva, this.object.iva.porcentaje);
-      this.object.ivaVenta = restarNumeros([this.object.precioTotal, this.object.precioSinIva]);
+      this.object.ivaCompra = restarNumeros([
+        this.object.costoBruto,
+        this.object.costoNeto,
+      ]);
+      this.object.precioSinIva = calculateAmountPlusPercentaje(
+        this.object.costoBruto,
+        this.object.ganancia
+      );
+      this.object.precioTotal = calculateAmountPlusPercentaje(
+        this.object.precioSinIva,
+        this.object.iva.porcentaje
+      );
+      this.object.ivaVenta = restarNumeros([
+        this.object.precioTotal,
+        this.object.precioSinIva,
+      ]);
     },
 
     gainCalculations() {
-      this.object.ganancia = roundTwoDecimals(calculatePercentReductionInAmount(this.object.precioTotal, this.object.iva.porcentaje) - this.object.costoBruto);
-      this.object.precioSinIva = calculatePercentReductionInAmount(this.object.precioTotal, this.object.iva.porcentaje);
-      this.object.ivaVenta = roundTwoDecimals(restarNumeros([this.object.precioTotal, this.object.precioSinIva]));
+      this.object.ganancia = roundTwoDecimals(
+        calculatePercentReductionInAmount(
+          this.object.precioTotal,
+          this.object.iva.porcentaje
+        ) - this.object.costoBruto
+      );
+      this.object.precioSinIva = calculatePercentReductionInAmount(
+        this.object.precioTotal,
+        this.object.iva.porcentaje
+      );
+      this.object.ivaVenta = roundTwoDecimals(
+        restarNumeros([this.object.precioTotal, this.object.precioSinIva])
+      );
     },
 
     save() {
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status == 500) {
             this.snackError = true;
             this.errorMessage = "Ocurrio un error";
           }
         });
-      this.$router.push({ name: "productos" })
+      this.$router.push({ name: "productos" });
     },
 
     back() {
       this.$router.push({ name: "productos" });
-    }
-  }
+    },
+  },
 };
 </script>
