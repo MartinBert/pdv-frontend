@@ -16,7 +16,7 @@
               v-model="loguedUser.sucursal"
               :items="loguedUser.empresa.sucursales"
               :return-object="true"
-              item-text="nombre"
+              item-text="razonSocial"
             />
           </v-col>
           <v-col cols="1" class="mt-2 text-end">
@@ -47,15 +47,24 @@
               color="primary"
               @click="$store.commit('productos/dialogProductosMutation')"
             >BUSCAR PRODUCTOS</v-btn>
-            <h5 class="mt-2 ml-2">Depósito predeterminado: {{defaultDeposit.nombre}}</h5>
+            <h5 class="mt-2 ml-2">Depósito predeterminado: 
+              <span v-if="defaultDeposit">
+                {{defaultDeposit.nombre}}
+              </span>
+              <span v-if="!defaultDeposit">
+                No definido
+              </span>
+            </h5>
           </div>
-          
+
+          <!-- TEST CERT -->
           <!-- <v-btn
             class="ml-1"
             color="primary"
             @click="testcert()"
-            >TEST CERTIFICADO</v-btn
-          > -->
+          >TEST CERTIFICADO</v-btn> -->
+          <!-- TEST CERT -->
+
         </v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">
@@ -281,6 +290,7 @@ import ReportsService from "../../services/ReportsService";
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),
+    passwordOfLoguedUser: '',
     fecha: getCurrentDate(),
     valid: true,
     barcode: "",
@@ -616,7 +626,7 @@ export default {
       if (documento.ivaCat == 1) {
         tipoDoc = 80;
       } else {
-        tipoDoc = 94;
+        tipoDoc = 96;
       }
 
       if (documento.ivaCat == 2 || documento.ivaCat == 1) {
@@ -679,6 +689,8 @@ export default {
                 .then((data) => {
                   cabeceraAfip = data.data.feCabResp;
                   detalleAfip = data.data.feDetResp;
+
+                  console.log(data);
 
                   comprobante = {
                     letra: documento.letra,
@@ -949,45 +961,30 @@ export default {
       this.$store.commit("productos/resetStates");
     },
 
-    // testcert(){
-    //   /* Constants */
-    //   const afipAuthorization = this.afipModuleAuthorization;
-    //   const sucursal = this.loguedUser.sucursal;
-    //   const ptoVenta = this.loguedUser.puntoVenta;
+    testcert(){
+      /* Constants */
+      const afipAuthorization = this.afipModuleAuthorization;
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
       
-    //   //Get authorized voucher number
-    //   axios
-    //     .get(
-    //       `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${sucursal.razonSocial}/${sucursal.cuit}/${ptoVenta.idFiscal}/006`,
-    //       {
-    //         headers: afipAuthorization
-    //       }
-    //     )
-    //     .then((data) => {
-    //       console.log(data);
-    //     });
-    // }
+      //Get authorized voucher number
+      axios
+        .get(
+          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${sucursal.razonSocial}/${sucursal.cuit}/${ptoVenta.idFiscal}/006`,
+          {
+            headers: afipAuthorization
+          }
+        )
+        .then((data) => {
+          console.log(data);
+        });
+    },
 
     applyChangesInLoguedUserData(){
-      const tenant = this.tenant;
-      const service = 'usuarios';
-      const token = this.token;
-
-      GenericService(tenant, service, token)
-      .get(this.loguedUser.id)
-      .then(data => {
-        data.data.sucursal = this.loguedUser.sucursal;
-        data.data.puntoVenta = this.loguedUser.puntoVenta;
-
-        console.log(data);
-        GenericService(tenant, service, token)
-        .save(data)
-        .then(()=>{
-          localStorage.setItem("userData", JSON.stringify(this.loguedUser));
-          successAlert("Proceso exitoso");
-        })
-      })
+      localStorage.setItem("userData", JSON.stringify(this.loguedUser));
+      successAlert("Cambios aplicados");
     }
+    
   },
 };
 </script>

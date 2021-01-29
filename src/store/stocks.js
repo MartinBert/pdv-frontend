@@ -4,6 +4,7 @@ export default {
       dialog: false,
       depositMigrationDialog: false,
       stockHistoryDialog: false,
+      stockReportsDialog: false,
       allDeposits: '',
       selectedDeposits: [],
       minimumQuantity: '',
@@ -14,6 +15,7 @@ export default {
         state.dialog = false;
         state.depositMigrationDialog = false;
         state.deposits = '';
+        state.stockReportsDialog = false;
         state.stockHistoryDialog = false;
         state.selectedDeposits = [];
         state.minimumQuantity = '';
@@ -29,6 +31,10 @@ export default {
 
       depositMigrationDialogMutation(state){
         state.depositMigrationDialog = !state.depositMigrationDialog;
+      },
+
+      stockReportsDialogMutation(state){
+        state.stockReportsDialog = !state.stockReportsDialog;
       },
 
       allDepositsMutation(state, arrayObject){

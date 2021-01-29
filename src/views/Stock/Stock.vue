@@ -2,15 +2,17 @@
   <v-container>
     <v-form>
       <v-row>
-        <v-col cols="8">
+        <v-col cols="6">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          <v-btn class="primary ml-1" @click="openStocksDialog()" raised
-            >MANEJO DE EXISTENCIAS MÍNIMAS</v-btn
+          <v-btn class="primary ml-1" @click="openDialog('minimumStockRestriction')" raised
+            >EXISTENCIAS MÍNIMAS</v-btn
           >
-          <v-btn class="primary ml-1" @click="openDepositMigrationDialog()"
-            >MIGRAR STOCK ENTRE DEPÓSITOS</v-btn
+          <v-btn class="primary ml-1" @click="openDialog('stockMigration')"
+            >MIGRAR STOCK</v-btn
           >
+          <v-btn class="success ml-1" @click="openDialog('reports')">Reportes</v-btn>
         </v-col>
+        <v-col cols="2"></v-col>
         <v-col cols="2">
           <v-autocomplete
             :items="depositos"
@@ -173,6 +175,13 @@
       v-on:depositsForMigrationProcess="applyMassiveChangesInDeposits()"
     />
 
+    <StockReportsDialog
+      :loguedUser="loguedUser"
+      :tenant="tenant"
+      :service="service"
+      :token="token"
+    /> 
+
     <!-- Loader -->
     <div class="text-center" style="margin-top: 15px" v-if="!loaded">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
@@ -185,6 +194,7 @@
 import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
 import ModifyMinimumStocksDialog from "../../components/ModifyMinimumStocksDialog";
+import StockReportsDialog from "../../components/StockReportsDialog";
 import DepositMigrationDialog from "../../components/DepositMigrationDialog";
 import { errorAlert } from '../../helpers/alerts';
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
@@ -214,6 +224,7 @@ export default {
   components: {
     ModifyMinimumStocksDialog,
     DepositMigrationDialog,
+    StockReportsDialog
   },
 
   mounted() {
@@ -337,16 +348,6 @@ export default {
         });
     },
 
-    openStocksDialog() {
-      this.$store.commit("stocks/dialogMutation");
-    },
-
-    openDepositMigrationDialog() {
-      const deposits = this.depositos.filter((el) => el.id !== 0);
-      this.$store.commit("stocks/allDepositsMutation", deposits);
-      this.$store.commit("stocks/depositMigrationDialogMutation");
-    },
-
     applyMassiveStocksRestrictions() {
       this.$store.commit("stocks/dialogMutation");
       this.loaded = false;
@@ -466,6 +467,29 @@ export default {
 
       GenericService(this.tenant, 'historialStock', this.token)
       .save(stockHistory);
+    },
+
+    openDialog(param){
+      switch (param) {
+        case "minimumStockRestriction":{
+          this.$store.commit("stocks/dialogMutation");
+
+          break;
+        }
+        case "stockMigration":{
+          const deposits = this.depositos.filter((el) => el.id !== 0);
+          this.$store.commit("stocks/allDepositsMutation", deposits);
+          this.$store.commit("stocks/depositMigrationDialogMutation");
+
+          break;
+        }
+        default:{
+          this.$store.commit('stocks/stockReportsDialogMutation');
+
+          break;
+        }
+      }
+
     }
   },
 };

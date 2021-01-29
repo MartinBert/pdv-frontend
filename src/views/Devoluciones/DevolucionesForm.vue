@@ -255,10 +255,14 @@ export default {
 
   computed: {
     montoRecomendado(){
-      const receivedProducts = this.object.productosEntrantes.reduce((acc, el) => acc + Number(el.precioTotal), 0);
-      const cededProducts = this.object.productosSalientes.reduce((acc, el) => acc + Number(el.precioTotal), 0);
-
-      return restarNumeros([receivedProducts, cededProducts]);
+      if(this.object.productosEntrantes || this.object.productosSalientes){
+        const receivedProducts = this.object.productosEntrantes.reduce((acc, el) => acc + Number(el.precioTotal), 0);
+        const cededProducts = this.object.productosSalientes.reduce((acc, el) => acc + Number(el.precioTotal), 0);
+  
+        return restarNumeros([receivedProducts, cededProducts]);
+      }else{
+        return 0;
+      }
     }
   },
 

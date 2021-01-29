@@ -355,8 +355,8 @@ export default {
             nombre: element.nombre,
             codigoBarra: String(element.codigoBarra),
             codigoProducto: String(element.codigoProducto),
-            marca: this.getMarca(element.idMarca),
-            rubro: this.getRubro(element.idRubro),
+            marca: this.getMarca(element.marca),
+            rubro: this.getRubro(element.rubro),
             propiedades: this.getPropiedades(element.propiedades),
             atributos: this.getAtributos(element),
             distribuidores: this.getDistribuidores(element.idDistribuidores),
@@ -380,20 +380,40 @@ export default {
       return importacion;
     },
 
-    getMarca(id) {
-      return this.marcas.filter(el => el.id === id)[0];
+    getMarca(str) {
+      const marca = this.marcas.filter(el => el.nombre.toLowerCase() === str.toLowerCase())[0];
+      if(marca){
+        return marca;
+      }else{
+        GenericService(this.tenant, 'marcas', this.token)
+        .save({nombre: str})
+        .then(data =>{
+          this.marcas.push(data.data);
+          return data.data;
+        })
+      }
     },
 
-    getRubro(id) {
-      return this.rubros.filter(el => el.id === id)[0];
+    getRubro(str) {
+      const rubro = this.rubros.filter(el => el.nombre.toLowerCase() === str.toLowerCase())[0];
+      if(rubro){
+        return rubro;
+      }else{
+        GenericService(this.tenant, 'rubros', this.token)
+        .save({nombre: str})
+        .then(data =>{
+          this.rubros.push(data.data);
+          return data.data;
+        })
+      }
     },
 
     getPropiedades(propiedades){
       propiedades = propiedades.split(',');
       let propiedadesArray = [];
       
-      propiedades.filter(el => {
-        this.propiedades.filter(e => {
+      propiedades.forEach(el => {
+        this.propiedades.forEach(e => {
           if(el == e.id){
             propiedadesArray.push(e);
           }
@@ -407,8 +427,8 @@ export default {
       const atributes = Object.entries(element).filter(el => el[0].substring(0,8) === 'atributo');
       const atributesName = atributes.map(el => {return el[1];});
       let atributesArray = [];
-      atributesName.filter(el => {
-        this.atributos.filter(e => {
+      atributesName.forEach(el => {
+        this.atributos.forEach(e => {
           if(el == e.valor || el == e.valorNumerico){
             atributesArray.push(e);
           }
@@ -428,8 +448,8 @@ export default {
         distribuidores = distribuidores.split(",");
         let distribuidoresArray = [];
 
-        distribuidores.filter(el => {
-          this.distribuidores.fliter(e => {
+        distribuidores.forEach(el => {
+          this.distribuidores.forEach(e => {
             if(el == e.id){
               distribuidoresArray.push(e);
             }

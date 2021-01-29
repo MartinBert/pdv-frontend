@@ -356,6 +356,8 @@ export default {
             .then(() => {
               this.$router.push({ name: "stock" });
             });
+
+          this.saveHistorial(stocks, `Carga de stock`);
         }
       }
     },

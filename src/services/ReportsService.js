@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default (tenant,service,token) =>{
     return{
-    // Products reports
+    /**** PRODUCTS REPORTS ****/
         listAllProducts(){
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/generalReport/${tenant}`, {
                 headers: { Authorization: "Bearer " + token },
@@ -10,8 +10,9 @@ export default (tenant,service,token) =>{
                 dataType: 'blob'
             })
         },
+    /**** PRODUCTS REPORTS ****/
 
-    // Sales reports
+    /**** SALES REPORTS ****/
         onCloseSaleReport(object){
             return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/onCloseSaleReport/${tenant}`, object,{
                 headers: { Authorization: "Bearer " + token },
@@ -75,7 +76,17 @@ export default (tenant,service,token) =>{
                 dataType: 'blob'
             })
         },
+    /**** SALES REPORTS ****/
 
+    /**** STOCKS REPORTS ****/
+        allStocksReport(id){
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/allStocksReport/${tenant}/${id}`, {
+                headers: { Authorization: "Bearer " + token },
+                responseType: 'arraybuffer',
+                dataType: 'blob'
+            })
+        },
+    /**** SALES REPORTS ****/
         
     }
 }

@@ -59,6 +59,12 @@ export default (tenant,service,token) =>{
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getForBussiness/${empresaId}/${page}/${size}`, {
                 headers: { Authorization: "Bearer " + token }
             })
+        },
+
+        update(object){
+            return axios.put(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`, object, {
+                headers: { Authorization: "Bearer " + token }
+            })
         }
     }
 }

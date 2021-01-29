@@ -234,6 +234,7 @@ export default {
 
     loadProducts(){
       this.$emit('productList', this.$store.state.productos.products);
+      this.$store.commit('productos/dialogProductosMutation');
     },
 
     clearSelection(){
@@ -243,6 +244,7 @@ export default {
         }
       });
       this.$store.commit('productos/clearProductsState');
+      this.$store.commit('productos/dialogProductosMutation');
     }
   }
 }

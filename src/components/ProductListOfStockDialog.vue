@@ -11,7 +11,6 @@
                 <template v-slot:default>
                     <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
                         <th>Código de barras</th>
                         <th>Código de producto</th>
@@ -20,7 +19,6 @@
                     </thead>
                     <tbody v-for="object in $store.state.eventual.eventual" :key="object.id">
                     <tr>
-                        <td>{{object.id}}</td>
                         <td>{{object.producto.nombre}}</td>
                         <td>{{object.producto.codigoBarra}}</td>
                         <td>{{object.producto.codigoProducto}}</td>

@@ -251,7 +251,7 @@ export default {
   },
 
   methods:{
-    /****USER AND MODELS****/
+    /**** USER AND MODELS ****/
     getObjects(){
 
         let id;
@@ -285,9 +285,9 @@ export default {
         });
 
     },
-    /****USER AND MODELS****/
+    /**** USER AND MODELS ****/
 
-    /****REPORTS****/
+    /**** Export PDF ****/
     allSalesReport(sucursal) {
       if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = sucursal.id;
@@ -358,7 +358,7 @@ export default {
         });
     },
 
-    /****REPORTS****/
+    /**** Export PDF ****/
 
     /**** Transform data functions ****/
     createDate(date, param){
@@ -373,6 +373,7 @@ export default {
     comingSoon(){
       infoAlert2("Disponible muy pronto");
     }
+    /**** Transform data functions ****/
   }
 };
 </script>
