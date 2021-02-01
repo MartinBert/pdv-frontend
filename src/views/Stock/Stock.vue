@@ -2,7 +2,7 @@
   <v-container>
     <v-form>
       <v-row>
-        <v-col cols="6">
+        <v-col cols="8">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
           <v-btn class="primary ml-1" @click="openDialog('minimumStockRestriction')" raised
             >EXISTENCIAS MÍNIMAS</v-btn
@@ -12,7 +12,6 @@
           >
           <v-btn class="success ml-1" @click="openDialog('reports')">Reportes</v-btn>
         </v-col>
-        <v-col></v-col>
         <v-col cols="2">
           <v-autocomplete
             :items="depositos"

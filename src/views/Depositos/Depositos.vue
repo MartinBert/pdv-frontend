@@ -3,22 +3,23 @@
     <h3>Depositos</h3>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="3" class="mt-2">
+        <v-col cols="9" class="mt-2 d-flex">
           <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>
           <v-btn class="primary ml-1" @click="openStockMovementHistoryDialog()">MOVIMIENTOS DE STOCK</v-btn>
+          <div style="width: 300px">
+            <v-file-input
+              dense
+              v-model="file" 
+              class="mt-0"
+              placeholder="Importar depósitos"
+              accept=".xlsx, xls"
+              @change="importDocuments($event)"
+            ></v-file-input>
+          </div>
         </v-col>
-        <v-col cols="3">
-          <v-file-input
-          v-model="file" 
-          class="mt-0"
-          placeholder="Importar depósitos"
-          accept=".xlsx, xls"
-          @change="importDocuments($event)"
-          ></v-file-input>
-        </v-col>
-        <v-col></v-col>
         <v-col cols="3">
           <v-text-field
+            style="width:300px"
             v-model="filterString"
             v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
             dense
