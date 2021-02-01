@@ -12,7 +12,7 @@
           >
           <v-btn class="success ml-1" @click="openDialog('reports')">Reportes</v-btn>
         </v-col>
-        <v-col cols="2"></v-col>
+        <v-col></v-col>
         <v-col cols="2">
           <v-autocomplete
             :items="depositos"

@@ -16,7 +16,7 @@
           @change="importDocuments($event)"
           ></v-file-input>
         </v-col>
-        <v-col cols="3"></v-col>
+        <v-col></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterString"
