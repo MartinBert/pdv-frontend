@@ -40,14 +40,14 @@
                 
                 <!-- Pagination -->
                 <v-pagination
-                v-model="paginate.page"
-                :length="paginate.totalPages"
+                v-model="filterParams.page"
+                :length="filterParams.totalPages"
                 next-icon="mdi-chevron-right"
                 prev-icon="mdi-chevron-left"
-                :page="paginate.page"
+                :page="filterParams.page"
                 :total-visible="8"
-                @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
-                v-if="paginate.totalPages > 1 && loaded"
+                @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+                v-if="filterParams.totalPages > 1 && loaded"
                 ></v-pagination>
                 <!-- End Pagination -->
 
@@ -70,11 +70,13 @@ export default {
         return {
             loguedUser: JSON.parse(localStorage.getItem("userData")),
             token: localStorage.getItem("token"),
-            filterString: "",
-            paginate: {
-            page: 1,
-            size: 10,
-            totalPages: 0
+            filterParams: {
+                idPerfil: "",
+                idSucursal: "",
+                stringParam: "",
+                page: 1,
+                size: 10,
+                totalPages: 0
             },
             objects: [],
         };
@@ -86,20 +88,25 @@ export default {
 
     mounted(){
         this.tenant = this.$route.params.tenant;
-        this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+        this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
     },
 
     methods: {
-        filterObjects(param, page, size) {
-            let id;
-            if (this.loguedUser.perfil < 3) {
-                id = "";
-            } else {
-                id = this.loguedUser.sucursal.id;
+        filterObjects(idPerfil, stringParam, page, size) {
+            let idSucursal;
+            
+            switch (idPerfil) {
+                case 1:
+                        idSucursal = '';
+                    break;
+            
+                default:
+                        idSucursal = this.loguedUser.sucursal.id;
+                    break;
             }
             
             GenericService(this.tenant, 'historialStock', this.token)
-            .filter({id, param, page, size})
+            .filter({idSucursal, stringParam, page, size})
             .then(data => {
                 this.objects = data.data.content;
             })

@@ -5,8 +5,8 @@
         <v-spacer></v-spacer>
         <v-col cols="3">
           <v-text-field
-            v-model="filterString"
-            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
+            v-model="filterParams.stringParam"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
             dense
             outlined
             rounded
@@ -19,7 +19,7 @@
           <v-text-field
             type="date"
             v-model="filterDate"
-            v-on:input="filterObjects(filterDate, paginate.page - 1, paginate.size)"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringDateParam, filterParams.page - 1, filterParams.size)"
             dense
             outlined
             rounded
@@ -70,18 +70,18 @@
     </div>
     <!-- End Loader -->
 
-    <!-- Paginate -->
+    <!-- filterParams -->
     <v-pagination
-      v-model="paginate.page"
-      :length="paginate.totalPages"
+      v-model="filterParams.page"
+      :length="filterParams.totalPages"
       next-icon="mdi-chevron-right"
       prev-icon="mdi-chevron-left"
-      :page="paginate.page"
+      :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
-      v-if="paginate.totalPages > 1"
+      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      v-if="filterParams.totalPages > 1"
     ></v-pagination>
-    <!-- End Paginate -->
+    <!-- End filterParams -->
 
     <!-- Dialog Detail-->
     <v-dialog v-model="$store.state.eventual.eventualDialog" width="500">
@@ -105,12 +105,15 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     objects: [],
-    filterString: '',
     filterDate: null,
-    paginate: {
+    filterParams: {
+      idPerfil: "",
+      idSucursal: "",
+      stringParam: "",
+      stringDateParam: "",
       page: 1,
       size: 10,
-      totalPages: 0,
+      totalPages: 0
     },
     loaded: false,
     tenant: "",
@@ -121,33 +124,37 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size)
+    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size)
   },
 
   methods: {
 
-    filterObjects(param, page, size) {
+    filterObjects(idPerfil, stringParam, page, size) {
       this.loaded = false;
-      let id;
+      let idSucursal;
 
-      if(this.loguedUser.perfil < 3){
-        id = "";
-      }else{
-        id = this.loguedUser.sucursal.id;
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
-      if(param === this.filterDate){
-        param = formatDate(param);
-        this.filterString = '';
+      if(stringParam === this.filterParams.stringDateParam){
+        stringParam = formatDate(stringParam);
+        this.filterParams.stringParam = '';
       }else{
-        this.filterDate = null;
+        this.filterParams.stringDateParam = null;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({id, param, page, size})
+        .filter({idPerfil, idSucursal, stringParam, page, size})
         .then((data) => {
           this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
+          this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
@@ -171,7 +178,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+          this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
         });
     },
 

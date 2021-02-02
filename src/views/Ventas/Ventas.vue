@@ -9,8 +9,8 @@
         <v-col cols="3">
           <v-text-field
             type="date"
-            v-model="filterString"
-            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
+            v-model="filterParams.stringParam"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
             dense
             outlined
             rounded
@@ -22,8 +22,8 @@
         <v-col cols="3">
           <v-text-field
             type="number"
-            v-model="filterStringReceiptNumber"
-            v-on:input="filterObjects(filterStringReceiptNumber, paginate.page - 1, paginate.size)"
+            v-model="filterParams.stringParamReceiptNumber"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParamReceiptNumber, filterParams.page - 1, filterParams.size)"
             dense
             outlined
             rounded
@@ -36,8 +36,8 @@
         <v-col cols="3">
           <v-text-field
             type="number"
-            v-model="filterDouble"
-            v-on:input="filterObjects(filterDouble, paginate.page - 1, paginate.size)"
+            v-model="filterParams.doubleParam"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.doubleParam, filterParams.page - 1, filterParams.size)"
             dense
             outlined
             rounded
@@ -115,18 +115,18 @@
     </div>
     <!-- End Loader -->
 
-    <!-- Paginate -->
+    <!-- filterParams -->
     <v-pagination
-      v-model="paginate.page"
-      :length="paginate.totalPages"
+      v-model="filterParams.page"
+      :length="filterParams.totalPages"
       next-icon="mdi-chevron-right"
       prev-icon="mdi-chevron-left"
-      :page="paginate.page"
+      :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
-      v-if="paginate.totalPages > 1"
+      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      v-if="filterParams.totalPages > 1"
     ></v-pagination>
-    <!-- End Paginate -->
+    <!-- End filterParams -->
 
     <v-dialog v-model="dialog" persistent width="500">
       <v-card>
@@ -188,13 +188,15 @@ export default {
     file: null,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     objects: null,
-    filterString: "",
-    filterDouble: "",
-    filterStringReceiptNumber: "",
-    paginate: {
+    filterParams: {
+      idPerfil: "",
+      idSucursal: "",
+      stringParam: "",
+      doubleParam: "",
+      stringParamReceiptNumber: "",
       page: 1,
       size: 10,
-      totalPages: 7
+      totalPages: 0
     },
     loaded: false,
     tenant: "",
@@ -211,49 +213,53 @@ export default {
   mounted() {
     this.$store.commit('eventual/resetStates');
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
   },
 
   methods: {
 
-    filterObjects(param, page, size){
+    filterObjects(idPerfil, param, page, size){
       let filterParam;
-      let id;
+      let idSucursal;
 
-      if(this.loguedUser.perfil < 3){
-        id = "";
-      }else{
-        id = this.loguedUser.sucursal.id;
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       switch (param) {
         case undefined:
-            if(this.filterDouble !== ""){
-              filterParam = {id, doubleParam: this.doubleParam, page, size};
-            }else if(this.filterStringReceiptNumber !== ""){
-              filterParam = {id, param: this.filterStringReceiptNumber, page, size}
+            if(this.filterParams.doubleParam !== ""){
+              filterParam = {idSucursal, doubleParam: this.filterParams.doubleParam, page, size};
+            }else if(this.filterParams.stringParamReceiptNumber !== ""){
+              filterParam = {idSucursal, stringParam: this.filterParams.stringParamReceiptNumber, page, size}
             }else{
-              filterParam = {id, param, page, size}
+              filterParam = {idSucursal, stringParam: param, page, size}
             }
           break;
         
         default:
-            if(param === this.filterString){
-              this.filterDouble = "";
-              this.filterStringReceiptNumber = "";
+            if(param === this.filterParams.stringParam){
+              this.filterParams.doubleParam = "";
+              this.filterParams.stringParamReceiptNumber = "";
               param = formatDate(param);
               if(param === "//"){
                 param = "";
               }
-              filterParam = {id, param, page, size};
-            }else if(param === this.filterDouble){
-              this.filterString = "";
-              this.filterStringReceiptNumber = "";
-              filterParam = {id, doubleParam: param, page, size};
+              filterParam = {idSucursal, stringParam: param, page, size};
+            }else if(param === this.filterParams.doubleParam){
+              this.filterParams.stringParam = "";
+              this.filterParams.stringParamReceiptNumber = "";
+              filterParam = {idSucursal, doubleParam: param, page, size};
             }else{
-              this.filterString = "",
-              this.filterDouble = "",
-              filterParam = {id, param, page, size}
+              this.filterParams.stringParam = "",
+              this.filterParams.doubleParam = "",
+              filterParam = {idSucursal, stringParam: param, page, size}
             }
           break;
       }
@@ -262,9 +268,9 @@ export default {
         .filter(filterParam)
         .then(data => {
           this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-          if(this.paginate.totalPages < this.paginate.page){
-              this.paginate.page = 1;
+          this.filterParams.totalPages = data.data.totalPages;
+          if(this.filterParams.totalPages < this.filterParams.page){
+              this.filterParams.page = 1;
           }
           this.loaded = true;
         });

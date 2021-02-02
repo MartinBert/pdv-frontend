@@ -68,20 +68,25 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.filterObjects('', 0, 100000);
+    this.filterObjects(this.loguedUser.perfil, '', 0, 100000);
   },
 
   methods: {
-    filterObjects(param, page, size){
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = ""
-      }else{
-        id = this.loguedUser.sucursal.id;
+    filterObjects(idPerfil, stringParam, page, size){
+      let idSucursal
+
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
       
       GenericService(this.tenant, "planesPago", this.token)
-      .filter({id, param, page, size})
+      .filter({idPerfil, idSucursal, stringParam, page, size})
       .then(data => {
         this.planes_pago = data.data.content;
       })

@@ -185,7 +185,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.filterObjects("", 0, 100000)
+    this.filterObjects(this.loguedUser.perfil, "", 0, 100000)
   },
   methods: {
     getObject(id) {
@@ -197,16 +197,21 @@ export default {
         });
     },
 
-    filterObjects(param, page, size){
+    filterObjects(idPerfil, stringParam, page, size){
       this.loaded = false
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = ""
-      }else{
-        id = this.loguedUser.empresa.id;
+      let idSucursal;
+      
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';          
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
-      const filterParam = {id, param, page, size}
+      const filterParam = {idSucursal, stringParam, page, size}
 
       GenericService(this.tenant, "empresas", this.token)
         .filter(filterParam)

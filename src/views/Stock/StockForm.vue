@@ -12,7 +12,7 @@
         <v-row v-if="urlId == 0" class="ml-5 mr-5">
           <v-col cols="10">
             <v-text-field
-              v-model="filterString"
+              v-model="filterParams.stringParam"
               dense
               outlined
               rounded
@@ -25,7 +25,7 @@
           <v-col cols="2">
             <v-btn
              class="primary"
-             @click="filterProducts(filterString, paginate.page - 1, paginate.size)"
+             @click="filterProducts(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
             >
               BUSCAR
             </v-btn>
@@ -61,14 +61,14 @@
               </template>
             </v-simple-table>
             <v-pagination
-              v-model="paginate.page"
-              :length="paginate.totalPages"
+              v-model="filterParams.page"
+              :length="filterParams.totalPages"
               next-icon="mdi-chevron-right"
               prev-icon="mdi-chevron-left"
-              :page="paginate.page"
+              :page="filterParams.page"
               :total-visible="8"
-              @input="filterProducts(filterString, paginate.page - 1, paginate.size)"
-              v-if="paginate.totalPages > 1"
+              @input="filterProducts(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+              v-if="filterParams.totalPages > 1"
             ></v-pagination>
           </v-col>
           <v-col cols="1" class="d-flex justify-center">
@@ -222,13 +222,15 @@ export default {
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-    paginate: {
+    filterParams: {
+      idPerfil: "",
+      idSucursal: "",
+      stringParam: "",
       page: 1,
       size: 5,
-      totalPages: 0,
+      totalPages: 0
     },
     radioGroup: "",
-    filterString: "",
     checked: false,
   }),
 
@@ -238,10 +240,10 @@ export default {
 
     if (this.urlId && this.urlId > 0) {
       this.getObject(this.urlId);
-      this.filterDepositos('', 0, 100000);
+      this.filterDepositos(this.loguedUser.perfil, '', 0, 100000);
     } else {
-      this.filterDepositos('', 0, 100000);
-      this.filterProducts(this.filterString, this.paginate.page - 1, this.paginate.size);
+      this.filterDepositos(this.loguedUser.perfil, '', 0, 100000);
+      this.filterProducts(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
     }
   },
 
@@ -263,10 +265,9 @@ export default {
         });
     },
     
-    filterProducts(param, page, size) {
-      const id = '';
+    filterProducts(stringParam, page, size) {
       GenericService(this.tenant, "productos", this.token)
-        .filter({id, param, page, size})
+        .filter({stringParam, page, size})
         .then((data) => {
           if(this.object.producto.length > 0){
             this.object.producto.forEach(el => {
@@ -277,25 +278,30 @@ export default {
               })
             })
           }
-          this.paginate.totalPages = data.data.totalPages;
-          if(this.paginate.totalPages < this.paginate.page){
-            this.paginate.page = 1;
+          this.filterParams.totalPages = data.data.totalPages;
+          if(this.filterParams.totalPages < this.filterParams.page){
+            this.filterParams.page = 1;
           }
           this.productos = data.data.content;
           this.loaded = true;
         });
     },
 
-    filterDepositos(param, page, size){
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = "";
-      }else{
-        id = this.loguedUser.sucursal.id;
+    filterDepositos(idPerfil, stringParam, page, size){
+      let idSucursal;
+      
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';         
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, "depositos", this.token)
-        .filter({id, param, page, size})
+        .filter({idPerfil, idSucursal, stringParam, page, size})
         .then((data) => {
           this.depositos = data.data.content;
           this.loaded = true;
@@ -362,16 +368,21 @@ export default {
       }
     },
 
-    onBarcodeScanned(barcode) {
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = '';
-      }else{
-        id = this.loguedUser.sucursal.id;
+    onBarcodeScanned(stringParam) {
+      let idSucursal;
+      
+      switch (this.loguedUser.perfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, "productos", this.token)
-        .filter({id, param: barcode, page: 0, size: 1})
+        .filter({idSucursal, stringParam, page: 0, size: 1})
         .then((data) => {
           const databaseItem = data.data.content[0];
           const productInList = this.productos.filter(el => el.id === databaseItem.id)[0];

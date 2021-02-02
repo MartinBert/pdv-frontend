@@ -108,10 +108,10 @@ export default {
         });
     },
 
-    getAtributes(param, page, size){
-      const id = '';
+    getAtributes(stringParam, page, size){
+      const idSucursal = '';
       GenericService(this.tenant, "atributos", this.token)
-        .filter({id, param, page, size})
+        .filter({idSucursal, stringParam, page, size})
         .then(data => {
           this.atributosTexto = data.data.content.filter(el => el.valor != undefined || el.valor != null);
           this.atributosNumero = data.data.content.filter(el => el.valor === undefined || el.valor === null);

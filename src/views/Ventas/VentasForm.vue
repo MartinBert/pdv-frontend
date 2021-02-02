@@ -364,14 +364,20 @@ export default {
   methods: {
 
     getObjects() {
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = ""
-      }else{
-        id = this.loguedUser.sucursal.id;
+      const idPerfil = this.loguedUser.perfil;
+      let idSucursal;
+    
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
       
-      const filterParam = { id, param: "", page: 0, size: 100000};
+      const filterParam = { idPerfil, idSucursal, stringParam: "", page: 0, size: 100000};
       
       GenericService(this.tenant, "clientes", this.token)
         .filter(filterParam)
@@ -420,15 +426,8 @@ export default {
     },
 
     onBarcodeScanned(barcode) {
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = '';
-      }else{
-        id = this.loguedUser.sucursal.id;
-      }
-
       GenericService(this.tenant, "productos", this.token)
-        .filter({id, param: barcode, page: 0, size: 1})
+        .filter({stringParam: barcode, page: 0, size: 1})
         .then((data) => {
           let databaseItem = data.data.content[0];
           if (this.products.length == 0) {
@@ -592,7 +591,7 @@ export default {
       const token = this.token;
       const service = this.service;
       const afipAuthorization = this.afipModuleAuthorization;
-      const filterParam = {id: sucursal.id, param: "", page: 0, size: 100000}
+      const filterParam = {idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", page: 0, size: 100000}
 
       /* Mutable vars */
       let tipoDoc;
@@ -689,9 +688,7 @@ export default {
                 .then((data) => {
                   cabeceraAfip = data.data.feCabResp;
                   detalleAfip = data.data.feDetResp;
-
-                  console.log(data);
-
+                  
                   comprobante = {
                     letra: documento.letra,
                     numeroCbte: body.nroDesde,
@@ -811,7 +808,7 @@ export default {
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
-      const filterParam = {id: sucursal.id, param: "", page: 0, size: 100000}
+      const filterParam = {idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", page: 0, size: 100000}
 
       //Mutable vars
       let file;
@@ -836,6 +833,8 @@ export default {
       } else {
         condVenta = true;
       }
+
+      console.log(totalVenta);
 
       comprobante = {
         letra: "X",

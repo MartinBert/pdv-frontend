@@ -144,16 +144,16 @@ export default {
         });
     },
 
-    getSalesList(param, page, size){
-        let id;
+    getSalesList(stringParam, page, size){
+        let idSucursal;
         if(this.loguedUser.perfil < 3){
-            id = "";
+            idSucursal = "";
         }else{
-            id = this.loguedUser.sucursal.id;
+            idSucursal = this.loguedUser.sucursal.id;
         }
 
         VentasService(this.tenant, this.service, this.token)
-        .filterNotCloseReceipts({id, param, page, size})
+        .filterNotCloseReceipts({idSucursal, stringParam, page, size})
         .then(data => {
             this.ventas = data.data;
             this.object.montoFacturado = this.ventas.reduce((acc, el) => Math.round((acc + Number(el.totalVenta))*100)/100, 0);

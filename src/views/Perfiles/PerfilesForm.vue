@@ -86,7 +86,7 @@ export default {
 
     getModules(){
       GenericService(this.tenant, "modulos", this.token)
-      .filter({id:'', param:'', page: 0, size: 100000})
+      .filter({stringParam: '', page: 0, size: 100000})
       .then(data => {
         this.modulos = data.data.content;
       })

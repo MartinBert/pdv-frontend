@@ -8,8 +8,8 @@
         <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
-            v-model="filterString"
-            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
+            v-model="filterParams.stringParam"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
             dense
             outlined
             rounded
@@ -76,18 +76,18 @@
     </div>
     <!-- End Loader -->
 
-    <!-- Paginate -->
+    <!-- filterParams -->
     <v-pagination
-      v-model="paginate.page"
-      :length="paginate.totalPages"
+      v-model="filterParams.page"
+      :length="filterParams.totalPages"
       next-icon="mdi-chevron-right"
       prev-icon="mdi-chevron-left"
-      :page="paginate.page"
+      :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
-      v-if="paginate.totalPages > 1"
+      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      v-if="filterParams.totalPages > 1"
     ></v-pagination>
-    <!-- End Paginate -->
+    <!-- End filterParams -->
 
     <CajaDetails />
   </v-container>
@@ -100,11 +100,13 @@ import CajaDetails from '../../components/CajaDetails';
 export default {
   data: () => ({
     objects: [],
-    filterString: "",
-    paginate: {
+    filterParams: {
+      idPerfil: "",
+      idSucursal: "",
+      stringParam: "",
       page: 1,
       size: 10,
-      totalPages: 0,
+      totalPages: 0
     },
     loaded: false,
     tenant: "",
@@ -120,25 +122,25 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size)
+    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size)
   },
 
   methods: {
 
-    filterObjects(param, page, size) {
+    filterObjects(idPerfil, stringParam, page, size) {
       this.loaded = false;
-      let id;
+      let idSucursal;
       if(this.loguedUser.perfil < 3){
-        id = "";
+        idSucursal = "";
       }else{
-        id = this.loguedUser.sucursal.id;
+        idSucursal = this.loguedUser.sucursal.id;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({id, param, page, size})
+        .filter({idPerfil, idSucursal,stringParam, page, size})
         .then((data) => {
           this.objects = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
+          this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
@@ -162,7 +164,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+          this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
         });
     },
 

@@ -13,7 +13,7 @@
                 item-text="text"
                 item-value="id"
                 label="Lista en la que buscar productos"
-                @change="filterObjects(filterString, paginate.page - 1, paginate.size, typeList)"
+                @change="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
               />
             </v-col>
           </v-row>
@@ -22,19 +22,19 @@
           <v-row>
             <v-col cols="10">
               <v-text-field
-                v-model="filterString"
+                v-model="filterParams.stringParam"
                 dense
                 outlined
                 rounded
                 class="text-left ml-5 mr-5 mt-5"
                 label="Escriba el nombre, código de artículo o código de barras del artículo que desea buscar"
                 placeholder=" "
-                @keypress.enter="filterObjects(filterString, paginate.page - 1, paginate.size, typeList)"
+                @keypress.enter="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
               ></v-text-field>
             </v-col>
             <v-col cols="2">
               <v-btn class="mt-5 primary"
-                @click="filterObjects(filterString, paginate.page - 1, paginate.size, typeList)"
+                @click="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
               >
                 BUSCAR
               </v-btn>
@@ -72,14 +72,14 @@
                   
                 </v-simple-table>
                 <v-pagination
-                  v-model="paginate.page"
-                  :length="paginate.totalPages"
+                  v-model="filterParams.page"
+                  :length="filterParams.totalPages"
                   next-icon="mdi-chevron-right"
                   prev-icon="mdi-chevron-left"
-                  :page="paginate.page"
+                  :page="filterParams.page"
                   :total-visible="8"
-                  @input="filterObjects(filterString, paginate.page - 1, paginate.size, typeList)"
-                  v-if="paginate.totalPages > 1"
+                  @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
+                  v-if="filterParams.totalPages > 1"
                 ></v-pagination>
               </v-col>
             </v-row>
@@ -109,12 +109,14 @@ export default {
       productos: [],
       typeList: 0,
       typeProductsList: [],
-      filterString: "",
-      paginate: {
+      filterParams: {
+        idPerfil: "",
+        idSucursal: "",
+        stringParam: "",
         page: 1,
-        size: 5,
+        size: 10,
         totalPages: 0
-      }
+      },
     }
   },
 
@@ -122,7 +124,7 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.token = localStorage.getItem('token');
     this.loguedUser = JSON.parse(localStorage.getItem("userData"));
-    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size, this.typeList);
+    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size, this.typeList);
     this.createtypeProductsList();
   },
 
@@ -143,13 +145,13 @@ export default {
   },
 
   methods:{
-    filterObjects(param, page, size, typeList) {
+    filterObjects(idPerfil, stringParam, page, size, typeList) {
       this.loaded = false;
       
       if(typeList === 0){
-        this.generalSearch(param, page, size);
+        this.generalSearch(idPerfil, stringParam, page, size);
       }else{
-        this.searchForDeposit(param, page, size, typeList);
+        this.searchForDeposit(idPerfil, stringParam, page, size, typeList);
       }
       
     },
@@ -177,53 +179,64 @@ export default {
       this.$refs.pTable.$forceUpdate();
     },
 
-    generalSearch(param, page, size){
+    generalSearch(idPerfil, stringParam, page, size){
       GenericService(this.tenant, 'productos', this.token)
-        .filter({ param, page, size })
+        .filter({ idPerfil, stringParam, page, size })
         .then(data => {
           this.productos = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-          if(this.paginate.totalPages < this.paginate.page){
-              this.paginate.page = 1;
+          this.filterParams.totalPages = data.data.totalPages;
+          if(this.filterParams.totalPages < this.filterParams.page){
+              this.filterParams.page = 1;
           }
           this.loaded = true;
         });
     },
 
-    searchForDeposit(param, page, size, typeList){
+    searchForDeposit(idPerfil, stringParam, page, size, typeList){
       const idParam = typeList;
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = ""
-      }else{
-        id = this.loguedUser.sucursal.id;
+      let idSucursal;
+      
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       StocksService(this.tenant, 'stock', this.token)
-      .filterStockForDepositId({id, param, page, size, idParam})
+      .filterStockForDepositId({idPerfil, idSucursal, stringParam, page, size, idParam})
       .then(data => {
         this.productos = data.data.content.map(el => {
           el.producto.cantidad = el.cantidad;
           return el.producto;
         });
-        this.paginate.totalPages = data.data.totalPages;
-        if(this.paginate.totalPages < this.paginate.page){
-            this.paginate.page = 1;
+        this.filterParams.totalPages = data.data.totalPages;
+        if(this.filterParams.totalPages < this.filterParams.page){
+            this.filterParams.page = 1;
         }
         this.loaded = true;
       });
     },
 
     createtypeProductsList(){
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = ""
-      }else{
-        id = this.loguedUser.sucursal.id;
+      const idPerfil = this.loguedUser.perfil;
+      let idSucursal;
+      
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, 'depositos', this.token)
-      .filter({id: id, param: '', page: 0, size: 100000})
+      .filter({idPerfil, idSucursal, stringParam: '', page: 0, size: 100000})
       .then(data => {
         this.typeProductsList.push({id: 0, text: 'Lista general de productos'});
         data.data.content.forEach(el => {

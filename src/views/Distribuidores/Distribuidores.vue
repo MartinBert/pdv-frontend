@@ -8,8 +8,8 @@
         <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
-            v-model="filterString"
-            v-on:input="filterObjects(filterString, paginate.page - 1, paginate.size)"
+            v-model="filterParams.stringParam"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, paginate.page - 1, paginate.size)"
             dense
             outlined
             rounded
@@ -67,7 +67,7 @@
       prev-icon="mdi-chevron-left"
       :page="paginate.page"
       :total-visible="8"
-      @input="filterObjects(filterString, paginate.page - 1, paginate.size)"
+      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, paginate.page - 1, paginate.size)"
       v-if="paginate.totalPages > 1"
     ></v-pagination>
     <!-- End Paginate -->
@@ -95,9 +95,11 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     objects: [],
-    filterString: "",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    paginate: {
+    filterParams: {
+      idPerfil: "",
+      idSucursal: "",
+      stringParam: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -110,21 +112,26 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.paginate.page - 1, this.paginate.size);
   },
   methods: {
 
-    filterObjects(param, page, size) {
+    filterObjects(idPerfil, stringParam, page, size) {
       this.loaded = false;
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = "";
-      }else{
-        id = this.loguedUser.sucursal.id;
+      let idSucursal;
+
+      switch (idPerfil) {
+        case 1:
+          idSucursal = '';
+          break;
+      
+        default:
+          idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({id, param, page, size})
+        .filter({idPerfil, idSucursal, stringParam, page, size})
         .then((data) => {
           this.objects = data.data.content;
           this.paginate.totalPages = data.data.totalPages;
@@ -151,7 +158,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size);
+          this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.paginate.page - 1, this.paginate.size);
         });
     }
   }

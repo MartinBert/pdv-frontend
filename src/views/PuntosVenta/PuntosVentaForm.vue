@@ -70,7 +70,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects('', 0, 100000);
+    this.filterObjects(this.loguedUser.perfil, '', 0, 100000);
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
@@ -88,17 +88,22 @@ export default {
         });
     },
 
-    filterObjects(param, page, size){
+    filterObjects(idPerfil, stringParam, page, size){
       this.loaded = false
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = ""
-      }else{
-        id = this.loguedUser.sucursal.id;
+      let idSucursal;
+
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, "sucursales", this.token)
-        .filter({id, param, page, size})
+        .filter({idPerfil, idSucursal, stringParam, page, size})
         .then(data => {
           this.sucursales = data.data.content;
           this.loaded = true;

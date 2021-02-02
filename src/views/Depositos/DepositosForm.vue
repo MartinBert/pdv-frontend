@@ -38,6 +38,17 @@
             ></v-text-field>
           </v-col>
         </v-row>
+        <v-row class="ma-1" v-if="loguedUser.perfil <= 2">
+          <v-col class="col-6">
+            <v-autocomplete
+              :items="sucursales"
+              item-text="nombre"
+              v-model="object.sucursales"
+              :return-object="true"
+              label="Sucursal"
+            ></v-autocomplete>
+          </v-col>
+        </v-row>
 
         <div class="ma-1">
           <v-col class="col-6">
@@ -62,6 +73,7 @@ import GenericService from "../../services/GenericService";
 
 export default {
   data: () => ({
+    sucursales: [],
     valid:true,
     object: {},
     loaded: false,
@@ -70,10 +82,11 @@ export default {
     service: "depositos",
     token: localStorage.getItem("token"),
     snackError: false,
-    errorMessage: ""
+    errorMessage: "",
   }),
 
   mounted() {
+    this.sucursales = this.loguedUser.empresa.sucursales;
     this.tenant = this.$route.params.tenant;
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
@@ -94,7 +107,9 @@ export default {
 
     save() {      
       this.$refs.form.validate();
-      this.object.sucursales = this.loguedUser.sucursal;
+      if(this.loguedUser.perfil > 2){
+        this.object.sucursales = this.loguedUser.sucursal;
+      }
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {

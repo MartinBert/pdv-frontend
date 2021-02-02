@@ -28,7 +28,7 @@
                 </v-col>
                 <v-col cols="6">
                   <v-autocomplete
-                    @input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
+                    @input="filterObjects(loguedUser.sucursal.id, filterParams.stringParam, paginate.page - 1, paginate.size)"
                     class="button-ventas comprobante"
                     v-model="dialogObject.documento"
                     :items="databaseItems.documentos"
@@ -81,8 +81,8 @@
                 <v-col class="d-flex">
                   <v-text-field
                     type="date"
-                    v-model="filterString"
-                    v-on:input="filterObjects(loguedUser.sucursal.id, filterString, paginate.page - 1, paginate.size)"
+                    v-model="filterParams.stringParam"
+                    v-on:input="filterObjects(loguedUser.sucursal.id, filterParams.stringParam, paginate.page - 1, paginate.size)"
                     dense
                     outlined
                     rounded
@@ -91,8 +91,8 @@
                   ></v-text-field>
                   <v-text-field
                     type="number"
-                    v-model="filterDouble"
-                    v-on:input="filterObjects(loguedUser.sucursal.id, filterDouble, paginate.page - 1, paginate.size)"
+                    v-model="filterParams.doubleParam"
+                    v-on:input="filterObjects(loguedUser.sucursal.id, filterParams.doubleParam, paginate.page - 1, paginate.size)"
                     dense
                     outlined
                     rounded
@@ -233,8 +233,10 @@ export default {
         totalVenta: "",
         comprobanteAsociado: ""
       },
-      filterString: "",
-      filterDouble: "",
+      filterParams:{
+        stringParam: '',
+        doubleParam: ''
+      },
       activeDetailDialog: false,
       detailRelationateReceipt: null,
       comprobantes: [],
@@ -249,7 +251,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getAllObjects();
+    this.getAllObjects(this.loguedUser.perfil, '', 0, 100000);
   },
 
   computed: {
@@ -259,15 +261,19 @@ export default {
   },
 
   methods: {
-    getAllObjects() {
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = ""
-      }else{
-        id = this.loguedUser.sucursal.id;
+    getAllObjects(idPerfil, stringParam, page, size) {
+      let idSucursal;
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
-      const filterParam = {id, param: "", page: 0, size: 100000}
+      const filterParam = {idSucursal, stringParam, page, size}
 
       GenericService(this.tenant, "clientes", this.token)
         .filter(filterParam)
@@ -337,18 +343,18 @@ export default {
       this.$refs.tab.$forceUpdate();
     },
 
-    filterObjects(id, param, page, size){
+    filterObjects(idSucursal, stringParam, page, size){
       let filterParam;
-      if(this.filterString === param){
-        this.filterDouble = "";
-        param = formatDate(param);
-        if(param === "//"){
-          param = "";
+      if(this.filterParams.stringParam === stringParam){
+        this.filterParams.doubleParam = "";
+        stringParam = formatDate(stringParam);
+        if(stringParam === "//"){
+          stringParam = "";
         }
-        filterParam = {id, param, page, size};
+        filterParam = {idSucursal, stringParam, page, size};
       }else{
-        this.filterString = "";
-        filterParam = {id, doubleParam: param, page, size};
+        this.filterParams.stringParam = "";
+        filterParam = {idSucursal, doubleParam: stringParam, page, size};
       }
       GenericService(this.tenant, "ventas", this.token)
         .filter(filterParam)
@@ -362,15 +368,15 @@ export default {
     },
 
     changePage(page, size){
-      const id = this.loguedUser.sucursal.id;
-      if(this.filterString || this.filterDouble){
-        if(this.filterString){
-          this.filterObjects(id, this.filterString, page, size);
+      const idSucursal = this.loguedUser.sucursal.id;
+      if(this.filterParams.stringParam || this.filterParams.doubleParam){
+        if(this.filterParams.stringParam){
+          this.filterObjects(idSucursal, this.filterParams.stringParam, page, size);
         }else{
-          this.filterObjects(id, this.filterDouble, page, size);
+          this.filterObjects(idSucursal, this.filterParams.doubleParam, page, size);
         }
       }else{
-        this.filterObjects(id, "", page, size);
+        this.filterObjects(idSucursal, "", page, size);
       }
 
     }

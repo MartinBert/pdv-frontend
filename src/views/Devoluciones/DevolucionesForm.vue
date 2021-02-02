@@ -411,7 +411,7 @@ export default {
         documento.codigoDocumento,
         totalVenta
       );
-      const filterParam = { id: sucursal.id, param: "", page: 0, size: 100000 }
+      const filterParam = { idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", page: 0, size: 100000 }
 
       const comprobanteAsociadoDetalle = {
         nro: comprobanteAsociado.numeroCbte,
@@ -644,7 +644,7 @@ export default {
         documento.codigoDocumento,
         totalVenta
       );
-      const filterParam = { id: sucursal.id, param: "", page: 0, size: 100000 }
+      const filterParam = { idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", page: 0, size: 100000 }
 
       /* Mutable vars */
       let file;
@@ -773,7 +773,7 @@ export default {
       const productosSalientes = this.object.productosSalientes;
       const tenant = this.tenant;
       const token = this.token;
-      const filterParam = {id: sucursal.id, param: "", page: 0, size: 10000}
+      const filterParam = { idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", page: 0, size: 10000}
 
       let productos;
       let devolucion = {

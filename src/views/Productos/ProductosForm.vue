@@ -10,7 +10,7 @@
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-1">
-          <v-col>
+          <v-col cols="4">
             <v-text-field
               type="text"
               v-model="object.nombre"
@@ -20,7 +20,7 @@
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="4">
             <v-text-field
               type="text"
               v-model="object.codigoProducto"
@@ -30,8 +30,9 @@
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="4" class="d-flex">
             <v-text-field
+              class="mr-2"
               type="text"
               v-model="object.codigoBarra"
               :counter="50"
@@ -39,6 +40,7 @@
               required
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
+            <v-btn class="success mt-3" @click="generateBarCode()">Generar</v-btn>
           </v-col>
         </v-row>
         <v-row class="ma-1">
@@ -235,6 +237,7 @@ import {
   restarNumeros,
   roundTwoDecimals,
   calculatePercentReductionInAmount,
+  generateBarCode,
 } from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
 
@@ -251,6 +254,7 @@ export default {
     object: {
       estado: 1,
       ganancia: 0,
+      codigoBarra: '',
       iva: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
     },
     cantidad: [],
@@ -368,6 +372,11 @@ export default {
       this.object.ivaVenta = roundTwoDecimals(
         restarNumeros([this.object.precioTotal, this.object.precioSinIva])
       );
+    },
+
+    generateBarCode(){
+      this.object.codigoBarra = generateBarCode();
+      console.log(this.object.codigoBarra);
     },
 
     save() {

@@ -19,17 +19,18 @@
             item-value="id"
             label="Depósito"
             v-model="typeList"
-            @change="filterObjects(filterString, paginate.page - 1, paginate.size, typeList)"
+            @change="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
           />
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterString"
+            v-model="filterParams.stringParam"
             v-on:input="
               filterObjects(
-                filterString,
-                paginate.page - 1,
-                paginate.size,
+                loguedUser.perfil, 
+                filterParams.stringParam,
+                filterParams.page - 1,
+                filterParams.size,
                 typeList
               )
             "
@@ -116,16 +117,16 @@
     </v-simple-table>
 
     <v-pagination
-      v-model="paginate.page"
-      :length="paginate.totalPages"
+      v-model="filterParams.page"
+      :length="filterParams.totalPages"
       next-icon="mdi-chevron-right"
       prev-icon="mdi-chevron-left"
-      :page="paginate.page"
+      :page="filterParams.page"
       :total-visible="8"
       @input="
-        filterObjects(filterString, paginate.page - 1, paginate.size, typeList)
+        filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)
       "
-      v-if="paginate.totalPages > 1"
+      v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End List with pagination -->
 
@@ -202,11 +203,13 @@ export default {
   data: () => ({
     objects: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    filterString: "",
-    paginate: {
+    filterParams: {
+      idPerfil: "",
+      idSucursal: "",
+      stringParam: "",
       page: 1,
       size: 10,
-      totalPages: 0,
+      totalPages: 0
     },
     loaded: false,
     tenant: "",
@@ -229,40 +232,51 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects(
-      this.filterString,
-      this.paginate.page - 1,
-      this.paginate.size,
+      this.loguedUser.perfil, 
+      this.filterParams.stringParam,
+      this.filterParams.page - 1,
+      this.filterParams.size,
       this.typeList
     );
-    this.getOtherModels("", 0, 100000);
+    this.getOtherModels(this.loguedUser.perfil, "", 0, 100000);
   },
 
   methods: {
-    filterObjects(param, page, size, typeList) {
-      let id;
-      if (this.loguedUser.perfil < 3) {
-        id = "";
-      } else {
-        id = this.loguedUser.sucursal.id;
+    filterObjects(idPerfil, stringParam, page, size, typeList) {
+      let idSucursal;
+      
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       if (typeList === 0) {
-        this.search(id, param, page, size);
+        this.search(idPerfil, idSucursal, stringParam, page, size);
       } else {
-        this.searchForDeposit(id, param, page, size, typeList);
+        this.searchForDeposit(idPerfil, idSucursal, stringParam, page, size, typeList);
       }
     },
 
-    getOtherModels(param, page, size) {
-      let id;
-      if (this.loguedUser.perfil < 3) {
-        id = "";
-      } else {
-        id = this.loguedUser.sucursal.id;
+    getOtherModels(idPerfil, stringParam, page, size) {
+      let idSucursal;
+
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, "depositos", this.token)
-        .filter({ id, param, page, size })
+        .filter({ idPerfil, idSucursal, stringParam, page, size })
         .then((data) => {
           this.depositos = data.data.content;
           this.depositos.push({
@@ -273,9 +287,9 @@ export default {
         });
     },
 
-    search(id, param, page, size) {
+    search(idPerfil, idSucursal, stringParam, page, size) {
       GenericService(this.tenant, this.service, this.token)
-        .filter({ id, param, page, size })
+        .filter({ idPerfil, idSucursal, stringParam, page, size })
         .then((data) => {
           this.objects = data.data.content;
           if(this.migration.length > 0){
@@ -287,19 +301,19 @@ export default {
               })
             })
           }
-          this.paginate.totalPages = data.data.totalPages;
-          if (this.paginate.totalPages < this.paginate.page) {
-            this.paginate.page = 1;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
           }
           this.loaded = true;
         });
     },
 
-    searchForDeposit(id, param, page, size, typeList) {
+    searchForDeposit(idPerfil, idSucursal, stringParam, page, size, typeList) {
       const idParam = typeList;
 
       StocksService(this.tenant, "stock", this.token)
-        .filterStockForDepositId({ id, param, page, size, idParam })
+        .filterStockForDepositId({ idPerfil, idSucursal, stringParam, page, size, idParam })
         .then((data) => {
           this.objects = data.data.content;
           if(this.migration.length > 0){
@@ -311,9 +325,9 @@ export default {
               })
             })
           }
-          this.paginate.totalPages = data.data.totalPages;
-          if (this.paginate.totalPages < this.paginate.page) {
-            this.paginate.page = 1;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
           }
           this.loaded = true;
         });
@@ -339,9 +353,10 @@ export default {
         .delete(this.idObjet)
         .then(() => {
           this.filterObjects(
-            this.filterString,
-            this.paginate.page - 1,
-            this.paginate.size,
+            this.loguedUser.perfil, 
+            this.filterParams.stringParam,
+            this.filterParams.page - 1,
+            this.filterParams.size,
             this.typeList
           );
         });
@@ -351,20 +366,24 @@ export default {
       this.$store.commit("stocks/dialogMutation");
       this.loaded = false;
 
-      const param = "";
+      const stringParam = "";
       const page = 0;
       const size = 100000;
 
-      let id;
+      let idSucursal;
 
-      if (this.loguedUser.perfil < 3) {
-        id = "";
-      } else {
-        id = this.loguedUser.sucursal.id;
+      switch (this.loguedUser.perfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({ id, param, page, size })
+        .filter({ idSucursal, stringParam, page, size })
         .then((data) => {
           let stockWithRestrictions = data.data.content.map((el) => {
             el.cantidadMinima = this.$store.state.stocks.minimumQuantity;
@@ -379,9 +398,10 @@ export default {
 
           this.$store.commit("stocks/resetStates");
           this.filterObjects(
-            this.filterString,
-            this.paginate.page - 1,
-            this.paginate.size,
+            this.loguedUser.perfil,
+            this.filterParams.stringParam,
+            this.filterParams.page - 1,
+            this.filterParams.size,
             this.typeList
           );
         });
@@ -390,22 +410,26 @@ export default {
     applyMassiveChangesInDeposits() {
       this.loaded = false;
 
-      const param = "";
+      const stringParam = "";
       const page = 0;
       const size = 100000;
 
-      let id;
+      let idSucursal;
       let depositToModifyId = this.$store.state.stocks.selectedDeposits[0].id;
       let newDepositForProducts = this.$store.state.stocks.selectedDeposits[1];
 
-      if (this.loguedUser.perfil < 3) {
-        id = "";
-      } else {
-        id = this.loguedUser.sucursal.id;
+      switch (this.loguedUser.perfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({ id, param, page, size })
+        .filter({ idSucursal, stringParam, page, size })
         .then((data) => {
           let affectedProducts = data.data.content.filter(
             (el) => el.deposito.id == depositToModifyId
@@ -419,7 +443,7 @@ export default {
           this.saveHistorial(affectedProducts, "Movimiento masivo de stock entre depósitos");
 
           this.$store.commit("stocks/resetStates");
-          setTimeout(()=>{this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size, this.typeList);}, 500);
+          setTimeout(()=>{this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size, this.typeList);}, 500);
         });
     },
 
@@ -449,7 +473,7 @@ export default {
         this.migration = [];
         this.destinationDepositForMigrations = {};
 
-        setTimeout(()=>{this.filterObjects(this.filterString, this.paginate.page - 1, this.paginate.size, this.typeList);}, 500);
+        setTimeout(()=>{this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size, this.typeList);}, 500);
       }else{
         errorAlert("Debe seleccionar al menos 1 producto para migrar su stock de depósito");
       }

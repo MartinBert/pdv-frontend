@@ -129,10 +129,10 @@ export default {
         });
     },
 
-    getIvaConditions(param, page, size){
+    getIvaConditions(stringParam, page, size){
       let id = '';
       GenericService(this.tenant, "condicionesFiscales", this.token)
-        .filter({id, param, page, size})
+        .filter({id, stringParam, page, size})
         .then(data => {
           this.condicioniva = data.data.content.filter(el => el.id !== 3);
         });

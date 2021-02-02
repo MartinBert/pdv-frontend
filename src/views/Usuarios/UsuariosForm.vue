@@ -150,7 +150,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getAllObjects('', 0, 100000);
+    this.getAllObjects(this.loguedUser.perfil, '', 0, 100000);
   },
 
   methods: {
@@ -163,23 +163,16 @@ export default {
         });
     },
 
-    getAllObjects(param, page, size){
-
-      let id;
-      if(this.loguedUser.perfil !== 1){
-        id = this.loguedUser.empresa.id;
-      }else{
-        id = '';
-      }
+    getAllObjects(idPerfil, stringParam, page, size){
 
       GenericService(this.tenant, "perfiles", this.token)
-      .filter({id: this.loguedUser.perfil , param, page, size})
+      .filter({ idPerfil , stringParam, page, size})
       .then(data => {
         this.perfiles = data.data.content;
       });
 
       GenericService(this.tenant, "empresas", this.token)
-      .filter({id, param, page, size})
+      .filter({ idPerfil , stringParam, page, size})
       .then(data => {
         this.empresas = data.data.content;
         if(this.loguedUser.perfil !== 1){
