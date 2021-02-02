@@ -114,7 +114,7 @@
             label="Iva compras"
               :items="ivasCompra"
               item-text="nombre"
-              v-model="ivaCompraSelected"
+              v-model="object.ivaComprasObject"
               :return-object="true"
               v-on:input="calculations()"
             />
@@ -124,7 +124,7 @@
             label="Iva ventas"
               :items="ivasVenta"
               item-text="nombre"
-              v-model="ivaVentaSelected"
+              v-model="object.ivaVentasObject"
               :return-object="true"
               v-on:input="calculations()"
             />
@@ -263,14 +263,13 @@ export default {
     rubros: [],
     ivasCompra: [],
     ivasVenta: [],
-    ivaCompraSelected: {},
-    ivaVentaSelected: {},
     valid: true,
     object: {
       estado: 1,
       ganancia: 0,
       codigoBarra: '',
-      iva: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
+      ivaComprasObject: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
+      ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
     },
     cantidad: [],
     loaded: false,
@@ -330,8 +329,6 @@ export default {
               case "ivas":
                 this.ivasCompra = data.data.content.filter(el => el.tipo);
                 this.ivasVenta = data.data.content.filter(el => !el.tipo);
-                this.ivaCompraSelected = this.ivasCompra.filter(el => el.porcentaje === 21)[0];
-                this.ivaVentaSelected = this.ivasVenta.filter(el => el.porcentaje === 21)[0];
                 break;
 
               case "propiedades":
@@ -355,7 +352,7 @@ export default {
     calculations() {
       this.object.costoNeto = calculateAmountMinusPercentaje(
         this.object.costoBruto,
-        this.ivaCompraSelected.porcentaje
+        this.object.ivaComprasObject.porcentaje
       );
       this.object.precioCosto = this.object.costoNeto;
       this.object.ivaCompra = restarNumeros([
@@ -368,7 +365,7 @@ export default {
       );
       this.object.precioTotal = calculateAmountPlusPercentaje(
         this.object.precioSinIva,
-        this.ivaVentaSelected.porcentaje
+        this.object.ivaVentasObject.porcentaje
       );
       this.object.ivaVenta = restarNumeros([
         this.object.precioTotal,
@@ -380,12 +377,12 @@ export default {
       this.object.ganancia = roundTwoDecimals(
         calculatePercentReductionInAmount(
           this.object.precioTotal,
-          this.ivaVentaSelected.porcentaje
+          this.object.ivaVentasObject.porcentaje
         ) - this.object.costoBruto
       );
       this.object.precioSinIva = calculatePercentReductionInAmount(
         this.object.precioTotal,
-        this.ivaVentaSelected.porcentaje
+        this.object.ivaVentasObject.porcentaje
       );
       this.object.ivaVenta = roundTwoDecimals(
         restarNumeros([this.object.precioTotal, this.object.precioSinIva])

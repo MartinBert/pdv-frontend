@@ -351,7 +351,7 @@ export default {
             element.codigoBarra = generateBarCode();
           }
 
-          let iva = this.getIva(element.idIva).porcentaje;
+          let ivaComp = this.getIva(element.idIvaCompras).porcentaje;
           let ganancia = element.ganancia / 100;
           let obj = {
             nombre: element.nombre,
@@ -362,14 +362,15 @@ export default {
             propiedades: this.getPropiedades(element.propiedades),
             atributos: this.getAtributos(element),
             distribuidores: this.getDistribuidores(element.idDistribuidores),
-            iva: this.getIva(element.idIva),
-            precioCosto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(iva))),
-            costoNeto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(iva)) / (1 + decimalPercent(iva))),
-            costoBruto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(iva))),
-            ivaCompra: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(iva)) - element.precioTotal / (1 + ganancia) / (1 + iva) / (1 + iva)),
+            ivaComprasObject: this.getIva(element.idIvaCompras),
+            ivaVentasObject: this.getIva(element.idIvaVentas),
+            precioCosto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(ivaComp))),
+            costoNeto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(ivaComp)) / (1 + decimalPercent(ivaComp))),
+            costoBruto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(ivaComp))),
+            ivaCompra: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(ivaComp)) - element.precioTotal / (1 + ganancia) / (1 + ivaComp) / (1 + ivaComp)),
             ganancia: element.ganancia,
-            precioSinIva: roundTwoDecimals(element.precioTotal / (1 + iva)),
-            ivaVenta: roundTwoDecimals(element.precioTotal - element.precioTotal / (1 + decimalPercent(iva))),
+            precioSinIva: roundTwoDecimals(element.precioTotal / (1 + ivaComp)),
+            ivaVenta: roundTwoDecimals(element.precioTotal - element.precioTotal / (1 + decimalPercent(ivaComp))),
             precioTotal: element.precioTotal,
             estado: 1,
           };
