@@ -24,6 +24,14 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
+          <v-col>
+            <v-autocomplete
+              :items="ivaTypes"
+              item-text="text"
+              item-value="value"
+              v-model="object.tipo"
+            />
+          </v-col>
         </v-row>
         <div class="ma-1">
           <v-col class="col-6">
@@ -48,7 +56,13 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     valid: true,
-    object: {},
+    ivaTypes:[
+      {text: "Iva compras", value: true},
+      {text: "Iva ventas", value: false},
+    ],
+    object: {
+      tipo: false,
+    },
     loaded: false,
     tenant: "",
     service: "ivas",

@@ -29,6 +29,7 @@
             <th>ID</th>
             <th>Nombre</th>
             <th>Porcentaje</th>
+            <th>Tipo</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -37,6 +38,10 @@
             <td>{{ object.id }}</td>
             <td>{{ object.nombre }}</td>
             <td>{{ object.porcentaje }}</td>
+            <td>
+              <v-alert v-if="!object.tipo" dense class="success">Iva Ventas</v-alert>
+              <v-alert v-if="object.tipo" dense class="info">Iva Compras</v-alert>
+            </td>
             <td>
               <a title="Editar"
                 ><img
