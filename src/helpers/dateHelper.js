@@ -10,6 +10,18 @@ export function formatDate(str) {
     return date;
 }
 
+export function formatDateWithoutSlash(str){
+    let character = /-/gi;
+    let firstDate = str.replace(character, '');
+    firstDate = firstDate.substring(0, 8);
+    let year = firstDate.substring(0, 4);
+    let month = firstDate.substring(4, 6);
+    let day = firstDate.substring(6, 8);
+    let date = day + month + year;
+
+    return date;
+}
+
 export function getCurrentDate() {
     let generatedFecha = new Date();
     let day = generatedFecha.getDate().toString();
@@ -41,6 +53,11 @@ export function getYearsList(){
     }
 
     return years;
+}
+
+export function getInternationalDate(){
+    const date = new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    return parseInt(date.replace(/-/g, ''));
 }
 
 export const monthsList = [

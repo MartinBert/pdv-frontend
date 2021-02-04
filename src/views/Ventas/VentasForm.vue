@@ -58,11 +58,11 @@
           </div>
 
           <!-- TEST CERT -->
-          <!-- <v-btn
+          <v-btn
             class="ml-1"
             color="primary"
             @click="testcert()"
-          >TEST CERTIFICADO</v-btn> -->
+          >TEST CERTIFICADO</v-btn>
           <!-- TEST CERT -->
 
         </v-col>
@@ -273,17 +273,19 @@ import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import Calculator from "../../components/Calculator";
 import ProductDialog from "../../components/ProductDialog";
-import { formatDate, getCurrentDate } from "../../helpers/dateHelper";
+import { formatDate, getCurrentDate, getInternationalDate, formatDateWithoutSlash } from "../../helpers/dateHelper";
 import { checkIfInvoice } from "../../helpers/processObjectsHelper";
 import {
-  calculateAlicIvaBaseImpVentas,
-  calculateAlicIvaImporteVentas,
+  // calculateAlicIvaBaseImpVentas,
+  // calculateAlicIvaImporteVentas,
   generateBarCode,
   calculatePercentaje,
   decimalPercent,
   generateFiveDecimalCode
 } from "../../helpers/mathHelper";
 import { errorAlert, successAlert } from '../../helpers/alerts';
+import { formatReceiptA, formatReceiptB, formatReceiptC } from '../../helpers/receiptFormatHelper';
+import { addZerosInString } from '../../helpers/stringHelper';
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
 
@@ -311,7 +313,6 @@ export default {
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-    afipModuleAuthorization: {},
     modificator: "",
     priceModificationPorcent: 0,
     dialogIndividualPercent: false,
@@ -397,12 +398,6 @@ export default {
           this.depositos = data.data.content;
           this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
         });
-
-      VentasService(this.tenant, this.service, this.token)
-        .getAfipModuleAuthorization()
-        .then((data) => {
-          this.afipModuleAuthorization = data.data;
-        });
     },
 
     processProductsObject(producto) {
@@ -412,6 +407,7 @@ export default {
         codigoBarra,
         cantUnidades,
         precioTotal,
+        ivaVentasObject,
         total,
       } = producto;
       let object = {
@@ -420,6 +416,7 @@ export default {
         codigoBarra: codigoBarra,
         cantUnidades: cantUnidades,
         precioUnitario: parseFloat(precioTotal).toFixed(2),
+        ivaVentas: ivaVentasObject.porcentaje,
         precioTotal: parseFloat(total).toFixed(2),
       };
       return object;
@@ -502,6 +499,7 @@ export default {
             nombre: "DESCUENTO",
             codigoBarra: 1111111111,
             cantUnidades: 0,
+            ivaVentas: 8888,
             precioUnitario: percent,
             precioTotal: percent,
           };
@@ -515,6 +513,7 @@ export default {
             nombre: "RECARGO",
             codigoBarra: 2222222222,
             cantUnidades: 0,
+            ivaVentas: 8888,
             precioUnitario: percent,
             precioTotal: percent,
           };
@@ -548,6 +547,7 @@ export default {
           nombre: "DESCUENTO - " + this.renglon.nombre,
           codigoBarra: generateBarCode(),
           cantUnidades: 0,
+          ivaVentas: 99999,
           precioUnitario: calculatePercentaje(
             this.renglon.precioTotal,
             percent
@@ -560,6 +560,7 @@ export default {
           nombre: "RECARGO - " + this.renglon.nombre,
           codigoBarra: generateBarCode(),
           cantUnidades: 0,
+          ivaVentas: 99999,
           precioUnitario: calculatePercentaje(
             this.renglon.precioTotal,
             percent
@@ -576,7 +577,7 @@ export default {
     },
 
     save() {
-      /* Constants */
+      /*** Constants ***/
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
@@ -585,21 +586,14 @@ export default {
       const cliente = this.object.cliente;
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
-      const fecha = this.fecha;
       const totalVenta = this.totalVenta;
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
-      const afipAuthorization = this.afipModuleAuthorization;
       const filterParam = {idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", page: 0, size: 100000}
 
-      /* Mutable vars */
-      let tipoDoc;
-      let alicIva = { baseImp: 0, id: 5, importe: 0 };
-      let impNeto;
+      /*** Mutable vars ***/
       let comprobante;
-      let cabeceraAfip;
-      let detalleAfip;
       let file;
       let fileURL;
       let productos;
@@ -607,191 +601,152 @@ export default {
       let productsBelowMinimumStock = [];
       let productsOutOfStockAndDeposits = [];
       let productsWithoutStockOnDefaultDeposit = [];
-
-      if (planesPago) {
-        if (planesPago.length < 2) {
-          if (planesPago[0].cuotas > 1) {
-            condVenta = true;
-          } else {
-            condVenta = false;
-          }
-        } else {
-          condVenta = false;
-        }
-      } else {
-        condVenta = true;
-      }
-
-      if (documento.ivaCat == 1) {
-        tipoDoc = 80;
-      } else {
-        tipoDoc = 96;
-      }
-
-      if (documento.ivaCat == 2 || documento.ivaCat == 1) {
-        alicIva.baseImp = calculateAlicIvaBaseImpVentas(totalVenta);
-        alicIva.importe = calculateAlicIvaImporteVentas(
-          totalVenta,
-          alicIva.baseImp
-        );
-        impNeto = alicIva.baseImp;
-      } else {
-        alicIva = [];
-      }
-
-      //Instance body from AFIP ws-services
-      let body = {
-        alicIva: [alicIva],
-        asociados: [],
-        cbteTipo: documento.codigoDocumento,
-        concepto: 1,
-        cotizMoneda: 1,
-        cuit: sucursal.cuit,
-        fecha: fecha,
-        fechaServicioHasta: fecha,
-        fechaServicioVenc: fecha,
-        fechaServiciodesde: fecha,
-        fechaVencimientoPago: "0",
-        idMoneda: "PES",
-        impNeto: impNeto,
-        name: sucursal.razonSocial,
-        nroDesde: "",
-        nroDoc: cliente.cuit,
-        nroHasta: "",
-        opcionales: [],
-        ptoVenta: ptoVenta.idFiscal,
-        tipoDoc: tipoDoc,
-        tributos: [],
-      };
   
-      //Get authorized voucher number
+      /*** Get last voucher emmited number ***/
       axios
-        .get(
-          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${body.name}/${body.cuit}/${body.ptoVenta}/${body.cbteTipo}`,
-          {
-            headers: afipAuthorization,
-          }
-        )
-        .then((data) => {
-          body.nroDesde = data.data + 1;
-          body.nroHasta = body.nroDesde;
-          if (mediosPago !== undefined) {
-            if (body.impNeto !== 0) {
+      .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`)
+      .then(data => {
+        const numberOfReceipt = parseInt(data.data.responseOfAfip) + 1;
+        let voucher;
+        
+        /*** Format voucher according to type ***/
+        switch (documento.letra) {
+          case "A":
+              voucher = formatReceiptA(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), products, totalVenta);
+            break;
+          
+          case "B":
+              voucher = formatReceiptB(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), products, totalVenta);
+            break
+        
+          default:
+              voucher = formatReceiptC(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), totalVenta);
+            break;
+        }
+
+        /*** Evaluate required sales form data ***/
+        if (mediosPago !== undefined) {
+          if (products.length > 0) {
+
+            console.log(voucher);
+
+            /*** Send voucher to AFIP ***/
               axios
-                .post(
-                  `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/generarComprobante/${sucursal.razonSocial}`,
-                  body,
-                  {
-                    headers: afipAuthorization,
-                  }
-                )
-                .then((data) => {
-                  cabeceraAfip = data.data.feCabResp;
-                  detalleAfip = data.data.feDetResp;
-                  
-                  comprobante = {
-                    letra: documento.letra,
-                    numeroCbte: body.nroDesde,
-                    fechaEmision: formatDate(cabeceraAfip.fchProceso),
-                    fechaVto: formatDate(detalleAfip[0].caefchVto),
-                    condicionVenta: condVenta,
-                    productos: products,
-                    barCode: detalleAfip[0].barcode,
-                    cae: detalleAfip[0].cae,
-                    puntoVenta: ptoVenta,
-                    sucursal: sucursal,
-                    documentoComercial: documento,
-                    empresa: empresa,
-                    cliente: cliente,
-                    totalVenta: totalVenta,
-                    mediosPago: [mediosPago],
-                    planesPago: [planesPago],
-                    nombreDocumento: documento.nombre,
-                  };
+              .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, voucher)
+              .then(data => {
+                const cae = data.data.CAE;
+                const dateOfCaeExpiration = data.data.CAEFchVto;
+                const barCode = sucursal.cuit + addZerosInString("02", documento.codigoDocumento) + addZerosInString("04", ptoVenta.idFiscal) + cae + formatDateWithoutSlash(dateOfCaeExpiration);
+                
+                if(planesPago.cuotas > 1){condVenta = false;}else{condVenta = true;}
 
-                  if (comprobante.cae) {
-                    GenericService(tenant, "comprobantesFiscales", token).save(
-                      comprobante
-                    );
+                comprobante = {
+                  letra: documento.letra,
+                  numeroCbte: numberOfReceipt,
+                  fechaEmision: formatDate(getCurrentDate()),
+                  fechaVto: formatDate(dateOfCaeExpiration),
+                  condicionVenta: condVenta,
+                  productos: products,
+                  barCode: barCode,
+                  cae: cae,
+                  puntoVenta: ptoVenta,
+                  sucursal: sucursal,
+                  documentoComercial: documento,
+                  empresa: empresa,
+                  cliente: cliente,
+                  totalVenta: totalVenta,
+                  mediosPago: [mediosPago],
+                  planesPago: [planesPago],
+                  nombreDocumento: documento.nombre,
+                };
+                
+                /*** Save receipt in database ***/
+                if (comprobante.cae) {
+                  GenericService(tenant, "comprobantesFiscales", token).save(
+                    comprobante
+                  );
 
-                    GenericService(tenant, "stock", token)
-                      .filter(filterParam)
-                      .then((data) => {
-                        productos = data.data.content;
+                  /*** Save stocks modifications ***/
+                  GenericService(tenant, "stock", token)
+                    .filter(filterParam)
+                    .then((data) => {
+                      productos = data.data.content;
 
-                        productos.forEach((el) => {
-                          comprobante.productos.forEach((e) => {
-                            if (el.producto.id === e.id) {
-                              e.checked = true
-                              switch (el.deposito.id) {
-                                case this.defaultDeposit.id:
-                                    el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                      productos.forEach((el) => {
+                        comprobante.productos.forEach((e) => {
+                          if (el.producto.id === e.id) {
+                            e.checked = true
+                            switch (el.deposito.id) {
+                              case this.defaultDeposit.id:
+                                  el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
 
-                                    if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
-                                      productsBelowMinimumStock.push(el);
-                                    }
-                                    GenericService(tenant, "stock", token).save(el);
-                                  break;
-                              
-                                default:
-                                    el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
-                                    if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
-                                      productsBelowMinimumStock.push(el);
-                                    }
-                                    GenericService(tenant, "stock", token).save(el);
-                                    productsWithoutStockOnDefaultDeposit.push(el);
-                                  break;
-                              }
+                                  if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                                    productsBelowMinimumStock.push(el);
+                                  }
+                                  GenericService(tenant, "stock", token).save(el);
+                                break;
+                            
+                              default:
+                                  el.cantidad = parseInt(el.cantidad) - parseInt(e.cantUnidades);
+                                  if(el.cantidadMinima && el.cantidad < Number(el.cantidadMinima)){
+                                    productsBelowMinimumStock.push(el);
+                                  }
+                                  GenericService(tenant, "stock", token).save(el);
+                                  productsWithoutStockOnDefaultDeposit.push(el);
+                                break;
                             }
-                          });
+                          }
                         });
-
-                        const viewCheckedProductsInReceipt = comprobante.productos.filter(el => !el.checked);
-                        if(viewCheckedProductsInReceipt.length > 0){
-                          productsOutOfStockAndDeposits = viewCheckedProductsInReceipt;
-                        }
-                      })
-                      .then(() => {
-                        successAlert("Venta realizada")
-                        .then(()=>{
-                          VentasService(this.tenant, this.service, this.token)
-                          .checkProductsAndDepositsStatus(productsBelowMinimumStock, productsWithoutStockOnDefaultDeposit, productsOutOfStockAndDeposits);
-                        })
-                      })
-                      .then(() => {
-                        ReportsService(tenant, service, token)
-                          .onCloseSaleReport(comprobante)
-                          .then((res) => {
-                            file = new Blob([res["data"]], {
-                              type: "application/pdf",
-                            });
-                            fileURL = URL.createObjectURL(file);
-                            window.open(fileURL, "_blank");
-                          });
                       });
 
-                    this.object = {};
-                    this.products = [];
-                    this.modificator = "";
-                    this.priceModificationPorcent = 0;
-                    this.individualPercent = "";
-                    this.listennerOfListChange = 999999999;
-                    this.$store.commit("productos/resetStates");
-                  } else {
-                    if(detalleAfip[0].observaciones){
-                      errorAlert(detalleAfip[0].observaciones[0].msg)
-                    }else{
-                      errorAlert("Tipo de comprobante no disponible");
-                    }
-                  }
-                });
-            } else {
-              errorAlert("No hay productos seleccionados en la venta");
-            }
+                      const viewCheckedProductsInReceipt = comprobante.productos.filter(el => !el.checked);
+                      if(viewCheckedProductsInReceipt.length > 0){
+                        productsOutOfStockAndDeposits = viewCheckedProductsInReceipt;
+                      }
+                    })
+                    .then(() => {
+                      successAlert("Venta realizada")
+                      .then(()=>{
+                        VentasService(this.tenant, this.service, this.token)
+                        .checkProductsAndDepositsStatus(productsBelowMinimumStock, productsWithoutStockOnDefaultDeposit, productsOutOfStockAndDeposits);
+                      })
+                    })
+                    .then(() => {
+                      ReportsService(tenant, service, token)
+                        .onCloseSaleReport(comprobante)
+                        .then((res) => {
+                          file = new Blob([res["data"]], {
+                            type: "application/pdf",
+                          });
+                          fileURL = URL.createObjectURL(file);
+                          window.open(fileURL, "_blank");
+                        });
+                    });
+
+                  /*** Reset view objects status ***/
+                  this.object = {};
+                  this.products = [];
+                  this.modificator = "";
+                  this.priceModificationPorcent = 0;
+                  this.individualPercent = "";
+                  this.listennerOfListChange = 999999999;
+                  this.$store.commit("productos/resetStates");
+
+                } else {
+                  errorAlert("Tipo de comprobante no disponible");
+                }
+              })
+              .catch((err) => {
+                console.log('---------------- ERROR IN AFIP RESPONSE ----------------');
+                console.log(err);
+              })
           } else {
-            errorAlert("Debe seleccionar un medio de pago");
+            errorAlert("No hay productos seleccionados en la venta");
           }
-        });
+        } else {
+          errorAlert("Debe seleccionar un medio de pago");
+        }
+      });
     },
 
     saveNoFiscal() {
@@ -833,8 +788,6 @@ export default {
       } else {
         condVenta = true;
       }
-
-      console.log(totalVenta);
 
       comprobante = {
         letra: "X",
@@ -961,22 +914,17 @@ export default {
     },
 
     testcert(){
-      /* Constants */
-      const afipAuthorization = this.afipModuleAuthorization;
-      const sucursal = this.loguedUser.sucursal;
-      const ptoVenta = this.loguedUser.puntoVenta;
-      
-      //Get authorized voucher number
-      axios
-        .get(
-          `${process.env.VUE_APP_API_AFIP}/rest/api/facturas/obtenerUltimoNumeroAutorizado/${sucursal.razonSocial}/${sucursal.cuit}/${ptoVenta.idFiscal}/006`,
-          {
-            headers: afipAuthorization
-          }
-        )
-        .then((data) => {
-          console.log(data);
-        });
+      const cuitSucursal = this.loguedUser.sucursal.cuit;
+      const ptoVenta = this.loguedUser.puntoVenta.idFiscal;
+      const compType = 11
+
+      axios.get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuitSucursal}/${ptoVenta}/${compType}`)
+      .then(data => {
+        console.log(data.data.responseOfAfip);
+      })
+      .catch(err => {
+        console.log(err);
+      })
     },
 
     applyChangesInLoguedUserData(){

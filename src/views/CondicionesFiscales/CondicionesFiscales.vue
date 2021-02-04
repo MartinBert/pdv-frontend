@@ -9,7 +9,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterParams.stringParam"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-on:input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
             dense
             outlined
             rounded
@@ -59,7 +59,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page -1, filterParams.size)"
+      @input="filterObjects(filterParams.stringParam, filterParams.page -1, filterParams.size)"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -103,7 +103,7 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
   },
   methods: {
 

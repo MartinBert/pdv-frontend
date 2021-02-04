@@ -15,7 +15,7 @@ export function decimalPercent(integerPercent){
 }
 
 export function calculatePercentaje(number, percent){
-    return roundTwoDecimals(number * decimalPercent(percent));
+    return roundTwoDecimals(Number(number) * decimalPercent(Number(percent)));
 }
 
 export function calculateAmountPlusPercentaje(number, percent){
@@ -27,15 +27,24 @@ export function calculateAmountMinusPercentaje(number, percent){
 }
 
 export function calculatePercentReductionInAmount(number, percent){
-    return roundTwoDecimals(number / (1 + decimalPercent(percent)));
+    return roundTwoDecimals(Number(number) / (1 + decimalPercent(percent)));
 }
 
 export function sumarNumeros(array){
-    return roundTwoDecimals(array.reduce((acc, el) => acc + el));
+    return roundTwoDecimals(array.reduce((acc, el) => acc + Number(el)));
 }
 
 export function restarNumeros(array){
-    return roundTwoDecimals(array.reduce((acc, el) => acc - el));
+    return roundTwoDecimals(array.reduce((acc, el) => acc - Number(el)));
+}
+
+export function ordenarMayorMenor(array){
+    return array.sort((a, b) => a - b);
+}
+
+export function promediar(array){
+    const total = sumarNumeros(array);
+    return roundTwoDecimals(total / array.length);
 }
 
 export function roundTwoDecimals(number){

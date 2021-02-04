@@ -1,3 +1,5 @@
+import { sprintf } from 'sprintf-js/src/sprintf';
+
 export function escapeCharacters(str){
     const safeString = 
     str
@@ -18,4 +20,8 @@ export function escapeCharacters(str){
     .replace(/%5D/gi, ']');
 
     return safeString;
+}
+
+export function addZerosInString(numZeros, str){
+    return sprintf(`"%${numZeros}d"`, str).replace(/"/g, ''); 
 }
