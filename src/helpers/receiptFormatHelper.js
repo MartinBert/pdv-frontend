@@ -123,7 +123,7 @@ export function formatReceiptB(ptoVentaId, receiptCode, clientCuit, numberOfRece
         'PtoVta' 	: ptoVentaId, // Punto de venta
         'CbteTipo' 	: receiptCode, // Tipo de comprobante (ver tipos disponibles) 
         'Concepto' 	: 1, // Concepto del Comprobante: (1)Productos, (2)Servicios, (3)Productos y Servicios
-        'DocTipo' 	: 80, // Tipo de documento del comprador (ver tipos disponibles)
+        'DocTipo' 	: 96, // Tipo de documento del comprador (ver tipos disponibles)
         'DocNro' 	: clientCuit, // Numero de documento del comprador
         'CbteDesde' : numberOfReceipt, // Numero de comprobante o numero del primer comprobante en caso de ser mas de uno
         'CbteHasta' : numberOfReceipt, // Numero de comprobante o numero del ultimo comprobante en caso de ser mas de uno
