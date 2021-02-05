@@ -38,29 +38,6 @@ export default (tenant,service,token) =>{
             })
         },
 
-        disable: function(id, array){
-            array.forEach(el => {
-                if (el.id == id){
-                    el.estado = 0;
-                    return axios.put(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`, el, {
-                        headers: { Authorization: "Bearer " + token }
-                    });
-                }
-            });
-        },
-
-        getDataForSucursal: function(sucursalId,page,size){
-            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getForSucursal/${sucursalId}/${page}/${size}`, {
-                headers: { Authorization: "Bearer " + token }
-            })
-        },
-
-        getDataForBussiness(empresaId, page, size){
-            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getForBussiness/${empresaId}/${page}/${size}`, {
-                headers: { Authorization: "Bearer " + token }
-            })
-        },
-
         update(object){
             return axios.put(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`, object, {
                 headers: { Authorization: "Bearer " + token }

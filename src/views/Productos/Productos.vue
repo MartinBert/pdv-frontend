@@ -22,9 +22,10 @@
             :items="estados"
             v-model="estadoSeleccionado"
             item-text="text"
-            item-value="id"
+            :return-object="true"
             outlined
             dense
+            @input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
           ></v-select>
         </v-col>
         <v-spacer></v-spacer>
@@ -76,9 +77,18 @@
                   height="40"
               /></a>
               <a title="Eliminar"
+              v-if="object.estado == 1"
                 ><img
                   src="/../../images/icons/ico_11.svg"
-                  @click="openDelete(object.id)"
+                  @click="deleteObject(object)"
+                  width="40"
+                  height="40"
+              /></a>
+              <a title="Eliminar"
+              v-if="object.estado != 1"
+                ><img
+                  src="/../../images/icons/add.svg"
+                  @click="reactivationOfProduct(object)"
                   width="40"
                   height="40"
               /></a>
@@ -107,27 +117,6 @@
       v-if="filterParams.totalPages > 1 && loaded"
     ></v-pagination>
     <!-- End filterParams -->
-
-    <!-- Dialog Delete-->
-    <v-dialog v-model="dialogDeleteObject" width="500">
-      <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center"
-          >¿Está seguro que desea realizar esta acción?</v-card-title
-        >
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject"
-            >Si</v-btn
-          >
-          <v-btn small color="disabled" @click="dialogDeleteObject = false"
-            >No</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog Delete -->
 
     <!-- Dialog Loader -->
     <template>
@@ -174,7 +163,7 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
-import { successAlert } from "../../helpers/alerts";
+import { successAlert, questionAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
 
 export default {
@@ -212,7 +201,6 @@ export default {
     service: "productos",
     token: localStorage.getItem("token"),
     dialogStock: false,
-    dialogDeleteObject: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
 
@@ -225,13 +213,21 @@ export default {
 
   methods: {
     filterObjects(stringParam, page, size) {
+      let doubleParam;
+      console.log(this.estadoSeleccionado.id);
+      if(this.estadoSeleccionado.id === 1){
+        doubleParam = 0
+      }else{
+        doubleParam = 2
+      }
+
       GenericService(this.tenant, "productos", this.token)
-        .filter({ stringParam, page, size })
-        .then((data) => {
-          this.objects = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
+      .filter({ doubleParam, stringParam, page, size })
+      .then((data) => {
+        this.objects = data.data.content;
+        this.filterParams.totalPages = data.data.totalPages;
+        this.loaded = true;
+      });
     },
 
     getOtherModels(page, size) {
@@ -278,18 +274,36 @@ export default {
       this.$router.push({ name: "productosForm", params: { id: id } });
     },
 
-    openDelete(id) {
-      this.idObjet = id;
-      this.dialogDeleteObject = true;
+    deleteObject(object) {
+      questionAlert('Atención, esta acción deshabilitará el producto en el sistema y el mismo no se mostrará para otras operaciones', 'Desea continuar')
+      .then(result => {
+        if(result.isConfirmed){
+          object.estado = 2;
+          GenericService(this.tenant, this.service, this.token)
+          .save(object);
+
+          this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.getOtherModels(0, 100000);
+        }
+      })
     },
 
-    deleteObject() {
-      this.dialog = true;
-      this.dialogDeleteObject = false;
-      GenericService(this.tenant, this.service, this.token).disable(
-        this.idObjet,
-        this.objects
-      );
+    reactivationOfProduct(object) {
+      questionAlert('Atención, esta acción activará el producto en el sistema', 'Desea continuar')
+      .then(result => {
+        if(result.isConfirmed){
+          this.loaded = false;
+          object.estado = 1;
+          GenericService(this.tenant, this.service, this.token)
+          .save(object)
+          .then(()=>{
+            this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+            this.getOtherModels(0, 100000);
+          })
+        }
+        
+      })
+
     },
 
     //Load excel
