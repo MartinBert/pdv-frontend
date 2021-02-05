@@ -1,6 +1,6 @@
 import { ordenarMayorMenor, sumarNumeros, roundTwoDecimals, restarNumeros, calculatePercentReductionInAmount } from './mathHelper';
 
-export function formatReceiptA(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta){
+export function formatReceiptA(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt){
     const productsWithIva = products.filter(el => el.ivaVentas);
     const iva21Object = productsWithIva.filter(el => el.ivaVentas === 21);
     const iva10Object = productsWithIva.filter(el => el.ivaVentas === 10.5);
@@ -81,10 +81,14 @@ export function formatReceiptA(ptoVentaId, receiptCode, clientCuit, numberOfRece
         )
     }
 
+    if(asociatedReceipt){
+        voucherA.CbtesAsoc = asociatedReceipt;
+    }
+
     return voucherA;
 }
 
-export function formatReceiptB(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta){
+export function formatReceiptB(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt){
     const productsWithIva = products.filter(el => el.ivaVentas);
     const iva21Object = productsWithIva.filter(el => el.ivaVentas === 21);
     const iva10Object = productsWithIva.filter(el => el.ivaVentas === 10.5);
@@ -165,11 +169,15 @@ export function formatReceiptB(ptoVentaId, receiptCode, clientCuit, numberOfRece
         )
     }
 
+    if(asociatedReceipt){
+        voucherB.CbtesAsoc = asociatedReceipt;
+    }
+
     return voucherB;
 }
 
-export function formatReceiptC(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, totalVenta){
-    const voucherC = {
+export function formatReceiptC(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, totalVenta, asociatedReceipt){
+    let voucherC = {
         'CantReg' 	: 1, // Cantidad de comprobantes a registrar
         'PtoVta' 	: ptoVentaId, // Punto de venta
         'CbteTipo' 	: receiptCode, // Tipo de comprobante (ver tipos disponibles) 
@@ -188,6 +196,10 @@ export function formatReceiptC(ptoVentaId, receiptCode, clientCuit, numberOfRece
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
     };
+    
+    if(asociatedReceipt){
+        voucherC.CbtesAsoc = asociatedReceipt;
+    }
 
     return voucherC;
 }

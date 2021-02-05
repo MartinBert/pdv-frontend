@@ -10,6 +10,7 @@ export function processDetailReceipt(codigoDocumento, totalVenta) {
     let object = {
       nombre: evaluation,
       cantUnidades: 1,
+      ivaVentas: 21,
       precioUnitario: parseFloat(totalVenta).toFixed(
         2
       ),

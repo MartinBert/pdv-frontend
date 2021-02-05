@@ -276,8 +276,6 @@ import ProductDialog from "../../components/ProductDialog";
 import { formatDate, getCurrentDate, getInternationalDate, formatDateWithoutSlash } from "../../helpers/dateHelper";
 import { checkIfInvoice } from "../../helpers/processObjectsHelper";
 import {
-  // calculateAlicIvaBaseImpVentas,
-  // calculateAlicIvaImporteVentas,
   generateBarCode,
   calculatePercentaje,
   decimalPercent,

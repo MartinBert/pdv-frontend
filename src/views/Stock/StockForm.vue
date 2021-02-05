@@ -326,21 +326,11 @@ export default {
         this.$refs.form.validate();
         if (this.urlId > 0) {
           GenericService(this.tenant, this.service, this.token)
-            .save(this.object)
-            .then(() => {
-
-              this.saveHistorial([this.object], `Cambio en stock de ${this.object.producto.nombre}`)
-
-              .then(()=>{
-                this.$router.push({ name: "stock" });
-              })
-            })
-            .catch((error) => {
-              if (error.response.status == 500) {
-                this.snackError = true;
-                this.errorMessage = "Ocurrio un error";
-              }
-            });
+          .save(this.object)
+          .then(() => {
+            this.saveHistorial([this.object], `Cambio en stock de ${this.object.producto.nombre}`)
+            this.$router.push({ name: "stock" });
+          })
         } else {
           var stocks = [];
           this.object.deposito.forEach((ele) => {
