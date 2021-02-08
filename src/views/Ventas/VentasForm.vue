@@ -58,11 +58,11 @@
           </div>
 
           <!-- TEST CERT -->
-          <v-btn
+          <!-- <v-btn
             class="ml-1"
             color="primary"
             @click="testcert()"
-          >TEST CERTIFICADO</v-btn>
+          >TEST CERTIFICADO</v-btn> -->
           <!-- TEST CERT -->
 
         </v-col>
