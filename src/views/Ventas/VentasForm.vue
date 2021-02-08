@@ -325,11 +325,11 @@ export default {
   },
 
   created() {
-    // this.$barcodeScanner.init(this.onBarcodeScanned);
+    this.$barcodeScanner.init((barcode) => this.onBarcodeScanned(barcode));
   },
 
   destroyed () {
-      this.$barcodeScanner.destroy()
+    this.$barcodeScanner.destroy();
   },
 
   computed: {
@@ -425,22 +425,23 @@ export default {
         .filter({stringParam: barcode, page: 0, size: 1})
         .then((data) => {
           let databaseItem = data.data.content[0];
-          if (this.products.length == 0) {
-            databaseItem.cantUnidades = 1;
-            databaseItem.total = databaseItem.precioTotal;
-            this.products.push(this.processProductsObject(databaseItem));
-          } else {
-            if(this.products.filter(el => el.id === databaseItem.id).length > 0){
-              this.products.filter(el => el.id === databaseItem.id)[0].cantUnidades++;
-              this.products.filter(el => el.id === databaseItem.id)[0].precioTotal = 
-              this.products.filter(el => el.id === databaseItem.id)[0].precioUnitario *
-              this.products.filter(el => el.id === databaseItem.id)[0].cantUnidades;
-            }else{
+          console.log(databaseItem);
+            if (this.products.length == 0) {
               databaseItem.cantUnidades = 1;
               databaseItem.total = databaseItem.precioTotal;
               this.products.push(this.processProductsObject(databaseItem));
+            } else {
+              if(this.products.filter(el => el.id === databaseItem.id).length > 0){
+                this.products.filter(el => el.id === databaseItem.id)[0].cantUnidades++;
+                this.products.filter(el => el.id === databaseItem.id)[0].precioTotal = 
+                this.products.filter(el => el.id === databaseItem.id)[0].precioUnitario *
+                this.products.filter(el => el.id === databaseItem.id)[0].cantUnidades;
+              }else{
+                databaseItem.cantUnidades = 1;
+                databaseItem.total = databaseItem.precioTotal;
+                this.products.push(this.processProductsObject(databaseItem));
+              }
             }
-          }
         })
         .catch(() => {
           errorAlert("No existe un producto con ese código de barras");
@@ -529,12 +530,24 @@ export default {
 
     addProduct(data) {
       data = [...new Set(data)];
-      let processObjects = [];
+      let processPorducts = [];
       data.forEach((el) => { 
-        processObjects.push(this.processProductsObject(el));
+        processPorducts.push(this.processProductsObject(el));
       });
-
-      this.products = processObjects;
+      
+      if(this.products.length > 0){
+        let productsAddedInTheSale = this.products;
+        productsAddedInTheSale.forEach(el => {
+          processPorducts.forEach(e => {
+            if(el.id !== e.id){
+              productsAddedInTheSale.push(e);
+            }
+          });
+        });
+        this.products = [...new Set(productsAddedInTheSale)]
+      }else{
+        this.products = processPorducts;
+      }
     },
 
     applyToLine(percent) {

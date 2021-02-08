@@ -10,13 +10,9 @@ import store from  './store/index';
 
 Vue.config.productionTip = false
 
-let options = {
-  controlSequenceKeys: ['NumLock', 'Clear']
-}
-
 Vue.use(Vuex);
 Vue.use(colors);
-Vue.use(VueBarcodeScanner, options);
+Vue.use(VueBarcodeScanner);
 new Vue({
   store,
   router,

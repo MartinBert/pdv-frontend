@@ -29,7 +29,7 @@
                 class="text-left ml-5 mr-5 mt-5"
                 label="Escriba el nombre, código de artículo o código de barras del artículo que desea buscar"
                 placeholder=" "
-                @keypress.enter="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
+                @keypress.space="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
               ></v-text-field>
             </v-col>
             <v-col cols="2">

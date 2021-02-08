@@ -214,7 +214,6 @@ export default {
   methods: {
     filterObjects(stringParam, page, size) {
       let doubleParam;
-      console.log(this.estadoSeleccionado.id);
       if(this.estadoSeleccionado.id === 1){
         doubleParam = 0
       }else{
@@ -488,10 +487,6 @@ export default {
           window.open(fileURL, "_blank");
         });
     },
-
-    evalPropertie(propertie, atribute){
-      console.log(propertie, atribute);
-    }
   },
 };
 </script>
