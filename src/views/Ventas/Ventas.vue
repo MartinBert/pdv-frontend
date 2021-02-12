@@ -48,6 +48,25 @@
           ></v-text-field>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col></v-col>
+        <v-col cols="3">
+          <v-text-field
+            type="number"
+            v-model="specialFilter"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            label="Búsqueda especial"
+            placeholder=" "
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="1">
+          <v-btn class="primary" @click="alterIdParam()">APLICAR</v-btn>
+        </v-col>
+      </v-row>
     </v-form>
 
     <v-row>
@@ -190,6 +209,7 @@ export default {
     objects: null,
     filterParams: {
       idPerfil: "",
+      idParam: "",
       idSucursal: "",
       stringParam: "",
       doubleParam: "",
@@ -204,6 +224,7 @@ export default {
     token: localStorage.getItem("token"),
     dialogMode: "",
     dialog: false,
+    specialFilter: ''
   }),
 
   components:{
@@ -235,11 +256,11 @@ export default {
       switch (param) {
         case undefined:
             if(this.filterParams.doubleParam !== ""){
-              filterParam = {idSucursal, doubleParam: this.filterParams.doubleParam, page, size};
+              filterParam = { idParam:this.filterParams.idParam, idSucursal, doubleParam: this.filterParams.doubleParam, page, size};
             }else if(this.filterParams.stringParamReceiptNumber !== ""){
-              filterParam = {idSucursal, stringParam: this.filterParams.stringParamReceiptNumber, page, size}
+              filterParam = { idParam:this.filterParams.idParam, idSucursal, stringParam: this.filterParams.stringParamReceiptNumber, page, size}
             }else{
-              filterParam = {idSucursal, stringParam: param, page, size}
+              filterParam = { idParam:this.filterParams.idParam, idSucursal, stringParam: param, page, size}
             }
           break;
         
@@ -251,15 +272,15 @@ export default {
               if(param === "//"){
                 param = "";
               }
-              filterParam = {idSucursal, stringParam: param, page, size};
+              filterParam = { idParam:this.filterParams.idParam, idSucursal, stringParam: param, page, size};
             }else if(param === this.filterParams.doubleParam){
               this.filterParams.stringParam = "";
               this.filterParams.stringParamReceiptNumber = "";
-              filterParam = {idSucursal, doubleParam: param, page, size};
+              filterParam = { idParam:this.filterParams.idParam, idSucursal, doubleParam: param, page, size};
             }else{
               this.filterParams.stringParam = "",
               this.filterParams.doubleParam = "",
-              filterParam = {idSucursal, stringParam: param, page, size}
+              filterParam = { idParam:this.filterParams.idParam, idSucursal, stringParam: param, page, size}
             }
           break;
       }
@@ -317,8 +338,12 @@ export default {
 
     seeReports(){
       this.$store.commit('eventual/mutateEventualDialog');
-    }
+    },
 
+    alterIdParam(){
+      this.filterParams.idParam = this.specialFilter; 
+      this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    }
   },
 };
 </script>

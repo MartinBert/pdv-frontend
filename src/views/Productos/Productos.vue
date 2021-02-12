@@ -4,9 +4,10 @@
       <v-row>
         <v-col cols="4" v-if="perfil < 3">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          <v-btn class="primary ml-3" @click="getReport()" raised
+          <v-btn class="primary ml-1" @click="getReport()" raised
             >Reportes</v-btn
           >
+          <v-btn class="primary ml-1" @click="goPricesManagerView()">MODIFICAR PRECIOS</v-btn>
         </v-col>
         <v-col cols="3" v-if="perfil < 3">
           <v-file-input
@@ -487,6 +488,10 @@ export default {
           window.open(fileURL, "_blank");
         });
     },
+
+    goPricesManagerView(){
+      this.$router.push({ name: "precios" });
+    }
   },
 };
 </script>

@@ -38,6 +38,7 @@
 
     <v-app-bar app color="primary" dark clipped-left fixed>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      
       <v-spacer></v-spacer>
 
       <v-menu offset-y>
@@ -282,6 +283,12 @@ export default {
             visible: false
           },
           {
+            path: "/seleccionSucursales",
+            name: "seleccionSucursales",
+            title: "Sucursal de operación",
+            visible: false
+          },
+          {
             path: "/puntos_venta",
             name: "puntosVenta",
             title: "Puntos de venta",
@@ -380,7 +387,7 @@ export default {
         .catch(() => {
           this.logout();
         });
-    }
+    },
   }
 };
 </script>

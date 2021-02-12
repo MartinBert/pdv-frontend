@@ -29,6 +29,7 @@
             <th>ID</th>
             <th>Nombre</th>
             <th>ID Fiscal</th>
+            <th>Sucursal</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -37,6 +38,7 @@
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
             <td>{{object.idFiscal}}</td>
+            <td>{{check(object)}}</td>
             <td>
               <a title="Editar"><img src="/../../images/icons/ico_10.svg" @click="edit(object.id)" width="40" height="40"/></a>
               <a title="Eliminar"><img src="/../../images/icons/ico_11.svg" @click="openDelete(object.id)" width="40" height="40"/></a>
@@ -103,7 +105,9 @@ export default {
     tenant: "",
     service: "punto_ventas",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false
+    dialogDeleteObject: false,
+    sucursales: [],
+    sucursalName: '',
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -159,6 +163,10 @@ export default {
           this.getAll(this.filterParams.page - 1, this.filterParams.size);
         });
     },
+
+    check(object){
+      console.log(object);
+    }
   }
 };
 </script>

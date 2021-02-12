@@ -42,6 +42,12 @@ export default (tenant,service,token) =>{
             return axios.put(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`, object, {
                 headers: { Authorization: "Bearer " + token }
             })
+        },
+
+        getSucursalOfSalePoint(sucursalId){
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getSucursalOfSalePoint/${sucursalId}`, {
+                headers: { Authorization: "Bearer " + token }
+            })
         }
     }
 }

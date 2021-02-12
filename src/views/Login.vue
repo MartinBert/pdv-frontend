@@ -88,14 +88,12 @@ export default {
                   "puntoVenta": data.data.puntoVenta,
                   "empresa": data.data.empresa
                 }
-                localStorage.setItem("userData", JSON.stringify(userData));
-                this.clearConsole();            
+                localStorage.setItem("userData", JSON.stringify(userData));            
               }else{
                 const userData = {
                   "perfil": data.data.perfil.id,
                 }
                 localStorage.setItem("userData", JSON.stringify(userData));
-                this.clearConsole();
               }
             })
           })
@@ -104,12 +102,6 @@ export default {
           });
       }
     },
-
-    clearConsole(){
-      if(window.console || window.firebug){
-        console.clear();
-      }
-    }
   },
 }
 </script>

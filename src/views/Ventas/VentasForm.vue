@@ -2,44 +2,6 @@
   <v-container>
     <!-- Body -->
     <v-col cols="12">
-      <form @submit.prevent="applyChangesInLoguedUserData()" v-if="loguedUser.perfil === 2">
-        <v-row>
-          <v-col cols="2" class="mt-2">
-            <span >
-              Sucursal de facturación:
-            </span>
-          </v-col>
-          <v-col cols="2">
-            <v-autocomplete
-            filled
-            dense
-              v-model="loguedUser.sucursal"
-              :items="loguedUser.empresa.sucursales"
-              :return-object="true"
-              item-text="razonSocial"
-            />
-          </v-col>
-          <v-col cols="1" class="mt-2 text-end">
-            <span>
-              Punto Vta:
-            </span>
-          </v-col>
-          <v-col cols="2">
-            <v-autocomplete
-            filled
-            dense
-              v-model="loguedUser.puntoVenta"
-              :items="loguedUser.sucursal.puntosVenta"
-              :return-object="true"
-              item-text="nombre"
-            />
-          </v-col>
-          <v-col>
-            <v-btn type="submit" class="success">Aplicar cambios</v-btn>
-          </v-col>
-        </v-row>
-      </form>
-      
       <v-row>
         <v-col cols="6">
           <div class="d-flex text-left">
@@ -531,20 +493,18 @@ export default {
     addProduct(data) {
       data = [...new Set(data)];
       let processPorducts = [];
+
       data.forEach((el) => { 
         processPorducts.push(this.processProductsObject(el));
       });
       
       if(this.products.length > 0){
-        let productsAddedInTheSale = this.products;
-        productsAddedInTheSale.forEach(el => {
-          processPorducts.forEach(e => {
-            if(el.id !== e.id){
-              productsAddedInTheSale.push(e);
-            }
-          });
+        this.products.forEach(el => {
+          processPorducts = processPorducts.filter(e => e.id !== el.id);
         });
-        this.products = [...new Set(productsAddedInTheSale)]
+        processPorducts.forEach(el => {
+          this.products.push(el);
+        });
       }else{
         this.products = processPorducts;
       }
@@ -937,11 +897,6 @@ export default {
         console.log(err);
       })
     },
-
-    applyChangesInLoguedUserData(){
-      localStorage.setItem("userData", JSON.stringify(this.loguedUser));
-      successAlert("Cambios aplicados");
-    }
     
   },
 };

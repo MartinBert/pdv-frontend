@@ -16,6 +16,7 @@ import MarcasForm from '../views/Marcas/MarcasForm.vue';
 import Rubros from '../views/Rubros/Rubros.vue';
 import RubrosForm from '../views/Rubros/RubrosForm.vue';
 import Productos from '../views/Productos/Productos.vue';
+import Precios from '../views/Precios/Precios.vue';
 import ProductosForm from '../views/Productos/ProductosForm.vue';
 import Ventas from '../views/Ventas/Ventas.vue';
 import VentasForm from '../views/Ventas/VentasForm.vue';
@@ -57,6 +58,7 @@ import Ivas from "../views/Ivas/Ivas.vue";
 import IvasForm from "../views/Ivas/IvasForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
 import Mensajes from "../views/Mensajes/Mensajes.vue";
+import SeleccionSucursales from "../views/Sucursales/SeleccionSucursales.vue";
 
 Vue.use(VueRouter)
 
@@ -235,6 +237,12 @@ const routes = [
                 meta: { requiresAuth: true }
             },
             {
+                path: 'precios',
+                name: 'precios',
+                component: Precios,
+                meta: { requiresAuth: true }
+            },
+            {
                 path: 'ventas/list',
                 name: 'ventas',
                 component: Ventas,
@@ -334,6 +342,12 @@ const routes = [
                 path: 'sucursales',
                 name: 'sucursales',
                 component: Sucursales,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'seleccionSucursales',
+                name: 'seleccionSucursales',
+                component: SeleccionSucursales,
                 meta: { requiresAuth: true }
             },
             {

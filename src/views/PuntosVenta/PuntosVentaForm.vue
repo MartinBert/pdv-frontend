@@ -26,10 +26,11 @@
               :items="sucursales"
               item-text="nombre"
               item-value="id"
-              v-model="object.sucursal"
+              v-model="sucursal"
               :return-object="true"
               label="Sucursales donde funciona"
               required
+              multiple
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-select>
           </v-col>
@@ -60,6 +61,7 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     sucursales: [],
     object: {},
+    sucursal: [],
     loaded: false,
     tenant: "",
     service: "punto_ventas",
@@ -84,6 +86,8 @@ export default {
         .get(id)
         .then(data => {
           this.object = data.data;
+          this.sucursal = [this.object.sucursales]
+          console.log(this.sucursal)
           this.loaded = true;
         });
     },
@@ -112,17 +116,19 @@ export default {
 
     save() {
       this.$refs.form.validate();
-      GenericService(this.tenant, this.service, this.token)
+      this.sucursal.forEach(el => {
+        this.object.sucursal = el;
+        GenericService(this.tenant, this.service, this.token)
         .save(this.object)
-        .then(() => {
-          this.$router.push({ name: "puntosVenta" });
-        })
         .catch(error => {
           if (error.response.status == 500) {
             this.snackError = true;
             this.errorMessage = "Ocurrio un error";
           }
         });
+      })
+
+      this.$router.push({ name: "puntosVenta" });
     },
 
     back() {
