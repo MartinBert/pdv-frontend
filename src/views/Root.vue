@@ -428,8 +428,10 @@ export default {
 
     changeUserData(){
       localStorage.setItem("userData", JSON.stringify(this.loguedUser));
-      successAlert("Cambios aplicados");
-      console.log(JSON.parse(localStorage.getItem("userData")))
+      successAlert("Cambios aplicados")
+      .then(()=>{
+        location.reload();
+      })
     }    
   }
 };
