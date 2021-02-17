@@ -38,9 +38,31 @@
 
     <v-app-bar app color="primary" dark clipped-left fixed>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      
-      <v-spacer></v-spacer>
 
+      <v-spacer />
+        <form @submit.prevent="changeUserData()" v-if="logued" class="d-flex mt-5">
+          <v-autocomplete
+            :items="sucursales"
+            v-model="loguedUser.sucursal"
+            item-text="razonSocial"
+            :return-object="true"
+            @change="getSalesPoint(loguedUser.sucursal)"
+          />
+
+          <v-autocomplete
+            :items="salesPoint"
+            v-model="loguedUser.puntoVenta"
+            item-text="nombre"
+            :return-object="true"
+            class="ml-2"
+          />
+
+          <v-btn
+            type="submit"
+            class="success ml-2"
+          >APLICAR</v-btn>
+        </form>
+      <v-spacer />
       <v-menu offset-y>
         <template v-slot:activator="{ on }">
           <a><img src="/../../images/icons/perfil.svg" v-on="on" height="50" width="50" style="border-radius: 50% 50% 50% 50%; border: solid 2px #E7ECED;"></a>
@@ -71,15 +93,19 @@
 
 <script>
 import axios from "axios";
+import { successAlert } from '../helpers/alerts';
 export default {
   props: {
     source: String
   },
   data: () => ({
     user: null,
+    logued: false,
     tenant: "",
     drawer: null,
     token: localStorage.getItem("token"),
+    loguedUser: {},
+    salesPoint: [],
     nameRouter: "",
     modulos: [
       {
@@ -361,6 +387,13 @@ export default {
         )
         .then(response => {
           this.user = response.data;
+          if(this.user.perfil.id == 2){
+            setTimeout(()=>{
+              this.loguedUser = JSON.parse(localStorage.getItem("userData"));
+              this.sucursales = this.loguedUser.empresa.sucursales;
+              this.logued = true;
+            }, 1500)
+          }
           this.modulos.forEach(m => {
             this.user.perfil.modulos.forEach(modulo => {
               if(m.name == modulo.nombre){
@@ -388,6 +421,16 @@ export default {
           this.logout();
         });
     },
+
+    getSalesPoint(){
+      this.salesPoint = this.loguedUser.sucursal.puntosVenta;
+    },
+
+    changeUserData(){
+      localStorage.setItem("userData", JSON.stringify(this.loguedUser));
+      successAlert("Cambios aplicados");
+      console.log(JSON.parse(localStorage.getItem("userData")))
+    }    
   }
 };
 </script>
