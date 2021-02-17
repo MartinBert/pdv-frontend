@@ -54,10 +54,10 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Producto</th>
+            <th>Atributos</th>
             <th>Cantidad</th>
-            <th>Cantidad mínima</th>
+            <th>Cant. mínima</th>
             <th>Depósito</th>
             <th>Acciones</th>
             <th class="text-center">Migrar a otro depósito</th>
@@ -65,8 +65,8 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{ object.id }}</td>
             <td>{{ object.producto.nombre }}</td>
+            <td>{{ setAtributesValues(object.producto.atributos) }}</td>
             <td>{{ object.cantidad }}</td>
             <td>
               <span v-if="!object.cantidadMinima"
@@ -437,8 +437,10 @@ export default {
 
           affectedProducts.forEach((el) => {
             el.deposito = newDepositForProducts;
-            GenericService(this.tenant, this.service, this.token).save(el);
+            el.algorim = el.producto.nombre + el.deposito.id;
+            GenericService(this.tenant, this.service, this.token).update(el);
           });
+          
 
           this.saveHistorial(affectedProducts, "Movimiento masivo de stock entre depósitos");
 
@@ -464,8 +466,9 @@ export default {
         this.loaded = false;
         this.migration.forEach(el => {
           el.deposito = this.destinationDepositForMigrations;
+          el.algorim = el.producto.nombre + el.deposito.id;
           GenericService(this.tenant, this.service, this.token)
-          .save(el);
+          .update(el);
         })
         
         this.saveHistorial(this.migration, "Migración de productos");
@@ -512,7 +515,18 @@ export default {
           break;
         }
       }
+    },
 
+    setAtributesValues(atributes){
+      let str = atributes.reduce((acc, element) => {
+        if(element.valor){
+          return acc + element.valor + ",";
+        }else{
+          return acc + element.valorNumerico.toString() + ",";
+        }
+      }, "");
+
+      return str;
     }
   },
 };

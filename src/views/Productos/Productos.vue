@@ -50,11 +50,9 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Código de barras</th>
-            <th>Código de producto</th>
-            <th>Marca</th>
+            <th>Atributos</th>
             <th>Precio de costo</th>
             <th>Precio de venta</th>
             <th v-if="perfil < 3">Acciones</th>
@@ -62,12 +60,10 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{ object.id }}</td>
             <td>{{ object.nombre }}</td>
             <td>{{ object.codigoBarra }}</td>
-            <td>{{ object.codigoProducto }}</td>
-            <td>{{ object.marca ? object.marca.nombre : "Sin marca" }}</td>
-            <td>${{ object.precioCosto }}</td>
+            <td>{{ setAtributesValues(object.atributos) }}</td>
+            <td>${{ object.costoBruto }}</td>
             <td>${{ object.precioTotal }}</td>
             <td v-if="perfil < 3">
               <a title="Editar"
@@ -491,6 +487,18 @@ export default {
 
     goPricesManagerView(){
       this.$router.push({ name: "precios" });
+    },
+
+    setAtributesValues(atributes){
+      let str = atributes.reduce((acc, element) => {
+        if(element.valor){
+          return acc + element.valor + ",";
+        }else{
+          return acc + element.valorNumerico.toString() + ",";
+        }
+      }, "");
+
+      return str;
     }
   },
 };
