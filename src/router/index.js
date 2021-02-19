@@ -58,7 +58,6 @@ import Ivas from "../views/Ivas/Ivas.vue";
 import IvasForm from "../views/Ivas/IvasForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
 import Mensajes from "../views/Mensajes/Mensajes.vue";
-import SeleccionSucursales from "../views/Sucursales/SeleccionSucursales.vue";
 
 Vue.use(VueRouter)
 
@@ -342,12 +341,6 @@ const routes = [
                 path: 'sucursales',
                 name: 'sucursales',
                 component: Sucursales,
-                meta: { requiresAuth: true }
-            },
-            {
-                path: 'seleccionSucursales',
-                name: 'seleccionSucursales',
-                component: SeleccionSucursales,
                 meta: { requiresAuth: true }
             },
             {

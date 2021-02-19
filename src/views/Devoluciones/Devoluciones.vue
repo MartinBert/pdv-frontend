@@ -5,16 +5,27 @@
         <v-col cols="6">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterParams.stringParam"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.longParam, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
             dense
             outlined
             rounded
             class="text-left"
             placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.longParam"
+            v-on:input="filterObjects(loguedUser.perfil, filterParams.longParam, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda especial"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
@@ -90,7 +101,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      @input="filterObjects(loguedUser.perfil, filterParams.longParam, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -172,21 +183,26 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    this.filterObjects(this.loguedUser.perfil, this.filterParams.longParam, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
   },
 
   methods: {
-    filterObjects(idPerfil, stringParam, page, size){
+    filterObjects(idPerfil, longParam, stringParam, page, size){
       this.loaded = false
       let idSucursal;
-      if(this.loguedUser.perfil < 3){
-        idSucursal = ""
-      }else{
-        idSucursal = this.loguedUser.sucursal.id;
+      
+      switch (idPerfil) {
+        case 1:
+            idSucursal = '';
+          break;
+      
+        default:
+            idSucursal = this.loguedUser.sucursal.id;
+          break;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({idPerfil, idSucursal, stringParam, page, size})
+        .filter({idPerfil, idSucursal, longParam, stringParam, page, size})
         .then(data => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;

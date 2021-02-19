@@ -83,11 +83,11 @@
       </v-menu>
     </v-app-bar>
 
-    <v-content>
-      <v-container class="d-flex justify-center root-container" fluid>
+    <v-main>
+      <v-container fluid class="root-container">
         <router-view></router-view>
       </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
@@ -306,12 +306,6 @@ export default {
             path: "/sucursales",
             name: "sucursales",
             title: "Sucursales",
-            visible: false
-          },
-          {
-            path: "/seleccionSucursales",
-            name: "seleccionSucursales",
-            title: "Sucursal de operación",
             visible: false
           },
           {

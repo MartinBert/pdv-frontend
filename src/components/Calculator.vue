@@ -1,117 +1,119 @@
 <template>
-  <v-row>
-    <v-col class="calculadora">
-      <v-row>
-        <v-col class="syntax ml-3 mr-3">
-          <input class="historicSyntax" v-model="historicSyntax" type="text">
-          <input class="currentSyntax" v-model="currentSyntax" type="text">
-          <input class="result" v-model="result" type="text">
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col class="sr">
-          <div class="clear" @click="clear()">C</div>
-        </v-col>
-        <v-col class="sr">
-          <div class="clear" @click="currentSyntaxClear()">CE</div>
-        </v-col>
-        <v-col class="sr">
-          <div class="clear" @click="partialClear()">«</div>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(1)">1</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(4)">4</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(7)">7</div>
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(2)">2</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(5)">5</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(8)">8</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(0)">0</div>
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(3)">3</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(6)">6</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="button" @click="addExpression(9)">9</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="black" @click="addExpression('.')">.</div>
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col>
-          <v-row>
-            <v-col class="sr">
-              <div class="black" @click="addExpression('+')">+</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="black" @click="addExpression('-')">-</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="black" @click="addExpression('/')">/</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="sr">
-              <div class="black" @click="addExpression('*')">x</div>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col class="sr">
-          <div class="black" @click="addExpression('=')">=</div>
-        </v-col>
-      </v-row>
-    </v-col>
-  </v-row>
-</template>
+<v-container>
+    <v-row>
+      <v-col class="calculadora">
+        <v-row>
+          <v-col class="syntax ml-3 mr-3 mt-3">
+            <input class="historicSyntax" v-model="historicSyntax" type="text">
+            <input class="currentSyntax" v-model="currentSyntax" type="text">
+            <input class="result" v-model="result" type="text">
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="sr">
+            <div class="clear" @click="clear()">C</div>
+          </v-col>
+          <v-col class="sr">
+            <div class="clear" @click="currentSyntaxClear()">CE</div>
+          </v-col>
+          <v-col class="sr">
+            <div class="clear" @click="partialClear()">«</div>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(1)">1</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(4)">4</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(7)">7</div>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(2)">2</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(5)">5</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(8)">8</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(0)">0</div>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(3)">3</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(6)">6</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="button" @click="addExpression(9)">9</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="black" @click="addExpression('.')">.</div>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col>
+            <v-row>
+              <v-col class="sr">
+                <div class="black" @click="addExpression('+')">+</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="black" @click="addExpression('-')">-</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="black" @click="addExpression('/')">/</div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="sr">
+                <div class="black" @click="addExpression('*')">x</div>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="sr">
+            <div class="black" @click="addExpression('=')">=</div>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+    </v-container>
+  </template>
 <script>
 export default {
   name: "Calculator",

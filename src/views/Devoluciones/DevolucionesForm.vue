@@ -464,8 +464,6 @@ export default {
         if (mediosPago !== undefined) {
           if (productosEntrantes.length > 0) {
 
-            console.log(voucher);
-
             /*** Send voucher to AFIP ***/
               axios
               .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, voucher)
