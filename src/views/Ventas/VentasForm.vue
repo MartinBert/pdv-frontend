@@ -429,7 +429,6 @@ export default {
         .filter({ stringParam: barcode, page: 0, size: 1 })
         .then((data) => {
           let databaseItem = data.data.content[0];
-          console.log(databaseItem);
           if (this.products.length == 0) {
             databaseItem.cantUnidades = 1;
             databaseItem.total = databaseItem.precioTotal;
@@ -906,9 +905,9 @@ export default {
     },
 
     testcert() {
-      const cuitSucursal = this.loguedUser.sucursal.cuit;
-      const ptoVenta = this.loguedUser.puntoVenta.idFiscal;
-      const compType = 11;
+      const cuitSucursal = 30715876775;
+      const ptoVenta = 2;
+      const compType = 1;
 
       axios
         .get(

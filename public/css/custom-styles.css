@@ -43,7 +43,8 @@
 .root-container {
     background-image: url('/images/root/root-background.png');
     opacity: 90%;
-    font-family: CocogoseSemiLightCoursive;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
     height: 100%;
     width: 100%;
     animation: movimiento 20s infinite linear alternate;

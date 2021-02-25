@@ -51,7 +51,7 @@
                         <th>Producto</th>
                         <th>Código de barras</th>
                         <th>Código de producto</th>
-                        <th v-if="typeList !== 1">Cantidad en stock</th>
+                        <th v-if="typeList !== 0">Cantidad en stock</th>
                       </tr>
                     </thead>
                     <tbody v-for="producto in productos" :key="producto.id">
@@ -65,7 +65,7 @@
                         <td>{{ producto.nombre }}</td>
                         <td>{{ producto.codigoBarra }}</td>
                         <td>{{ producto.codigoProducto }}</td>
-                        <td v-if="typeList !== 1">{{producto.cantidad}}</td>
+                        <td v-if="typeList !== 0">{{producto.cantidad}}</td>
                       </tr>
                     </tbody>
                   </template>

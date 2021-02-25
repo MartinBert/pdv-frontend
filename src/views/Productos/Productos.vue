@@ -2,17 +2,23 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="4" v-if="perfil < 3">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        <v-col cols="12" v-if="perfil < 3">
+          <v-btn class="primary" @click="newObject()" raised>Lista</v-btn>
+          <v-btn class="primary ml-1" @click="newObject()" raised>Nuevo</v-btn>
           <v-btn class="primary ml-1" @click="getReport()" raised
             >Reportes</v-btn
           >
+          <v-btn class="primary ml-1">Generar Etiqueta</v-btn>
           <v-btn class="primary ml-1" @click="goPricesManagerView()">MODIFICAR PRECIOS</v-btn>
         </v-col>
+      </v-row>
+      <v-row>
+        <v-col></v-col>
         <v-col cols="3" v-if="perfil < 3">
           <v-file-input
+            class="mt-3"
+            dense
             v-model="file"
-            class="mt-0"
             placeholder="Importar productos"
             accept=".xlsx, xls"
             @change="onChange($event)"
@@ -29,8 +35,19 @@
             @input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
           ></v-select>
         </v-col>
-        <v-spacer></v-spacer>
-        <v-col cols="3">
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.stringParam"
+            v-on:input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.stringParam"
             v-on:input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
@@ -160,7 +177,7 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
-import { successAlert, questionAlert } from "../../helpers/alerts";
+import { successAlert, questionAlert, infoAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
 
 export default {
@@ -198,7 +215,8 @@ export default {
     service: "productos",
     token: localStorage.getItem("token"),
     dialogStock: false,
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    checkImportStatus: 0
   }),
 
   mounted() {
@@ -221,6 +239,9 @@ export default {
       .filter({ doubleParam, stringParam, page, size })
       .then((data) => {
         this.objects = data.data.content;
+        this.objects.forEach(el => {
+          el.precioTotal = el.precioTotal * 2;
+        })
         this.filterParams.totalPages = data.data.totalPages;
         this.loaded = true;
       });
@@ -333,7 +354,12 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(() => {
-              successAlert('Importación exitosa');
+              successAlert('Importación exitosa')
+              .then(() => {
+                if(this.checkImportStatus > 0){
+                  infoAlert("Se agregaron nuevos atributos al sistema. Realice nuevamente la importación para asignarlos correctamente");
+                }
+              })
               this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
               this.loaderStatus = true;
               this.loaded = true;
@@ -437,19 +463,27 @@ export default {
     },
 
     getAtributos(element){
-      const atributes = Object.entries(element).filter(el => el[0].substring(0,8) === 'atributo');
-      const atributesName = atributes.map(el => {return el[1];});
-      let atributesArray = [];
-      atributesName.forEach(el => {
-        this.atributos.forEach(e => {
-          if(el == e.valor || el == e.valorNumerico){
-            atributesArray.push(e);
+      const attributes = Object.entries(element).filter(el => el[0].substring(0,8) === 'atributo');
+      const attributesNames = attributes.map(el => {return el[1];});
+      let listOfAttributes = [];
+      attributesNames.forEach(attributeName => {
+        this.atributos.forEach(attribute => {
+          if(attributeName && attributeName == attribute.valor){
+            listOfAttributes.push(attribute);
+          }
+          if(attributeName && attributeName == attribute.valorNumerico){
+            listOfAttributes.push(attribute);
           }
         })
       })
 
-      return atributesArray;
-        
+      listOfAttributes = [...new Set(listOfAttributes)];
+
+      if(listOfAttributes.length === 0){
+        this.createNewAtributes(attributesNames);
+      }
+
+      return listOfAttributes;
     },
 
     getIva(id){
@@ -499,7 +533,30 @@ export default {
       }, "");
 
       return str;
+    },
+
+    createNewAtributes(atributeNames){
+      atributeNames.forEach(el => {
+        let obj = {
+          valor: null,
+          valorNumerico: null
+        }
+        if(el && typeof(el) === 'string'){
+          obj.valor = el;
+        }else{
+          if(el){
+            obj.valorNumerico = el;
+          }
+        }
+        GenericService(this.tenant, "atributos", this.token)
+        .save(obj)
+        .then(data => {
+          this.atributos.push(data.data);
+        })
+      })
+      this.checkImportStatus += 1;
     }
   },
 };
 </script>
+
