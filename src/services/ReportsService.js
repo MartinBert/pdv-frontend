@@ -10,6 +10,13 @@ export default (tenant,service,token) =>{
                 dataType: 'blob'
             })
         },
+        labels(labelList){
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/labels`, labelList, {
+                headers: { Authorization: "Bearer " + token },
+                responseType: 'arraybuffer',
+                dataType: 'blob'
+            })
+        },
     /**** PRODUCTS REPORTS ****/
 
     /**** SALES REPORTS ****/

@@ -3,18 +3,18 @@
     <v-form class="mb-3">
       <v-row>
         <v-col cols="12" v-if="perfil < 3">
-          <v-btn class="primary" @click="newObject()" raised>Lista</v-btn>
-          <v-btn class="primary ml-1" @click="newObject()" raised>Nuevo</v-btn>
+          <v-btn class="primary ml-1" @click="view = 'listOfProducts'" raised>LISTA</v-btn>
+          <v-btn class="primary ml-1" @click="newObject()" raised>NUEVO</v-btn>
           <v-btn class="primary ml-1" @click="getReport()" raised
-            >Reportes</v-btn
+            >REPORTES</v-btn
           >
-          <v-btn class="primary ml-1">Generar Etiqueta</v-btn>
+          <v-btn class="primary ml-1" @click="view = 'labelPrinting'">GENERAR ETIQUETAS</v-btn>
           <v-btn class="primary ml-1" @click="goPricesManagerView()">MODIFICAR PRECIOS</v-btn>
         </v-col>
       </v-row>
       <v-row>
-        <v-col></v-col>
-        <v-col cols="3" v-if="perfil < 3">
+        <v-col v-if="view == 'listOfProducts'"></v-col>
+        <v-col cols="3" v-if="perfil < 3 && view == 'listOfProducts'">
           <v-file-input
             class="mt-3"
             dense
@@ -24,7 +24,7 @@
             @change="onChange($event)"
           ></v-file-input>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="2" v-if="view == 'listOfProducts'">
           <v-select
             :items="estados"
             v-model="estadoSeleccionado"
@@ -55,83 +55,87 @@
             outlined
             rounded
             class="text-left"
-            placeholder="Búsqueda"
+            placeholder="Atributos"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
       </v-row>
     </v-form>
+    <v-container v-if="loaded && view === 'listOfProducts'">
+      <v-simple-table style="background-color: transparent">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Código de barras</th>
+              <th>Atributos</th>
+              <th>Precio de costo</th>
+              <th>Precio de venta</th>
+              <th v-if="perfil < 3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody v-for="object in objects" :key="object.id">
+            <tr>
+              <td>{{ object.nombre }}</td>
+              <td>{{ object.codigoBarra }}</td>
+              <td>{{ setAtributesValues(object.atributos) }}</td>
+              <td>${{ object.costoBruto }}</td>
+              <td>${{ object.precioTotal }}</td>
+              <td v-if="perfil < 3">
+                <a title="Editar"
+                  ><img
+                    src="/../../images/icons/ico_10.svg"
+                    @click="edit(object.id)"
+                    width="40"
+                    height="40"
+                /></a>
+                <a title="Eliminar"
+                v-if="object.estado == 1"
+                  ><img
+                    src="/../../images/icons/ico_11.svg"
+                    @click="deleteObject(object)"
+                    width="40"
+                    height="40"
+                /></a>
+                <a title="Eliminar"
+                v-if="object.estado != 1"
+                  ><img
+                    src="/../../images/icons/add.svg"
+                    @click="reactivationOfProduct(object)"
+                    width="40"
+                    height="40"
+                /></a>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+      <v-pagination
+        v-model="filterParams.page"
+        :length="filterParams.totalPages"
+        next-icon="mdi-chevron-right"
+        prev-icon="mdi-chevron-left"
+        :page="filterParams.page"
+        :total-visible="8"
+        @input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+        v-if="filterParams.totalPages > 1 && loaded"
+      ></v-pagination>
+    </v-container>
+    
 
-    <!-- List -->
-    <v-simple-table style="background-color: transparent" v-if="loaded">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Código de barras</th>
-            <th>Atributos</th>
-            <th>Precio de costo</th>
-            <th>Precio de venta</th>
-            <th v-if="perfil < 3">Acciones</th>
-          </tr>
-        </thead>
-        <tbody v-for="object in objects" :key="object.id">
-          <tr>
-            <td>{{ object.nombre }}</td>
-            <td>{{ object.codigoBarra }}</td>
-            <td>{{ setAtributesValues(object.atributos) }}</td>
-            <td>${{ object.costoBruto }}</td>
-            <td>${{ object.precioTotal }}</td>
-            <td v-if="perfil < 3">
-              <a title="Editar"
-                ><img
-                  src="/../../images/icons/ico_10.svg"
-                  @click="edit(object.id)"
-                  width="40"
-                  height="40"
-              /></a>
-              <a title="Eliminar"
-              v-if="object.estado == 1"
-                ><img
-                  src="/../../images/icons/ico_11.svg"
-                  @click="deleteObject(object)"
-                  width="40"
-                  height="40"
-              /></a>
-              <a title="Eliminar"
-              v-if="object.estado != 1"
-                ><img
-                  src="/../../images/icons/add.svg"
-                  @click="reactivationOfProduct(object)"
-                  width="40"
-                  height="40"
-              /></a>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <!-- End List -->
+    <LabelPrinting 
+    v-if="view === 'labelPrinting'" 
+    :objects="objects" 
+    :page="filterParams.page" 
+    :totalVisible="filterParams.size" 
+    :totalPages="filterParams.totalPages"
+    :tenant="tenant"
+    :token="token"
+    v-on:changePage="changePage"
+    v-on:checkProduct="checkProductInList"
+    />
 
-    <!-- Loader -->
-    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
-      :page="filterParams.page"
-      :total-visible="8"
-      @input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
-      v-if="filterParams.totalPages > 1 && loaded"
-    ></v-pagination>
-    <!-- End filterParams -->
-
+    <Spinner v-if="!loaded"/>
     <!-- Dialog Loader -->
     <template>
       <v-dialog
@@ -176,6 +180,8 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
+import LabelPrinting from "../../components/LabelPrinting";
+import Spinner from "../../components/Spinner";
 import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
 import { successAlert, questionAlert, infoAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
@@ -183,6 +189,7 @@ import XLSX from "xlsx";
 export default {
   data: () => ({
     icon: "mdi-check-circle",
+    view: 'listOfProducts',
     perfil: '',
     loader: false,
     loaderStatus: false,
@@ -216,8 +223,13 @@ export default {
     token: localStorage.getItem("token"),
     dialogStock: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    checkImportStatus: 0
+    checkImportStatus: 0,
   }),
+
+  components: {
+    LabelPrinting,
+    Spinner
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -238,10 +250,14 @@ export default {
       GenericService(this.tenant, "productos", this.token)
       .filter({ doubleParam, stringParam, page, size })
       .then((data) => {
-        this.objects = data.data.content;
-        this.objects.forEach(el => {
-          el.precioTotal = el.precioTotal * 2;
+        data.data.content.forEach(el => {
+          this.$store.state.productos.products.forEach(e => {
+            if(el.codigoBarra == e.codigoBarra){
+              el.selected = true;
+            }
+          })
         })
+        this.objects = data.data.content;
         this.filterParams.totalPages = data.data.totalPages;
         this.loaded = true;
       });
@@ -555,6 +571,23 @@ export default {
         })
       })
       this.checkImportStatus += 1;
+    }, 
+
+    changePage(data){
+      this.filterParams.page = data;
+      this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    },
+
+    checkProductInList(data){
+      this.objects.forEach(product => {
+        if(product.id === data.id){
+          if(product.selected){
+            product.selected = false;
+          }else{
+            product.selected = true;
+          }
+        }
+      })
     }
   },
 };
