@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="900px">
+    <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="1200px">
       <v-card height="780px">
         <v-card-title>
           <v-row>
@@ -13,28 +13,36 @@
                 item-text="text"
                 item-value="id"
                 label="Lista en la que buscar productos"
-                @change="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
+                @change="filterObjects(filterParams, typeList)"
               />
             </v-col>
           </v-row>
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="10">
+            <v-col cols="5">
               <v-text-field
                 v-model="filterParams.stringParam"
                 dense
                 outlined
                 rounded
                 class="text-left ml-5 mr-5 mt-5"
-                label="Escriba el nombre, código de artículo o código de barras del artículo que desea buscar"
-                placeholder=" "
-                @keypress.space="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
+                label="Nombre, código de artículo, código de barras"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="5">
+              <v-text-field
+                v-model="filterParams.thirdStringParam"
+                dense
+                outlined
+                rounded
+                class="text-left ml-5 mr-5 mt-5"
+                label="Marca"
               ></v-text-field>
             </v-col>
             <v-col cols="2">
               <v-btn class="mt-5 primary"
-                @click="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
+                @click="filterObjects(filterParams, typeList)"
               >
                 BUSCAR
               </v-btn>
@@ -49,6 +57,8 @@
                       <tr>
                         <th>Elegir</th>
                         <th>Producto</th>
+                        <th>Marca</th>
+                        <th>Atributos</th>
                         <th>Código de barras</th>
                         <th>Código de producto</th>
                         <th v-if="typeList !== 0">Cantidad en stock</th>
@@ -63,6 +73,8 @@
                           ></v-checkbox>
                         </td>
                         <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.marca.nombre }}</td>
+                        <td>{{setAtributesValues(producto.atributos)}}</td>
                         <td>{{ producto.codigoBarra }}</td>
                         <td>{{ producto.codigoProducto }}</td>
                         <td v-if="typeList !== 0">{{producto.cantidad}}</td>
@@ -78,7 +90,7 @@
                   prev-icon="mdi-chevron-left"
                   :page="filterParams.page"
                   :total-visible="8"
-                  @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
+                  @input="filterObjects(filterParams, typeList)"
                   v-if="filterParams.totalPages > 1"
                 ></v-pagination>
               </v-col>
@@ -101,7 +113,7 @@ export default {
   name: "ProductDialog",
 
   props:{
-    refreshListStatus: Number
+    refreshListStatus: Number,
   },
 
   data(){
@@ -111,8 +123,11 @@ export default {
       typeProductsList: [],
       filterParams: {
         idPerfil: "",
+        idParam: "",
         idSucursal: "",
         stringParam: "",
+        thirdStringParam: "",
+        doubleParam: 0,
         page: 1,
         size: 10,
         totalPages: 0
@@ -124,7 +139,8 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.token = localStorage.getItem('token');
     this.loguedUser = JSON.parse(localStorage.getItem("userData"));
-    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size, this.typeList);
+    this.filterParams.idPerfil = this.loguedUser.perfil;
+    this.filterObjects(this.filterParams, this.typeList);
     this.createtypeProductsList();
   },
 
@@ -145,13 +161,13 @@ export default {
   },
 
   methods:{
-    filterObjects(idPerfil, stringParam, page, size, typeList) {
+    filterObjects(filterParams, typeList) {
       this.loaded = false;
       
       if(typeList === 0){
-        this.generalSearch(idPerfil, stringParam, page, size);
+        this.generalSearch(filterParams);
       }else{
-        this.searchForDeposit(idPerfil, stringParam, page, size, typeList);
+        this.searchForDeposit(filterParams, typeList);
       }
       
     },
@@ -179,9 +195,9 @@ export default {
       this.$refs.pTable.$forceUpdate();
     },
 
-    generalSearch(idPerfil, stringParam, page, size){
+    generalSearch(filterParams){
       GenericService(this.tenant, 'productos', this.token)
-        .filter({ idPerfil, stringParam, page, size })
+        .filter(filterParams)
         .then(data => {
           this.productos = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -192,22 +208,22 @@ export default {
         });
     },
 
-    searchForDeposit(idPerfil, stringParam, page, size, typeList){
-      const idParam = typeList;
-      let idSucursal;
+    searchForDeposit(filterParams, typeList){
+      filterParams.idParam = typeList;
+      filterParams.idSucursal;
       
-      switch (idPerfil) {
+      switch (filterParams.idPerfil) {
         case 1:
-            idSucursal = '';
+            filterParams.idSucursal = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            filterParams.idSucursal = this.loguedUser.sucursal.id;
           break;
       }
 
       StocksService(this.tenant, 'stock', this.token)
-      .filterStockForDepositId({idPerfil, idSucursal, stringParam, page, size, idParam})
+      .filterStockForDepositId(filterParams)
       .then(data => {
         this.productos = data.data.content.map(el => {
           el.producto.cantidad = el.cantidad;
@@ -258,6 +274,18 @@ export default {
       });
       this.$store.commit('productos/clearProductsState');
       this.$store.commit('productos/dialogProductosMutation');
+    },
+
+    setAtributesValues(atributes){
+      let str = atributes.reduce((acc, element) => {
+        if(element.valor){
+          return acc + element.valor + ",";
+        }else{
+          return acc + element.valorNumerico.toString() + ",";
+        }
+      }, "");
+
+      return str;
     }
   }
 }

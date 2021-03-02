@@ -2,7 +2,7 @@
   <v-container>
     <v-form>
       <v-row>
-        <v-col cols="8">
+        <v-col cols="6">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
           <v-btn class="primary ml-1" @click="openDialog('minimumStockRestriction')" raised
             >EXISTENCIAS MÍNIMAS</v-btn
@@ -19,7 +19,7 @@
             item-value="id"
             label="Depósito"
             v-model="typeList"
-            @change="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)"
+            @change="filterObjects(filterParams, typeList)"
           />
         </v-col>
         <v-col cols="2">
@@ -27,10 +27,7 @@
             v-model="filterParams.stringParam"
             v-on:input="
               filterObjects(
-                loguedUser.perfil, 
-                filterParams.stringParam,
-                filterParams.page - 1,
-                filterParams.size,
+                filterParams,
                 typeList
               )
             "
@@ -39,6 +36,23 @@
             rounded
             class="text-left mt-2"
             placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.thirdStringParam"
+            v-on:input="
+              filterObjects(
+                filterParams,
+                typeList
+              )
+            "
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            placeholder="Marca"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
@@ -56,6 +70,9 @@
           <tr>
             <th>Producto</th>
             <th>Atributos</th>
+            <th>Marca</th>
+            <th>Codigo de barras</th>
+            <th>Codigo de producto</th>
             <th>Cantidad</th>
             <th>Cant. mínima</th>
             <th>Depósito</th>
@@ -67,6 +84,9 @@
           <tr>
             <td>{{ object.producto.nombre }}</td>
             <td>{{ setAtributesValues(object.producto.atributos) }}</td>
+            <td>{{ object.producto.marca.nombre }}</td>
+            <td>{{ object.producto.codigoBarra }}</td>
+            <td>{{ object.producto.codigoProducto}}</td>
             <td>{{ object.cantidad }}</td>
             <td>
               <span v-if="!object.cantidadMinima"
@@ -82,15 +102,15 @@
                 ><img
                   src="/../../images/icons/ico_10.svg"
                   @click="edit(object.id)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
               /></a>
               <a title="Eliminar"
                 ><img
                   src="/../../images/icons/ico_11.svg"
                   @click="openDelete(object.id)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
               /></a>
             </td>
             <td class="text-center">
@@ -98,16 +118,16 @@
                 <img
                   src="/../../images/icons/add.svg"
                   @click="addToMigration(object)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
                 />
               </button>
               <button type="button" v-if="object.selected === true">
                 <img
                   src="/../../images/icons/success.svg"
                   @click="removeOfMigration(object)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
                 />
               </button>
             </td>
@@ -124,7 +144,7 @@
       :page="filterParams.page"
       :total-visible="8"
       @input="
-        filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size, typeList)
+        filterObjects(filterParams, typeList)
       "
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
@@ -207,6 +227,7 @@ export default {
       idPerfil: "",
       idSucursal: "",
       stringParam: "",
+      thirdStringParam: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -231,34 +252,30 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterParams.idPerfil = this.loguedUser.perfil;
     this.filterObjects(
-      this.loguedUser.perfil, 
-      this.filterParams.stringParam,
-      this.filterParams.page - 1,
-      this.filterParams.size,
+      this.filterParams,
       this.typeList
     );
     this.getOtherModels(this.loguedUser.perfil, "", 0, 100000);
   },
 
   methods: {
-    filterObjects(idPerfil, stringParam, page, size, typeList) {
-      let idSucursal;
-      
-      switch (idPerfil) {
+    filterObjects(filterParams, typeList) {
+      switch (filterParams.idPerfil) {
         case 1:
-            idSucursal = '';
+            filterParams.idSucursal = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            filterParams.idSucursal = this.loguedUser.sucursal.id;
           break;
       }
 
       if (typeList === 0) {
-        this.search(idPerfil, idSucursal, stringParam, page, size);
+        this.search(filterParams);
       } else {
-        this.searchForDeposit(idPerfil, idSucursal, stringParam, page, size, typeList);
+        this.searchForDeposit(filterParams, typeList);
       }
     },
 
@@ -287,9 +304,9 @@ export default {
         });
     },
 
-    search(idPerfil, idSucursal, stringParam, page, size) {
+    search(filterParams) {
       GenericService(this.tenant, this.service, this.token)
-        .filter({ idPerfil, idSucursal, stringParam, page, size })
+        .filter(filterParams)
         .then((data) => {
           this.objects = data.data.content;
           if(this.migration.length > 0){
@@ -309,12 +326,13 @@ export default {
         });
     },
 
-    searchForDeposit(idPerfil, idSucursal, stringParam, page, size, typeList) {
-      const idParam = typeList;
+    searchForDeposit(filterParams, typeList) {
+      filterParams.idParam = typeList;
 
       StocksService(this.tenant, "stock", this.token)
-        .filterStockForDepositId({ idPerfil, idSucursal, stringParam, page, size, idParam })
+        .filterStockForDepositId(filterParams)
         .then((data) => {
+          console.log(data);
           this.objects = data.data.content;
           if(this.migration.length > 0){
             this.migration.filter(el => {
@@ -353,10 +371,7 @@ export default {
         .delete(this.idObjet)
         .then(() => {
           this.filterObjects(
-            this.loguedUser.perfil, 
-            this.filterParams.stringParam,
-            this.filterParams.page - 1,
-            this.filterParams.size,
+            this.filterParams,
             this.typeList
           );
         });

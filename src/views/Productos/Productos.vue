@@ -13,7 +13,10 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col v-if="view == 'listOfProducts'"></v-col>
+        <v-spacer v-if="view == 'listOfProducts'"/>
+        <v-col cols="2" class="mt-2 ml-3" v-if="view == 'labelPrinting'">
+          <h2>Seleccion de productos</h2>
+        </v-col>
         <v-col cols="3" v-if="perfil < 3 && view == 'listOfProducts'">
           <v-file-input
             class="mt-3"
@@ -32,13 +35,13 @@
             :return-object="true"
             outlined
             dense
-            @input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            @input="filterObjects(filterParams)"
           ></v-select>
         </v-col>
         <v-col cols="2">
           <v-text-field
             v-model="filterParams.stringParam"
-            v-on:input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-on:input="filterObjects(filterParams)"
             dense
             outlined
             rounded
@@ -49,13 +52,13 @@
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-model="filterParams.thirdStringParam"
+            v-on:input="filterObjects(filterParams)"
             dense
             outlined
             rounded
             class="text-left"
-            placeholder="Atributos"
+            placeholder="Marcas"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
@@ -68,7 +71,9 @@
             <tr>
               <th>Nombre</th>
               <th>Código de barras</th>
+              <th>Código de producto</th>
               <th>Atributos</th>
+              <th>Marca</th>
               <th>Precio de costo</th>
               <th>Precio de venta</th>
               <th v-if="perfil < 3">Acciones</th>
@@ -78,7 +83,9 @@
             <tr>
               <td>{{ object.nombre }}</td>
               <td>{{ object.codigoBarra }}</td>
+              <td>{{ object.codigoProducto }}</td>
               <td>{{ setAtributesValues(object.atributos) }}</td>
+              <td>{{ object.marca.nombre }}</td>
               <td>${{ object.costoBruto }}</td>
               <td>${{ object.precioTotal }}</td>
               <td v-if="perfil < 3">
@@ -86,24 +93,24 @@
                   ><img
                     src="/../../images/icons/ico_10.svg"
                     @click="edit(object.id)"
-                    width="40"
-                    height="40"
+                    width="30"
+                    height="30"
                 /></a>
                 <a title="Eliminar"
                 v-if="object.estado == 1"
                   ><img
                     src="/../../images/icons/ico_11.svg"
                     @click="deleteObject(object)"
-                    width="40"
-                    height="40"
+                    width="30"
+                    height="30"
                 /></a>
                 <a title="Eliminar"
                 v-if="object.estado != 1"
                   ><img
                     src="/../../images/icons/add.svg"
                     @click="reactivationOfProduct(object)"
-                    width="40"
-                    height="40"
+                    width="30"
+                    height="30"
                 /></a>
               </td>
             </tr>
@@ -117,7 +124,7 @@
         prev-icon="mdi-chevron-left"
         :page="filterParams.page"
         :total-visible="8"
-        @input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+        @input="filterObjects(filterParams)"
         v-if="filterParams.totalPages > 1 && loaded"
       ></v-pagination>
     </v-container>
@@ -213,6 +220,8 @@ export default {
       idPerfil: "",
       idSucursal: "",
       stringParam: "",
+      secondStringParam: "",
+      thirdStringParam: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -233,22 +242,20 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    this.filterObjects(this.filterParams);
     this.getOtherModels(0, 100000);
     this.perfil = this.loguedUser.perfil;
   },
 
   methods: {
-    filterObjects(stringParam, page, size) {
-      let doubleParam;
+    filterObjects(filterParams) {
       if(this.estadoSeleccionado.id === 1){
-        doubleParam = 0
+        filterParams.doubleParam = 0
       }else{
-        doubleParam = 2
+        filterParams.doubleParam = 2
       }
-
       GenericService(this.tenant, "productos", this.token)
-      .filter({ doubleParam, stringParam, page, size })
+      .filter(filterParams)
       .then((data) => {
         data.data.content.forEach(el => {
           this.$store.state.productos.products.forEach(e => {
@@ -257,6 +264,7 @@ export default {
             }
           })
         })
+
         this.objects = data.data.content;
         this.filterParams.totalPages = data.data.totalPages;
         this.loaded = true;
@@ -315,7 +323,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
           .save(object);
 
-          this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects(this.filterParams);
           this.getOtherModels(0, 100000);
         }
       })
@@ -330,7 +338,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
           .save(object)
           .then(()=>{
-            this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+            this.filterObjects(this.filterParams);
             this.getOtherModels(0, 100000);
           })
         }
@@ -376,7 +384,7 @@ export default {
                   infoAlert("Se agregaron nuevos atributos al sistema. Realice nuevamente la importación para asignarlos correctamente");
                 }
               })
-              this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+              this.filterObjects(this.filterParams);
               this.loaderStatus = true;
               this.loaded = true;
             });
@@ -575,7 +583,7 @@ export default {
 
     changePage(data){
       this.filterParams.page = data;
-      this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+      this.filterObjects(this.filterParams);
     },
 
     checkProductInList(data){

@@ -10,14 +10,26 @@
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row v-if="urlId == 0" class="ml-5 mr-5">
-          <v-col cols="10">
+          <v-col cols="5">
             <v-text-field
               v-model="filterParams.stringParam"
               dense
               outlined
               rounded
               class="text-left"
-              label="Puede buscar un artículo escribiendo su nombre, código o código de barras aquí"
+              label="Nombre, código de artículo, código de barras"
+              placeholder=" "
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="5">
+            <v-text-field
+              v-model="filterParams.thirdStringParam"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Marca"
               placeholder=" "
               append-icon="mdi-magnify"
             ></v-text-field>
@@ -25,7 +37,7 @@
           <v-col cols="2">
             <v-btn
              class="primary"
-             @click="filterProducts(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+             @click="filterProducts(filterParams)"
             >
               BUSCAR
             </v-btn>
@@ -39,6 +51,7 @@
                   <tr>
                     <th></th>
                     <th>Nombre</th>
+                    <th>Marca</th>
                     <th>Código de barras</th>
                     <th>Código de producto</th>
                     <th>Precio de costo</th>
@@ -53,6 +66,7 @@
                       ></v-checkbox>
                     </td>
                     <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.marca.nombre }}</td>
                     <td>{{ producto.codigoBarra }}</td>
                     <td>{{ producto.codigoProducto }}</td>
                     <td>${{ producto.precioCosto }}</td>
@@ -67,7 +81,7 @@
               prev-icon="mdi-chevron-left"
               :page="filterParams.page"
               :total-visible="8"
-              @input="filterProducts(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+              @input="filterProducts(filterParams)"
               v-if="filterParams.totalPages > 1"
             ></v-pagination>
           </v-col>
@@ -226,6 +240,7 @@ export default {
       idPerfil: "",
       idSucursal: "",
       stringParam: "",
+      thirdStringParam: "",
       page: 1,
       size: 5,
       totalPages: 0
@@ -243,7 +258,7 @@ export default {
       this.filterDepositos(this.loguedUser.perfil, '', 0, 100000);
     } else {
       this.filterDepositos(this.loguedUser.perfil, '', 0, 100000);
-      this.filterProducts(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+      this.filterProducts(this.filterParams);
     }
   },
 
@@ -265,9 +280,9 @@ export default {
         });
     },
     
-    filterProducts(stringParam, page, size) {
+    filterProducts(filterParams) {
       GenericService(this.tenant, "productos", this.token)
-        .filter({stringParam, page, size})
+        .filter(filterParams)
         .then((data) => {
           if(this.object.producto.length > 0){
             this.object.producto.forEach(el => {

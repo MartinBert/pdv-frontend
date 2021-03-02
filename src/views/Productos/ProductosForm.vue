@@ -38,6 +38,7 @@
               :counter="50"
               label="Código de barras"
               required
+              @focusout="checkBarCode(filterParams, object.codigoBarra)"
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
             <v-btn class="success mt-3" @click="generateBarCode()">Generar</v-btn>
@@ -243,6 +244,7 @@
 </template>
 
 <script>
+import { errorAlert } from '../../helpers/alerts';
 import {
   calculateAmountPlusPercentaje,
   calculateAmountMinusPercentaje,
@@ -271,6 +273,16 @@ export default {
       ivaComprasObject: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
     },
+    filterParams: {
+      idPerfil: "",
+      idSucursal: "",
+      stringParam: "",
+      secondStringParam: "",
+      thirdStringParam: "",
+      page: 1,
+      size: 1,
+      totalPages: 0
+    },
     cantidad: [],
     loaded: false,
     tenant: "",
@@ -287,7 +299,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getOtherModels(0, 20000);
+    this.getOtherModels(0, 100000);
   },
 
   methods: {
@@ -392,6 +404,20 @@ export default {
     generateBarCode(){
       this.object.codigoBarra = generateBarCode();
       console.log(this.object.codigoBarra);
+    },
+
+    checkBarCode(filterParams, barcode){
+      filterParams.stringParam = barcode;
+      GenericService(this.tenant, this.service, this.token)
+      .filter(filterParams)
+      .then(data => {
+        errorAlert("El código de barras que ha introducido ya existe en otro producto: " + data.data.content[0].nombre)
+        .then(data => {
+          if(data.dismiss){
+            this.object.codigoBarra = "";
+          }
+        })
+      })
     },
 
     save() {

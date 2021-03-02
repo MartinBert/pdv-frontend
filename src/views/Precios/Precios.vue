@@ -116,9 +116,10 @@ export default {
           const filterParam = {
             longParam: 1,
             idParam: this.object.distribuidor.id,
-            page: 0,
+            page: 1,
             size: 100000,
           };
+
           GenericService(this.tenant, this.service, this.token)
             .filter(filterParam)
             .then((data) => {
@@ -149,7 +150,7 @@ export default {
           const filterParam = {
             longParam: 1,
             idParam: this.object.distribuidor.id,
-            page: 0,
+            page: 1,
             size: 100000,
           };
           GenericService(this.tenant, this.service, this.token)

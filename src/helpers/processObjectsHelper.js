@@ -60,6 +60,7 @@ export function checkIfInvoice(docs){
     "111",
     "9999",
   ];
+  
   const filteredDocs = docs.filter((el) => {
     for (let i = 0; i < arr.length; i++) {
       if (el.codigoDocumento === arr[i]) {

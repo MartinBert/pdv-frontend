@@ -10,13 +10,13 @@
               @click="$store.commit('productos/dialogProductosMutation')"
               >BUSCAR PRODUCTOS</v-btn
             >
-            <h5 class="mt-2 ml-2">
+            <h3 class="mt-2 ml-2">
               Depósito predeterminado:
               <span v-if="defaultDeposit">
                 {{ defaultDeposit.nombre }}
               </span>
               <span v-if="!defaultDeposit"> No definido </span>
-            </h5>
+            </h3>
           </div>
 
           <!-- TEST CERT -->
@@ -26,6 +26,7 @@
             @click="testcert()"
           >TEST CERTIFICADO</v-btn> -->
           <!-- TEST CERT -->
+          
         </v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">

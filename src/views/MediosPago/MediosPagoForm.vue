@@ -4,7 +4,7 @@
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-1">
-            <v-col class="col-6"> 
+            <v-col> 
               <v-text-field 
               type="text"
               v-model="object.nombre"
@@ -14,7 +14,7 @@
               :rules="[v => !!v || 'Campo requerido...']"
             ></v-text-field>
             </v-col>
-            <v-col class="col-6"> 
+            <v-col> 
               <v-autocomplete
                 :items="planes_pago"
                 v-model="object.planPago"
@@ -24,6 +24,11 @@
                 :return-object="true"
                 :rules="[v => !!v || 'Campo requerido...']"
               ></v-autocomplete>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type=""
+              />
             </v-col>
         </v-row>
         <div class="ma-1">

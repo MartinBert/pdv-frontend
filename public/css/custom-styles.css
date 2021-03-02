@@ -42,26 +42,17 @@
 
 /***ROOT***/
 .root-container {
-    background-image: url('/images/root/root-background.png');
+    background-color: #e7e7e7;
     opacity: 90%;
-    font-family: 'Roboto', sans-serif;
+    font-size: 12px !important;
     font-weight: 400;
     height: 100%;
     width: 100%;
     animation: movimiento 20s infinite linear alternate;
 }
 
-@keyframes movimiento {
-    from {
-        background-position: bottom left;
-    }
-    to {
-        background-position: top-right;
-    }
-}
-
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
+    font-family:'Roboto', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
@@ -69,14 +60,16 @@
     margin-top: 60px;
 }
 
-.v-data-table th {
-    height: 35px !important;
+.v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
+.v-data-table > .v-data-table__wrapper > table > thead > tr > th,
+.v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
+   font-size: 12px !important;
 }
 
-.button_cliente_class {
-    background-image: url("/images/buttons/btn_cliente.svg");
-    width: 100%;
-    height: 100%;
+.v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
+.v-data-table > .v-data-table__wrapper > table > thead > tr > td,
+.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td {
+   font-size: 12px !important;
 }
 
 .verticalSeparator {
@@ -96,9 +89,8 @@
 }
 
 .select-ventas-import {
-    font-family: Century Gothic, CenturyGothic, AppleGothic, sans-serif;
-    font-weight: bold;
-    font-style: italic;
+    font-family: 'Roboto';
+    font-weight: 400;
     border-bottom: solid 1px rgb(63, 81, 181);
     color: rgb(172, 171, 171);
     text-align: right;
@@ -166,7 +158,6 @@
 /*******/
 
 /***IMAGES***/
-
 #ghostImage {
     margin-top: 5%;
     -webkit-animation: 3s rotate linear infinite;
@@ -238,7 +229,6 @@
 /*******/
 
 /***KEYFRAMES***/
-
 @keyframes rotate {
     from {
         transform: rotate(0deg);
@@ -257,6 +247,15 @@
     }
 }
 
+
+@keyframes movimiento {
+    from {
+        background-position: bottom left;
+    }
+    to {
+        background-position: top-right;
+    }
+}
 /*******/
 
 /*** MAIN NAVIGATION ***/

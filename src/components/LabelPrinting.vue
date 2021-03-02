@@ -1,14 +1,16 @@
 <template>
     <v-container style="background-color: transparent">
         <v-row>
-            <v-col cols="5">
+            <v-col cols="12">
                 <v-simple-table style="background-color: transparent" ref="tableOfProducts">
                     <template v-slot:default>
                     <thead>
                         <tr>
                         <th>Nombre</th>
                         <th>Atributos</th>
+                        <th>Marca</th>
                         <th>Código de barras</th>
+                        <th>Código de producto</th>
                         <th>Acciones</th>
                         </tr>
                     </thead>
@@ -16,7 +18,9 @@
                         <tr>
                         <td>{{object.nombre}}</td>
                         <td>{{setAtributesValues(object.atributos)}}</td>
+                        <td>{{object.marca.nombre}}</td>
                         <td>{{object.codigoBarra}}</td>
+                        <td>{{object.codigoProducto}}</td>
                         <td>
                             <a title="Agregar"
                             v-if="!object.selected"
@@ -46,53 +50,26 @@
                 v-on:changePage="changePage"
                 />
             </v-col>
-            <v-col cols="1" class="d-flex justify-center">
-                <div class="verticalSeparator"></div>
-            </v-col>
-            <v-col cols="5">
+            <v-row>
+                <v-col>
+                    <div class="horizontalSeparator"></div>
+                </v-col>
+            </v-row>
+            <v-col cols="12">
                 <v-row>
-                    <v-col>
-                        <h3>Seleccione el formato de impresión</h3>
-                        <v-row>
-                            <v-col cols="6">
-                                <img 
-                                src="/../../images/labels/labelWithoutPrice.png" 
-                                alt="etiqueta de productos" 
-                                @click="getTypeClass('labelWithoutPrice')" 
-                                v-bind:class="labelFormats.labelWithoutPrice">
-                            </v-col>
-                            <v-col cols="6">
-                                <img 
-                                src="/../../images/labels/labelWithoutPrice.png" 
-                                alt="etiqueta de productos" 
-                                @click="getTypeClass('labelWithAttributes')" 
-                                v-bind:class="labelFormats.labelWithAttributes">
-                            </v-col>
-                            <v-col cols="6">
-                                <img 
-                                src="/../../images/labels/labelWithoutPrice.png" 
-                                alt="etiqueta de productos" 
-                                @click="getTypeClass('labelWithPrice')" 
-                                v-bind:class="labelFormats.labelWithPrice">
-                            </v-col>
-                            <v-col cols="6">
-                                <img 
-                                src="/../../images/labels/labelWithoutPrice.png" 
-                                alt="etiqueta de productos" 
-                                @click="getTypeClass('labelOnlyBarCode')"  
-                                v-bind:class="labelFormats.labelOnlyBarCode">
-                            </v-col>
-                        </v-row>
+                    <v-col cols="12">
+                        <h2>Indique la cantidad de etiquetas a imprimir en cada caso</h2>
                     </v-col>
-                </v-row>
-                <v-row>
                     <v-col>
-                        <v-simple-table style="background-color: transparent" height="250">
+                        <v-simple-table style="background-color: transparent" height="525">
                             <template v-slot:default>
                             <thead>
                                 <tr>
                                 <th>Nombre</th>
                                 <th>Atributos</th>
+                                <th>Marca</th>
+                                <th>Código de barras</th>
+                                <th>Código de producto</th>
                                 <th>Cantidad</th>
                                 </tr>
                             </thead>
@@ -100,6 +77,9 @@
                                 <tr>
                                 <td>{{object.nombre}}</td>
                                 <td>{{setAtributesValues(object.atributos)}}</td>
+                                <td>{{object.marca.nombre}}</td>
+                                <td>{{object.codigoBarra}}</td>
+                                <td>{{object.codigoProducto}}</td>
                                 <td>
                                     <v-text-field
                                     autocomplete="off"
@@ -128,7 +108,7 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col class="text-end">
+            <v-col class="text-center">
                 <v-btn class="primary" @click="printLabels(labelList)">IMPRIMIR ETIQUETAS</v-btn>
             </v-col>
         </v-row>
@@ -180,7 +160,8 @@ export default {
                 if($event < 0) $event = 0; 
                 if($event.length > 3) $event = $event.slice(0, 3);
                 this.labelList = this.labelList.filter(el => el.codigoBarra !== object.codigoBarra);
-                const labelList = Array(parseInt($event)).fill({nombre: object.nombre, codigoBarra: object.codigoBarra});
+                object.attributes = this.setAtributesValues(object.atributos);
+                const labelList = Array(parseInt($event)).fill({nombre: object.nombre, codigoBarra: object.codigoBarra, attributes: object.attributes});
                 labelList.forEach(el => {
                     this.labelList.push(el);
                 });
@@ -199,6 +180,7 @@ export default {
                 window.open(fileURL, "_blank");
             });
         },
+
         setAtributesValues(atributes){
         let str = atributes.reduce((acc, element) => {
             if(element.valor){
