@@ -927,7 +927,8 @@ export default {
         idPerfil: this.loguedUser.perfil,
         idSucursal: this.loguedUser.sucursal.id,
         stringParam: "",
-        page: 0,
+        thirdStringParam: "",
+        page: 1,
         size: 100000,
       };
       let productsBelowMinimumStock = [];

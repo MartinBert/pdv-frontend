@@ -170,8 +170,6 @@
     width: 150px;
     height: 150px;
     margin-top: 5%;
-    -webkit-animation: 3s rotate linear infinite;
-    animation: 3s rotate linear infinite;
     -webkit-transform-origin: 50% 50%;
     transform-origin: 50% 50%;
 }
@@ -180,8 +178,6 @@
     width: 150px;
     height: 150px;
     margin-top: 5%;
-    -webkit-animation: 3s rotate linear infinite;
-    animation: 3s rotate linear infinite;
     -webkit-transform-origin: 50% 50%;
     transform-origin: 50% 50%;
 }
@@ -190,8 +186,6 @@
     width: 150px;
     height: 150px;
     margin-top: 5%;
-    -webkit-animation: 3s rotate linear infinite;
-    animation: 3s rotate linear infinite;
     -webkit-transform-origin: 50% 50%;
     transform-origin: 50% 50%;
 }
@@ -200,8 +194,6 @@
     width: 150px;
     height: 150px;
     margin-top: 5%;
-    -webkit-animation: 3s rotate linear infinite;
-    animation: 3s rotate linear infinite;
     -webkit-transform-origin: 50% 50%;
     transform-origin: 50% 50%;
 }

@@ -41,7 +41,7 @@
               @focusout="checkBarCode(filterParams, object.codigoBarra)"
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
-            <v-btn class="success mt-3" @click="generateBarCode()">Generar</v-btn>
+            <v-btn class="primary mt-3" @click="generateBarCode()">Generar</v-btn>
           </v-col>
         </v-row>
         <v-row class="ma-1">

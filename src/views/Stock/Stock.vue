@@ -10,7 +10,12 @@
           <v-btn class="primary ml-1" @click="openDialog('stockMigration')"
             >MIGRAR STOCK</v-btn
           >
-          <v-btn class="success ml-1" @click="openDialog('reports')">Reportes</v-btn>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-spacer/>
+        <v-col cols="1">
+          <v-btn class="primary mt-3" @click="openDialog('reports')">Reportes</v-btn>
         </v-col>
         <v-col cols="2">
           <v-autocomplete
@@ -153,7 +158,7 @@
     <v-row>
       <v-col cols="12">
         <form @submit.prevent="migrateStockToOtherDeposit()">
-          <v-btn class="success" type="submit">Migrar seleccionados</v-btn>
+          <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
           <v-autocomplete
             :items="realDeposits"
             item-text="nombre"
@@ -381,24 +386,26 @@ export default {
       this.$store.commit("stocks/dialogMutation");
       this.loaded = false;
 
-      const stringParam = "";
-      const page = 0;
-      const size = 100000;
-
-      let idSucursal;
+      let filterParams = {
+        idSucursal: "",
+        stringParam: "",
+        thirdStringParam: "",
+        page: 1,
+        size: 100000
+      }
 
       switch (this.loguedUser.perfil) {
         case 1:
-            idSucursal = '';
+            filterParams.idSucursal = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            filterParams.idSucursal = this.loguedUser.sucursal.id;
           break;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({ idSucursal, stringParam, page, size })
+        .filter(filterParams)
         .then((data) => {
           let stockWithRestrictions = data.data.content.map((el) => {
             el.cantidadMinima = this.$store.state.stocks.minimumQuantity;
@@ -425,26 +432,29 @@ export default {
     applyMassiveChangesInDeposits() {
       this.loaded = false;
 
-      const stringParam = "";
-      const page = 0;
-      const size = 100000;
+      let filterParams = {
+        idSucursal: "",
+        stringParam: "",
+        thirdStringParam: "",
+        page: 1,
+        size: 100000
+      }
 
-      let idSucursal;
       let depositToModifyId = this.$store.state.stocks.selectedDeposits[0].id;
       let newDepositForProducts = this.$store.state.stocks.selectedDeposits[1];
 
       switch (this.loguedUser.perfil) {
         case 1:
-            idSucursal = '';
+            filterParams.idSucursal = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            filterParams.idSucursal = this.loguedUser.sucursal.id;
           break;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({ idSucursal, stringParam, page, size })
+        .filter(filterParams)
         .then((data) => {
           let affectedProducts = data.data.content.filter(
             (el) => el.deposito.id == depositToModifyId
@@ -460,7 +470,7 @@ export default {
           this.saveHistorial(affectedProducts, "Movimiento masivo de stock entre depósitos");
 
           this.$store.commit("stocks/resetStates");
-          setTimeout(()=>{this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size, this.typeList);}, 500);
+          setTimeout(()=>{this.filterObjects(this.filterParams, this.typeList);}, 500);
         });
     },
 
@@ -491,7 +501,7 @@ export default {
         this.migration = [];
         this.destinationDepositForMigrations = {};
 
-        setTimeout(()=>{this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size, this.typeList);}, 500);
+        setTimeout(()=>{this.filterObjects(this.filterParams, this.typeList);}, 500);
       }else{
         errorAlert("Debe seleccionar al menos 1 producto para migrar su stock de depósito");
       }

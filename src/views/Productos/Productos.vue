@@ -5,15 +5,17 @@
         <v-col cols="12" v-if="perfil < 3">
           <v-btn class="primary ml-1" @click="view = 'listOfProducts'" raised>LISTA</v-btn>
           <v-btn class="primary ml-1" @click="newObject()" raised>NUEVO</v-btn>
-          <v-btn class="primary ml-1" @click="getReport()" raised
-            >REPORTES</v-btn
-          >
           <v-btn class="primary ml-1" @click="view = 'labelPrinting'">GENERAR ETIQUETAS</v-btn>
           <v-btn class="primary ml-1" @click="goPricesManagerView()">MODIFICAR PRECIOS</v-btn>
         </v-col>
       </v-row>
       <v-row>
         <v-spacer v-if="view == 'listOfProducts'"/>
+        <v-col cols="1" v-if="view == 'listOfProducts'">
+          <v-btn class="primary ml-1" @click="getReport()" raised
+            >REPORTE</v-btn
+          >
+        </v-col>
         <v-col cols="2" class="mt-2 ml-3" v-if="view == 'labelPrinting'">
           <h2>Seleccion de productos</h2>
         </v-col>
@@ -27,7 +29,7 @@
             @change="onChange($event)"
           ></v-file-input>
         </v-col>
-        <v-col cols="2" v-if="view == 'listOfProducts'">
+        <v-col cols="2" v-if="view == 'listOfProducts' && perfil < 3">
           <v-select
             :items="estados"
             v-model="estadoSeleccionado"

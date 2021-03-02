@@ -26,25 +26,16 @@
             <v-col>
               <form @submit.prevent="allSalesReport(loguedUser.sucursal)">
                 <v-btn class="primary v-btn--block" type="submit">TODAS LAS VENTAS</v-btn>
-                <div class="d-flex justify-center mt-3">
-                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
-                </div>
               </form>
             </v-col>
             <v-col>
               <form @submit.prevent="allSalesGroupBy(loguedUser.sucursal, 'Receipts')">
                 <v-btn class="primary v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR COMPROBANTE</v-btn>
-                <div class="d-flex justify-center mt-3">
-                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
-                </div>
               </form>
             </v-col>
             <v-col>
               <form @submit.prevent="allSalesGroupBy(loguedUser.sucursal, 'Clients')">
                 <v-btn class="primary v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR CLIENTE</v-btn>
-                <div class="d-flex justify-center mt-3">
-                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
-                </div>
               </form>
             </v-col>
           </v-row>
@@ -52,25 +43,16 @@
              <v-col>
               <form @submit.prevent="comingSoon()">
                 <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR MEDIOS DE PAGO</v-btn>
-                <div class="d-flex justify-center mt-3">
-                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
-                </div>
               </form>
             </v-col>
             <v-col>
               <form @submit.prevent="comingSoon()">
                 <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR MARCAS</v-btn>
-                <div class="d-flex justify-center mt-3">
-                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
-                </div>
               </form>
             </v-col>
             <v-col>
               <form @submit.prevent="comingSoon()">
                 <v-btn class="default v-btn--block" type="submit">TODAS LAS VENTAS AGRUPADAS POR RUBROS</v-btn>
-                <div class="d-flex justify-center mt-3">
-                  <img src="/../../images/messages/happy_1.svg" width="40" height="40">
-                </div>
               </form>
             </v-col> 
           </v-row>

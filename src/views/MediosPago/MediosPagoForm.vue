@@ -25,11 +25,6 @@
                 :rules="[v => !!v || 'Campo requerido...']"
               ></v-autocomplete>
             </v-col>
-            <v-col>
-              <v-text-field
-                type=""
-              />
-            </v-col>
         </v-row>
         <div class="ma-1">
           <v-col class="col-6">
