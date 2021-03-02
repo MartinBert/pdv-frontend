@@ -10,8 +10,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-spacer v-if="view == 'listOfProducts'"/>
-        <v-col cols="1" v-if="view == 'listOfProducts'">
+        <v-col class="text-end" v-if="view == 'listOfProducts'">
           <v-btn class="primary ml-1" @click="getReport()" raised
             >REPORTE</v-btn
           >

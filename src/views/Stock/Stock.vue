@@ -13,8 +13,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-spacer/>
-        <v-col cols="1">
+        <v-col class="text-end">
           <v-btn class="primary mt-3" @click="openDialog('reports')">Reportes</v-btn>
         </v-col>
         <v-col cols="2">

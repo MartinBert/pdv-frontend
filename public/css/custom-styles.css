@@ -20,7 +20,8 @@
 }
 
 .input-login {
-    font-family: CocogoseUltralightCoursive;
+    font-family: 'Roboto';
+    font-weight: 300;
 }
 
 .card-login {
@@ -30,7 +31,8 @@
 }
 
 .card-login button {
-    font-family: CocogoseUltralightCoursive;
+    font-family: 'Roboto';
+    font-weight: 300;
     background-color: rgba(0, 0, 0, 0.363);
     margin-bottom: 2%;
     padding: 5px 5% 5px 5%;
