@@ -50,7 +50,6 @@
     font-weight: 400;
     height: 100%;
     width: 100%;
-    animation: movimiento 20s infinite linear alternate;
 }
 
 #app {

@@ -1,6 +1,6 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" app clipped class="main_navigation" width="17%">
+    <v-navigation-drawer v-model="drawer" app clipped class="main_navigation" style="background-color: #e7e7e7" width="17%">
       <v-list nav dense>
         <div v-for="m in modulosVisibles" :key="m.name">
           <v-list-group v-if="m.childs && m.childs.length > 0">
