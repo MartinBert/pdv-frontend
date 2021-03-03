@@ -36,23 +36,6 @@
         <v-col cols="3">
           <v-text-field
             type="number"
-            v-model="filterParams.doubleParam"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.doubleParam, filterParams.page - 1, filterParams.size)"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Búsqueda por total facturado"
-            placeholder=" "
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col></v-col>
-        <v-col cols="3">
-          <v-text-field
-            type="number"
             v-model="specialFilter"
             dense
             outlined
@@ -61,10 +44,8 @@
             label="Búsqueda especial"
             placeholder=" "
             append-icon="mdi-magnify"
+            @input="alterIdParam()"
           ></v-text-field>
-        </v-col>
-        <v-col cols="1">
-          <v-btn class="primary" @click="alterIdParam()">APLICAR</v-btn>
         </v-col>
       </v-row>
     </v-form>
@@ -80,7 +61,6 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Fecha de venta</th>
             <th>Código de barras</th>
             <th>Comprobante</th>
@@ -93,7 +73,6 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{object.id}}</td>
             <td>{{object.fechaEmision}}</td>
             <td>{{object.barCode}}</td>
             <td>{{object.nombreDocumento}}</td>

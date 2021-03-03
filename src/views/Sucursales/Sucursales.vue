@@ -26,7 +26,6 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Teléfono</th>
             <th>Email</th>
@@ -37,7 +36,6 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
             <td>{{object.telefono}}</td>
             <td>{{object.email}}</td>

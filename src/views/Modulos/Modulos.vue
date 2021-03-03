@@ -26,14 +26,12 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{ object.id }}</td>
             <td>{{ object.nombre }}</td>
             <td>
               <a title="Editar"

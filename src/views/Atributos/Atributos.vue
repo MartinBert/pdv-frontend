@@ -44,14 +44,12 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Valor</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{ object.id }}</td>
             <td>
               <span v-if="object.valor">{{ object.valor }}</span>
               <span v-if="object.valorNumerico">{{object.valorNumerico}}</span>

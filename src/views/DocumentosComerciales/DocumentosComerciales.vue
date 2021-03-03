@@ -35,7 +35,6 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Tipo de documento</th>
             <th>Letra</th>
@@ -44,7 +43,6 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
             <td>
               <v-alert type="success" dense v-if="object.tipo">Fiscal</v-alert>

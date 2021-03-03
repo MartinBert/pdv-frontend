@@ -51,7 +51,6 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Dirección</th>
             <th>Telefono</th>
@@ -62,7 +61,6 @@
         </thead>
         <tbody v-for="object in objects" :key="object.id">
           <tr>
-            <td>{{ object.id }}</td>
             <td>{{ object.nombre }}</td>
             <td>{{ object.direccion }}</td>
             <td>{{ object.telefono }}</td>
