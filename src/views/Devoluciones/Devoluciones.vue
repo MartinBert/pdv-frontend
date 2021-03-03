@@ -55,20 +55,20 @@
             <td>
               <button type="button">
                 <img
-                  src="/../../images/icons/eye.svg"
+                  src="/../../images/icons/details.svg"
                   @click="seeDetail('devueltos', o)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
                 />
               </button>
             </td>
             <td>
               <button type="button">
                 <img
-                  src="/../../images/icons/eye.svg"
+                  src="/../../images/icons/details.svg"
                   @click="seeDetail('cedidos', o)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
                 />
               </button>
             </td>
@@ -78,8 +78,8 @@
               <span v-if="!o.comprobante">SIN COMPROBANTE</span>
             </td>
             <td>
-              <a title="Reimprimir comprobante" v-if="o.comprobante"><img src="/../../images/icons/impresora.svg" @click="print(o.comprobante)" width="40" height="40"/></a>
-              <a title="Agregar comprobante" v-if="!o.comprobante"><img src="/../../images/icons/add.svg" @click="addReceipt(o)" width="40" height="40"/></a>
+              <a title="Reimprimir comprobante" v-if="o.comprobante"><img src="/../../images/icons/printer.svg" @click="print(o.comprobante)" width="30" height="30"/></a>
+              <a title="Agregar comprobante" v-if="!o.comprobante"><img src="/../../images/icons/add.svg" @click="addReceipt(o)" width="30" height="30"/></a>
             </td>
           </tr>
         </tbody>

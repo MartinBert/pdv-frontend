@@ -25,9 +25,9 @@
                         <td>{{object.descripcion}}</td>
                         <td class="text-center">
                             <button @click="seeDetails(object.stocks)"><img
-                                src="/../../images/icons/eye.svg"
-                                width="40"
-                                height="40"
+                                src="/../../images/icons/details.svg"
+                                width="30"
+                                height="30"
                             /></button>
                         </td>
                         <td>{{object.fecha}}</td>

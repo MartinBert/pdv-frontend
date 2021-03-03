@@ -51,10 +51,10 @@
             <td>
               <button type="button">
                 <img
-                  src="/../../images/icons/eye.svg"
+                  src="/../../images/icons/details.svg"
                   @click="seeDetail(object.message)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
                 />
               </button>
             </td>

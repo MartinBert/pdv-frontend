@@ -6,7 +6,7 @@
           <v-list-group v-if="m.childs && m.childs.length > 0">
             <template v-slot:activator>
               <v-list-item-action>
-                <img v-bind:src="m.icon" height="40" width="40"/>
+                <img v-bind:src="m.icon" height="30" width="30"/>
               </v-list-item-action>
               <v-list-item-title>{{m.title}}</v-list-item-title>
             </template>
@@ -59,7 +59,7 @@
 
           <v-btn
             type="submit"
-            class="success ml-2"
+            class="ml-2"
           >APLICAR</v-btn>
         </form>
       <v-spacer />
@@ -112,7 +112,7 @@ export default {
         name: "ventas",
         title: "Ventas",
         visible: false,
-        icon: "/../images/icons/ico_01.svg",
+        icon: "/../images/icons/sale.svg",
         childs: [
           {
             path: "/ventas",
@@ -144,7 +144,7 @@ export default {
         name: "productos",
         title: "Productos",
         visible: false,
-        icon: "/../images/icons/ico_02.svg",
+        icon: "/../images/icons/products.svg",
         childs: [
           {
             path: "/productos",
@@ -194,7 +194,7 @@ export default {
         name: "documentos",
         title: "Doc. Comerciales",
         visible: false,
-        icon: "/../images/icons/ico_03.svg",
+        icon: "/../images/icons/commercial_documents.svg",
         childs: [
           {
             path: "/documentos_comerciales",
@@ -208,7 +208,7 @@ export default {
         name: "mediosPago",
         title: "Medios de Pago",
         visible: false,
-        icon: "/../images/icons/ico_04.svg",
+        icon: "/../images/icons/payment_methods.svg",
         childs: [
           {
             path: "/medios_de_pago",
@@ -228,7 +228,7 @@ export default {
         name: "personas",
         title: "Personas",
         visible: false,
-        icon: "/../images/icons/ico_05.svg",
+        icon: "/../images/icons/people.svg",
         childs: [
           {
             path: "/clientes",
@@ -260,7 +260,7 @@ export default {
         name: "relaciones",
         title: "Relaciones",
         visible: false,
-        icon: "/../images/icons/ico_06.svg",
+        icon: "/../images/icons/relations.svg",
         childs: [
           {
             path: "/condiciones_fiscales",
@@ -274,7 +274,7 @@ export default {
         name: "usuarios",
         title: "Usuarios",
         visible: false,
-        icon: "/../images/icons/ico_07.svg",
+        icon: "/../images/icons/users.svg",
         childs: [
           {
             path: "/usuarios",
@@ -294,7 +294,7 @@ export default {
         name: "configuraciones",
         title: "Configuraciones",
         visible: false,
-        icon: "/../images/icons/ico_08.svg",
+        icon: "/../images/icons/settings.svg",
         childs: [
           {
             path: "/empresa",
@@ -332,7 +332,7 @@ export default {
         name: "soporte",
         title: "Soporte",
         visible: false,
-        icon: "/../images/icons/ico_12.svg",
+        icon: "/../images/icons/support.svg",
         childs: [
           {
             path: "/preguntas_frecuentes",

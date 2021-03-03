@@ -51,18 +51,18 @@
                       <div class="d-flex mt-1">
                         <button type="button">
                           <img
-                            src="/../../images/icons/ico_11.svg"
+                            src="/../../images/icons/delete.svg"
                             @click="deleteLine(p.id, 'entrante')"
-                            width="40"
-                            height="40"
+                            width="30"
+                            height="30"
                           />
                         </button>
                         <button type="button">
                           <img
-                            src="/../../images/icons/adelante.svg"
+                            src="/../../images/icons/next.svg"
                             @click="changeStatus(p, 'entrante')"
-                            width="40"
-                            height="40"
+                            width="30"
+                            height="30"
                           />
                         </button>
                       </div>
@@ -97,18 +97,18 @@
                       <div class="d-flex mt-1">
                         <button type="button">
                           <img
-                            src="/../../images/icons/ico_11.svg"
+                            src="/../../images/icons/delete.svg"
                             @click="deleteLine(p.id, 'saliente')"
-                            width="40"
-                            height="40"
+                            width="30"
+                            height="30"
                           />
                         </button>
                         <button type="button">
                           <img
-                            src="/../../images/icons/atras.svg"
+                            src="/../../images/icons/previous.svg"
                             @click="changeStatus(p, 'saliente')"
-                            width="40"
-                            height="40"
+                            width="30"
+                            height="30"
                           />
                         </button>
                       </div>
@@ -149,8 +149,8 @@
               @click="$store.commit('receipt/receiptDialogMutation')"
               ><img
                 src="/../../images/icons/success.svg"
-                width="40"
-                height="40"
+                width="30"
+                height="30"
             /></v-btn>
           </v-col>
           <v-col cols="4">

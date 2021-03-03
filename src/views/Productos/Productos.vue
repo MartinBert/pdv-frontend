@@ -92,7 +92,7 @@
               <td v-if="perfil < 3">
                 <a title="Editar"
                   ><img
-                    src="/../../images/icons/ico_10.svg"
+                    src="/../../images/icons/edit.svg"
                     @click="edit(object.id)"
                     width="30"
                     height="30"
@@ -100,7 +100,7 @@
                 <a title="Eliminar"
                 v-if="object.estado == 1"
                   ><img
-                    src="/../../images/icons/ico_11.svg"
+                    src="/../../images/icons/delete.svg"
                     @click="deleteObject(object)"
                     width="30"
                     height="30"

@@ -99,28 +99,28 @@
             <td>{{object.nombreDocumento}}</td>
             <td class="text-center">
               <button @click="seeDetails(object.productos)"><img
-                src="/../../images/icons/eye.svg"
-                width="40"
-                height="40"
+                src="/../../images/icons/details.svg"
+                width="30"
+                height="30"
               /></button>
             </td>
             <td class="text-center">
               <button @click="seeDetails(object.mediosPago)"><img
-                src="/../../images/icons/eye.svg"
-                width="40"
-                height="40"
+                src="/../../images/icons/details.svg"
+                width="30"
+                height="30"
               /></button>
             </td>
             <td class="text-center">
               <button @click="seeDetails(object.planesPago)"><img
-                src="/../../images/icons/eye.svg"
-                width="40"
-                height="40"
+                src="/../../images/icons/details.svg"
+                width="30"
+                height="30"
               /></button>
             </td>
             <td>${{object.totalVenta}}</td>
             <td>
-              <a title="Reimprimir comprobante"><img src="/../../images/icons/impresora.svg" @click="print(object)" width="40" height="40"/></a>
+              <a title="Reimprimir comprobante"><img src="/../../images/icons/printer.svg" @click="print(object)" width="30" height="30"/></a>
             </td>
           </tr>
         </tbody>

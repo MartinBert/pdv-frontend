@@ -61,13 +61,13 @@
         </v-col>
         <v-col cols="12" class="d-flex justify-center">
           <a href="https://www.facebook.com/prysoftarg" target="_blank">
-            <img src="/../../images/icons/facebook.svg" width="40" height="40" class="mr-5"/>
+            <img src="/../../images/icons/facebook.svg" width="30" height="30" class="mr-5"/>
           </a>
           <a href="https://api.whatsapp.com/send?phone=5493482273235" class="btn btn-secondary btn-md" target="_blank">
-            <img src="/../../images/icons/whatsapp.svg" width="40" height="40" class="mr-5"/>
+            <img src="/../../images/icons/whatsapp.svg" width="30" height="30" class="mr-5"/>
           </a>
           <a href="https://www.instagram.com/prysoft/?hl=es-la" target="_blank">
-            <img src="/../../images/icons/instagram.svg" width="40" height="40" />
+            <img src="/../../images/icons/instagram.svg" width="30" height="30" />
           </a>
         </v-col>
       </v-row>

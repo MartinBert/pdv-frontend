@@ -26,6 +26,7 @@
             @click="testcert()"
           >TEST CERTIFICADO</v-btn> -->
           <!-- TEST CERT -->
+          
         </v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">
@@ -169,10 +170,10 @@
                         <td>
                           <button type="button">
                             <img
-                              src="/../../images/icons/ico_11.svg"
+                              src="/../../images/icons/delete.svg"
                               @click="deleteLine(p.id)"
-                              width="40"
-                              height="40"
+                              width="30"
+                              height="30"
                             />
                           </button>
                         </td>

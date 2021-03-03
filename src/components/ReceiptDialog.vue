@@ -123,10 +123,10 @@
                           <td>
                             <button type="button">
                               <img
-                                src="/../../images/icons/eye.svg"
+                                src="/../../images/icons/details.svg"
                                 @click="seeDetail(c)"
-                                width="40"
-                                height="40"
+                                width="30"
+                                height="30"
                               />
                             </button>
                           </td>
@@ -135,16 +135,16 @@
                               <img
                                 src="/../../images/icons/add.svg"
                                 @click="addRelationateReceipt(c)"
-                                width="40"
-                                height="40"
+                                width="30"
+                                height="30"
                               />
                             </button>
                             <button type="button" v-if="c.selected === true">
                               <img
                                 src="/../../images/icons/success.svg"
                                 @click="remove(c)"
-                                width="40"
-                                height="40"
+                                width="30"
+                                height="30"
                               />
                             </button>
                           </td>

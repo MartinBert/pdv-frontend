@@ -27,16 +27,16 @@
                             ><img
                                 src="/../../images/icons/add.svg"
                                 @click="addProductToTagsList(object)"
-                                width="40"
-                                height="40"
+                                width="30"
+                                height="30"
                             /></a>
                             <a title="Quitar"
                             v-if="object.selected"
                             ><img
                                 src="/../../images/icons/success.svg"
                                 @click="deleteLine(object)"
-                                width="40"
-                                height="40"
+                                width="30"
+                                height="30"
                             /></a>
                         </td>
                         </tr>
@@ -93,10 +93,10 @@
                                 <td>
                                     <a title="Agregar"
                                     ><img
-                                        src="/../../images/icons/ico_11.svg"
+                                        src="/../../images/icons/delete.svg"
                                         @click="deleteLine(object)"
-                                        width="40"
-                                        height="40"
+                                        width="30"
+                                        height="30"
                                     /></a>
                                 </td>
                                 </tr>

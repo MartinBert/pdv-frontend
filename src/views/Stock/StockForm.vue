@@ -105,10 +105,10 @@
                     <td>
                       <button type="button">
                         <img
-                          src="/../../images/icons/ico_11.svg"
+                          src="/../../images/icons/delete.svg"
                           @click="deleteLine(producto.id)"
-                          width="40"
-                          height="40"
+                          width="30"
+                          height="30"
                         />
                       </button>
                     </td>

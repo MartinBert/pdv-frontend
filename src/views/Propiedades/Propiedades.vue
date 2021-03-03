@@ -39,27 +39,27 @@
             <td>
               <button type="button">
                 <img
-                  src="/../../images/icons/eye.svg"
+                  src="/../../images/icons/details.svg"
                   @click="seeDetail(object.atributos)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
                 />
               </button>
             </td>
             <td>
               <a title="Editar"
                 ><img
-                  src="/../../images/icons/ico_10.svg"
+                  src="/../../images/icons/edit.svg"
                   @click="edit(object.id)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
               /></a>
               <a title="Eliminar"
                 ><img
-                  src="/../../images/icons/ico_11.svg"
+                  src="/../../images/icons/delete.svg"
                   @click="openDelete(object.id)"
-                  width="40"
-                  height="40"
+                  width="30"
+                  height="30"
               /></a>
             </td>
           </tr>
