@@ -6,7 +6,7 @@
           <v-list-group v-if="m.childs && m.childs.length > 0">
             <template v-slot:activator>
               <v-list-item-action>
-                <img v-bind:src="m.icon" height="30" width="30"/>
+                <img v-bind:src="m.icon" height="35" width="35"/>
               </v-list-item-action>
               <v-list-item-title>{{m.title}}</v-list-item-title>
             </template>
@@ -35,10 +35,8 @@
         </div>
       </v-list>
     </v-navigation-drawer>
-
     <v-app-bar app color="primary" dark clipped-left fixed>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-
       <v-spacer />
         <form @submit.prevent="changeUserData()" v-if="logued" class="d-flex mt-5">
           <v-autocomplete
@@ -48,7 +46,6 @@
             :return-object="true"
             @change="getSalesPoint(loguedUser.sucursal)"
           />
-
           <v-autocomplete
             :items="salesPoint"
             v-model="loguedUser.puntoVenta"
@@ -56,7 +53,6 @@
             :return-object="true"
             class="ml-2"
           />
-
           <v-btn
             type="submit"
             class="ml-2"
@@ -76,14 +72,12 @@
               <v-list-item-subtitle>{{user.perfil.nombre}}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
-
           <v-card-actions>
             <v-btn text @click="logout()">Cerrar sesión</v-btn>
           </v-card-actions>
         </v-card>
       </v-menu>
     </v-app-bar>
-
     <v-main>
       <v-container fluid class="root-container">
         <router-view></router-view>
@@ -91,7 +85,6 @@
     </v-main>
   </v-app>
 </template>
-
 <script>
 import axios from "axios";
 import { successAlert } from '../helpers/alerts';
