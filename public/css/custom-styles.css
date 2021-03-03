@@ -3,7 +3,8 @@
 /***LOGIN***/
 
 .backgroundclass {
-    background-image: linear-gradient(black,rgb(24, 24, 121), rgb(24, 24, 121), black);
+    background: rgb(2,0,36);
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(3,1,45,1) 9%, rgba(10,10,158,1) 50%, rgba(4,3,69,1) 95%, rgba(2,0,36,1) 100%);
     background-size: 100%;
     animation: toColor 4s linear alternate infinite;
     transition: 2s;
@@ -15,16 +16,6 @@
     50%   { -webkit-filter: grayscale(50%); filter: grayscale(50%); }
     75%   { -webkit-filter: grayscale(25%); filter: grayscale(25%); }
     100%  { -webkit-filter: grayscale(0%); filter: grayscale(0%); }
-}
-
-
-@keyframes movimiento {
-    from {
-        background-position: bottom left;
-    }
-    to {
-        background-position: top-right;
-    }
 }
 
 .toolbarclass {
