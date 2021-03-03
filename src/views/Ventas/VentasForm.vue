@@ -271,9 +271,7 @@ import {
 } from "../../helpers/mathHelper";
 import { errorAlert, successAlert } from "../../helpers/alerts";
 import {
-  formatReceiptA,
-  formatReceiptB,
-  formatReceiptC,
+  formatFiscalInvoice
 } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
 import axios from "axios";
@@ -631,7 +629,7 @@ export default {
           };
 
           /*** Format invoice according to type ***/
-          invoice = this.formatFiscalInvoice(
+          invoice = formatFiscalInvoice(
             documento.letra,
             dataForCreateInvoice
           );
@@ -966,25 +964,6 @@ export default {
       }
 
       return saleCondition;
-    },
-
-    formatFiscalInvoice(letter, dataForInvoice) {
-      let invoice;
-      switch (letter) {
-        case "A":
-          invoice = formatReceiptA(dataForInvoice);
-          break;
-
-        case "B":
-          invoice = formatReceiptB(dataForInvoice);
-          break;
-
-        default:
-          invoice = formatReceiptC(dataForInvoice);
-          break;
-      }
-
-      return invoice;
     },
   },
 };

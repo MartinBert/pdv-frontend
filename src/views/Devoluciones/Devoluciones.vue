@@ -152,7 +152,7 @@ import ReceiptDialog from "../../components/ReceiptDialog";
 import { questionAlert, errorAlert, successAlert } from "../../helpers/alerts";
 import { generateBarCode, generateFiveDecimalCode } from "../../helpers/mathHelper";
 import { processDetailReceipt } from "../../helpers/processObjectsHelper";
-import { formatReceiptA, formatReceiptB, formatReceiptC } from '../../helpers/receiptFormatHelper';
+import { formatFiscalInvoice } from '../../helpers/receiptFormatHelper';
 import { addZerosInString } from '../../helpers/stringHelper';
 
 export default {
@@ -290,37 +290,35 @@ export default {
       let file;
       let fileURL;
       let condVenta;
+      let invoice; 
       let devolucion = this.temporalObject
   
-      /*** Get last voucher emmited number ***/
+      /*** Get last invoice emmited number ***/
       axios
       .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`)
       .then(data => {
         const numberOfReceipt = parseInt(data.data.responseOfAfip) + 1;
-        let voucher;
+        const dataForCreateInvoice = {
+          ptoVentaId: ptoVenta.idFiscal,
+          receiptCode: documento.codigoDocumento,
+          clientCuit: cliente.cuit,
+          numberOfReceipt: numberOfReceipt,
+          date: getInternationalDate(),
+          products: [detail],
+          totalVenta: totalVenta,
+          asociatedReceipt: comprobanteAsociadoDetalle
+        };
         
-        /*** Format voucher according to type ***/
-        switch (documento.letra) {
-          case "A":
-              voucher = formatReceiptA(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), [detail], totalVenta, comprobanteAsociadoDetalle);
-            break;
-          
-          case "B":
-              voucher = formatReceiptB(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), [detail], totalVenta, comprobanteAsociadoDetalle);
-            break
-        
-          default:
-              voucher = formatReceiptC(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), totalVenta, comprobanteAsociadoDetalle);
-            break;
-        }
+        /*** Format invoice according to type ***/
+        invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice)
 
         /*** Evaluate required sales form data ***/
         if (mediosPago !== undefined) {
-          console.log(voucher);
+          console.log(invoice);
 
-        /*** Send voucher to AFIP ***/
+        /*** Send invoice to AFIP ***/
           axios
-          .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, voucher)
+          .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
           .then(data => {
             console.log(data);
             const cae = data.data.CAE;

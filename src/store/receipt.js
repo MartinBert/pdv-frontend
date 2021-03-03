@@ -4,7 +4,6 @@ export default {
       receiptDialog: false,
       receipt: {}
     },
-    getters: {},
     mutations: {
       resetStates(state) {
         state.receiptDialog = false;
@@ -17,5 +16,4 @@ export default {
         state.receipt = object;
       }
     },
-    actions: {}
   };

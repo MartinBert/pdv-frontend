@@ -206,3 +206,23 @@ export function formatReceiptC(object){
 
     return voucherC;
 }
+
+export function formatFiscalInvoice(letter, dataForInvoice) {
+    let invoice;
+    
+    switch (letter) {
+      case "A":
+        invoice = formatReceiptA(dataForInvoice);
+        break;
+
+      case "B":
+        invoice = formatReceiptB(dataForInvoice);
+        break;
+
+      default:
+        invoice = formatReceiptC(dataForInvoice);
+        break;
+    }
+
+    return invoice;
+}

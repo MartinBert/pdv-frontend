@@ -205,7 +205,7 @@ import {
   generateFiveDecimalCode,
   restarNumeros
 } from "../../helpers/mathHelper";
-import { formatReceiptA, formatReceiptB, formatReceiptC } from '../../helpers/receiptFormatHelper';
+import { formatFiscalInvoice } from '../../helpers/receiptFormatHelper';
 import { addZerosInString } from '../../helpers/stringHelper';
 import ProductDialog from "../../components/ProductDialog";
 import ReceiptDialog from "../../components/ReceiptDialog";
@@ -421,14 +421,13 @@ export default {
         totalVenta
       );
 
-      console.log(comprobanteAsociado);
-
       /*** Mutable vars ***/
       let comprobante;
       let file;
       let fileURL;
       let productos;
       let condVenta;
+      let invoice;
       let devolucion = {
         fecha: formatDate(getCurrentDate()),
         descripcion: this.object.descripcion,
@@ -438,35 +437,31 @@ export default {
         sucursal: sucursal,
       };
   
-      /*** Get last voucher emmited number ***/
+      /*** Get last invoice emmited number ***/
       axios
       .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`)
       .then(data => {
         const numberOfReceipt = parseInt(data.data.responseOfAfip) + 1;
-        let voucher;
-        
-        /*** Format voucher according to type ***/
-        switch (documento.letra) {
-          case "A":
-              voucher = formatReceiptA(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), [detail], totalVenta, comprobanteAsociadoDetalle);
-            break;
-          
-          case "B":
-              voucher = formatReceiptB(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), [detail], totalVenta, comprobanteAsociadoDetalle);
-            break
-        
-          default:
-              voucher = formatReceiptC(ptoVenta.idFiscal, documento.codigoDocumento, cliente.cuit, numberOfReceipt, getInternationalDate(), totalVenta, comprobanteAsociadoDetalle);
-            break;
-        }
+        const dataForCreateInvoice = {
+            ptoVentaId: ptoVenta.idFiscal,
+            receiptCode: documento.codigoDocumento,
+            clientCuit: cliente.cuit,
+            numberOfReceipt: numberOfReceipt,
+            date: getInternationalDate(),
+            products: [detail],
+            totalVenta: totalVenta,
+            asociatedReceipt: comprobanteAsociadoDetalle
+        };
 
+        /*** Format invoice according to type ***/
+        invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice)
+      
         /*** Evaluate required sales form data ***/
         if (mediosPago !== undefined) {
           if (productosEntrantes.length > 0) {
-
-            /*** Send voucher to AFIP ***/
+            /*** Send invoice to AFIP ***/
               axios
-              .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, voucher)
+              .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
               .then(data => {
                 console.log(data);
                 const cae = data.data.CAE;
@@ -501,7 +496,6 @@ export default {
                   .save(comprobante)
                   .then((data) => {
                     let comprobanteGenerado = data.data;
-                  
                     GenericService(tenant, "stock", token)
                       .filter(filterParam)
                       .then((data) => {

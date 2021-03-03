@@ -5,7 +5,6 @@ export default {
     products: [],
     detailList: [],
   },
-  getters: {},
   mutations: {
     resetStates(state) {
       state.dialogProd = false;
@@ -29,5 +28,4 @@ export default {
       state.detailList = object;
     },
   },
-  actions: {}
 };
