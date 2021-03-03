@@ -45,7 +45,7 @@
           <tr>
             <td>{{object.id}}</td>
             <td>{{object.nombre}}</td>
-            <td class="text-center">
+            <td>
               <button @click="openPlans(object.planPago)"><img
                 src="/../../images/icons/details.svg"
                 width="30"

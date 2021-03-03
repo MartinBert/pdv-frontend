@@ -97,8 +97,8 @@
             </v-row>
             <v-row>
               <v-col cols="12" class="text-end">
-                <v-btn class="success" @click="loadProducts()">CARGAR PRODUCTOS</v-btn>
-                <v-btn class="error ml-1" @click="clearSelection()">LIMPIAR</v-btn>
+                <v-btn class="primary" @click="loadProducts()">CARGAR PRODUCTOS</v-btn>
+                <v-btn class="default ml-1" @click="clearSelection()">LIMPIAR</v-btn>
               </v-col>
             </v-row>
           </v-container>

@@ -167,7 +167,7 @@
         </v-card-text>
         <v-card-actions>
           <v-col cols="12">
-            <v-btn class="success ml-5" type="submit">AGREGAR COMPROBANTE</v-btn>
+            <v-btn class="primary ml-5" type="submit">AGREGAR COMPROBANTE</v-btn>
           </v-col>
         </v-card-actions>
       </form>

@@ -42,7 +42,7 @@
             <td>{{object.telefono}}</td>
             <td>{{object.email}}</td>
             <td>{{object.direccion}}</td>
-            <td class="text-center">
+            <td>
               <button @click="seeDetails(object)"><img
                 src="/../../images/icons/details.svg"
                 width="30"

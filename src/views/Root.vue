@@ -60,6 +60,7 @@
           <v-btn
             type="submit"
             class="ml-2"
+            outlined
           >APLICAR</v-btn>
         </form>
       <v-spacer />

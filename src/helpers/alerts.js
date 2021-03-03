@@ -58,8 +58,8 @@ export function questionAlert(strTitle, strText) {
         showDenyButton: true,
         confirmButtonText: 'SI',
         denyButtonText: 'NO',
-        confirmButtonColor: 'rgb(0, 146, 90)',
-        denyButtonColor: 'rgb(209, 50, 50)'
+        confirmButtonColor: 'rgb(63, 81, 181)',
+        denyButtonColor: 'rgb(172, 171, 171)'
     });
 }
 export function infoAlert(str) {

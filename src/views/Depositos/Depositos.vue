@@ -84,7 +84,7 @@
             </td>
             <td>
               <span v-if="object.defaultDeposit == '1'">
-                <img src="/../../images/icons/success.svg" alt="success" width="50">
+                <img src="/../../images/icons/success.svg" alt="success" width="30" height="30">
               </span>
               <span v-if="object.defaultDeposit !== '1'">
                 <v-btn class="primary" @click="selectDefaultDeposit(loguedUser.perfil, object)"

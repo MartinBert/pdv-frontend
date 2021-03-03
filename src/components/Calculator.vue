@@ -11,13 +11,13 @@
         </v-row>
         <v-row>
           <v-col class="sr">
-            <div class="clear" @click="clear()">C</div>
+            <div class="black" @click="clear()">C</div>
           </v-col>
           <v-col class="sr">
-            <div class="clear" @click="currentSyntaxClear()">CE</div>
+            <div class="black" @click="currentSyntaxClear()">CE</div>
           </v-col>
           <v-col class="sr">
-            <div class="clear" @click="partialClear()">«</div>
+            <div class="black" @click="partialClear()">«</div>
           </v-col>
         </v-row>
         <v-row>
@@ -240,7 +240,7 @@ export default {
   cursor: pointer;
   border: solid 1px black;
   border-radius: 5px 5px 5px 5px;
-  background-color: #48c;
+  background-color: #364ab8;
   color: #fff;
   font-size: 30px;
 }
@@ -248,15 +248,6 @@ export default {
 .sr .black {
   cursor: pointer;
   border: solid 1px;
-  border-radius: 5px 5px 5px 5px;
-  color: #fff;
-  font-size: 30px;
-}
-
-.sr .clear {
-  background-color: red;
-  cursor: pointer;
-  border: solid 1px black;
   border-radius: 5px 5px 5px 5px;
   color: #fff;
   font-size: 30px;

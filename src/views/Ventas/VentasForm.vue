@@ -185,8 +185,8 @@
             </v-row>
             <v-row>
               <v-col class="text-right">
-                <v-btn type="submit" class="success">Finalizar venta</v-btn>
-                <v-btn type="button" class="error ml-1" @click="clear()"
+                <v-btn type="submit" class="primary">Finalizar venta</v-btn>
+                <v-btn type="button" class="default ml-1" @click="clear()"
                   >Cancelar</v-btn
                 >
               </v-col>
