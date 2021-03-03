@@ -1,6 +1,7 @@
 import { ordenarMayorMenor, sumarNumeros, roundTwoDecimals, restarNumeros, calculatePercentReductionInAmount } from './mathHelper';
 
-export function formatReceiptA(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt){
+export function formatReceiptA(object){
+    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt } = object;
     const productsWithIva = products.filter(el => el.ivaVentas);
     const iva21Object = productsWithIva.filter(el => el.ivaVentas === 21);
     const iva10Object = productsWithIva.filter(el => el.ivaVentas === 10.5);
@@ -88,7 +89,8 @@ export function formatReceiptA(ptoVentaId, receiptCode, clientCuit, numberOfRece
     return voucherA;
 }
 
-export function formatReceiptB(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt){
+export function formatReceiptB(object){
+    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt } = object;
     const productsWithIva = products.filter(el => el.ivaVentas);
     const iva21Object = productsWithIva.filter(el => el.ivaVentas === 21);
     const iva10Object = productsWithIva.filter(el => el.ivaVentas === 10.5);
@@ -176,7 +178,8 @@ export function formatReceiptB(ptoVentaId, receiptCode, clientCuit, numberOfRece
     return voucherB;
 }
 
-export function formatReceiptC(ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, totalVenta, asociatedReceipt){
+export function formatReceiptC(object){
+    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, totalVenta, asociatedReceipt } = object;
     let voucherC = {
         'CantReg' 	: 1, // Cantidad de comprobantes a registrar
         'PtoVta' 	: ptoVentaId, // Punto de venta

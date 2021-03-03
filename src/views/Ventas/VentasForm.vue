@@ -26,7 +26,6 @@
             @click="testcert()"
           >TEST CERTIFICADO</v-btn> -->
           <!-- TEST CERT -->
-          
         </v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">
@@ -186,7 +185,7 @@
             <v-row>
               <v-col class="text-right">
                 <v-btn type="submit" class="success">Finalizar venta</v-btn>
-                <v-btn type="button" class="error ml-1" @click="cancelSale()"
+                <v-btn type="button" class="error ml-1" @click="clear()"
                   >Cancelar</v-btn
                 >
               </v-col>
@@ -282,9 +281,7 @@ import ReportsService from "../../services/ReportsService";
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    passwordOfLoguedUser: "",
     fecha: getCurrentDate(),
-    valid: true,
     barcode: "",
     page: 0,
     size: 1000,
@@ -301,8 +298,6 @@ export default {
     tenant: "",
     service: "ventas",
     token: localStorage.getItem("token"),
-    snackError: false,
-    errorMessage: "",
     modificator: "",
     priceModificationPorcent: 0,
     dialogIndividualPercent: false,
@@ -546,7 +541,6 @@ export default {
       data.forEach((el) => {
         processPorducts.push(this.processProductsObject(el));
       });
-
       if (this.products.length > 0) {
         this.products.forEach((el) => {
           processPorducts = processPorducts.filter((e) => e.id !== el.id);
@@ -610,70 +604,45 @@ export default {
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
+      const condVenta = this.checkSaleCondition(planesPago);
 
       /*** Mutable vars ***/
       let comprobante;
       let file;
       let fileURL;
-      let condVenta;
+      let invoice;
 
-      /*** Get last voucher emmited number ***/
+      /*** Get last invoice emmited number ***/
       axios
         .get(
           `${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`
         )
         .then((data) => {
           const numberOfReceipt = parseInt(data.data.responseOfAfip) + 1;
-          let voucher;
+          const dataForCreateInvoice = {
+            ptoVentaId: ptoVenta.idFiscal,
+            receiptCode: documento.codigoDocumento,
+            clientCuit: cliente.cuit,
+            numberOfReceipt: numberOfReceipt,
+            date: getInternationalDate(),
+            products: products,
+            totalVenta: totalVenta,
+          };
 
-          /*** Format voucher according to type ***/
-          switch (documento.letra) {
-            case "A":
-              voucher = formatReceiptA(
-                ptoVenta.idFiscal,
-                documento.codigoDocumento,
-                cliente.cuit,
-                numberOfReceipt,
-                getInternationalDate(),
-                products,
-                totalVenta
-              );
-              break;
+          /*** Format invoice according to type ***/
+          invoice = this.formatFiscalInvoice(
+            documento.letra,
+            dataForCreateInvoice
+          );
 
-            case "B":
-              voucher = formatReceiptB(
-                ptoVenta.idFiscal,
-                documento.codigoDocumento,
-                cliente.cuit,
-                numberOfReceipt,
-                getInternationalDate(),
-                products,
-                totalVenta
-              );
-              break;
-
-            default:
-              voucher = formatReceiptC(
-                ptoVenta.idFiscal,
-                documento.codigoDocumento,
-                cliente.cuit,
-                numberOfReceipt,
-                getInternationalDate(),
-                totalVenta
-              );
-              break;
-          }
-
-          /*** Evaluate required sales form data ***/
+          /*** Evaluate required sale form data ***/
           if (mediosPago !== undefined) {
             if (products.length > 0) {
-              console.log(voucher);
-
-              /*** Send voucher to AFIP ***/
+              /*** Send invoice to AFIP ***/
               axios
                 .post(
                   `${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`,
-                  voucher
+                  invoice
                 )
                 .then((data) => {
                   const cae = data.data.CAE;
@@ -685,12 +654,7 @@ export default {
                     cae +
                     formatDateWithoutSlash(dateOfCaeExpiration);
 
-                  if (planesPago.cuotas > 1) {
-                    condVenta = false;
-                  } else {
-                    condVenta = true;
-                  }
-
+                  /*** Create receipt ***/
                   comprobante = {
                     letra: documento.letra,
                     numeroCbte: numberOfReceipt,
@@ -711,30 +675,10 @@ export default {
                     nombreDocumento: documento.nombre,
                   };
 
-                  /*** Save receipt in database ***/
+                  /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
-                    GenericService(tenant, "comprobantesFiscales", token).save(
-                      comprobante
-                    );
-
-                    /*** Save stocks modifications ***/
-                    this.applyStockModifications(comprobante)
-                      .then((data) => {
-                        const productsBelowMinimumStock = data[0];
-                        const productsWithoutStockOnDefaultDeposit = data[1];
-                        const productsOutOfStockAndDeposits = data[2];
-                        successAlert("Venta realizada").then(() => {
-                          VentasService(
-                            this.tenant,
-                            this.service,
-                            this.token
-                          ).checkProductsAndDepositsStatus(
-                            productsBelowMinimumStock,
-                            productsWithoutStockOnDefaultDeposit,
-                            productsOutOfStockAndDeposits
-                          );
-                        });
-                      })
+                    GenericService(tenant, "comprobantesFiscales", token)
+                      .save(comprobante)
                       .then(() => {
                         ReportsService(tenant, service, token)
                           .onCloseSaleReport(comprobante)
@@ -745,16 +689,32 @@ export default {
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
                           });
+                      })
+                      .then(() => {
+                        /*** Save stocks modifications ***/
+                        this.applyStockModifications(comprobante)
+                          .then((data) => {
+                            const productsBelowMinimumStock = data[0];
+                            const productsWithoutStockOnDefaultDeposit =
+                              data[1];
+                            const productsOutOfStockAndDeposits = data[2];
+                            successAlert("Venta realizada").then(() => {
+                              VentasService(
+                                this.tenant,
+                                this.service,
+                                this.token
+                              ).checkProductsAndDepositsStatus(
+                                productsBelowMinimumStock,
+                                productsWithoutStockOnDefaultDeposit,
+                                productsOutOfStockAndDeposits
+                              );
+                            });
+                          })
+                          .finally(() => {
+                            /*** Reset view objects and status ***/
+                            this.clear();
+                          });
                       });
-
-                    /*** Reset view objects status ***/
-                    this.object = {};
-                    this.products = [];
-                    this.modificator = "";
-                    this.priceModificationPorcent = 0;
-                    this.individualPercent = "";
-                    this.listennerOfListChange = 999999999;
-                    this.$store.commit("productos/resetStates");
                   } else {
                     errorAlert("Tipo de comprobante no disponible");
                   }
@@ -775,6 +735,7 @@ export default {
     },
 
     saveNoFiscal() {
+      /*** Constants ***/
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
       const totalVenta = this.totalVenta;
@@ -788,27 +749,14 @@ export default {
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
+      const condVenta = this.checkSaleCondition(planesPago);
 
-      //Mutable vars
+      /*** Mutable vars ***/
       let file;
       let fileURL;
-      let comprobante;
-      let condVenta;
+      var comprobante;
 
-      if (planesPago) {
-        if (planesPago.length < 2) {
-          if (planesPago[0].cuotas > 1) {
-            condVenta = true;
-          } else {
-            condVenta = false;
-          }
-        } else {
-          condVenta = false;
-        }
-      } else {
-        condVenta = true;
-      }
-
+      /*** Create receipt ***/
       comprobante = {
         letra: "X",
         numeroCbte: generateFiveDecimalCode(),
@@ -829,29 +777,12 @@ export default {
         nombreDocumento: documento.nombre,
       };
 
+      /*** Evaluate required sale form data ***/
       if (comprobante.mediosPago[0] !== undefined) {
         if (Number(comprobante.totalVenta) !== 0) {
-          GenericService(tenant, "comprobantesFiscales", token).save(
-            comprobante
-          );
-
-          this.applyStockModifications(comprobante)
-            .then((data) => {
-              const productsBelowMinimumStock = data[0];
-              const productsWithoutStockOnDefaultDeposit = data[1];
-              const productsOutOfStockAndDeposits = data[2];
-              successAlert("Venta realizada").then(() => {
-                VentasService(
-                  this.tenant,
-                  this.service,
-                  this.token
-                ).checkProductsAndDepositsStatus(
-                  productsBelowMinimumStock,
-                  productsWithoutStockOnDefaultDeposit,
-                  productsOutOfStockAndDeposits
-                );
-              });
-            })
+          /*** Save receipt in database and print ticket ***/
+          GenericService(tenant, "comprobantesFiscales", token)
+            .save(comprobante)
             .then(() => {
               ReportsService(tenant, service, token)
                 .onCloseSaleReport(comprobante)
@@ -861,16 +792,32 @@ export default {
                   });
                   fileURL = URL.createObjectURL(file);
                   window.open(fileURL, "_blank");
+                })
+                .then(() => {
+                  /*** Save stocks modifications ***/
+                  this.applyStockModifications(comprobante)
+                    .then((data) => {
+                      const productsBelowMinimumStock = data[0];
+                      const productsWithoutStockOnDefaultDeposit = data[1];
+                      const productsOutOfStockAndDeposits = data[2];
+                      successAlert("Venta realizada").then(() => {
+                        VentasService(
+                          this.tenant,
+                          this.service,
+                          this.token
+                        ).checkProductsAndDepositsStatus(
+                          productsBelowMinimumStock,
+                          productsWithoutStockOnDefaultDeposit,
+                          productsOutOfStockAndDeposits
+                        );
+                      });
+                    })
+                    .finally(() => {
+                      /*** Reset view objects and status ***/
+                      this.clear();
+                    });
                 });
             });
-
-          this.object = {};
-          this.products = [];
-          this.modificator = "";
-          this.priceModificationPorcent = 0;
-          this.individualPercent = "";
-          this.listennerOfListChange = 999999999;
-          this.$store.commit("productos/resetStates");
         } else {
           errorAlert("No hay productos seleccionados en la venta");
         }
@@ -895,7 +842,7 @@ export default {
       }
     },
 
-    cancelSale() {
+    clear() {
       this.object = {};
       this.products = [];
       this.modificator = "";
@@ -909,7 +856,6 @@ export default {
       const cuitSucursal = 30715876775;
       const ptoVenta = 2;
       const compType = 1;
-
       axios
         .get(
           `${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuitSucursal}/${ptoVenta}/${compType}`
@@ -935,13 +881,14 @@ export default {
       let productsWithoutStockOnDefaultDeposit = [];
       let productsOutOfStockAndDeposits = [];
       let stocks;
+      let receiptData = comprobante;
 
       await GenericService(this.tenant, "stock", this.token)
         .filter(filterParam)
         .then((data) => {
           stocks = data.data.content;
           stocks.forEach((stock) => {
-            comprobante.productos.forEach((productInReceipt) => {
+            receiptData.productos.forEach((productInReceipt) => {
               if (stock.producto.id === productInReceipt.id) {
                 productInReceipt.checked = true;
                 switch (stock.deposito.id) {
@@ -949,7 +896,7 @@ export default {
                     stock.cantidad =
                       parseInt(stock.cantidad) -
                       parseInt(productInReceipt.cantUnidades);
-                    comprobante.productos = comprobante.productos.filter(
+                    receiptData.productos = receiptData.productos.filter(
                       (el) => el.id !== productInReceipt.id
                     );
                     if (
@@ -967,7 +914,7 @@ export default {
                     stock.cantidad =
                       parseInt(stock.cantidad) -
                       parseInt(productInReceipt.cantUnidades);
-                    comprobante.productos = comprobante.productos.filter(
+                    receiptData.productos = receiptData.productos.filter(
                       (el) => el.id !== productInReceipt.id
                     );
                     if (
@@ -986,7 +933,7 @@ export default {
             });
           });
 
-          const viewCheckedProductsInReceipt = comprobante.productos.filter(
+          const viewCheckedProductsInReceipt = receiptData.productos.filter(
             (el) => !el.checked
           );
           if (viewCheckedProductsInReceipt.length > 0) {
@@ -999,6 +946,44 @@ export default {
         productsWithoutStockOnDefaultDeposit,
         productsOutOfStockAndDeposits,
       ];
+    },
+
+    checkSaleCondition(paymentPlan) {
+      let saleCondition;
+      if (paymentPlan) {
+        if (paymentPlan.length < 2) {
+          if (paymentPlan[0].cuotas > 1) {
+            saleCondition = true;
+          } else {
+            saleCondition = false;
+          }
+        } else {
+          saleCondition = false;
+        }
+      } else {
+        saleCondition = true;
+      }
+
+      return saleCondition;
+    },
+
+    formatFiscalInvoice(letter, dataForInvoice) {
+      let invoice;
+      switch (letter) {
+        case "A":
+          invoice = formatReceiptA(dataForInvoice);
+          break;
+
+        case "B":
+          invoice = formatReceiptB(dataForInvoice);
+          break;
+
+        default:
+          invoice = formatReceiptC(dataForInvoice);
+          break;
+      }
+
+      return invoice;
     },
   },
 };
