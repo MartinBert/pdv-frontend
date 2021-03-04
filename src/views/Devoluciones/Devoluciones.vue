@@ -281,8 +281,6 @@ export default {
         totalVenta
       );
 
-      console.log(comprobanteAsociado);
-
       /*** Mutable vars ***/
       let comprobante;
       let file;
@@ -312,13 +310,10 @@ export default {
 
         /*** Evaluate required sales form data ***/
         if (mediosPago !== undefined) {
-          console.log(invoice);
-
         /*** Send invoice to AFIP ***/
           axios
           .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
           .then(data => {
-            console.log(data);
             const cae = data.data.CAE;
             const dateOfCaeExpiration = data.data.CAEFchVto;
             const barCode = sucursal.cuit + addZerosInString("02", documento.codigoDocumento) + addZerosInString("04", ptoVenta.idFiscal) + cae + formatDateWithoutSlash(dateOfCaeExpiration);

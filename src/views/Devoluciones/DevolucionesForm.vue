@@ -284,8 +284,6 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
-
-      GenericService(this.tenant, 'depositos', this.token)
     },
 
     getDeposits(){
@@ -294,9 +292,6 @@ export default {
       .then(data => {
         this.depositos = data.data.content;
         this.defaultDeposit = this.depositos.filter(el => el.defaultDeposit === '1')[0];
-
-        console.log(this.depositos);
-        console.log(this.defaultDeposit);
       })
     },
 
@@ -463,7 +458,6 @@ export default {
               axios
               .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
               .then(data => {
-                console.log(data);
                 const cae = data.data.CAE;
                 const dateOfCaeExpiration = data.data.CAEFchVto;
                 const barCode = sucursal.cuit + addZerosInString("02", documento.codigoDocumento) + addZerosInString("04", ptoVenta.idFiscal) + cae + formatDateWithoutSlash(dateOfCaeExpiration);
@@ -500,12 +494,10 @@ export default {
                       .filter(filterParam)
                       .then((data) => {
                         productos = data.data.content;
+                        console.log(productos);
                         productos.forEach((el) => {
                           productosEntrantes.forEach((e) => {
-                            if (
-                              el.producto.id === e.id &&
-                              el.deposito.id == this.defaultDeposit.id
-                            ) {
+                            if (el.producto.id === e.id) {
                               el.cantidad =
                                 parseInt(el.cantidad) +
                                 parseInt(e.cantUnidades);
@@ -515,10 +507,7 @@ export default {
 
                           if (productosSalientes.length > 0) {
                             productosSalientes.forEach((e) => {
-                              if (
-                                el.producto.id === e.id &&
-                                el.deposito.id == this.defaultDeposit.id
-                              ) {
+                              if (el.producto.id === e.id) {
                                 el.cantidad =
                                   parseInt(el.cantidad) -
                                   parseInt(e.cantUnidades);
@@ -610,13 +599,6 @@ export default {
         empresa: empresa,
         sucursal: sucursal,
       };
-
-      GenericService(tenant, "depositos", token)
-        .filter(filterParam)
-        .then((data) => {
-          this.depositos = data.data.content;
-          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
-        });
 
       if (planesPago) {
         if (planesPago.length < 2) {
@@ -734,13 +716,6 @@ export default {
         empresa: empresa,
         sucursal: sucursal,
       };
-
-      GenericService(tenant, "depositos", token)
-        .filter(filterParam)
-        .then((data) => {
-          this.depositos = data.data.content;
-          this.defaultDeposit = data.data.content.filter(el => el.defaultDeposit === '1')[0];
-        });
 
       GenericService(tenant, "stock", token)
         .filter(filterParam)
