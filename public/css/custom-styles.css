@@ -1,7 +1,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 /***LOGIN***/
-
 .backgroundclass {
     background: rgb(2,0,36);
     background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(3,1,45,1) 9%, rgba(10,10,158,1) 50%, rgba(4,3,69,1) 95%, rgba(2,0,36,1) 100%);
@@ -53,8 +52,11 @@
 /*******/
 
 /***ROOT***/
+:root{
+    --main-bg-color: #d2d2ff;
+}
 .root-container {
-    background-color: #e7e7e7;
+    background-color: var(--main-bg-color);
     opacity: 90%;
     font-size: 12px !important;
     font-weight: 400;
