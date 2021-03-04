@@ -46,7 +46,7 @@
             outlined
             rounded
             class="text-left"
-            placeholder="Búsqueda"
+            label="Búsqueda"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
@@ -58,21 +58,23 @@
             outlined
             rounded
             class="text-left"
-            placeholder="Marcas"
+            label="Marcas"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
         <v-col cols="2">
           <v-autocomplete
-            v-model="filterParams.thirdStringParam"
+            v-model="filterParams.attibutesArray"
+            :items="atributos"
             v-on:change="filterObjects(filterParams)"
             multiple
             dense
             outlined
             rounded
-            class="text-left"
-            placeholder="Atributos"
+            item-text="valor"
+            label="Atributos"
             append-icon="mdi-magnify"
+            :return-object="true"
           ></v-autocomplete>
         </v-col>
       </v-row>
@@ -235,6 +237,7 @@ export default {
       stringParam: "",
       secondStringParam: "",
       thirdStringParam: "",
+      attributesArray: [],
       page: 1,
       size: 10,
       totalPages: 0
@@ -262,11 +265,16 @@ export default {
 
   methods: {
     filterObjects(filterParams) {
+      filterParams.longParam = filterParams.attributesArray[0].id;
+      filterParams.secondLongParam = filterParams.attributesArray[1].id;
+      filterParams.fifthLongParam = filterParams.attributesArray[2].id;
+
       if(this.estadoSeleccionado.id === 1){
         filterParams.doubleParam = 0
       }else{
         filterParams.doubleParam = 2
       }
+      
       GenericService(this.tenant, "productos", this.token)
       .filter(filterParams)
       .then((data) => {

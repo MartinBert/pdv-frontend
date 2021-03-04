@@ -8,6 +8,7 @@ import Vuex from 'vuex';
 import VueBarcodeScanner from 'vue-barcode-scanner';
 import store from  './store/index';
 
+
 Vue.config.productionTip = false
 
 Vue.use(Vuex);
