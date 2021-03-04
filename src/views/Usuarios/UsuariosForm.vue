@@ -163,16 +163,16 @@ export default {
         });
     },
 
-    getAllObjects(idPerfil, stringParam, page, size){
+    getAllObjects(fourthLongParam, stringParam, page, size){
 
       GenericService(this.tenant, "perfiles", this.token)
-      .filter({ idPerfil , stringParam, page, size})
+      .filter({ fourthLongParam , stringParam, page, size})
       .then(data => {
         this.perfiles = data.data.content;
       });
 
       GenericService(this.tenant, "empresas", this.token)
-      .filter({ idPerfil , stringParam, page, size})
+      .filter({ fourthLongParam , stringParam, page, size})
       .then(data => {
         this.empresas = data.data.content;
         if(this.loguedUser.perfil !== 1){

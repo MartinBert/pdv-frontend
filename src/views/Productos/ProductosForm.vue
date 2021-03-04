@@ -274,8 +274,8 @@ export default {
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
     },
     filterParams: {
-      idPerfil: "",
-      idSucursal: "",
+      fourthLongParam: "",
+      thirdLongParam: "",
       stringParam: "",
       secondStringParam: "",
       thirdStringParam: "",

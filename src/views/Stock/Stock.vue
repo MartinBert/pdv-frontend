@@ -228,8 +228,8 @@ export default {
     objects: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
-      idPerfil: "",
-      idSucursal: "",
+      fourthLongParam: "",
+      thirdLongParam: "",
       stringParam: "",
       thirdStringParam: "",
       page: 1,
@@ -256,7 +256,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.idPerfil = this.loguedUser.perfil;
+    this.filterParams.fourthLongParam = this.loguedUser.perfil;
     this.filterObjects(
       this.filterParams,
       this.typeList
@@ -266,13 +266,13 @@ export default {
 
   methods: {
     filterObjects(filterParams, typeList) {
-      switch (filterParams.idPerfil) {
+      switch (filterParams.fourthLongParam) {
         case 1:
-            filterParams.idSucursal = '';
+            filterParams.thirdLongParam = '';
           break;
       
         default:
-            filterParams.idSucursal = this.loguedUser.sucursal.id;
+            filterParams.thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
@@ -283,21 +283,21 @@ export default {
       }
     },
 
-    getOtherModels(idPerfil, stringParam, page, size) {
-      let idSucursal;
+    getOtherModels(fourthLongParam, stringParam, page, size) {
+      let thirdLongParam;
 
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';
+            thirdLongParam = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
       GenericService(this.tenant, "depositos", this.token)
-        .filter({ idPerfil, idSucursal, stringParam, page, size })
+        .filter({ fourthLongParam, thirdLongParam, stringParam, page, size })
         .then((data) => {
           this.depositos = data.data.content;
           this.depositos.push({
@@ -331,7 +331,7 @@ export default {
     },
 
     searchForDeposit(filterParams, typeList) {
-      filterParams.idParam = typeList;
+      filterParams.secondLongParam = typeList;
 
       StocksService(this.tenant, "stock", this.token)
         .filterStockForDepositId(filterParams)
@@ -386,7 +386,7 @@ export default {
       this.loaded = false;
 
       let filterParams = {
-        idSucursal: "",
+        thirdLongParam: "",
         stringParam: "",
         thirdStringParam: "",
         page: 1,
@@ -395,11 +395,11 @@ export default {
 
       switch (this.loguedUser.perfil) {
         case 1:
-            filterParams.idSucursal = '';
+            filterParams.thirdLongParam = '';
           break;
       
         default:
-            filterParams.idSucursal = this.loguedUser.sucursal.id;
+            filterParams.thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
@@ -432,7 +432,7 @@ export default {
       this.loaded = false;
 
       let filterParams = {
-        idSucursal: "",
+        thirdLongParam: "",
         stringParam: "",
         thirdStringParam: "",
         page: 1,
@@ -444,11 +444,11 @@ export default {
 
       switch (this.loguedUser.perfil) {
         case 1:
-            filterParams.idSucursal = '';
+            filterParams.thirdLongParam = '';
           break;
       
         default:
-            filterParams.idSucursal = this.loguedUser.sucursal.id;
+            filterParams.thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 

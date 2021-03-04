@@ -237,8 +237,8 @@ export default {
     snackError: false,
     errorMessage: "",
     filterParams: {
-      idPerfil: "",
-      idSucursal: "",
+      fourthLongParam: "",
+      thirdLongParam: "",
       stringParam: "",
       thirdStringParam: "",
       page: 1,
@@ -302,21 +302,21 @@ export default {
         });
     },
 
-    filterDepositos(idPerfil, stringParam, page, size){
-      let idSucursal;
+    filterDepositos(fourthLongParam, stringParam, page, size){
+      let thirdLongParam;
       
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';         
+            thirdLongParam = '';         
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
       GenericService(this.tenant, "depositos", this.token)
-        .filter({idPerfil, idSucursal, stringParam, page, size})
+        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
         .then((data) => {
           this.depositos = data.data.content;
           this.loaded = true;
@@ -375,20 +375,20 @@ export default {
     },
 
     onBarcodeScanned(stringParam) {
-      let idSucursal;
+      let thirdLongParam;
       
       switch (this.loguedUser.perfil) {
         case 1:
-            idSucursal = '';
+            thirdLongParam = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
       GenericService(this.tenant, "productos", this.token)
-        .filter({idSucursal, stringParam, page: 0, size: 1})
+        .filter({thirdLongParam, stringParam, page: 0, size: 1})
         .then((data) => {
           const databaseItem = data.data.content[0];
           const productInList = this.productos.filter(el => el.id === databaseItem.id)[0];

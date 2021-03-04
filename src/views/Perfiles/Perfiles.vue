@@ -87,8 +87,8 @@ export default {
   data: () => ({
     objects: [],
     filterParams: {
-      idPerfil: "",
-      idSucursal: "",
+      fourthLongParam: "",
+      thirdLongParam: "",
       stringParam: "",
       page: 1,
       size: 10,
@@ -109,10 +109,10 @@ export default {
   methods: {
 
     filterObjects(stringParam, page, size){
-      let idPerfil = 1;
+      let fourthLongParam = 1;
 
       GenericService(this.tenant, this.service, this.token)
-      .filter({idPerfil, stringParam, page, size})
+      .filter({fourthLongParam, stringParam, page, size})
       .then(data => {
         this.objects = data.data.content;
         this.filterParams.totalPages = data.data.totalPages;

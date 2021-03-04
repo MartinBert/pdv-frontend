@@ -109,9 +109,9 @@ export default {
     },
 
     getAtributes(stringParam, page, size){
-      const idSucursal = '';
+      const thirdLongParam = '';
       GenericService(this.tenant, "atributos", this.token)
-        .filter({idSucursal, stringParam, page, size})
+        .filter({thirdLongParam, stringParam, page, size})
         .then(data => {
           this.atributosTexto = data.data.content.filter(el => el.valor != undefined || el.valor != null);
           this.atributosNumero = data.data.content.filter(el => el.valor === undefined || el.valor === null);

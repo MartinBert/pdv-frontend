@@ -86,8 +86,8 @@ export default {
   data: () => ({
     objects: [],
     filterParams: {
-      idPerfil: "",
-      idSucursal: "",
+      fourthLongParam: "",
+      thirdLongParam: "",
       stringParam: "",
       page: 1,
       size: 10,

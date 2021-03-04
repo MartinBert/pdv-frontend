@@ -197,21 +197,21 @@ export default {
         });
     },
 
-    filterObjects(idPerfil, stringParam, page, size){
+    filterObjects(fourthLongParam, stringParam, page, size){
       this.loaded = false
-      let idSucursal;
+      let thirdLongParam;
       
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';          
+            thirdLongParam = '';          
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
-      const filterParam = {idSucursal, stringParam, page, size}
+      const filterParam = {thirdLongParam, stringParam, page, size}
 
       GenericService(this.tenant, "empresas", this.token)
         .filter(filterParam)

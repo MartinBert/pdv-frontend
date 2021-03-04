@@ -72,21 +72,21 @@ export default {
   },
 
   methods: {
-    filterObjects(idPerfil, stringParam, page, size){
-      let idSucursal
+    filterObjects(fourthLongParam, stringParam, page, size){
+      let thirdLongParam
 
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';
+            thirdLongParam = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
       
       GenericService(this.tenant, "planesPago", this.token)
-      .filter({idPerfil, idSucursal, stringParam, page, size})
+      .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
       .then(data => {
         this.planes_pago = data.data.content;
       })

@@ -44,7 +44,7 @@
             label="Búsqueda especial"
             placeholder=" "
             append-icon="mdi-magnify"
-            @input="alterIdParam()"
+            @input="altersecondLongParam()"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -187,9 +187,9 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     objects: null,
     filterParams: {
-      idPerfil: "",
-      idParam: "",
-      idSucursal: "",
+      fourthLongParam: "",
+      secondLongParam: "",
+      thirdLongParam: "",
       stringParam: "",
       doubleParam: "",
       stringParamReceiptNumber: "",
@@ -218,28 +218,28 @@ export default {
 
   methods: {
 
-    filterObjects(idPerfil, param, page, size){
+    filterObjects(fourthLongParam, param, page, size){
       let filterParam;
-      let idSucursal;
+      let thirdLongParam;
 
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';
+            thirdLongParam = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
       switch (param) {
         case undefined:
             if(this.filterParams.doubleParam !== ""){
-              filterParam = { idParam:this.filterParams.idParam, idSucursal, doubleParam: this.filterParams.doubleParam, page, size};
+              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, doubleParam: this.filterParams.doubleParam, page, size};
             }else if(this.filterParams.stringParamReceiptNumber !== ""){
-              filterParam = { idParam:this.filterParams.idParam, idSucursal, stringParam: this.filterParams.stringParamReceiptNumber, page, size}
+              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, stringParam: this.filterParams.stringParamReceiptNumber, page, size}
             }else{
-              filterParam = { idParam:this.filterParams.idParam, idSucursal, stringParam: param, page, size}
+              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, stringParam: param, page, size}
             }
           break;
         
@@ -251,15 +251,15 @@ export default {
               if(param === "//"){
                 param = "";
               }
-              filterParam = { idParam:this.filterParams.idParam, idSucursal, stringParam: param, page, size};
+              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, stringParam: param, page, size};
             }else if(param === this.filterParams.doubleParam){
               this.filterParams.stringParam = "";
               this.filterParams.stringParamReceiptNumber = "";
-              filterParam = { idParam:this.filterParams.idParam, idSucursal, doubleParam: param, page, size};
+              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, doubleParam: param, page, size};
             }else{
               this.filterParams.stringParam = "",
               this.filterParams.doubleParam = "",
-              filterParam = { idParam:this.filterParams.idParam, idSucursal, stringParam: param, page, size}
+              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, stringParam: param, page, size}
             }
           break;
       }
@@ -319,8 +319,8 @@ export default {
       this.$store.commit('eventual/mutateEventualDialog');
     },
 
-    alterIdParam(){
-      this.filterParams.idParam = this.specialFilter; 
+    altersecondLongParam(){
+      this.filterParams.secondLongParam = this.specialFilter; 
       this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
     }
   },

@@ -122,9 +122,9 @@ export default {
       typeList: 0,
       typeProductsList: [],
       filterParams: {
-        idPerfil: "",
-        idParam: "",
-        idSucursal: "",
+        fourthLongParam: "",
+        secondLongParam: "",
+        thirdLongParam: "",
         stringParam: "",
         thirdStringParam: "",
         doubleParam: 0,
@@ -139,7 +139,7 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.token = localStorage.getItem('token');
     this.loguedUser = JSON.parse(localStorage.getItem("userData"));
-    this.filterParams.idPerfil = this.loguedUser.perfil;
+    this.filterParams.fourthLongParam = this.loguedUser.perfil;
     this.filterObjects(this.filterParams, this.typeList);
     this.createtypeProductsList();
   },
@@ -209,16 +209,16 @@ export default {
     },
 
     searchForDeposit(filterParams, typeList){
-      filterParams.idParam = typeList;
-      filterParams.idSucursal;
+      filterParams.secondLongParam = typeList;
+      filterParams.thirdLongParam;
       
-      switch (filterParams.idPerfil) {
+      switch (filterParams.fourthLongParam) {
         case 1:
-            filterParams.idSucursal = '';
+            filterParams.thirdLongParam = '';
           break;
       
         default:
-            filterParams.idSucursal = this.loguedUser.sucursal.id;
+            filterParams.thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
@@ -238,21 +238,21 @@ export default {
     },
 
     createtypeProductsList(){
-      const idPerfil = this.loguedUser.perfil;
-      let idSucursal;
+      const fourthLongParam = this.loguedUser.perfil;
+      let thirdLongParam;
       
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';
+            thirdLongParam = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
       GenericService(this.tenant, 'depositos', this.token)
-      .filter({idPerfil, idSucursal, stringParam: '', page: 0, size: 100000})
+      .filter({fourthLongParam, thirdLongParam, stringParam: '', page: 0, size: 100000})
       .then(data => {
         this.typeProductsList.push({id: 0, text: 'Lista general de productos'});
         data.data.content.forEach(el => {

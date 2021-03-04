@@ -92,22 +92,22 @@ export default {
         });
     },
 
-    filterObjects(idPerfil, stringParam, page, size){
+    filterObjects(fourthLongParam, stringParam, page, size){
       this.loaded = false
-      let idSucursal;
+      let thirdLongParam;
 
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';
+            thirdLongParam = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
       GenericService(this.tenant, "sucursales", this.token)
-        .filter({idPerfil, idSucursal, stringParam, page, size})
+        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
         .then(data => {
           this.sucursales = data.data.content;
           this.loaded = true;

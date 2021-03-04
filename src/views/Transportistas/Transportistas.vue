@@ -94,8 +94,8 @@ export default {
   data: () => ({
     objects: [],
     filterParams: {
-      idPerfil: "",
-      idSucursal: "",
+      fourthLongParam: "",
+      thirdLongParam: "",
       stringParam: "",
       page: 1,
       size: 10,
@@ -114,23 +114,23 @@ export default {
   },
   methods: {
     
-    filterObjects(idPerfil, stringParam, page, size){
+    filterObjects(fourthLongParam, stringParam, page, size){
       this.loaded = false;
-      let idSucursal;
+      let thirdLongParam;
 
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';
+            thirdLongParam = '';
           
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({idPerfil, idSucursal, stringParam, page, size})
+        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
         .then((data) => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;

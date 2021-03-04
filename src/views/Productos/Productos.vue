@@ -7,17 +7,16 @@
           <v-btn class="primary ml-1" @click="newObject()" raised>NUEVO</v-btn>
           <v-btn class="primary ml-1" @click="view = 'labelPrinting'">GENERAR ETIQUETAS</v-btn>
           <v-btn class="primary ml-1" @click="goPricesManagerView()">MODIFICAR PRECIOS</v-btn>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col class="text-end" v-if="view == 'listOfProducts'">
           <v-btn class="primary ml-1" @click="getReport()" raised
             >REPORTE</v-btn
           >
         </v-col>
-        <v-col cols="2" class="mt-2 ml-3" v-if="view == 'labelPrinting'">
+      </v-row>
+      <v-row>
+        <v-col class="mt-2 ml-3" v-if="view == 'labelPrinting'">
           <h2>Seleccion de productos</h2>
         </v-col>
+        <v-spacer/>
         <v-col cols="3" v-if="perfil < 3 && view == 'listOfProducts'">
           <v-file-input
             class="mt-3"
@@ -62,6 +61,19 @@
             placeholder="Marcas"
             append-icon="mdi-magnify"
           ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-autocomplete
+            v-model="filterParams.thirdStringParam"
+            v-on:change="filterObjects(filterParams)"
+            multiple
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Atributos"
+            append-icon="mdi-magnify"
+          ></v-autocomplete>
         </v-col>
       </v-row>
     </v-form>
@@ -218,8 +230,8 @@ export default {
     ],
     estadoSeleccionado: { id: 1, text: "Activos" },
     filterParams: {
-      idPerfil: "",
-      idSucursal: "",
+      thirdLongParam: "",
+      fourthLongParam: "",
       stringParam: "",
       secondStringParam: "",
       thirdStringParam: "",

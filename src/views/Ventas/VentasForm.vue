@@ -354,22 +354,22 @@ export default {
 
   methods: {
     getObjects() {
-      const idPerfil = this.loguedUser.perfil;
-      let idSucursal;
+      const fourthLongParam = this.loguedUser.perfil;
+      let thirdLongParam;
 
-      switch (idPerfil) {
+      switch (fourthLongParam) {
         case 1:
-          idSucursal = "";
+          thirdLongParam = "";
           break;
 
         default:
-          idSucursal = this.loguedUser.sucursal.id;
+          thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
       const filterParam = {
-        idPerfil,
-        idSucursal,
+        fourthLongParam,
+        thirdLongParam,
         stringParam: "",
         page: 0,
         size: 100000,
@@ -869,8 +869,8 @@ export default {
 
     async applyStockModifications(comprobante) {
       const filterParam = {
-        idPerfil: this.loguedUser.perfil,
-        idSucursal: this.loguedUser.sucursal.id,
+        fourthLongParam: this.loguedUser.perfil,
+        thirdLongParam: this.loguedUser.sucursal.id,
         stringParam: "",
         thirdStringParam: "",
         page: 1,

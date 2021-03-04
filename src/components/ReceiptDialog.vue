@@ -261,19 +261,19 @@ export default {
   },
 
   methods: {
-    getAllObjects(idPerfil, stringParam, page, size) {
-      let idSucursal;
-      switch (idPerfil) {
+    getAllObjects(fourthLongParam, stringParam, page, size) {
+      let thirdLongParam;
+      switch (fourthLongParam) {
         case 1:
-            idSucursal = '';
+            thirdLongParam = '';
           break;
       
         default:
-            idSucursal = this.loguedUser.sucursal.id;
+            thirdLongParam = this.loguedUser.sucursal.id;
           break;
       }
 
-      const filterParam = {idSucursal, stringParam, page, size}
+      const filterParam = {thirdLongParam, stringParam, page, size}
 
       GenericService(this.tenant, "clientes", this.token)
         .filter(filterParam)
@@ -343,7 +343,7 @@ export default {
       this.$refs.tab.$forceUpdate();
     },
 
-    filterObjects(idSucursal, stringParam, page, size){
+    filterObjects(thirdLongParam, stringParam, page, size){
       let filterParam;
       if(this.filterParams.stringParam === stringParam){
         this.filterParams.doubleParam = "";
@@ -351,10 +351,10 @@ export default {
         if(stringParam === "//"){
           stringParam = "";
         }
-        filterParam = {idSucursal, stringParam, page, size};
+        filterParam = {thirdLongParam, stringParam, page, size};
       }else{
         this.filterParams.stringParam = "";
-        filterParam = {idSucursal, doubleParam: stringParam, page, size};
+        filterParam = {thirdLongParam, doubleParam: stringParam, page, size};
       }
       GenericService(this.tenant, "ventas", this.token)
         .filter(filterParam)
@@ -368,15 +368,15 @@ export default {
     },
 
     changePage(page, size){
-      const idSucursal = this.loguedUser.sucursal.id;
+      const thirdLongParam = this.loguedUser.sucursal.id;
       if(this.filterParams.stringParam || this.filterParams.doubleParam){
         if(this.filterParams.stringParam){
-          this.filterObjects(idSucursal, this.filterParams.stringParam, page, size);
+          this.filterObjects(thirdLongParam, this.filterParams.stringParam, page, size);
         }else{
-          this.filterObjects(idSucursal, this.filterParams.doubleParam, page, size);
+          this.filterObjects(thirdLongParam, this.filterParams.doubleParam, page, size);
         }
       }else{
-        this.filterObjects(idSucursal, "", page, size);
+        this.filterObjects(thirdLongParam, "", page, size);
       }
 
     }

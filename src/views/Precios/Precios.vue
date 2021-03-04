@@ -115,7 +115,7 @@ export default {
           this.loaded = false;
           const filterParam = {
             longParam: 1,
-            idParam: this.object.distribuidor.id,
+            secondLongParam: this.object.distribuidor.id,
             page: 1,
             size: 100000,
           };
@@ -149,7 +149,7 @@ export default {
           this.loaded = false;
           const filterParam = {
             longParam: 1,
-            idParam: this.object.distribuidor.id,
+            secondLongParam: this.object.distribuidor.id,
             page: 1,
             size: 100000,
           };

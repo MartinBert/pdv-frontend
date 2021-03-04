@@ -71,8 +71,8 @@ export default {
             loguedUser: JSON.parse(localStorage.getItem("userData")),
             token: localStorage.getItem("token"),
             filterParams: {
-                idPerfil: "",
-                idSucursal: "",
+                fourthLongParam: "",
+                thirdLongParam: "",
                 stringParam: "",
                 page: 1,
                 size: 10,
@@ -92,21 +92,21 @@ export default {
     },
 
     methods: {
-        filterObjects(idPerfil, stringParam, page, size) {
-            let idSucursal;
+        filterObjects(fourthLongParam, stringParam, page, size) {
+            let thirdLongParam;
             
-            switch (idPerfil) {
+            switch (fourthLongParam) {
                 case 1:
-                        idSucursal = '';
+                        thirdLongParam = '';
                     break;
             
                 default:
-                        idSucursal = this.loguedUser.sucursal.id;
+                        thirdLongParam = this.loguedUser.sucursal.id;
                     break;
             }
             
             GenericService(this.tenant, 'historialStock', this.token)
-            .filter({idSucursal, stringParam, page, size})
+            .filter({thirdLongParam, stringParam, page, size})
             .then(data => {
                 this.objects = data.data.content;
             })

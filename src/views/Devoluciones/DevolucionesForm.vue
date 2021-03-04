@@ -288,7 +288,7 @@ export default {
 
     getDeposits(){
       GenericService(this.tenant, 'depositos', this.token)
-      .filter({idPerfil: this.loguedUser.perfil, idSucursal: this.loguedUser.sucursal.id, stringParam: '', page: 0, size: 100000})
+      .filter({fourthLongParam: this.loguedUser.perfil, thirdLongParam: this.loguedUser.sucursal.id, stringParam: '', page: 0, size: 100000})
       .then(data => {
         this.depositos = data.data.content;
         this.defaultDeposit = this.depositos.filter(el => el.defaultDeposit === '1')[0];
@@ -405,7 +405,7 @@ export default {
       const tenant = this.tenant;
       const token = this.token;
       const service = "ventas";
-      const filterParam = {idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", thirdStringParam: "", page: 1, size: 100000}
+      const filterParam = {fourthLongParam: this.loguedUser.perfil, thirdLongParam: sucursal.id, stringParam: "", thirdStringParam: "", page: 1, size: 100000}
       const comprobanteAsociadoDetalle = [{
         Tipo: comprobanteAsociado.documentoComercial.codigoDocumento,
         PtoVta: comprobanteAsociado.puntoVenta.idFiscal,
@@ -583,7 +583,7 @@ export default {
         documento.codigoDocumento,
         totalVenta
       );
-      const filterParam = { idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", thirdStringParam: "", page: 1, size: 100000 }
+      const filterParam = { fourthLongParam: this.loguedUser.perfil, thirdLongParam: sucursal.id, stringParam: "", thirdStringParam: "", page: 1, size: 100000 }
 
       /* Mutable vars */
       let file;
@@ -705,7 +705,7 @@ export default {
       const productosSalientes = this.object.productosSalientes;
       const tenant = this.tenant;
       const token = this.token;
-      const filterParam = { idPerfil: this.loguedUser.perfil, idSucursal: sucursal.id, stringParam: "", thirdStringParam: "", page: 1, size: 10000}
+      const filterParam = { fourthLongParam: this.loguedUser.perfil, thirdLongParam: sucursal.id, stringParam: "", thirdStringParam: "", page: 1, size: 10000}
 
       let productos;
       let devolucion = {
