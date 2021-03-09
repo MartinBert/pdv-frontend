@@ -10,13 +10,11 @@
           <v-btn class="primary ml-1" @click="openDialog('stockMigration')"
             >MIGRAR STOCK</v-btn
           >
+          <v-btn class="primary ml-1" @click="openDialog('reports')">Reportes</v-btn>
         </v-col>
       </v-row>
       <v-row>
-        <v-col class="text-end">
-          <v-btn class="primary mt-3" @click="openDialog('reports')">Reportes</v-btn>
-        </v-col>
-        <v-col cols="2">
+        <v-col>
           <v-autocomplete
             :items="depositos"
             item-text="nombre"
@@ -26,37 +24,63 @@
             @change="filterObjects(filterParams, typeList)"
           />
         </v-col>
-        <v-col cols="2">
+        <v-col>
           <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="
-              filterObjects(
-                filterParams,
-                typeList
-              )
-            "
+            v-model="filterParams.productoName"
+            v-on:input="filterObjects(filterParams,typeList)"
             dense
             outlined
             rounded
             class="text-left mt-2"
-            placeholder="Búsqueda"
+            label="Nombre"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col cols="2">
+        <v-col>
           <v-text-field
-            v-model="filterParams.thirdStringParam"
-            v-on:input="
-              filterObjects(
-                filterParams,
-                typeList
-              )
-            "
+            v-model="filterParams.productoCodigo"
+            v-on:input="filterObjects(filterParams,typeList)"
             dense
             outlined
             rounded
             class="text-left mt-2"
-            placeholder="Marca"
+            label="Codigo"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoCodigoBarras"
+            v-on:input="filterObjects(filterParams,typeList)"
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            label="Codigo de barras"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoMarcaName"
+            v-on:input="filterObjects(filterParams,typeList)"
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            label="Marca"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoPrimerAtributoName"
+            v-on:input="filterObjects(filterParams,typeList)"
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            label="Atributo"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
@@ -228,10 +252,17 @@ export default {
     objects: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
-      thirdStringParam: "",
+      productoName: "",
+      productoCodigo: "",
+      productoCodigoBarras: "",
+      productoMarcaName: "",
+      productoPrimerAtributoName: "",
+      productoSegundoAtributoName: "",
+      productoTercerAtributoName: "",
+      productoEstado: 0,
+      stockDepositoId: "",
+      sucursalId: "",
+      perfilId: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -256,23 +287,20 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.fourthLongParam = this.loguedUser.perfil;
-    this.filterObjects(
-      this.filterParams,
-      this.typeList
-    );
+    this.filterParams.perfilId = this.loguedUser.perfil;
+    this.filterObjects(this.filterParams,this.typeList);
     this.getOtherModels(this.loguedUser.perfil, "", 0, 100000);
   },
 
   methods: {
     filterObjects(filterParams, typeList) {
-      switch (filterParams.fourthLongParam) {
+      switch (filterParams.perfilId) {
         case 1:
-            filterParams.thirdLongParam = '';
+            filterParams.sucursalId = '';
           break;
       
         default:
-            filterParams.thirdLongParam = this.loguedUser.sucursal.id;
+            filterParams.sucursalId = this.loguedUser.sucursal.id;
           break;
       }
 
@@ -331,12 +359,10 @@ export default {
     },
 
     searchForDeposit(filterParams, typeList) {
-      filterParams.secondLongParam = typeList;
-
+      filterParams.stockDepositoId = typeList;
       StocksService(this.tenant, "stock", this.token)
         .filterStockForDepositId(filterParams)
         .then((data) => {
-          console.log(data);
           this.objects = data.data.content;
           if(this.migration.length > 0){
             this.migration.filter(el => {

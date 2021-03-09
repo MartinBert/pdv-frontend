@@ -28,7 +28,7 @@
                 </v-col>
                 <v-col cols="6">
                   <v-autocomplete
-                    @input="filterObjects(loguedUser.sucursal.id, filterParams.stringParam, paginate.page - 1, paginate.size)"
+                    @input="filterObjects(loguedUser.sucursal.id, filterParams.stringParam, paginate.page, paginate.size)"
                     class="button-ventas comprobante"
                     v-model="dialogObject.documento"
                     :items="databaseItems.documentos"
@@ -82,7 +82,7 @@
                   <v-text-field
                     type="date"
                     v-model="filterParams.stringParam"
-                    v-on:input="filterObjects(loguedUser.sucursal.id, filterParams.stringParam, paginate.page - 1, paginate.size)"
+                    v-on:input="filterObjects(loguedUser.sucursal.id, filterParams.stringParam, paginate.page, paginate.size)"
                     dense
                     outlined
                     rounded
@@ -92,7 +92,7 @@
                   <v-text-field
                     type="number"
                     v-model="filterParams.doubleParam"
-                    v-on:input="filterObjects(loguedUser.sucursal.id, filterParams.doubleParam, paginate.page - 1, paginate.size)"
+                    v-on:input="filterObjects(loguedUser.sucursal.id, filterParams.doubleParam, paginate.page, paginate.size)"
                     dense
                     outlined
                     rounded
@@ -159,7 +159,7 @@
                       prev-icon="mdi-chevron-left"
                       :page="paginate.page"
                       :total-visible="8"
-                      @input="changePage(paginate.page - 1, paginate.size)"
+                      @input="changePage(paginate.page, paginate.size)"
                   ></v-pagination>
                 </v-col>
               </v-row>

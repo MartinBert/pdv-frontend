@@ -869,12 +869,14 @@ export default {
 
     async applyStockModifications(comprobante) {
       const filterParam = {
-        fourthLongParam: this.loguedUser.perfil,
-        thirdLongParam: this.loguedUser.sucursal.id,
-        stringParam: "",
-        thirdStringParam: "",
+        sucursalId: this.loguedUser.sucursal.id,
+        productoName: "",
+        productoCodigo: "",
+        productoMarcaName: "",
+        productoCodigoBarras: "",
+        productoPrimerAtributoName: "",
         page: 1,
-        size: 100000,
+        size: 100000
       };
       let productsBelowMinimumStock = [];
       let productsWithoutStockOnDefaultDeposit = [];

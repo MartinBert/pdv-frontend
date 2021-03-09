@@ -8,9 +8,9 @@
         <v-spacer></v-spacer>
         <v-col cols="3">
           <v-text-field
-            type="date"
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            type="text"
+            v-model="filterParams.fechaEmision"
+            v-on:input="filterObjects(filterParams)"
             dense
             outlined
             rounded
@@ -22,8 +22,8 @@
         <v-col cols="3">
           <v-text-field
             type="number"
-            v-model="filterParams.stringParamReceiptNumber"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParamReceiptNumber, filterParams.page - 1, filterParams.size)"
+            v-model="filterParams.numeroComprobante"
+            v-on:input="filterObjects(filterParams)"
             dense
             outlined
             rounded
@@ -36,7 +36,7 @@
         <v-col cols="3">
           <v-text-field
             type="number"
-            v-model="specialFilter"
+            v-model="filterParams.blackReceiptFilter"
             dense
             outlined
             rounded
@@ -44,7 +44,7 @@
             label="Búsqueda especial"
             placeholder=" "
             append-icon="mdi-magnify"
-            @input="altersecondLongParam()"
+            @input="filterObjects(filterParams)"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -121,7 +121,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      @input="filterObjects(filterParams)"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -173,7 +173,6 @@
 </template>
 
 <script>
-import { formatDate } from '../../helpers/dateHelper';
 import { infoAlert } from '../../helpers/alerts';
 import GenericService from '../../services/GenericService';
 import ReportsService from '../../services/ReportsService';
@@ -187,12 +186,12 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     objects: null,
     filterParams: {
-      fourthLongParam: "",
-      secondLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
-      doubleParam: "",
-      stringParamReceiptNumber: "",
+      blackReceiptFilter: "",
+      sucursalId: "",
+      fechaEmision: "",
+      comprobanteCerrado: "",
+      numeroComprobante: "",
+      totalVenta: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -203,7 +202,6 @@ export default {
     token: localStorage.getItem("token"),
     dialogMode: "",
     dialog: false,
-    specialFilter: ''
   }),
 
   components:{
@@ -213,57 +211,13 @@ export default {
   mounted() {
     this.$store.commit('eventual/resetStates');
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    this.filterObjects(this.filterParams);
   },
 
   methods: {
 
-    filterObjects(fourthLongParam, param, page, size){
-      let filterParam;
-      let thirdLongParam;
-
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
-      switch (param) {
-        case undefined:
-            if(this.filterParams.doubleParam !== ""){
-              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, doubleParam: this.filterParams.doubleParam, page, size};
-            }else if(this.filterParams.stringParamReceiptNumber !== ""){
-              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, stringParam: this.filterParams.stringParamReceiptNumber, page, size}
-            }else{
-              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, stringParam: param, page, size}
-            }
-          break;
-        
-        default:
-            if(param === this.filterParams.stringParam){
-              this.filterParams.doubleParam = "";
-              this.filterParams.stringParamReceiptNumber = "";
-              param = formatDate(param);
-              if(param === "//"){
-                param = "";
-              }
-              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, stringParam: param, page, size};
-            }else if(param === this.filterParams.doubleParam){
-              this.filterParams.stringParam = "";
-              this.filterParams.stringParamReceiptNumber = "";
-              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, doubleParam: param, page, size};
-            }else{
-              this.filterParams.stringParam = "",
-              this.filterParams.doubleParam = "",
-              filterParam = { secondLongParam:this.filterParams.secondLongParam, thirdLongParam, stringParam: param, page, size}
-            }
-          break;
-      }
-
+    filterObjects(filterParam){
+      filterParam.sucursalId = this.loguedUser.sucursal.id;
       GenericService(this.tenant, "ventas", this.token)
         .filter(filterParam)
         .then(data => {
@@ -319,9 +273,28 @@ export default {
       this.$store.commit('eventual/mutateEventualDialog');
     },
 
-    altersecondLongParam(){
-      this.filterParams.secondLongParam = this.specialFilter; 
-      this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    containValue(value){
+      if(value !== "" || value !== undefined || value !== null){
+        return true;
+      }else{
+        return false;
+      }
+    },
+
+    isEmpty(value){
+      if(value === "" || value === undefined || value === null){
+        return true;
+      }else{
+        return false;
+      }
+    },
+
+    isEmptyDate(date){
+      if(date === "" || date === undefined || date === null || date === '//'){
+        return true;
+      }else{
+        return false;
+      }
     }
   },
 };

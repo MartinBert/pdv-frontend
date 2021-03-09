@@ -20,32 +20,55 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="5">
+            <v-col>
               <v-text-field
-                v-model="filterParams.stringParam"
+                v-model="filterParams.productoName"
                 dense
                 outlined
                 rounded
-                class="text-left ml-5 mr-5 mt-5"
-                label="Nombre, código de artículo, código de barras"
+                label="Nombre"
+                @input="filterObjects(filterParams, typeList)"
               ></v-text-field>
             </v-col>
-            <v-col cols="5">
+            <v-col>
               <v-text-field
-                v-model="filterParams.thirdStringParam"
+                v-model="filterParams.productoCodigo"
                 dense
                 outlined
                 rounded
-                class="text-left ml-5 mr-5 mt-5"
+                label="Codigo de producto"
+                @input="filterObjects(filterParams, typeList)"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="filterParams.productoCodigoBarras"
+                dense
+                outlined
+                rounded
+                label="Codigo de barras"
+                @input="filterObjects(filterParams, typeList)"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="filterParams.productoMarcaName"
+                dense
+                outlined
+                rounded
                 label="Marca"
+                @input="filterObjects(filterParams, typeList)"
               ></v-text-field>
             </v-col>
-            <v-col cols="2">
-              <v-btn class="mt-5 primary"
-                @click="filterObjects(filterParams, typeList)"
-              >
-                BUSCAR
-              </v-btn>
+            <v-col>
+              <v-text-field
+                v-model="filterParams.productoPrimerAtributoName"
+                dense
+                outlined
+                rounded
+                label="Atributo"
+                @input="filterObjects(filterParams, typeList)"
+              ></v-text-field>
             </v-col>
           </v-row>
           <v-container fluid>
@@ -122,12 +145,17 @@ export default {
       typeList: 0,
       typeProductsList: [],
       filterParams: {
-        fourthLongParam: "",
-        secondLongParam: "",
-        thirdLongParam: "",
-        stringParam: "",
-        thirdStringParam: "",
-        doubleParam: 0,
+        productoName: "",
+        productoCodigo: "",
+        productoCodigoBarras: "",
+        productoMarcaName: "",
+        productoPrimerAtributoName: "",
+        productoSegundoAtributoName: "",
+        productoTercerAtributoName: "",
+        productoEstado: 0,
+        stockDepositoId: "",
+        sucursalId: "",
+        perfilId: "",
         page: 1,
         size: 10,
         totalPages: 0
@@ -139,7 +167,7 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.token = localStorage.getItem('token');
     this.loguedUser = JSON.parse(localStorage.getItem("userData"));
-    this.filterParams.fourthLongParam = this.loguedUser.perfil;
+    this.filterParams.perfilId = this.loguedUser.perfil;
     this.filterObjects(this.filterParams, this.typeList);
     this.createtypeProductsList();
   },
@@ -209,19 +237,18 @@ export default {
     },
 
     searchForDeposit(filterParams, typeList){
-      filterParams.secondLongParam = typeList;
-      filterParams.thirdLongParam;
+      filterParams.stockDepositoId = typeList;
+      filterParams.sucursalId;
       
-      switch (filterParams.fourthLongParam) {
+      switch (filterParams.perfilId) {
         case 1:
-            filterParams.thirdLongParam = '';
+            filterParams.sucursalId = '';
           break;
       
         default:
-            filterParams.thirdLongParam = this.loguedUser.sucursal.id;
+            filterParams.sucursalId = this.loguedUser.sucursal.id;
           break;
       }
-
       StocksService(this.tenant, 'stock', this.token)
       .filterStockForDepositId(filterParams)
       .then(data => {

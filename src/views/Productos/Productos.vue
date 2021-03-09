@@ -13,24 +13,21 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col class="mt-2 ml-3" v-if="view == 'labelPrinting'">
-          <h2>Seleccion de productos</h2>
-        </v-col>
-        <v-spacer/>
-        <v-col cols="3" v-if="perfil < 3 && view == 'listOfProducts'">
+        <v-col cols="6"></v-col>
+        <v-col v-if="perfil < 3 && view == 'listOfProducts'">
           <v-file-input
             class="mt-3"
             dense
             v-model="file"
-            placeholder="Importar productos"
+            placeholder="Importar"
             accept=".xlsx, xls"
             @change="onChange($event)"
           ></v-file-input>
         </v-col>
-        <v-col cols="2" v-if="view == 'listOfProducts' && perfil < 3">
+        <v-col v-if="view == 'listOfProducts' && perfil < 3">
           <v-select
             :items="estados"
-            v-model="estadoSeleccionado"
+            v-model="estadoSelecionado"
             item-text="text"
             :return-object="true"
             outlined
@@ -38,44 +35,70 @@
             @input="filterObjects(filterParams)"
           ></v-select>
         </v-col>
-        <v-col cols="2">
+      </v-row>
+      <v-row>
+        <v-col class="mt-2 ml-3" v-if="view == 'labelPrinting'">
+          <h2>Seleccion de productos</h2>
+        </v-col>
+        <v-col>
           <v-text-field
-            v-model="filterParams.stringParam"
+            v-model="filterParams.productoName"
             v-on:input="filterObjects(filterParams)"
             dense
             outlined
             rounded
             class="text-left"
-            label="Búsqueda"
+            label="Nombre de producto"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col cols="2">
+        <v-col>
           <v-text-field
-            v-model="filterParams.thirdStringParam"
+            v-model="filterParams.productoCodigo"
             v-on:input="filterObjects(filterParams)"
             dense
             outlined
             rounded
             class="text-left"
-            label="Marcas"
+            label="Codigo de producto"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col cols="2">
-          <v-autocomplete
-            v-model="filterParams.attibutesArray"
-            :items="atributos"
-            v-on:change="filterObjects(filterParams)"
-            multiple
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoCodigoBarras"
+            v-on:input="filterObjects(filterParams)"
             dense
             outlined
             rounded
-            item-text="valor"
-            label="Atributos"
+            class="text-left"
+            label="Codigo de barras"
             append-icon="mdi-magnify"
-            :return-object="true"
-          ></v-autocomplete>
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoMarcaName"
+            v-on:input="filterObjects(filterParams)"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            label="Marca"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoPrimerAtributoName"
+            v-on:input="filterObjects(filterParams)"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            label="Atributo"
+            append-icon="mdi-magnify"
+          />
         </v-col>
       </v-row>
     </v-form>
@@ -230,14 +253,16 @@ export default {
       { id: 1, text: "Activos" },
       { id: 2, text: "Inactivos" },
     ],
-    estadoSeleccionado: { id: 1, text: "Activos" },
+    estadoSelecionado: { id: 1, text: "Activos" },
     filterParams: {
-      thirdLongParam: "",
-      fourthLongParam: "",
-      stringParam: "",
-      secondStringParam: "",
-      thirdStringParam: "",
-      attributesArray: [],
+      productoName: "",
+      productoCodigo: "",
+      productoCodigoBarras: "",
+      productoMarcaName: "",
+      productoPrimerAtributoName: "",
+      productoSegundoAtributoName: "",
+      productoTercerAtributoName: "",
+      productoEstado: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -265,16 +290,12 @@ export default {
 
   methods: {
     filterObjects(filterParams) {
-      filterParams.longParam = filterParams.attributesArray[0].id;
-      filterParams.secondLongParam = filterParams.attributesArray[1].id;
-      filterParams.fifthLongParam = filterParams.attributesArray[2].id;
-
-      if(this.estadoSeleccionado.id === 1){
-        filterParams.doubleParam = 0
+      this.loaded = false
+      if(this.estadoSelecionado.id > 1){
+        filterParams.productoEstado = 2
       }else{
-        filterParams.doubleParam = 2
+        filterParams.productoEstado = 0
       }
-      
       GenericService(this.tenant, "productos", this.token)
       .filter(filterParams)
       .then((data) => {

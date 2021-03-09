@@ -10,38 +10,57 @@
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row v-if="urlId == 0" class="ml-5 mr-5">
-          <v-col cols="5">
-            <v-text-field
-              v-model="filterParams.stringParam"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              label="Nombre, código de artículo, código de barras"
-              placeholder=" "
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="5">
-            <v-text-field
-              v-model="filterParams.thirdStringParam"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              label="Marca"
-              placeholder=" "
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="2">
-            <v-btn
-             class="primary"
-             @click="filterProducts(filterParams)"
-            >
-              BUSCAR
-            </v-btn>
-          </v-col>
+           <v-col>
+              <v-text-field
+                v-model="filterParams.productoName"
+                dense
+                outlined
+                rounded
+                label="Nombre"
+                @input="filterProducts(filterParams)"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="filterParams.productoCodigo"
+                dense
+                outlined
+                rounded
+                label="Codigo de producto"
+                @input="filterProducts(filterParams)"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="filterParams.productoCodigoBarras"
+                dense
+                outlined
+                rounded
+                label="Codigo de barras"
+                @input="filterProducts(filterParams)"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="filterParams.productoMarcaName"
+                dense
+                outlined
+                rounded
+                label="Marca"
+                @input="filterProducts(filterParams)"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="filterParams.productoPrimerAtributoName"
+                v-on:input="filterProducts(filterParams)"
+                dense
+                outlined
+                rounded
+                label="Atributo"
+                append-icon="mdi-magnify"
+              ></v-text-field>
+            </v-col>
         </v-row>
         <v-row class="ml-5 mr-5" v-if="urlId == 0">
           <v-col cols="7">
@@ -237,10 +256,17 @@ export default {
     snackError: false,
     errorMessage: "",
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
-      thirdStringParam: "",
+      productoName: "",
+      productoCodigo: "",
+      productoCodigoBarras: "",
+      productoMarcaName: "",
+      productoPrimerAtributoName: "",
+      productoSegundoAtributoName: "",
+      productoTercerAtributoName: "",
+      productoEstado: 0,
+      stockDepositoId: "",
+      sucursalId: "",
+      perfilId: "",
       page: 1,
       size: 5,
       totalPages: 0

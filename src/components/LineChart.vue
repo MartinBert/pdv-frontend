@@ -1,33 +1,40 @@
 <template>
     <v-container>
-        <h1>
-            {{salesData[0].fechaEmision}}
+        <h1 v-if="loaded">
+            {{salesData}}
         </h1>
+        <Spinner v-if="!loaded"/>
     </v-container>
 </template>
 <script>
 import { errorAlert } from '../helpers/alerts';
 import GenericService from '../services/GenericService';
+import Spinner from './Spinner';
 export default {
     data: () => ({
         token: localStorage.getItem("token"),
         service: "ventas",
         tenant:"",
         filterParams: {
-            fourthLongParam: "",
-            secondLongParam: "",
-            thirdLongParam: "",
-            stringParam: "",
-            doubleParam: "",
-            stringParamReceiptNumber: "",
+            sucursalId: "",
+            blackReceiptFilter: "",
+            fechaEmision: "",
+            numeroComprobante: "",
+            totalVenta: "",
             page: 1,
-            size: 10,
+            size: 1,
             totalPages: 0
         },
-        salesData: []
+        loguedUser: JSON.parse(localStorage.getItem("userData")),
+        salesData: [],
+        loaded: false
     }),
+    components: {
+        Spinner
+    },
     mounted(){
         this.tenant = this.$route.params.tenant;
+        this.filterParams.sucursalId = this.loguedUser.sucursal.id
         this.getSaleData();
     },
     methods: {
@@ -36,6 +43,7 @@ export default {
             .filter(this.filterParams)
             .then(dataOfSales => {
                 this.salesData = dataOfSales.data.content;
+                this.loaded = true;
             })
             .catch(err => {
                 errorAlert(err);

@@ -98,24 +98,31 @@ export default {
       salidasNoContabilizadas: Number(0),
       montoFacturado: Number(0)
     },
+    
     loaded: false,
     tenant: "",
     service: "caja",
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    filterParams: {
+      sucursalId: "",
+      page: 1,
+      size: 100000,
+    }
   }),
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
       this.loaded = true;
     }
 
-    this.getSalesList("cerrado", 0, 100000);
+    this.getSalesList(this.filterParams);
   },
 
   computed:{
@@ -144,16 +151,9 @@ export default {
         });
     },
 
-    getSalesList(stringParam, page, size){
-        let thirdLongParam;
-        if(this.loguedUser.perfil < 3){
-            thirdLongParam = "";
-        }else{
-            thirdLongParam = this.loguedUser.sucursal.id;
-        }
-
+    getSalesList(filterParams){
         VentasService(this.tenant, this.service, this.token)
-        .filterNotCloseReceipts({thirdLongParam, stringParam, page, size})
+        .filterNotCloseReceipts(filterParams)
         .then(data => {
             this.ventas = data.data;
             this.object.montoFacturado = this.ventas.reduce((acc, el) => Math.round((acc + Number(el.totalVenta))*100)/100, 0);
