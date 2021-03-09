@@ -28,7 +28,7 @@
                 </v-col>
                 <v-col cols="6">
                   <v-autocomplete
-                    @input="filterObjects(loguedUser.sucursal.id, filterParams.stringParam, paginate.page, paginate.size)"
+                    @input="filterObjects(filterParams)"
                     class="button-ventas comprobante"
                     v-model="dialogObject.documento"
                     :items="databaseItems.documentos"
@@ -80,24 +80,23 @@
                 </v-col>
                 <v-col class="d-flex">
                   <v-text-field
-                    type="date"
-                    v-model="filterParams.stringParam"
-                    v-on:input="filterObjects(loguedUser.sucursal.id, filterParams.stringParam, paginate.page, paginate.size)"
+                    type="text"
+                    v-model="filterParams.fechaEmision"
+                    v-on:input="filterObjects(filterParams)"
                     dense
                     outlined
                     rounded
-                    class="text-left"
+                    label="Fecha"
                     append-icon="mdi-magnify"
                   ></v-text-field>
                   <v-text-field
-                    type="number"
-                    v-model="filterParams.doubleParam"
-                    v-on:input="filterObjects(loguedUser.sucursal.id, filterParams.doubleParam, paginate.page, paginate.size)"
+                    type="text"
+                    v-model="filterParams.numeroComprobante"
+                    v-on:input="filterObjects(filterParams)"
                     dense
                     outlined
                     rounded
-                    class="text-left"
-                    placeholder="Búsqueda por total facturado"
+                    label="Número de comprobante"
                     append-icon="mdi-magnify"
                   ></v-text-field>
                 </v-col>
@@ -153,13 +152,13 @@
                     </template>
                   </v-simple-table>
                   <v-pagination
-                      v-model="paginate.page"
-                      :length="paginate.totalPages"
+                      v-model="filterParams.page"
+                      :length="filterParams.totalPages"
                       next-icon="mdi-chevron-right"
                       prev-icon="mdi-chevron-left"
-                      :page="paginate.page"
+                      :page="filterParams.page"
                       :total-visible="8"
-                      @input="changePage(paginate.page, paginate.size)"
+                      @input="filterObjects(filterParams)"
                   ></v-pagination>
                 </v-col>
               </v-row>
@@ -210,7 +209,6 @@
 import GenericService from "../services/GenericService";
 import { errorAlert } from "../helpers/alerts";
 import { checkIfNote } from "../helpers/processObjectsHelper";
-import { formatDate } from "../helpers/dateHelper";
 
 export default {
   name: "ReceiptDialog",
@@ -218,9 +216,7 @@ export default {
   data() {
     return {
       paginate: {
-        page: 1,
-        size: 5,
-        totalPages: 0
+        
       },
       loguedUser: JSON.parse(localStorage.getItem("userData")),
       tenant: null,
@@ -234,8 +230,15 @@ export default {
         comprobanteAsociado: ""
       },
       filterParams:{
-        stringParam: '',
-        doubleParam: ''
+        sucursalId: '',
+        fechaEmision: '',
+        comprobanteCerrado: '',
+        numeroComprobante: '',
+        blackReceiptFilter: '',
+        totalVenta: '',
+        page: 1,
+        size: 5,
+        totalPages: 0
       },
       activeDetailDialog: false,
       detailRelationateReceipt: null,
@@ -251,6 +254,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     this.getAllObjects(this.loguedUser.perfil, '', 0, 100000);
   },
 
@@ -343,43 +347,17 @@ export default {
       this.$refs.tab.$forceUpdate();
     },
 
-    filterObjects(thirdLongParam, stringParam, page, size){
-      let filterParam;
-      if(this.filterParams.stringParam === stringParam){
-        this.filterParams.doubleParam = "";
-        stringParam = formatDate(stringParam);
-        if(stringParam === "//"){
-          stringParam = "";
-        }
-        filterParam = {thirdLongParam, stringParam, page, size};
-      }else{
-        this.filterParams.stringParam = "";
-        filterParam = {thirdLongParam, doubleParam: stringParam, page, size};
-      }
+    filterObjects(filterParams){
       GenericService(this.tenant, "ventas", this.token)
-        .filter(filterParam)
+        .filter(filterParams)
         .then(data => {
           this.comprobantes = data.data.content;
-          this.paginate.totalPages = data.data.totalPages;
-          if(this.paginate.totalPages < this.paginate.page){
-              this.paginate.page = 1;
+          this.filterParams.totalPages = data.data.totalPages;
+          if(this.filterParams.totalPages < this.filterParams.page){
+              this.filterParams.page = 1;
           }
         });
     },
-
-    changePage(page, size){
-      const thirdLongParam = this.loguedUser.sucursal.id;
-      if(this.filterParams.stringParam || this.filterParams.doubleParam){
-        if(this.filterParams.stringParam){
-          this.filterObjects(thirdLongParam, this.filterParams.stringParam, page, size);
-        }else{
-          this.filterObjects(thirdLongParam, this.filterParams.doubleParam, page, size);
-        }
-      }else{
-        this.filterObjects(thirdLongParam, "", page, size);
-      }
-
-    }
   },
 };
 </script>
