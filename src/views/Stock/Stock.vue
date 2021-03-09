@@ -304,10 +304,10 @@ export default {
           break;
       }
 
-      if (typeList === 0) {
-        this.search(filterParams);
-      } else {
+      if (typeList > 0) {
         this.searchForDeposit(filterParams, typeList);
+      } else {
+        this.search(filterParams);
       }
     },
 
@@ -444,13 +444,7 @@ export default {
           this.saveHistorial(stockWithRestrictions, "Cambio masivo en límite de existencias mínimas");
 
           this.$store.commit("stocks/resetStates");
-          this.filterObjects(
-            this.loguedUser.perfil,
-            this.filterParams.stringParam,
-            this.filterParams.page - 1,
-            this.filterParams.size,
-            this.typeList
-          );
+          this.filterObjects(this.filterParams,this.typeList);
         });
     },
 

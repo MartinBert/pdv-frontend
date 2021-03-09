@@ -278,9 +278,19 @@ export default {
       }
 
       const filterParam = {thirdLongParam, stringParam, page, size}
+      const clientFilter = {
+          sucursalId: this.loguedUser.sucursal.id,
+          personaSocialReason: "",
+          personaName: "",
+          personaCuit: "",
+          personaDirection: "",
+          personaContactName: "",
+          page: 1,
+          size: 100000,
+        }
 
       GenericService(this.tenant, "clientes", this.token)
-        .filter(filterParam)
+        .filter(clientFilter)
         .then((data) => {
           this.databaseItems.clientes = data.data.content;
         });

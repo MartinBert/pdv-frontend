@@ -235,7 +235,6 @@ export default {
   methods:{
     /**** USER AND MODELS ****/
     getObjects(){
-
         let id;
         if(this.loguedUser.perfil < 3){
           id = "";
@@ -244,6 +243,16 @@ export default {
         }
 
         const filterParam = {id, param: '', page: 0, size: 100000}
+        const clientFilter = {
+          sucursalId: this.loguedUser.sucursal.id,
+          personaSocialReason: "",
+          personaName: "",
+          personaCuit: "",
+          personaDirection: "",
+          personaContactName: "",
+          page: 1,
+          size: 100000,
+        }
         
         if(this.loguedUser.perfil < 3){
           GenericService(this.tenant, "sucursales", this.token)
@@ -254,7 +263,7 @@ export default {
         }
 
         GenericService(this.tenant, "clientes", this.token)
-        .filter(filterParam)
+        .filter(clientFilter)
         .then(data => {
           this.clientes = data.data.content;
         });
