@@ -10,7 +10,7 @@
           <v-text-field
             type="text"
             v-model="filterParams.fechaEmision"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -23,7 +23,7 @@
           <v-text-field
             type="number"
             v-model="filterParams.numeroComprobante"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -44,7 +44,7 @@
             label="Búsqueda especial"
             placeholder=" "
             append-icon="mdi-magnify"
-            @input="filterObjects(filterParams)"
+            @input="filterObjects()"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -121,7 +121,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterParams)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -211,15 +211,17 @@ export default {
   mounted() {
     this.$store.commit('eventual/resetStates');
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterParams);
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterObjects();
   },
 
   methods: {
 
-    filterObjects(filterParam){
-      filterParam.sucursalId = this.loguedUser.sucursal.id;
+    filterObjects(){
       GenericService(this.tenant, "ventas", this.token)
-        .filter(filterParam)
+        .filter(this.filterParams)
         .then(data => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;

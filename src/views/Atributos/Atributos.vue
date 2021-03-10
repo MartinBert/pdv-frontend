@@ -26,8 +26,8 @@
         <v-spacer></v-spacer>
         <v-col cols="3">
           <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-model="filterParams.atributoValor"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -90,7 +90,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -126,9 +126,7 @@ export default {
   data: () => ({
     objects: [],
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
+      atributoValor: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -143,22 +141,14 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size)
+    this.filterObjects()
   },
 
   methods: {
 
-    filterObjects(param, page, size) {
-      this.loaded = false;
-      let id;
-      if(this.loguedUser.perfil < 3){
-        id = "";
-      }else{
-        id = this.loguedUser.sucursal.id;
-      }
-
+    filterObjects() {
       GenericService(this.tenant, this.service, this.token)
-        .filter({id, param, page, size})
+        .filter(this.filterParams)
         .then((data) => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -185,7 +175,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects();
         });
     },
 
@@ -211,7 +201,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(doc.data)
             .then(() => {
-              this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+              this.filterObjects();
               this.loaderStatus = true;
               window.setTimeout(()=>{
                 this.loader = false

@@ -167,6 +167,22 @@ export default {
       { id: 1, text: "Física" },
       { id: 2, text: "Jurídica" }
     ],
+    filterParams:{
+      empresas: {
+        perfilId: "",
+        empresaId: "",
+        empresaName: "", 
+        empresaCuit: "",
+        empresaSocialReason: "",
+        page: 1,
+        size: 100000
+      },
+      condicionesFiscales: {
+        condicionFiscalName: "",
+        page: 1,
+        size: 100000
+      }
+    },
     condicioniva: [],
     object: {},
     empresas: [],
@@ -185,7 +201,11 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.filterObjects(this.loguedUser.perfil, "", 0, 100000)
+    this.filterParams.empresas.perfilId = this.loguedUser.perfil;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.empresas.empresaId = this.loguedUser.empresa.id;
+    }
+    this.filterObjects()
   },
   methods: {
     getObject(id) {
@@ -197,30 +217,16 @@ export default {
         });
     },
 
-    filterObjects(fourthLongParam, stringParam, page, size){
+    filterObjects(){
       this.loaded = false
-      let thirdLongParam;
-      
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';          
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
-      const filterParam = {thirdLongParam, stringParam, page, size}
-
       GenericService(this.tenant, "empresas", this.token)
-        .filter(filterParam)
+        .filter(this.filterParams.empresas)
         .then(data => {
           this.empresas = data.data.content;
         });
 
       GenericService(this.tenant, "condicionesFiscales", this.token)
-        .filter(filterParam)
+        .filter(this.filterParams.condicionesFiscales)
         .then(data => {
           this.condicioniva = data.data.content.filter(el => el.id !== 3)
           this.loaded = true;

@@ -18,7 +18,7 @@
         <v-col cols="3">
           <v-text-field
             v-model="filterParams.rubroName"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -66,7 +66,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterParams)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -111,14 +111,13 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterParams);
+    this.filterObjects();
   },
   methods: {
-    filterObjects(filterParams){
+    filterObjects(){
       this.loaded = false;
-
       GenericService(this.tenant, this.service, this.token)
-        .filter(filterParams)
+        .filter(this.filterParams)
         .then((data) => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -145,7 +144,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects();
         });
     },
 
@@ -171,7 +170,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(doc.data)
             .then(() => {
-              this.getAll(this.filterParams.page - 1, this.filterParams.size);
+              this.filterObjects();
               this.loaderStatus = true;
               window.setTimeout(()=>{
                 this.loader = false

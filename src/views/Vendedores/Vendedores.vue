@@ -8,7 +8,7 @@
         <v-col cols="2">
           <v-text-field
             v-model="filterParams.personaSocialReason"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -19,7 +19,7 @@
         <v-col cols="2">
           <v-text-field
             v-model="filterParams.personaName"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -30,7 +30,7 @@
         <v-col cols="2">
           <v-text-field
             v-model="filterParams.personaCuit"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -85,7 +85,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterParams)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -133,14 +133,16 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    this.filterObjects(this.filterParams);
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterObjects();
   },
   methods: {
 
-    filterObjects(filterParams){
+    filterObjects(){
       GenericService(this.tenant, this.service, this.token)
-        .filter(filterParams)
+        .filter(this.filterParams)
         .then((data) => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -167,7 +169,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getLoguedUser;
+          this.filterObjects();
         });
     }
   }

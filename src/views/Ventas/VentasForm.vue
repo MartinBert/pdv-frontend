@@ -354,20 +354,12 @@ export default {
 
   methods: {
     getObjects() {
-      const fourthLongParam = this.loguedUser.perfil;
-      let thirdLongParam;
-
-      switch (fourthLongParam) {
-        case 1:
-          thirdLongParam = "";
-          break;
-
-        default:
-          thirdLongParam = this.loguedUser.sucursal.id;
-          break;
+      let sucursalId;
+      if(this.loguedUser.perfil > 1){
+        sucursalId = this.loguedUser.sucursal.id;
       }
       const clientFilter = {
-        sucursalId: this.loguedUser.sucursal.id,
+        sucursalId: sucursalId,
         personaSocialReason: "",
         personaName: "",
         personaCuit: "",
@@ -376,13 +368,20 @@ export default {
         page: 1,
         size: 100000,
       }
-      const filterParam = {
-        fourthLongParam,
-        thirdLongParam,
-        stringParam: "",
-        page: 0,
-        size: 100000,
-      };
+      const medioPagoFilter = {
+        sucursalId: sucursalId,
+        medioPagoName: "",
+        page: 1,
+        size: 100000
+      }
+      const depositoFilter = {
+        depositoName: "",
+        perfilId: this.loguedUser.perfil,
+        sucursalId: sucursalId,
+        page: 1,
+        size: 10,
+        totalPages: 0
+      }
 
       GenericService(this.tenant, "clientes", this.token)
         .filter(clientFilter)
@@ -391,13 +390,13 @@ export default {
         });
 
       GenericService(this.tenant, "mediosPago", this.token)
-        .filter(filterParam)
+        .filter(medioPagoFilter)
         .then((data) => {
           this.databaseItems.medios_de_pago = data.data.content;
         });
 
       GenericService(this.tenant, "depositos", this.token)
-        .filter(filterParam)
+        .filter(depositoFilter)
         .then((data) => {
           this.depositos = data.data.content;
           this.defaultDeposit = data.data.content.filter(
@@ -429,8 +428,21 @@ export default {
     },
 
     onBarcodeScanned(barcode) {
+      const filterParams = {
+        productoName: "",
+        productoCodigo: "",
+        productoCodigoBarras: barcode,
+        productoMarcaName: "",
+        productoPrimerAtributoName: "",
+        productoSegundoAtributoName: "",
+        productoTercerAtributoName: "",
+        productoEstado: "",
+        page: 1,
+        size: 1,
+        totalPages: 0
+      }
       GenericService(this.tenant, "productos", this.token)
-        .filter({ stringParam: barcode, page: 0, size: 1 })
+        .filter(filterParams)
         .then((data) => {
           let databaseItem = data.data.content[0];
           if (this.products.length == 0) {

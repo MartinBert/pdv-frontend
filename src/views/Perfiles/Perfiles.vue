@@ -9,8 +9,8 @@
         <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-model="filterParams.perfilName"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -58,7 +58,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -86,10 +86,10 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     objects: [],
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
+      perfilId: "",
+      perfilName: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -103,16 +103,15 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    this.filterParams.perfilId = this.loguedUser.perfil;
+    this.filterObjects();
   },
 
   methods: {
 
-    filterObjects(stringParam, page, size){
-      let fourthLongParam = 1;
-
+    filterObjects(){
       GenericService(this.tenant, this.service, this.token)
-      .filter({fourthLongParam, stringParam, page, size})
+      .filter(this.filterParams)
       .then(data => {
         this.objects = data.data.content;
         this.filterParams.totalPages = data.data.totalPages;
@@ -139,7 +138,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects();
         });
     }
   }

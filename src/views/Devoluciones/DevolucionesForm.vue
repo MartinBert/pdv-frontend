@@ -241,6 +241,15 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     radioGroup: "",
     filterString: "",
+    filterParams:{
+      depositos:{
+        perfilId: "",
+        sucursalId: "",
+        depositoName: "",
+        page: 1,
+        size: 100000
+      }
+    },
     checked: false,
     saveDialog: false,
     receiptDialogData: null,
@@ -257,7 +266,6 @@ export default {
       if(this.object.productosEntrantes || this.object.productosSalientes){
         const receivedProducts = this.object.productosEntrantes.reduce((acc, el) => acc + Number(el.precioTotal), 0);
         const cededProducts = this.object.productosSalientes.reduce((acc, el) => acc + Number(el.precioTotal), 0);
-  
         return restarNumeros([receivedProducts, cededProducts]);
       }else{
         return 0;
@@ -272,6 +280,10 @@ export default {
       this.getObject(this.$route.params.id);
     } else {
       this.loaded = true;
+    }
+    this.filterParams.depositos.perfilId = this.loguedUser.perfil;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.depositos.sucursalId = this.loguedUser.sucursal.id;
     }
     this.getDeposits();
   },
@@ -288,7 +300,7 @@ export default {
 
     getDeposits(){
       GenericService(this.tenant, 'depositos', this.token)
-      .filter({fourthLongParam: this.loguedUser.perfil, thirdLongParam: this.loguedUser.sucursal.id, stringParam: '', page: 0, size: 100000})
+      .filter(this.filterParams["depositos"])
       .then(data => {
         this.depositos = data.data.content;
         this.defaultDeposit = this.depositos.filter(el => el.defaultDeposit === '1')[0];

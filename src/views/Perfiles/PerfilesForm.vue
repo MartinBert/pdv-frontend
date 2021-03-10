@@ -57,6 +57,11 @@ export default {
     modulos: [],
     object: {},
     loaded: false,
+    filterParams: {
+      moduloName: "",
+      page: 1,
+      size: 100000
+    },
     tenant: "",
     service: "perfiles",
     token: localStorage.getItem("token"),
@@ -86,7 +91,7 @@ export default {
 
     getModules(){
       GenericService(this.tenant, "modulos", this.token)
-      .filter({stringParam: '', page: 0, size: 100000})
+      .filter(this.filterParams)
       .then(data => {
         this.modulos = data.data.content;
       })

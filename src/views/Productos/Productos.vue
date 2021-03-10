@@ -32,7 +32,7 @@
             :return-object="true"
             outlined
             dense
-            @input="filterObjects(filterParams)"
+            @input="filterObjects()"
           ></v-select>
         </v-col>
       </v-row>
@@ -43,7 +43,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoName"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -55,7 +55,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoCodigo"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -67,7 +67,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoCodigoBarras"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -79,7 +79,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoMarcaName"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -91,7 +91,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoPrimerAtributoName"
-            v-on:input="filterObjects(filterParams)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -162,7 +162,7 @@
         prev-icon="mdi-chevron-left"
         :page="filterParams.page"
         :total-visible="8"
-        @input="filterObjects(filterParams)"
+        @input="filterObjects()"
         v-if="filterParams.totalPages > 1 && loaded"
       ></v-pagination>
     </v-container>
@@ -283,21 +283,20 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterParams);
+    this.filterObjects();
     this.getOtherModels(0, 100000);
     this.perfil = this.loguedUser.perfil;
   },
 
   methods: {
-    filterObjects(filterParams) {
-      this.loaded = false
+    filterObjects() {
       if(this.estadoSelecionado.id > 1){
-        filterParams.productoEstado = 2
+        this.filterParams.productoEstado = 2
       }else{
-        filterParams.productoEstado = 0
+        this.filterParams.productoEstado = 0
       }
       GenericService(this.tenant, "productos", this.token)
-      .filter(filterParams)
+      .filter(this.filterParams)
       .then((data) => {
         data.data.content.forEach(el => {
           this.$store.state.productos.products.forEach(e => {
@@ -365,7 +364,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
           .save(object);
 
-          this.filterObjects(this.filterParams);
+          this.filterObjects();
           this.getOtherModels(0, 100000);
         }
       })
@@ -380,7 +379,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
           .save(object)
           .then(()=>{
-            this.filterObjects(this.filterParams);
+            this.filterObjects();
             this.getOtherModels(0, 100000);
           })
         }
@@ -426,7 +425,7 @@ export default {
                   infoAlert("Se agregaron nuevos atributos al sistema. Realice nuevamente la importación para asignarlos correctamente");
                 }
               })
-              this.filterObjects(this.filterParams);
+              this.filterObjects();
               this.loaderStatus = true;
               this.loaded = true;
             });
@@ -625,7 +624,7 @@ export default {
 
     changePage(data){
       this.filterParams.page = data;
-      this.filterObjects(this.filterParams);
+      this.filterObjects();
     },
 
     checkProductInList(data){

@@ -56,7 +56,6 @@ export default {
       { id: 1, text: "Física" },
       { id: 2, text: "Jurídica" }
     ],
-    condicioniva: [],
     object: {},
     loaded: false,
     tenant: "",
@@ -74,7 +73,6 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getCondicionesIva();
   },
   methods: {
     getObject(id) {
@@ -83,14 +81,6 @@ export default {
         .then(data => {
           this.object = data.data;
           this.loaded = true;
-        });
-    },
-
-    getCondicionesIva(){
-      GenericService(this.tenant, "condicionesFiscales", this.token)
-        .getAll()
-        .then(data => {
-          this.condicioniva = data.data.content;
         });
     },
 

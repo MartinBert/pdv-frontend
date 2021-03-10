@@ -136,6 +136,23 @@ export default {
     listenenItems: { sucursales: [], puntos_venta: [] },
     loaded: false,
     changePassword: false,
+    filterParams: {
+      perfiles: {
+        perfilId: "",
+        perfilName: "",
+        page: 1,
+        size: 100000
+      },
+      empresas: {
+        perfilId: "",
+        empresaId: "",
+        empresaName: "", 
+        empresaCuit: "",
+        empresaSocialReason: "",
+        page: 1,
+        size: 100000
+      }
+    },
     tenant: "",
     service: "usuarios",
     token: localStorage.getItem("token"),
@@ -150,7 +167,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getAllObjects(this.loguedUser.perfil, '', 0, 100000);
+    this.getAllObjects();
   },
 
   methods: {
@@ -162,17 +179,15 @@ export default {
           this.loaded = true;
         });
     },
-
-    getAllObjects(fourthLongParam, stringParam, page, size){
-
+    getAllObjects(){
       GenericService(this.tenant, "perfiles", this.token)
-      .filter({ fourthLongParam , stringParam, page, size})
+      .filter(this.filterParams.perfiles)
       .then(data => {
         this.perfiles = data.data.content;
       });
 
       GenericService(this.tenant, "empresas", this.token)
-      .filter({ fourthLongParam , stringParam, page, size})
+      .filter(this.filterParams.empresas)
       .then(data => {
         this.empresas = data.data.content;
         if(this.loguedUser.perfil !== 1){

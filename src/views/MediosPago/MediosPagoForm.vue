@@ -53,6 +53,13 @@ export default {
     object: {},
     planes_pago: [],
     loaded: false,
+    filterParams: {
+      sucursalId: "",
+      planPagoName: "",
+      page: 1,
+      size: 100000,
+      totalPages: 0
+    },
     tenant: "",
     service: "mediosPago",
     token: localStorage.getItem("token"),
@@ -68,25 +75,16 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.filterObjects(this.loguedUser.perfil, '', 0, 100000);
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterObjects();
   },
 
   methods: {
-    filterObjects(fourthLongParam, stringParam, page, size){
-      let thirdLongParam
-
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-      
+    filterObjects(){
       GenericService(this.tenant, "planesPago", this.token)
-      .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
+      .filter(this.filterParams)
       .then(data => {
         this.planes_pago = data.data.content;
       })

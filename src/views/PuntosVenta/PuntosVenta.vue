@@ -8,8 +8,8 @@
         <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-model="filterParams.puntoVentaName"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -28,7 +28,6 @@
           <tr>
             <th>Nombre</th>
             <th>ID Fiscal</th>
-            <th>Sucursal</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -36,7 +35,6 @@
           <tr>
             <td>{{object.nombre}}</td>
             <td>{{object.idFiscal}}</td>
-            <td>{{check(object)}}</td>
             <td>
               <a title="Editar"><img src="/../../images/icons/edit.svg" @click="edit(object.id)" width="30" height="30"/></a>
               <a title="Eliminar"><img src="/../../images/icons/delete.svg" @click="openDelete(object.id)" width="30" height="30"/></a>
@@ -61,7 +59,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -92,9 +90,8 @@ export default {
     empresas: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
+      puntoVentaName: "",
+      sucursalId: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -109,7 +106,10 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterObjects();
   },
 
   methods: {
@@ -121,22 +121,10 @@ export default {
       this.$router.push({ name: "puntosVentaForm", params: { id: id } });
     },
 
-    filterObjects(fourthLongParam, stringParam, page, size){
+    filterObjects(){
       this.loaded = false
-      let thirdLongParam;
-      
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
       GenericService(this.tenant, this.service, this.token)
-        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
+        .filter(this.filterParams)
         .then(data => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -158,13 +146,9 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.getAll(this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects();
         });
     },
-
-    check(object){
-      console.log(object);
-    }
   }
 };
 </script>

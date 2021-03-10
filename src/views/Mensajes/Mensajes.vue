@@ -3,28 +3,48 @@
     <v-form class="mb-3">
       <v-row>
         <v-spacer></v-spacer>
-        <v-col cols="3">
+        <v-col cols="2">
           <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-model="filterParams.mensajeMessage"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
-            class="text-left"
-            placeholder="Búsqueda"
+            placeholder="Mensaje"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="2">
           <v-text-field
-            type="date"
-            v-model="filterDate"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringDateParam, filterParams.page - 1, filterParams.size)"
+            type="text"
+            v-model="filterParams.mensajeDate"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
-            class="text-left"
-            placeholder="Búsqueda"
+            placeholder="Fecha"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            type="text"
+            v-model="filterParams.mensajeNameAndLastName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Nombre y apellido"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            type="text"
+            v-model="filterParams.mensajeContactPhoneOrEmail"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Email o teléfono de contacto"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -76,7 +96,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -95,9 +115,7 @@
     <!-- End Dialog Detail -->
   </v-container>
 </template>
-
 <script>
-import { formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
 
 export default {
@@ -105,10 +123,10 @@ export default {
     objects: [],
     filterDate: null,
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
-      stringDateParam: "",
+      mensajeNameAndLastName: "",
+      mensajeContactPhoneOrEmail: "",
+      mensajeMessage: "",
+      mensajeDate: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -122,34 +140,15 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size)
+    this.filterObjects()
   },
 
   methods: {
 
-    filterObjects(fourthLongParam, stringParam, page, size) {
+    filterObjects() {
       this.loaded = false;
-      let thirdLongParam;
-
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
-      if(stringParam === this.filterParams.stringDateParam){
-        stringParam = formatDate(stringParam);
-        this.filterParams.stringParam = '';
-      }else{
-        this.filterParams.stringDateParam = null;
-      }
-
       GenericService(this.tenant, this.service, this.token)
-        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
+        .filter(this.filterParams)
         .then((data) => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -176,7 +175,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects();
         });
     },
 

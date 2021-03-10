@@ -2,19 +2,57 @@
   <v-container>
     <h3>Usuarios</h3>
       <v-row>
-        <v-col cols="1">
+        <v-col>
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-spacer></v-spacer>
-        <v-col cols="5">
+        <v-col cols="2">
           <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-model="filterParams.usuarioName"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
             class="text-left"
-            label="Búsqueda"
+            label="Nombre de usuario"
+            placeholder=" "
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.sucursalSocialReason"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            label="Razón social de sucursal"
+            placeholder=" "
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.puntoVentaName"
+            v-on:input="filterObjects"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            label="Nombre de punto de venta"
+            placeholder=" "
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.perfilName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            label="Perfil"
             placeholder=" "
             append-icon="mdi-magnify"
           ></v-text-field>
@@ -78,7 +116,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -113,9 +151,12 @@ export default {
   data: () => ({
     objects: [],
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
+      perfilId: "",
+      empresaId: "",
+      sucursalSocialReason: "",
+      perfilName: "",
+      puntoVentaName: "",
+      usuarioName: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -130,26 +171,18 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    this.filterParams.perfilId = this.loguedUser.perfil;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.empresaId = this.loguedUser.empresa.id;
+    }
+    this.filterObjects();
   },
 
   methods: {
 
-    filterObjects(fourthLongParam, stringParam, page, size){
-      let thirdLongParam;
-      
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
+    filterObjects(){
       GenericService(this.tenant, this.service, this.token)
-      .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
+      .filter(this.filterParams)
       .then(data => {
         this.objects = data.data.content;
         this.filterParams.totalPages = data.data.totalPages;
@@ -179,7 +212,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects();
         });
     },
 

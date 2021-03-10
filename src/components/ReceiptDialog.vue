@@ -28,7 +28,7 @@
                 </v-col>
                 <v-col cols="6">
                   <v-autocomplete
-                    @input="filterObjects(filterParams)"
+                    @input="filterObjects()"
                     class="button-ventas comprobante"
                     v-model="dialogObject.documento"
                     :items="databaseItems.documentos"
@@ -81,8 +81,8 @@
                 <v-col class="d-flex">
                   <v-text-field
                     type="text"
-                    v-model="filterParams.fechaEmision"
-                    v-on:input="filterObjects(filterParams)"
+                    v-model="filterParams.ventas.fechaEmision"
+                    v-on:input="filterObjects()"
                     dense
                     outlined
                     rounded
@@ -91,8 +91,8 @@
                   ></v-text-field>
                   <v-text-field
                     type="text"
-                    v-model="filterParams.numeroComprobante"
-                    v-on:input="filterObjects(filterParams)"
+                    v-model="filterParams.ventas.numeroComprobante"
+                    v-on:input="filterObjects()"
                     dense
                     outlined
                     rounded
@@ -152,13 +152,13 @@
                     </template>
                   </v-simple-table>
                   <v-pagination
-                      v-model="filterParams.page"
-                      :length="filterParams.totalPages"
+                      v-model="filterParams.ventas.page"
+                      :length="filterParams.ventas.totalPages"
                       next-icon="mdi-chevron-right"
                       prev-icon="mdi-chevron-left"
-                      :page="filterParams.page"
+                      :page="filterParams.ventas.page"
                       :total-visible="8"
-                      @input="filterObjects(filterParams)"
+                      @input="filterObjects()"
                   ></v-pagination>
                 </v-col>
               </v-row>
@@ -215,9 +215,6 @@ export default {
 
   data() {
     return {
-      paginate: {
-        
-      },
       loguedUser: JSON.parse(localStorage.getItem("userData")),
       tenant: null,
       token: localStorage.getItem("token"),
@@ -230,15 +227,33 @@ export default {
         comprobanteAsociado: ""
       },
       filterParams:{
-        sucursalId: '',
-        fechaEmision: '',
-        comprobanteCerrado: '',
-        numeroComprobante: '',
-        blackReceiptFilter: '',
-        totalVenta: '',
-        page: 1,
-        size: 5,
-        totalPages: 0
+        ventas:{
+          sucursalId: "",
+          fechaEmision: "",
+          comprobanteCerrado: "",
+          numeroComprobante: "",
+          blackReceiptFilter: "",
+          totalVenta: "",
+          page: 1,
+          size: 5,
+          totalPages: 0
+        },
+        clientes:{
+          sucursalId: "",
+          personaSocialReason: "",
+          personaName: "",
+          personaCuit: "",
+          personaDirection: "",
+          personaContactName: "",
+          page: 1,
+          size: 100000
+        },
+        mediosPago:{
+          sucursalId: "",
+          medioPagoName: "",
+          page: 1,
+          size: 100000
+        }
       },
       activeDetailDialog: false,
       detailRelationateReceipt: null,
@@ -254,8 +269,12 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    this.getAllObjects(this.loguedUser.perfil, '', 0, 100000);
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.ventas.sucursalId = this.loguedUser.sucursal.id;
+      this.filterParams.clientes.sucursalId = this.loguedUser.sucursal.id;
+      this.filterParams.mediosPago.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.getAllObjects();
   },
 
   computed: {
@@ -265,38 +284,15 @@ export default {
   },
 
   methods: {
-    getAllObjects(fourthLongParam, stringParam, page, size) {
-      let thirdLongParam;
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
-      const filterParam = {thirdLongParam, stringParam, page, size}
-      const clientFilter = {
-          sucursalId: this.loguedUser.sucursal.id,
-          personaSocialReason: "",
-          personaName: "",
-          personaCuit: "",
-          personaDirection: "",
-          personaContactName: "",
-          page: 1,
-          size: 100000,
-        }
-
+    getAllObjects() {
       GenericService(this.tenant, "clientes", this.token)
-        .filter(clientFilter)
+        .filter(this.filterParams["clientes"])
         .then((data) => {
           this.databaseItems.clientes = data.data.content;
         });
 
       GenericService(this.tenant, "mediosPago", this.token)
-        .filter(filterParam)
+        .filter(this.filterParams["mediosPago"])
         .then((data) => {
           this.databaseItems.medios_de_pago = data.data.content;
         });
@@ -357,9 +353,9 @@ export default {
       this.$refs.tab.$forceUpdate();
     },
 
-    filterObjects(filterParams){
+    filterObjects(){
       GenericService(this.tenant, "ventas", this.token)
-        .filter(filterParams)
+        .filter(this.filterParams["ventas"])
         .then(data => {
           this.comprobantes = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;

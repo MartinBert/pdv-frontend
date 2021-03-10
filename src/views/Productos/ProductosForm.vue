@@ -38,7 +38,7 @@
               :counter="50"
               label="Código de barras"
               required
-              @focusout="checkBarCode(filterParams, object.codigoBarra)"
+              @keypress.enter="checkBarCode(filterParams, object.codigoBarra)"
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
             <v-btn class="primary mt-3" @click="generateBarCode()">Generar</v-btn>
@@ -274,11 +274,14 @@ export default {
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
     },
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
-      secondStringParam: "",
-      thirdStringParam: "",
+      productoName: "",
+      productoCodigo: "",
+      productoCodigoBarras: "",
+      productoMarcaName: "",
+      productoPrimerAtributoName: "",
+      productoSegundoAtributoName: "",
+      productoTercerAtributoName: "",
+      productoEstado: "",
       page: 1,
       size: 1,
       totalPages: 0
@@ -407,10 +410,11 @@ export default {
     },
 
     checkBarCode(filterParams, barcode){
-      filterParams.stringParam = barcode;
+      filterParams.productoCodigoBarras = barcode;
       GenericService(this.tenant, this.service, this.token)
       .filter(filterParams)
       .then(data => {
+        if(this.isEmpty(data.data.content)) return;
         errorAlert("El código de barras que ha introducido ya existe en otro producto: " + data.data.content[0].nombre)
         .then(data => {
           if(data.dismiss){
@@ -418,6 +422,11 @@ export default {
           }
         })
       })
+    },
+
+    isEmpty(array){
+      if(array.length === 0) return true;
+      return false;
     },
 
     save() {

@@ -79,6 +79,11 @@ export default {
       ],
       tipoAtributo: ''
     },
+    filterParams: {
+      atributoValor: "",
+      page: 1,
+      size: 100000
+    },
     object: {},
     loaded: false,
     tenant: "",
@@ -96,7 +101,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getAtributes('', 0, 100000);
+    this.getAtributes();
   },
   methods: {
     getObject(id) {
@@ -108,10 +113,9 @@ export default {
         });
     },
 
-    getAtributes(stringParam, page, size){
-      const thirdLongParam = '';
+    getAtributes(){
       GenericService(this.tenant, "atributos", this.token)
-        .filter({thirdLongParam, stringParam, page, size})
+        .filter(this.filterParams)
         .then(data => {
           this.atributosTexto = data.data.content.filter(el => el.valor != undefined || el.valor != null);
           this.atributosNumero = data.data.content.filter(el => el.valor === undefined || el.valor === null);

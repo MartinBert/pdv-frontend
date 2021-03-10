@@ -2,21 +2,8 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="6">
+        <v-col>
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-        </v-col>
-        <v-col cols="3"></v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
         </v-col>
       </v-row>
     </v-form>
@@ -76,7 +63,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(loguedUser.perfil, filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -111,9 +98,6 @@ export default {
   data: () => ({
     objects: [],
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -127,27 +111,15 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size)
+    this.filterObjects()
   },
 
   methods: {
 
-    filterObjects(fourthLongParam, stringParam, page, size) {
+    filterObjects() {
       this.loaded = false;
-      let thirdLongParam;
-      
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
       GenericService(this.tenant, this.service, this.token)
-        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
+        .filter(this.filterParams)
         .then((data) => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -174,7 +146,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects();
         });
     },
   },

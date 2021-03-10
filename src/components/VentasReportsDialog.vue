@@ -236,15 +236,21 @@ export default {
     /**** USER AND MODELS ****/
     getObjects(){
         let id;
-        if(this.loguedUser.perfil < 3){
-          id = "";
-        }else{
+        if(this.loguedUser.perfil > 1){
           id = this.loguedUser.sucursal.id;
+        }else{
+          id = "";
         }
-
-        const filterParam = {id, param: '', page: 0, size: 100000}
+        const sucursalFilter = {
+          sucursalName: "",
+          sucursalSocialReason: "",
+          sucursalDirection: "",
+          sucursalId: "",
+          page: 1,
+          size: 100000
+        }
         const clientFilter = {
-          sucursalId: this.loguedUser.sucursal.id,
+          sucursalId: id,
           personaSocialReason: "",
           personaName: "",
           personaCuit: "",
@@ -256,18 +262,17 @@ export default {
         
         if(this.loguedUser.perfil < 3){
           GenericService(this.tenant, "sucursales", this.token)
-          .filter(filterParam)
+          .filter(sucursalFilter)
           .then(data => {
             this.sucursales = data.data.content;
           });
         }
-
+        
         GenericService(this.tenant, "clientes", this.token)
         .filter(clientFilter)
         .then(data => {
           this.clientes = data.data.content;
         });
-
 
         DocumentosService(this.tenant, "documentosComerciales", this.token)
         .getInvoices()

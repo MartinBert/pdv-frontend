@@ -64,6 +64,14 @@ export default {
     sucursal: [],
     loaded: false,
     tenant: "",
+    filterParams: {
+      sucursalName: "",
+      sucursalSocialReason: "",
+      sucursalDirection: "",
+      sucursalId: "",
+      page: 1,
+      size: 100000
+    },
     service: "punto_ventas",
     token: localStorage.getItem("token"),
     snackError: false,
@@ -72,7 +80,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.loguedUser.perfil, '', 0, 100000);
+    this.filterObjects();
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
@@ -92,22 +100,10 @@ export default {
         });
     },
 
-    filterObjects(fourthLongParam, stringParam, page, size){
+    filterObjects(){
       this.loaded = false
-      let thirdLongParam;
-
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
       GenericService(this.tenant, "sucursales", this.token)
-        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
+        .filter(this.filterParams)
         .then(data => {
           this.sucursales = data.data.content;
           this.loaded = true;

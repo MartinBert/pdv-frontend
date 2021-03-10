@@ -107,22 +107,30 @@ export default {
     errorMessage: "",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
+      blackReceiptFilter: "",
       sucursalId: "",
+      fechaEmision: "",
+      comprobanteCerrado: "",
+      numeroComprobante: "",
+      totalVenta: "",
       page: 1,
       size: 100000,
+      totalPages: 0
     }
   }),
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
     } else {
       this.loaded = true;
     }
 
-    this.getSalesList(this.filterParams);
+    this.getSalesList();
   },
 
   computed:{
@@ -151,9 +159,9 @@ export default {
         });
     },
 
-    getSalesList(filterParams){
+    getSalesList(){
         VentasService(this.tenant, this.service, this.token)
-        .filterNotCloseReceipts(filterParams)
+        .filterNotCloseReceipts(this.filterParams)
         .then(data => {
             this.ventas = data.data;
             this.object.montoFacturado = this.ventas.reduce((acc, el) => Math.round((acc + Number(el.totalVenta))*100)/100, 0);

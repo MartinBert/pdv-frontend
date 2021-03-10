@@ -74,6 +74,18 @@ export default {
     distribuidores: [],
     tenant: "",
     service: "productos",
+    filterParams: {
+      productoName: "",
+      productoCodigo: "",
+      productoCodigoBarras: "",
+      productoMarcaName: "",
+      productoPrimerAtributoName: "",
+      productoSegundoAtributoName: "",
+      productoTercerAtributoName: "",
+      productoEstado: "",
+      page: 1,
+      size: 100000
+    },
     token: localStorage.getItem("token"),
   }),
 
@@ -113,15 +125,8 @@ export default {
       ).then((result) => {
         if (result.isConfirmed) {
           this.loaded = false;
-          const filterParam = {
-            longParam: 1,
-            secondLongParam: this.object.distribuidor.id,
-            page: 1,
-            size: 100000,
-          };
-
           GenericService(this.tenant, this.service, this.token)
-            .filter(filterParam)
+            .filter(this.filterParams)
             .then((data) => {
               const products = data.data.content;
               const alterProducts = products.map((el) => {
@@ -147,14 +152,8 @@ export default {
       ).then((result) => {
         if (result.isConfirmed) {
           this.loaded = false;
-          const filterParam = {
-            longParam: 1,
-            secondLongParam: this.object.distribuidor.id,
-            page: 1,
-            size: 100000,
-          };
           GenericService(this.tenant, this.service, this.token)
-            .filter(filterParam)
+            .filter(this.filterParams)
             .then((data) => {
               const products = data.data.content;
               const alterProducts = products.map((el) => {

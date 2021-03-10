@@ -101,6 +101,11 @@ export default {
     object: {
       tipoPersona: 2,
     },
+    filterParams: {
+      condicionFiscalName: "",
+      page: 1,
+      size: 100000
+    },
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     loaded: false,
     tenant: "",
@@ -117,7 +122,7 @@ export default {
     } else {
       this.loaded = true;
     }
-    this.getIvaConditions('', 0, 100000);
+    this.getIvaConditions();
   },
   methods: {
     getObject(id) {
@@ -129,10 +134,9 @@ export default {
         });
     },
 
-    getIvaConditions(stringParam, page, size){
-      let id = '';
+    getIvaConditions(){
       GenericService(this.tenant, "condicionesFiscales", this.token)
-        .filter({id, stringParam, page, size})
+        .filter(this.filterParams)
         .then(data => {
           this.condicioniva = data.data.content.filter(el => el.id !== 3);
         });

@@ -13,7 +13,7 @@
                 item-text="text"
                 item-value="id"
                 label="Lista en la que buscar productos"
-                @change="filterObjects(filterParams, typeList)"
+                @change="filterObjects(typeList)"
               />
             </v-col>
           </v-row>
@@ -22,52 +22,52 @@
           <v-row>
             <v-col>
               <v-text-field
-                v-model="filterParams.productoName"
+                v-model="filterParams.productos.productoName"
                 dense
                 outlined
                 rounded
                 label="Nombre"
-                @input="filterObjects(filterParams, typeList)"
+                @input="filterObjects(typeList)"
               ></v-text-field>
             </v-col>
             <v-col>
               <v-text-field
-                v-model="filterParams.productoCodigo"
+                v-model="filterParams.productos.productoCodigo"
                 dense
                 outlined
                 rounded
                 label="Codigo de producto"
-                @input="filterObjects(filterParams, typeList)"
+                @input="filterObjects(typeList)"
               ></v-text-field>
             </v-col>
             <v-col>
               <v-text-field
-                v-model="filterParams.productoCodigoBarras"
+                v-model="filterParams.productos.productoCodigoBarras"
                 dense
                 outlined
                 rounded
                 label="Codigo de barras"
-                @input="filterObjects(filterParams, typeList)"
+                @input="filterObjects(typeList)"
               ></v-text-field>
             </v-col>
             <v-col>
               <v-text-field
-                v-model="filterParams.productoMarcaName"
+                v-model="filterParams.productos.productoMarcaName"
                 dense
                 outlined
                 rounded
                 label="Marca"
-                @input="filterObjects(filterParams, typeList)"
+                @input="filterObjects(typeList)"
               ></v-text-field>
             </v-col>
             <v-col>
               <v-text-field
-                v-model="filterParams.productoPrimerAtributoName"
+                v-model="filterParams.productos.productoPrimerAtributoName"
                 dense
                 outlined
                 rounded
                 label="Atributo"
-                @input="filterObjects(filterParams, typeList)"
+                @input="filterObjects(typeList)"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -107,13 +107,13 @@
                   
                 </v-simple-table>
                 <v-pagination
-                  v-model="filterParams.page"
-                  :length="filterParams.totalPages"
+                  v-model="filterParams.productos.page"
+                  :length="filterParams.productos.totalPages"
                   next-icon="mdi-chevron-right"
                   prev-icon="mdi-chevron-left"
-                  :page="filterParams.page"
+                  :page="filterParams.productos.page"
                   :total-visible="8"
-                  @input="filterObjects(filterParams, typeList)"
+                  @input="filterObjects(typeList)"
                   v-if="filterParams.totalPages > 1"
                 ></v-pagination>
               </v-col>
@@ -144,21 +144,34 @@ export default {
       productos: [],
       typeList: 0,
       typeProductsList: [],
+      loguedUser: {},
+      token: "",
+      tenant: "",
+      service: "",
       filterParams: {
-        productoName: "",
-        productoCodigo: "",
-        productoCodigoBarras: "",
-        productoMarcaName: "",
-        productoPrimerAtributoName: "",
-        productoSegundoAtributoName: "",
-        productoTercerAtributoName: "",
-        productoEstado: 0,
-        stockDepositoId: "",
-        sucursalId: "",
-        perfilId: "",
-        page: 1,
-        size: 10,
-        totalPages: 0
+        productos: {
+          stockDepositoId: "",
+          productoName: "",
+          productoCodigo: "",
+          productoCodigoBarras: "",
+          productoMarcaName: "",
+          productoPrimerAtributoName: "",
+          productoSegundoAtributoName: "",
+          productoTercerAtributoName: "",
+          productoEstado: 0,
+          sucursalId: "",
+          perfilId: "",
+          page: 1,
+          size: 10,
+          totalPages: 0
+        },
+        depositos:{
+          perfilId: "",
+          sucursalId: "",
+          depositoName: "",
+          page: 1,
+          size: 100000
+        }
       },
     }
   },
@@ -167,9 +180,9 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.token = localStorage.getItem('token');
     this.loguedUser = JSON.parse(localStorage.getItem("userData"));
-    this.filterParams.perfilId = this.loguedUser.perfil;
-    this.filterObjects(this.filterParams, this.typeList);
+    this.generalAsignation();
     this.createtypeProductsList();
+    this.filterObjects(this.typeList);
   },
 
   watch:{
@@ -189,15 +202,22 @@ export default {
   },
 
   methods:{
-    filterObjects(filterParams, typeList) {
-      this.loaded = false;
-      
-      if(typeList === 0){
-        this.generalSearch(filterParams);
-      }else{
-        this.searchForDeposit(filterParams, typeList);
+    generalAsignation(){
+      this.filterParams.productos.perfilId = this.loguedUser.perfil;
+      this.filterParams.depositos.perfilId = this.loguedUser.perfil;
+      if(this.loguedUser.perfil > 1){
+        this.filterParams.depositos.sucursalId = this.loguedUser.sucursal.id;
+        this.filterParams.productos.sucursalId = this.loguedUser.sucursal.id;
       }
-      
+    },
+
+    filterObjects(typeList) {
+      this.loaded = false;
+      if(typeList === 0){
+        this.generalSearch();
+      }else{
+        this.searchForDeposit(typeList);
+      }
     },
 
     checkProduct(id) {
@@ -223,63 +243,39 @@ export default {
       this.$refs.pTable.$forceUpdate();
     },
 
-    generalSearch(filterParams){
+    generalSearch(){
       GenericService(this.tenant, 'productos', this.token)
-        .filter(filterParams)
+        .filter(this.filterParams.productos)
         .then(data => {
           this.productos = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          if(this.filterParams.totalPages < this.filterParams.page){
-              this.filterParams.page = 1;
+          this.filterParams.productos.totalPages = data.data.totalPages;
+          if(this.filterParams.productos.totalPages < this.filterParams.productos.page){
+              this.filterParams.productos.page = 1;
           }
           this.loaded = true;
         });
     },
 
-    searchForDeposit(filterParams, typeList){
-      filterParams.stockDepositoId = typeList;
-      filterParams.sucursalId;
-      
-      switch (filterParams.perfilId) {
-        case 1:
-            filterParams.sucursalId = '';
-          break;
-      
-        default:
-            filterParams.sucursalId = this.loguedUser.sucursal.id;
-          break;
-      }
+    searchForDeposit(typeList){
+      this.filterParams.productos.stockDepositoId = typeList;
       StocksService(this.tenant, 'stock', this.token)
-      .filterStockForDepositId(filterParams)
+      .filterStockForDepositId(this.filterParams.productos)
       .then(data => {
         this.productos = data.data.content.map(el => {
           el.producto.cantidad = el.cantidad;
           return el.producto;
         });
-        this.filterParams.totalPages = data.data.totalPages;
-        if(this.filterParams.totalPages < this.filterParams.page){
-            this.filterParams.page = 1;
+        this.filterParams.productos.totalPages = data.data.totalPages;
+        if(this.filterParams.productos.totalPages < this.filterParams.productos.page){
+            this.filterParams.productos.page = 1;
         }
         this.loaded = true;
       });
     },
 
     createtypeProductsList(){
-      const fourthLongParam = this.loguedUser.perfil;
-      let thirdLongParam;
-      
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
       GenericService(this.tenant, 'depositos', this.token)
-      .filter({fourthLongParam, thirdLongParam, stringParam: '', page: 0, size: 100000})
+      .filter(this.filterParams.depositos)
       .then(data => {
         this.typeProductsList.push({id: 0, text: 'Lista general de productos'});
         data.data.content.forEach(el => {

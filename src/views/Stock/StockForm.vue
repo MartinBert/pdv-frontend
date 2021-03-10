@@ -17,7 +17,7 @@
                 outlined
                 rounded
                 label="Nombre"
-                @input="filterProducts(filterParams)"
+                @input="filterProducts()"
               ></v-text-field>
             </v-col>
             <v-col>
@@ -27,7 +27,7 @@
                 outlined
                 rounded
                 label="Codigo de producto"
-                @input="filterProducts(filterParams)"
+                @input="filterProducts()"
               ></v-text-field>
             </v-col>
             <v-col>
@@ -37,7 +37,7 @@
                 outlined
                 rounded
                 label="Codigo de barras"
-                @input="filterProducts(filterParams)"
+                @input="filterProducts()"
               ></v-text-field>
             </v-col>
             <v-col>
@@ -47,13 +47,13 @@
                 outlined
                 rounded
                 label="Marca"
-                @input="filterProducts(filterParams)"
+                @input="filterProducts()"
               ></v-text-field>
             </v-col>
             <v-col>
               <v-text-field
                 v-model="filterParams.productoPrimerAtributoName"
-                v-on:input="filterProducts(filterParams)"
+                v-on:input="filterProducts()"
                 dense
                 outlined
                 rounded
@@ -100,7 +100,7 @@
               prev-icon="mdi-chevron-left"
               :page="filterParams.page"
               :total-visible="8"
-              @input="filterProducts(filterParams)"
+              @input="filterProducts()"
               v-if="filterParams.totalPages > 1"
             ></v-pagination>
           </v-col>
@@ -271,6 +271,13 @@ export default {
       size: 5,
       totalPages: 0
     },
+    filterDepositsParam: {
+      depositoName: "",
+      perfilId: "",
+      sucursalId: "",
+      page: 1,
+      size: 100000
+    },
     radioGroup: "",
     checked: false,
   }),
@@ -278,13 +285,19 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.urlId = this.$route.params.id;
+    this.filterParams.perfilId = this.loguedUser.perfil;
+    this.filterDepositsParam.perfilId = this.loguedUser.perfil;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      this.filterDepositsParam.sucursalId = this.loguedUser.sucursal.id;
+    }
 
     if (this.urlId && this.urlId > 0) {
       this.getObject(this.urlId);
-      this.filterDepositos(this.loguedUser.perfil, '', 0, 100000);
+      this.filterDepositos();
     } else {
-      this.filterDepositos(this.loguedUser.perfil, '', 0, 100000);
-      this.filterProducts(this.filterParams);
+      this.filterDepositos();
+      this.filterProducts();
     }
   },
 
@@ -306,9 +319,9 @@ export default {
         });
     },
     
-    filterProducts(filterParams) {
+    filterProducts() {
       GenericService(this.tenant, "productos", this.token)
-        .filter(filterParams)
+        .filter(this.filterParams)
         .then((data) => {
           if(this.object.producto.length > 0){
             this.object.producto.forEach(el => {
@@ -328,21 +341,9 @@ export default {
         });
     },
 
-    filterDepositos(fourthLongParam, stringParam, page, size){
-      let thirdLongParam;
-      
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';         
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
+    filterDepositos(){
       GenericService(this.tenant, "depositos", this.token)
-        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
+        .filter(this.filterDepositsParam)
         .then((data) => {
           this.depositos = data.data.content;
           this.loaded = true;
@@ -400,21 +401,24 @@ export default {
       }
     },
 
-    onBarcodeScanned(stringParam) {
-      let thirdLongParam;
-      
-      switch (this.loguedUser.perfil) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
+    onBarcodeScanned(barcode) {
+      const filter = {
+        productoName: "",
+        productoCodigo: "",
+        productoCodigoBarras: barcode,
+        productoMarcaName: "",
+        productoPrimerAtributoName: "",
+        productoSegundoAtributoName: "",
+        productoTercerAtributoName: "",
+        productoEstado: 0,
+        stockDepositoId: "",
+        sucursalId: "",
+        perfilId: "",
+        page: 1,
+        size: 1,
       }
-
       GenericService(this.tenant, "productos", this.token)
-        .filter({thirdLongParam, stringParam, page: 0, size: 1})
+        .filter(filter)
         .then((data) => {
           const databaseItem = data.data.content[0];
           const productInList = this.productos.filter(el => el.id === databaseItem.id)[0];

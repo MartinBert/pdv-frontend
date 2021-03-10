@@ -42,6 +42,12 @@ export default {
       { id: 1, text: "Física" },
       { id: 2, text: "Jurídica" }
     ],
+    filterParams: {
+      condicionFiscalName: "",
+      page: 1,
+      size: 100000,
+      totalPages: 0
+    },
     condicioniva: [],
     object: {},
     loaded: false,
@@ -74,7 +80,7 @@ export default {
 
     getCondicionesIva(){
       GenericService(this.tenant, "condicionesFiscales", this.token)
-        .getAll()
+        .filter(this.filterParams)
         .then(data => {
           this.condicioniva = data.data.content;
         });

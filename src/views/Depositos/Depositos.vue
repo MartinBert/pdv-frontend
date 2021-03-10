@@ -22,15 +22,8 @@
         <v-col cols="3">
           <v-text-field
             style="width: 300px"
-            v-model="filterParams.stringParam"
-            v-on:input="
-              filterObjects(
-                loguedUser.perfil,
-                filterParams.stringParam,
-                filterParams.page - 1,
-                filterParams.size
-              )
-            "
+            v-model="filterParams.depositoName"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -85,7 +78,7 @@
                 <img src="/../../images/icons/success.svg" alt="success" width="30" height="30">
               </span>
               <span v-if="object.defaultDeposit !== '1'">
-                <v-btn class="primary" @click="selectDefaultDeposit(loguedUser.perfil, object)"
+                <v-btn class="primary" @click="selectDefaultDeposit(object)"
                   >Elegir predeterminado</v-btn
                 >
               </span>
@@ -113,14 +106,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="
-        filterObjects(
-          loguedUser.perfil,
-          filterParams.stringParam,
-          filterParams.page - 1,
-          filterParams.size
-        )
-      "
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1 && loaded"
     ></v-pagination>
     <!-- End filterParams -->
@@ -161,9 +147,9 @@ export default {
     objects: [],
     file: null,
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
+      depositoName: "",
+      perfilId: "",
+      sucursalId: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -182,29 +168,18 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(
-      this.loguedUser.perfil,
-      this.filterParams.stringParam,
-      this.filterParams.page - 1,
-      this.filterParams.size
-    );
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterParams.perfilId = this.loguedUser.perfil;
+    this.filterObjects();
   },
 
   methods: {
-    filterObjects(fourthLongParam, stringParam, page, size) {
+    filterObjects() {
       this.loaded = false;
-      let thirdLongParam;
-      switch (fourthLongParam) {
-        case 1:
-          thirdLongParam = "";
-          break;
-        default:
-          thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
-
       GenericService(this.tenant, this.service, this.token)
-        .filter({fourthLongParam, thirdLongParam, stringParam, page, size})
+        .filter(this.filterParams)
         .then((data) => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -243,12 +218,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(
-            this.loguedUser.perfil,
-            this.filterParams.stringParam,
-            this.filterParams.page - 1,
-            this.filterParams.size
-          );
+          this.filterObjects();
         })
         .catch(() => {
           errorAlert(
@@ -279,12 +249,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(doc.data)
             .then(() => {
-              this.filterObjects(
-                this.loguedUser.perfil,
-                this.filterParams.stringParam,
-                this.filterParams.page - 1,
-                this.filterParams.size
-              );
+              this.filterObjects();
               this.loaderStatus = true;
               window.setTimeout(() => {
                 this.loader = false;
@@ -320,32 +285,17 @@ export default {
       return importacion;
     },
 
-    selectDefaultDeposit(fourthLongParam, deposit) {
+    selectDefaultDeposit(deposit) {
       this.loaded = false;
-      const stringParam = "";
-      const page = 0;
-      const size = 100000;
-      
-      let thirdLongParam;
-
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
+      const filterParams = {
+        depositoName: "",
+        sucursalId: this.loguedUser.sucursal.id,
+        page: 1,
+        size: 100000
       }
 
       GenericService(this.tenant, this.service, this.token)
-        .filter({
-          fourthLongParam,
-          thirdLongParam,
-          stringParam,
-          page,
-          size,
-        })
+        .filter(filterParams)
         .then((data) => {
           let allDeposits = data.data.content;
           let allDefaultDeposits = allDeposits.filter(el => el.defaultDeposit === "1");
@@ -386,12 +336,7 @@ export default {
 
     refreshView(){
       setTimeout(() => {
-          this.filterObjects(
-            this.loguedUser.perfil,
-            this.filterParams.stringParam,
-            this.filterParams.page - 1,
-            this.filterParams.size
-          );
+          this.filterObjects();
       }, 500);
     }
   },

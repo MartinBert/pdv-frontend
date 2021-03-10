@@ -21,13 +21,13 @@
             item-value="id"
             label="Depósito"
             v-model="typeList"
-            @change="filterObjects(filterParams, typeList)"
+            @change="filterObjects(typeList)"
           />
         </v-col>
         <v-col>
           <v-text-field
             v-model="filterParams.productoName"
-            v-on:input="filterObjects(filterParams,typeList)"
+            v-on:input="filterObjects(typeList)"
             dense
             outlined
             rounded
@@ -39,7 +39,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoCodigo"
-            v-on:input="filterObjects(filterParams,typeList)"
+            v-on:input="filterObjects(typeList)"
             dense
             outlined
             rounded
@@ -51,7 +51,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoCodigoBarras"
-            v-on:input="filterObjects(filterParams,typeList)"
+            v-on:input="filterObjects(typeList)"
             dense
             outlined
             rounded
@@ -63,7 +63,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoMarcaName"
-            v-on:input="filterObjects(filterParams,typeList)"
+            v-on:input="filterObjects(typeList)"
             dense
             outlined
             rounded
@@ -75,7 +75,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoPrimerAtributoName"
-            v-on:input="filterObjects(filterParams,typeList)"
+            v-on:input="filterObjects(typeList)"
             dense
             outlined
             rounded
@@ -172,7 +172,7 @@
       :page="filterParams.page"
       :total-visible="8"
       @input="
-        filterObjects(filterParams, typeList)
+        filterObjects(typeList)
       "
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
@@ -267,6 +267,13 @@ export default {
       size: 10,
       totalPages: 0
     },
+    depositsFilterParams:{
+      depositoName: "",
+      perfilId: "",
+      sucursalId: "",
+      page: 1,
+      size: 100000
+    },
     loaded: false,
     tenant: "",
     service: "stock",
@@ -288,44 +295,72 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterParams.perfilId = this.loguedUser.perfil;
-    this.filterObjects(this.filterParams,this.typeList);
-    this.getOtherModels(this.loguedUser.perfil, "", 0, 100000);
+    this.depositsFilterParams.perfilId = this.loguedUser.perfil;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      this.depositsFilterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterObjects(this.typeList);
+    this.getOtherModels();
   },
 
   methods: {
-    filterObjects(filterParams, typeList) {
-      switch (filterParams.perfilId) {
-        case 1:
-            filterParams.sucursalId = '';
-          break;
-      
-        default:
-            filterParams.sucursalId = this.loguedUser.sucursal.id;
-          break;
-      }
-
+    filterObjects(typeList) {
       if (typeList > 0) {
-        this.searchForDeposit(filterParams, typeList);
+        this.searchForDeposit(typeList);
       } else {
-        this.search(filterParams);
+        this.search();
       }
     },
 
-    getOtherModels(fourthLongParam, stringParam, page, size) {
-      let thirdLongParam;
+    search() {
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.objects = data.data.content;
+          if(this.migration.length > 0){
+            this.migration.filter(el => {
+              this.objects.filter(e => {
+                if(el.id === e.id){
+                  e.selected = true;
+                }
+              })
+            })
+          }
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
 
-      switch (fourthLongParam) {
-        case 1:
-            thirdLongParam = '';
-          break;
-      
-        default:
-            thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
+    searchForDeposit(typeList) {
+      this.filterParams.stockDepositoId = typeList;
+      StocksService(this.tenant, "stock", this.token)
+        .filterStockForDepositId(this.filterParams)
+        .then((data) => {
+          this.objects = data.data.content;
+          if(this.migration.length > 0){
+            this.migration.filter(el => {
+              this.objects.filter(e => {
+                if(el.id === e.id){
+                  e.selected = true;
+                }
+              })
+            })
+          }
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
 
+    getOtherModels() {
       GenericService(this.tenant, "depositos", this.token)
-        .filter({ fourthLongParam, thirdLongParam, stringParam, page, size })
+        .filter(this.depositsFilterParams)
         .then((data) => {
           this.depositos = data.data.content;
           this.depositos.push({
@@ -333,51 +368,6 @@ export default {
             nombre: "Todos",
           });
           this.realDeposits = this.depositos.filter(el => el.id !== 0);
-        });
-    },
-
-    search(filterParams) {
-      GenericService(this.tenant, this.service, this.token)
-        .filter(filterParams)
-        .then((data) => {
-          this.objects = data.data.content;
-          if(this.migration.length > 0){
-            this.migration.filter(el => {
-              this.objects.filter(e => {
-                if(el.id === e.id){
-                  e.selected = true;
-                }
-              })
-            })
-          }
-          this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
-          this.loaded = true;
-        });
-    },
-
-    searchForDeposit(filterParams, typeList) {
-      filterParams.stockDepositoId = typeList;
-      StocksService(this.tenant, "stock", this.token)
-        .filterStockForDepositId(filterParams)
-        .then((data) => {
-          this.objects = data.data.content;
-          if(this.migration.length > 0){
-            this.migration.filter(el => {
-              this.objects.filter(e => {
-                if(el.id === e.id){
-                  e.selected = true;
-                }
-              })
-            })
-          }
-          this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
-          this.loaded = true;
         });
     },
 
@@ -400,10 +390,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(
-            this.filterParams,
-            this.typeList
-          );
+          this.filterObjects(this.typeList);
         });
     },
 
@@ -412,21 +399,23 @@ export default {
       this.loaded = false;
 
       let filterParams = {
-        thirdLongParam: "",
-        stringParam: "",
-        thirdStringParam: "",
+        productoName: "",
+        productoCodigo: "",
+        productoCodigoBarras: "",
+        productoMarcaName: "",
+        productoPrimerAtributoName: "",
+        productoSegundoAtributoName: "",
+        productoTercerAtributoName: "",
+        productoEstado: 0,
+        stockDepositoId: "",
+        sucursalId: "",
+        perfilId: "",
         page: 1,
         size: 100000
       }
-
-      switch (this.loguedUser.perfil) {
-        case 1:
-            filterParams.thirdLongParam = '';
-          break;
-      
-        default:
-            filterParams.thirdLongParam = this.loguedUser.sucursal.id;
-          break;
+      filterParams.perfilId = this.loguedUser.perfil;
+      if(this.loguedUser.perfil > 1){
+        filterParams.sucursalId = this.loguedUser.sucursal.id;
       }
 
       GenericService(this.tenant, this.service, this.token)
@@ -444,7 +433,7 @@ export default {
           this.saveHistorial(stockWithRestrictions, "Cambio masivo en límite de existencias mínimas");
 
           this.$store.commit("stocks/resetStates");
-          this.filterObjects(this.filterParams,this.typeList);
+          this.filterObjects(this.typeList);
         });
     },
 
@@ -452,25 +441,27 @@ export default {
       this.loaded = false;
 
       let filterParams = {
-        thirdLongParam: "",
-        stringParam: "",
-        thirdStringParam: "",
+        productoName: "",
+        productoCodigo: "",
+        productoCodigoBarras: "",
+        productoMarcaName: "",
+        productoPrimerAtributoName: "",
+        productoSegundoAtributoName: "",
+        productoTercerAtributoName: "",
+        productoEstado: 0,
+        stockDepositoId: "",
+        sucursalId: "",
+        perfilId: "",
         page: 1,
         size: 100000
+      }
+      filterParams.perfilId = this.loguedUser.perfil;
+      if(this.loguedUser.perfil > 1){
+        filterParams.sucursalId = this.loguedUser.sucursal.id;
       }
 
       let depositToModifyId = this.$store.state.stocks.selectedDeposits[0].id;
       let newDepositForProducts = this.$store.state.stocks.selectedDeposits[1];
-
-      switch (this.loguedUser.perfil) {
-        case 1:
-            filterParams.thirdLongParam = '';
-          break;
-      
-        default:
-            filterParams.thirdLongParam = this.loguedUser.sucursal.id;
-          break;
-      }
 
       GenericService(this.tenant, this.service, this.token)
         .filter(filterParams)
@@ -489,7 +480,7 @@ export default {
           this.saveHistorial(affectedProducts, "Movimiento masivo de stock entre depósitos");
 
           this.$store.commit("stocks/resetStates");
-          setTimeout(()=>{this.filterObjects(this.filterParams, this.typeList);}, 500);
+          setTimeout(()=>{this.filterObjects(this.typeList);}, 500);
         });
     },
 
@@ -520,7 +511,7 @@ export default {
         this.migration = [];
         this.destinationDepositForMigrations = {};
 
-        setTimeout(()=>{this.filterObjects(this.filterParams, this.typeList);}, 500);
+        setTimeout(()=>{this.filterObjects(this.typeList);}, 500);
       }else{
         errorAlert("Debe seleccionar al menos 1 producto para migrar su stock de depósito");
       }

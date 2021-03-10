@@ -8,8 +8,8 @@
         <v-col cols="3"></v-col>
         <v-col cols="3">
           <v-text-field
-            v-model="filterParams.stringParam"
-            v-on:input="filterObjects(filterParams.stringParam, filterParams.page - 1, filterParams.size)"
+            v-model="filterParams.condicionFiscalName"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -57,7 +57,7 @@
       prev-icon="mdi-chevron-left"
       :page="filterParams.page"
       :total-visible="8"
-      @input="filterObjects(filterParams.stringParam, filterParams.page -1, filterParams.size)"
+      @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
     <!-- End filterParams -->
@@ -86,9 +86,7 @@ export default {
   data: () => ({
     objects: [],
     filterParams: {
-      fourthLongParam: "",
-      thirdLongParam: "",
-      stringParam: "",
+      condicionFiscalName: "",
       page: 1,
       size: 10,
       totalPages: 0
@@ -101,7 +99,7 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects(this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+    this.filterObjects();
   },
   methods: {
 
@@ -113,11 +111,10 @@ export default {
       this.$router.push({ name: "condicionesFiscalesForm", params: { id: id } });
     },
 
-    filterObjects(stringParam, page, size){
+    filterObjects(){
       this.loaded = false;
-
       GenericService(this.tenant, this.service, this.token)
-        .filter({stringParam, page, size})
+        .filter(this.filterParams)
         .then(data => {
           this.objects = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -139,7 +136,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.loguedUser.perfil, this.filterParams.stringParam, this.filterParams.page - 1, this.filterParams.size);
+          this.filterObjects();
         });
     }
   }
