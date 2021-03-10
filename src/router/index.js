@@ -74,7 +74,7 @@ const routes = [
         component: Root,
         children: [
             {
-                path: '',
+                path: '/home',
                 name: 'home',
                 component: Home,
                 meta: { requiresAuth: true }

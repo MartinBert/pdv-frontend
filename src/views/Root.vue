@@ -80,7 +80,8 @@
     </v-app-bar>
     <v-main>
       <v-container fluid class="root-container">
-        <router-view></router-view>
+        <Home v-if="$route.name === 'root'"/>
+        <router-view v-if="$route.name !== 'root'"/>
       </v-container>
     </v-main>
   </v-app>
@@ -88,6 +89,7 @@
 <script>
 import axios from "axios";
 import { successAlert } from '../helpers/alerts';
+import Home from './Home';
 export default {
   props: {
     source: String
@@ -355,6 +357,9 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.getUser();
   },
+  components:{
+    Home
+  },
   methods: {
     go: function(to) {
       if(this.$router.currentRoute.name !== to)
@@ -363,7 +368,7 @@ export default {
     },
     logout: function() {
       localStorage.clear();
-      this.$router.push({ path: this.tenant + "/login" });
+      this.$router.push({ path: `${this.tenant}/login` }).catch(()=>{return;});
     },
     getUser: function() {
       axios
@@ -419,6 +424,9 @@ export default {
       successAlert("Cambios aplicados")
       .then(()=>{
         location.reload();
+      })
+      .catch(err => {
+        console.log(err);
       })
     }    
   }
