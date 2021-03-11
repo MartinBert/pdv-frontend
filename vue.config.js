@@ -88,4 +88,9 @@ module.exports = {
     "transpileDependencies": [
       "vuetify"
     ],
+    use: [
+      'vue-style-loader',
+      'css-loader',
+      'sass-loader'
+    ]
   }
