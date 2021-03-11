@@ -361,16 +361,18 @@ export default {
     Home
   },
   methods: {
-    go: function(to) {
+    go(to) {
       if(this.$router.currentRoute.name !== to)
       this.$router.push({ name: to });
       this.nameRouter = to;
     },
-    logout: function() {
+    
+    logout() {
       localStorage.clear();
-      this.$router.push({ path: `${this.tenant}/login` }).catch(()=>{return;});
+      this.go(`login`);
     },
-    getUser: function() {
+
+    getUser() {
       axios
         .get(
           `${process.env.VUE_APP_SERVER}/${this.tenant}/api/usuarios/getLogued`,
