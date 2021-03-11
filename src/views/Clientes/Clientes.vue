@@ -42,7 +42,7 @@
     </v-form>
 
     <!-- List -->
-    <v-simple-table style="background-color: transparent">
+    <v-simple-table style="background-color: transparent" v-if="loaded">
       <template v-slot:default>
         <thead>
           <tr>
@@ -83,15 +83,6 @@
         </tbody>
       </template>
     </v-simple-table>
-    <!-- End List -->
-
-    <!-- Loader -->
-    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
     <v-pagination
       v-model="filterParams.page"
       :length="filterParams.totalPages"
@@ -102,9 +93,9 @@
       @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
-    <!-- End filterParams -->
 
-    <!-- Dialog Delete-->
+    <Spinner v-if="!loaded"/>
+
     <v-dialog v-model="dialogDeleteObject" width="500">
       <v-card>
         <v-toolbar class="d-flex justify-center" color="primary" dark>
@@ -123,12 +114,13 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- End Dialog Delete -->
+
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
+import Spinner from "../../components/Spinner";
 
 export default {
   data: () => ({
@@ -151,6 +143,11 @@ export default {
     dialogDeleteObject: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
+
+  components:{
+    Spinner
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     if(this.loguedUser.perfil > 1){

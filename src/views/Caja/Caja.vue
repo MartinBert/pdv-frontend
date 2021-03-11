@@ -64,9 +64,7 @@
         v-if="filterParams.totalPages > 1"
       ></v-pagination>
     </v-container>
-
     <Spinner v-if="!loaded"/>
-
     <CajaDetails />
   </v-container>
 </template>

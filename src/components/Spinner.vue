@@ -1,6 +1,6 @@
 <template>
     <v-container>
-            <div class="loader"></div>
+      <div class="loader"></div>
     </v-container>
 </template>
 <script>
@@ -23,7 +23,6 @@ export default {
   width:10vmin;
   z-index:1;
 }
-
 .loader::before{
   animation:spin 2s infinite linear;
     border:solid 1vmin transparent;
@@ -38,7 +37,6 @@ export default {
     top:1vmin;
     width:6vmin;
 }
-
 .loader::after{
   animation:spin 3s infinite linear;
     border:solid 1vmin transparent;

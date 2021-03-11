@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <!-- Body -->
-    <v-col cols="12">
+    <v-col cols="12" v-if="loaded">
       <v-row class="mb-1">
         <v-col cols="6">
           <div class="d-flex text-left">
@@ -248,6 +248,8 @@
         </v-container>
       </v-card>
     </v-dialog>
+
+    <Spinner v-if="!loaded"/>
   </v-container>
 </template>
 
@@ -255,6 +257,7 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import Calculator from "../../components/Calculator";
+import Spinner from "../../components/Spinner";
 import ProductDialog from "../../components/ProductDialog";
 import {
   formatDate,
@@ -282,6 +285,7 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     fecha: getCurrentDate(),
     barcode: "",
+    loaded: true,
     page: 0,
     size: 1000,
     object: {},
@@ -308,6 +312,7 @@ export default {
   components: {
     Calculator,
     ProductDialog,
+    Spinner
   },
 
   created() {
@@ -733,10 +738,16 @@ export default {
                           .finally(() => {
                             /*** Reset view objects and status ***/
                             this.clear();
+                            this.loaded = true;
                           });
                       });
                   } else {
-                    errorAlert("Tipo de comprobante no disponible");
+                    errorAlert("Tipo de comprobante no disponible")
+                    .then(result => {
+                      if(result.isDismissed){
+                        this.loaded = true;
+                      }
+                    })
                   }
                 })
                 .catch((err) => {
@@ -744,12 +755,23 @@ export default {
                     "---------------- ERROR IN AFIP RESPONSE ----------------"
                   );
                   console.log(err);
+                  this.loaded = true;
                 });
             } else {
-              errorAlert("No hay productos seleccionados en la venta");
+              errorAlert("No hay productos seleccionados en la venta")
+              .then(result => {
+                if(result.isDismissed){
+                  this.loaded = true;
+                }
+              })
             }
           } else {
-            errorAlert("Debe seleccionar un medio de pago");
+            errorAlert("Debe seleccionar un medio de pago")
+            .then(result => {
+              if(result.isDismissed){
+                this.loaded = true;
+              }
+            })
           }
         });
     },
@@ -835,18 +857,30 @@ export default {
                     .finally(() => {
                       /*** Reset view objects and status ***/
                       this.clear();
+                      this.loaded = true;
                     });
                 });
             });
         } else {
-          errorAlert("No hay productos seleccionados en la venta");
+          errorAlert("No hay productos seleccionados en la venta")
+          .then(result => {
+            if(result.isDismissed){
+              this.loaded = true;
+            }
+          })
         }
       } else {
-        errorAlert("Debe seleccionar un medio de pago");
+        errorAlert("Debe seleccionar un medio de pago")
+        .then(result => {
+          if(result.isDismissed){
+            this.loaded = true;
+          }
+        })
       }
     },
 
     saveSale() {
+      this.loaded = false
       const documento = this.object.documento;
 
       if (documento !== undefined) {
@@ -858,7 +892,11 @@ export default {
       } else {
         errorAlert(
           "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
-        );
+        ).then(result => {
+          if(result.isDismissed){
+            this.loaded = true;
+          }
+        })
       }
     },
 

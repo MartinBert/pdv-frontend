@@ -15,7 +15,7 @@
                     @change="
                       getComercialDocuments(
                         dialogObject.cliente.condicionIva.documentos,
-                        loguedUser.empresa.condicionIva.documentos
+                        loguedUser.sucursal.condicionIva.documentos
                       )
                     "
                     v-model="dialogObject.cliente"
@@ -303,6 +303,7 @@ export default {
     },
 
     getComercialDocuments(clientDocs, businessDocs) {
+      console.log(clientDocs, businessDocs);
       let documentos = [];
       for (let i = 0; i < clientDocs.length; i++) {
         businessDocs.forEach((el) => {

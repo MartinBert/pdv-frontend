@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <Error :errorStatus="errorStatus" :errorMessage="errorMessage"/>
+    <Error :errorStatus="errorStatus"/>
     <v-card min-width="100%" v-if="loaded">
       <div>
         <v-form ref="form" class="mt-5">
@@ -104,7 +104,6 @@ export default {
     service: "caja",
     token: localStorage.getItem("token"),
     errorStatus: false,
-    errorMessage: "Ocurrio un error",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       blackReceiptFilter: "",
@@ -138,7 +137,12 @@ export default {
 
   computed:{
     diferencia(){
-      return Number(restarNumeros([this.object.existenciaFisica, this.object.existenciaInicial, this.object.salidasNoContabilizadas, this.object.montoFacturado]));
+      return Number(restarNumeros([
+        this.object.existenciaFisica, 
+        this.object.existenciaInicial, 
+        this.object.salidasNoContabilizadas, 
+        this.object.montoFacturado
+      ]));
     },
 
     detailMessage(){
@@ -190,7 +194,7 @@ export default {
         })
         .catch(error => {
           if (error.response.status == 500) {
-            this.snackError = true;
+            this.errorStatus = true;
           }
         });
     },
