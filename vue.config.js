@@ -80,10 +80,11 @@ module.exports = {
       host: '0.0.0.0',
       port: 8001,
       https: false,
+      public: '0.0.0.0:8001',
       disableHostCheck: true,
       hotOnly: false,
-
     },
+    publicPath: "/",
     "transpileDependencies": [
       "vuetify"
     ],
