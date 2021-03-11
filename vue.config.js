@@ -87,10 +87,5 @@ module.exports = {
     publicPath: "/",
     "transpileDependencies": [
       "vuetify"
-    ],
-    use: [
-      'vue-style-loader',
-      'css-loader',
-      'sass-loader'
     ]
   }

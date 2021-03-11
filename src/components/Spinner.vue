@@ -8,7 +8,7 @@ export default {
     name: 'Spinner'
 }
 </script>
-<style lang="scss">
+<style>
 .loader {
   animation:spin 1s infinite linear;
   border:solid 1vmin transparent;
@@ -22,8 +22,10 @@ export default {
   top:auto;
   width:10vmin;
   z-index:1;
-  &:before {
-    animation:spin 2s infinite linear;
+}
+
+.loader::before{
+  animation:spin 2s infinite linear;
     border:solid 1vmin transparent;
     border-radius:50%;
     border-right-color:rgb(12, 13, 117);
@@ -35,9 +37,10 @@ export default {
     position:absolute;
     top:1vmin;
     width:6vmin;
-  }
-  &:after {
-    animation:spin 3s infinite linear;
+}
+
+.loader::after{
+  animation:spin 3s infinite linear;
     border:solid 1vmin transparent;
     border-radius:50%;
     border-right-color:#364ab8;
@@ -49,7 +52,6 @@ export default {
     position:absolute;
     top:3vmin;
     width:2vmin;
-  }
 }
 
 @keyframes spin {
