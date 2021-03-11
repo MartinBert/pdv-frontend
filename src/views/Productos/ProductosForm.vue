@@ -406,7 +406,6 @@ export default {
 
     generateBarCode(){
       this.object.codigoBarra = generateBarCode();
-      console.log(this.object.codigoBarra);
     },
 
     checkBarCode(filterParams, barcode){

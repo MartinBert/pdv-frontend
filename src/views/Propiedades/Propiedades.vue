@@ -179,7 +179,6 @@ export default {
 
     seeDetail(object){
       if(object.length > 0){
-        console.log(object);
         this.$store.commit('eventual/addEventual', object);
         this.$store.commit('eventual/mutateEventualDialog');
       }else{

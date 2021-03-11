@@ -95,7 +95,6 @@ export default {
         .then(data => {
           this.object = data.data;
           this.sucursal = [this.object.sucursales]
-          console.log(this.sucursal)
           this.loaded = true;
         });
     },

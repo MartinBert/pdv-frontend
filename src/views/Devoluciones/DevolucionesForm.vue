@@ -515,7 +515,6 @@ export default {
                       .filter(filterParam)
                       .then((data) => {
                         productos = data.data.content;
-                        console.log(productos);
                         productos.forEach((el) => {
                           productosEntrantes.forEach((e) => {
                             if (el.producto.id === e.id) {

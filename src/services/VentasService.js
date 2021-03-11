@@ -53,7 +53,6 @@ export default (tenant,service,token) =>{
                 if(productsWithoutStockOnDefaultDeposit.length > 0){
                 let productsOnSecondaryDeposits = '';
                 productsWithoutStockOnDefaultDeposit.forEach(el => {
-                    console.log(el);
                     productsOnSecondaryDeposits += `${el.producto.nombre}, `
                 });
                 infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
