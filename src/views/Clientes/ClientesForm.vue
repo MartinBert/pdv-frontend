@@ -1,6 +1,12 @@
 <template>
   <v-card min-width="100%">
-    <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
+    <v-snackbar
+      v-model="snackError"
+      :color="'#E53935'"
+      :timeout="3000"
+      :top="true"
+      >{{ errorMessage }}</v-snackbar
+    >
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-1">
@@ -13,7 +19,7 @@
               v-model="object.tipoPersona"
               label="Tipo de persona"
               required
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-select>
           </v-col>
           <v-col>
@@ -27,7 +33,7 @@
               :return-object="true"
               label="Condición frente al IVA"
               required
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-select>
           </v-col>
           <v-col>
@@ -37,15 +43,17 @@
               :counter="50"
               label="Razón social"
               required
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text"
-            v-model="object.nombre" 
-            :counter="50" 
-            label="Nombre" 
-            required
+            <v-text-field
+              type="text"
+              v-model="object.nombre"
+              :counter="50"
+              label="Nombre"
+              required
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -55,30 +63,39 @@
               :counter="50"
               label="CUIT o DNI"
               required
-              :rules="[v => !!v || 'Campo requerido...']"
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
         </v-row>
         <v-row class="ma-3">
           <v-col>
-            <v-text-field type="text" 
-            v-model="object.direccion" 
-            :counter="50" 
-            label="Dirección"
+            <v-text-field
+              type="text"
+              v-model="object.direccion"
+              :counter="50"
+              label="Dirección"
+              required
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text" 
-            v-model="object.email" 
-            :counter="50" 
-            label="Email"
+            <v-text-field
+              type="text"
+              v-model="object.email"
+              :counter="50"
+              label="Email"
+              required
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field type="text" 
-            v-model="object.telefono" 
-            :counter="50" 
-            label="Teléfono"
+            <v-text-field
+              type="text"
+              v-model="object.telefono"
+              :counter="50"
+              label="Teléfono"
+              required
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -87,6 +104,8 @@
               v-model="object.telefonoAlternativo"
               :counter="50"
               label="Teléfono alternativo"
+              required
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -95,13 +114,17 @@
               v-model="object.nombreContacto"
               :counter="50"
               label="Nombre de contacto"
+              required
+              :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
           </v-col>
         </v-row>
 
         <div class="ma-1">
           <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
+            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid"
+              >Guardar</v-btn
+            >
             <v-btn color="default" @click="back()">Cancelar</v-btn>
           </v-col>
         </div>
@@ -109,8 +132,11 @@
     </div>
     <div v-if="!loaded">
       <v-row class="ma-1">
-        <v-col class="col-12" style="text-align:center">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        <v-col class="col-12" style="text-align: center">
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
         </v-col>
       </v-row>
     </div>
@@ -124,7 +150,7 @@ export default {
     valid: true,
     tipopersona: [
       { id: 1, text: "Física" },
-      { id: 2, text: "Jurídica" }
+      { id: 2, text: "Jurídica" },
     ],
     condicioniva: [],
     object: {},
@@ -134,7 +160,7 @@ export default {
     token: localStorage.getItem("token"),
     snackError: false,
     errorMessage: "",
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
   mounted() {
@@ -150,16 +176,16 @@ export default {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
-        .then(data => {
+        .then((data) => {
           this.object = data.data;
           this.loaded = true;
         });
     },
 
-    getCondicionesIva(){
+    getCondicionesIva() {
       GenericService(this.tenant, "condicionesFiscales", this.token)
         .getAll()
-        .then(data => {
+        .then((data) => {
           this.condicioniva = data.data.content;
         });
     },
@@ -172,7 +198,7 @@ export default {
         .then(() => {
           this.$router.push({ name: "clientes" });
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status == 500) {
             this.snackError = true;
             this.errorMessage = "Ocurrio un error";
@@ -182,7 +208,7 @@ export default {
 
     back() {
       this.$router.push({ name: "clientes" });
-    }
-  }
+    },
+  },
 };
 </script>

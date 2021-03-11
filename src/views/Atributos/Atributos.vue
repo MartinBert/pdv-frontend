@@ -40,62 +40,57 @@
     </v-form>
 
     <!-- List -->
-    <v-simple-table style="background-color: transparent">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th>Valor</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody v-for="object in objects" :key="object.id">
-          <tr>
-            <td>
-              <span v-if="object.valor">{{ object.valor }}</span>
-              <span v-if="object.valorNumerico">{{object.valorNumerico}}</span>
-            </td>
-            <td>
-              <a title="Editar"
-                ><img
-                  src="/../../images/icons/edit.svg"
-                  @click="edit(object.id)"
-                  width="30"
-                  height="30"
-              /></a>
-              <a title="Eliminar"
-                ><img
-                  src="/../../images/icons/delete.svg"
-                  @click="openDelete(object.id)"
-                  width="30"
-                  height="30"
-              /></a>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <!-- End List -->
+    <v-container v-if="loaded">
+      <v-simple-table style="background-color: transparent" >
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Valor</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody v-for="object in objects" :key="object.id">
+            <tr>
+              <td>{{ object.id }}</td>
+              <td>
+                <span v-if="object.valor">{{ object.valor }}</span>
+                <span v-if="object.valorNumerico">{{object.valorNumerico}}</span>
+              </td>
+              <td>
+                <a title="Editar"
+                  ><img
+                    src="/../../images/icons/edit.svg"
+                    @click="edit(object.id)"
+                    width="30"
+                    height="30"
+                /></a>
+                <a title="Eliminar"
+                  ><img
+                    src="/../../images/icons/delete.svg"
+                    @click="openDelete(object.id)"
+                    width="30"
+                    height="30"
+                /></a>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+      <v-pagination
+        v-model="filterParams.page"
+        :length="filterParams.totalPages"
+        next-icon="mdi-chevron-right"
+        prev-icon="mdi-chevron-left"
+        :page="filterParams.page"
+        :total-visible="8"
+        @input="filterObjects()"
+        v-if="filterParams.totalPages > 1"
+      ></v-pagination>
+    </v-container>
+    
+    <Spinner v-if="!loaded"/>
 
-    <!-- Loader -->
-    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
-      :page="filterParams.page"
-      :total-visible="8"
-      @input="filterObjects()"
-      v-if="filterParams.totalPages > 1"
-    ></v-pagination>
-    <!-- End filterParams -->
-
-    <!-- Dialog Delete-->
     <v-dialog v-model="dialogDeleteObject" width="500">
       <v-card>
         <v-toolbar class="d-flex justify-center" color="primary" dark>
@@ -114,12 +109,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- End Dialog Delete -->
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
+import Spinner from '../../components/Spinner';
 import XLSX from 'xlsx';
 
 export default {
@@ -139,13 +134,17 @@ export default {
     dialogDeleteObject: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
+
+  components:{
+    Spinner
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects()
   },
 
   methods: {
-
     filterObjects() {
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)

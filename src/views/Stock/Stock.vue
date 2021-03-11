@@ -11,6 +11,8 @@
             >MIGRAR STOCK</v-btn
           >
           <v-btn class="primary ml-1" @click="openDialog('reports')">Reportes</v-btn>
+          <v-btn class="primary ml-1" @click="modifyAlgorim()" v-if="loguedUser.perfil < 2">Cambiar marca de algoritmo de stock</v-btn>
+          <v-btn class="primary ml-1" @click="checkStocks()" v-if="loguedUser.perfil < 2">Check stock</v-btn>
         </v-col>
       </v-row>
       <v-row>
@@ -562,6 +564,34 @@ export default {
       }, "");
 
       return str;
+    },
+
+    modifyAlgorim(){
+      this.loaded = false;
+      GenericService(this.tenant, this.service, this.token)
+      .getAll(0, 100000)
+      .then(data => {
+        let stockForModify = data.data.content;
+        stockForModify.forEach(el => {
+          el.algorim = el.producto.codigoBarra + el.deposito.id;
+        })
+        GenericService(this.tenant, this.service, this.token)
+        .saveAll(stockForModify)
+        .then(()=>{
+          this.filterObjects();
+        })
+        .catch(err => {
+          console.log(err);
+        })
+      })
+    },
+
+    checkStocks(){
+      GenericService(this.tenant, this.service, this.token)
+      .getAll(0, 100000)
+      .then(data => {
+        console.log(data.data.content);
+      })
     }
   },
 };

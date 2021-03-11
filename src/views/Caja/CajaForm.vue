@@ -1,86 +1,86 @@
 <template>
-  <v-card min-width="100%">
-    <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
-    <div v-if="loaded">
-      <v-form ref="form" class="mt-5">
-        <v-row class="ma-1">
-          <v-col cols="12">
-            <v-text-field
-              type="text"
-              v-model="object.descripcion"
-              label="Descripción (puede dejar referencias de los egresos o información que considere útil para sus evaluaciones)"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-                type="number"
-                v-model="object.existenciaFisica"
-                label="Existencia física"
-                required
-                :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field 
-                type="number"
-                v-model="object.existenciaInicial" 
-                label="Dinero inicial en caja"
-                required
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field 
-                type="number"
-                v-model="object.salidasNoContabilizadas" 
-                label="Egresos"
-                required
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-                type="number"
-                v-model="object.montoFacturado"
-                label="Monto facturado"
-                required
-                :rules="[v => !!v || 'Campo requerido...']"
-                disabled
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-                type="number"
-                v-model="diferencia"
-                label="Diferencia"
-                required
-                :rules="[v => !!v || 'Campo requerido...']"
-                disabled
-            ></v-text-field>
-          </v-col>
-          <v-col class="text-right" cols="12">
-            <span v-bind:class="detailMessage.classType">{{detailMessage.message}}</span>
-          </v-col>
-        </v-row>
-        <div class="ma-1">
-          <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Procesar</v-btn>
-            <v-btn color="default" @click="back()">Cancelar</v-btn>
-          </v-col>
-        </div>
-      </v-form>
-    </div>
-    <div v-if="!loaded">
-      <v-row class="ma-1">
-        <v-col class="col-12" style="text-align:center">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
-        </v-col>
-      </v-row>
-    </div>
-  </v-card>
+  <v-container>
+    <Error :errorStatus="errorStatus" :errorMessage="errorMessage"/>
+    <v-card min-width="100%" v-if="loaded">
+      <div>
+        <v-form ref="form" class="mt-5">
+          <v-row class="ma-1">
+            <v-col cols="12">
+              <v-text-field
+                type="text"
+                v-model="object.descripcion"
+                label="Descripción (puede dejar referencias de los egresos o información que considere útil para sus evaluaciones)"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                  type="number"
+                  v-model="object.existenciaFisica"
+                  label="Existencia física"
+                  required
+                  :rules="[v => !!v || 'Campo requerido...']"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field 
+                  type="number"
+                  v-model="object.existenciaInicial" 
+                  label="Dinero inicial en caja"
+                  required
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field 
+                  type="number"
+                  v-model="object.salidasNoContabilizadas" 
+                  label="Egresos"
+                  required
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                  type="number"
+                  v-model="object.montoFacturado"
+                  label="Monto facturado"
+                  required
+                  :rules="[v => !!v || 'Campo requerido...']"
+                  disabled
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                  type="number"
+                  v-model="diferencia"
+                  label="Diferencia"
+                  required
+                  :rules="[v => !!v || 'Campo requerido...']"
+                  disabled
+              ></v-text-field>
+            </v-col>
+            <v-col class="text-right" cols="12">
+              <span v-bind:class="detailMessage.classType">{{detailMessage.message}}</span>
+            </v-col>
+          </v-row>
+          <div class="ma-1">
+            <v-col class="col-6">
+              <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Procesar</v-btn>
+              <v-btn color="default" @click="back()">Cancelar</v-btn>
+            </v-col>
+          </div>
+        </v-form>
+      </div>
+    </v-card>
+
+    <Spinner v-if="!loaded"/>
+    
+  </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
+import Spinner from '../../components/Spinner';
+import Error from '../../components/Error';
 import { restarNumeros } from "../../helpers/mathHelper";
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 export default {
@@ -103,8 +103,8 @@ export default {
     tenant: "",
     service: "caja",
     token: localStorage.getItem("token"),
-    snackError: false,
-    errorMessage: "",
+    errorStatus: false,
+    errorMessage: "Ocurrio un error",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       blackReceiptFilter: "",
@@ -119,6 +119,11 @@ export default {
     }
   }),
 
+  components:{
+    Spinner,
+    Error
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     if(this.loguedUser.perfil > 1){
@@ -126,9 +131,7 @@ export default {
     }
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
-    } else {
-      this.loaded = true;
-    }
+    } 
 
     this.getSalesList();
   },
@@ -165,6 +168,7 @@ export default {
         .then(data => {
             this.ventas = data.data;
             this.object.montoFacturado = this.ventas.reduce((acc, el) => Math.round((acc + Number(el.totalVenta))*100)/100, 0);
+            this.loaded = true;
         })
     },
 
@@ -187,7 +191,6 @@ export default {
         .catch(error => {
           if (error.response.status == 500) {
             this.snackError = true;
-            this.errorMessage = "Ocurrio un error";
           }
         });
     },

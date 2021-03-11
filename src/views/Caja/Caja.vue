@@ -8,79 +8,72 @@
       </v-row>
     </v-form>
 
-    <!-- List -->
-    <v-simple-table style="background-color: transparent">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Descripción</th>
-            <th>Detalles</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody v-for="object in objects" :key="object.id">
-          <tr>
-            <td>{{ object.fecha }}</td>
-            <td>{{ object.descripcion }}</td>
-            <td>
-              <button type="button">
-                <img
-                  src="/../../images/icons/details.svg"
-                  @click="seeDetail(object)"
-                  width="30"
-                  height="30"
-                />
-              </button>
-            </td>
-            <td>
-              <a title="Editar"
-                ><img
-                  src="/../../images/icons/edit.svg"
-                  @click="edit(object.id)"
-                  width="30"
-                  height="30"
-              /></a>
-              <a title="Eliminar"
-                ><img
-                  src="/../../images/icons/delete.svg"
-                  @click="openDelete(object.id)"
-                  width="30"
-                  height="30"
-              /></a>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <!-- End List -->
+    <v-container>
+      <v-simple-table style="background-color: transparent">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Detalles</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody v-for="object in objects" :key="object.id">
+            <tr>
+              <td>{{ object.fecha }}</td>
+              <td>{{ object.descripcion }}</td>
+              <td>
+                <button type="button">
+                  <img
+                    src="/../../images/icons/details.svg"
+                    @click="seeDetail(object)"
+                    width="30"
+                    height="30"
+                  />
+                </button>
+              </td>
+              <td>
+                <a title="Editar"
+                  ><img
+                    src="/../../images/icons/edit.svg"
+                    @click="edit(object.id)"
+                    width="30"
+                    height="30"
+                /></a>
+                <a title="Eliminar"
+                  ><img
+                    src="/../../images/icons/delete.svg"
+                    @click="openDelete(object.id)"
+                    width="30"
+                    height="30"
+                /></a>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+      <v-pagination
+        v-model="filterParams.page"
+        :length="filterParams.totalPages"
+        next-icon="mdi-chevron-right"
+        prev-icon="mdi-chevron-left"
+        :page="filterParams.page"
+        :total-visible="8"
+        @input="filterObjects()"
+        v-if="filterParams.totalPages > 1"
+      ></v-pagination>
+    </v-container>
 
-    <!-- Loader -->
-    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
-      :page="filterParams.page"
-      :total-visible="8"
-      @input="filterObjects()"
-      v-if="filterParams.totalPages > 1"
-    ></v-pagination>
-    <!-- End filterParams -->
+    <Spinner v-if="!loaded"/>
 
     <CajaDetails />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import CajaDetails from '../../components/CajaDetails';
+import Spinner from '../../components/Spinner';
 
 export default {
   data: () => ({
@@ -100,7 +93,8 @@ export default {
   }),
 
   components:{
-    CajaDetails
+    CajaDetails,
+    Spinner
   },
 
   mounted() {

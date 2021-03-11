@@ -384,7 +384,7 @@ export default {
                 cantidad: this.object.cantidad,
                 cantidadMinima: this.object.cantidadMinima,
                 sucursal: this.loguedUser.sucursal,
-                algorim: el.nombre + ele.id,
+                algorim: el.codigoBarra + ele.id,
               };
               stocks.push(obj);
             });
