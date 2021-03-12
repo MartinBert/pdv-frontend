@@ -303,7 +303,6 @@ export default {
     },
 
     getComercialDocuments(clientDocs, businessDocs) {
-      console.log(clientDocs, businessDocs);
       let documentos = [];
       for (let i = 0; i < clientDocs.length; i++) {
         businessDocs.forEach((el) => {
