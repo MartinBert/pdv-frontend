@@ -138,7 +138,6 @@
     </v-card>
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 export default {

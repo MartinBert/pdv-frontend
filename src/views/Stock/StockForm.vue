@@ -367,7 +367,7 @@ export default {
       }else{
         this.$refs.form.validate();
         if (this.urlId > 0) {
-          this.object.algorim = this.object.producto.nombre + this.object.deposito.id;
+          this.object.algorim = this.object.producto.codigoBarra + this.object.deposito.id;
           GenericService(this.tenant, this.service, this.token)
           .save(this.object)
           .then(() => {

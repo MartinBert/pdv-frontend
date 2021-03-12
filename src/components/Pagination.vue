@@ -8,6 +8,7 @@
       :page="paginationProperties.currentPage"
       :total-visible="totalVisible"
       @input="emmitPaginationStatus()"
+      v-if="totalPages > 1"
     ></v-pagination>
   </v-container>
 </template>

@@ -474,7 +474,7 @@ export default {
 
           affectedProducts.forEach((el) => {
             el.deposito = newDepositForProducts;
-            el.algorim = el.producto.nombre + el.deposito.id;
+            el.algorim = el.producto.codigoBarra + el.deposito.id;
             GenericService(this.tenant, this.service, this.token).update(el);
           });
           
@@ -503,7 +503,7 @@ export default {
         this.loaded = false;
         this.migration.forEach(el => {
           el.deposito = this.destinationDepositForMigrations;
-          el.algorim = el.producto.nombre + el.deposito.id;
+          el.algorim = el.producto.codigoBarra + el.deposito.id;
           GenericService(this.tenant, this.service, this.token)
           .update(el);
         })

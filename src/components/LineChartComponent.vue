@@ -1,6 +1,6 @@
 <template>
   <div class="small">
-    <BarChart :chart-data="datacollection"/>
+    <BarChart :chartData="datacollection"/>
   </div>
 </template>
 

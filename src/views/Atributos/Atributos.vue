@@ -39,87 +39,61 @@
       </v-row>
     </v-form>
 
-    <!-- List -->
-    <v-container v-if="loaded">
-      <v-simple-table style="background-color: transparent" >
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Valor</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody v-for="object in objects" :key="object.id">
-            <tr>
-              <td>{{ object.id }}</td>
-              <td>
-                <span v-if="object.valor">{{ object.valor }}</span>
-                <span v-if="object.valorNumerico">{{object.valorNumerico}}</span>
-              </td>
-              <td>
-                <a title="Editar"
-                  ><img
-                    src="/../../images/icons/edit.svg"
-                    @click="edit(object.id)"
-                    width="30"
-                    height="30"
-                /></a>
-                <a title="Eliminar"
-                  ><img
-                    src="/../../images/icons/delete.svg"
-                    @click="openDelete(object.id)"
-                    width="30"
-                    height="30"
-                /></a>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
-      <v-pagination
-        v-model="filterParams.page"
-        :length="filterParams.totalPages"
-        next-icon="mdi-chevron-right"
-        prev-icon="mdi-chevron-left"
-        :page="filterParams.page"
-        :total-visible="8"
-        @input="filterObjects()"
-        v-if="filterParams.totalPages > 1"
-      ></v-pagination>
-    </v-container>
-    
-    <Spinner v-if="!loaded"/>
+    <SimpleTable
+      :headers="headers"
+      :items="atributos"
+      :values="tableValues"
+      :actions="actions"
+      v-on:editItem="edit"
+      v-on:deleteItem="deleteItem"
+      v-if="loaded"
+    />
 
-    <v-dialog v-model="dialogDeleteObject" width="500">
-      <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center"
-          >¿Está seguro que desea realizar esta acción?</v-card-title
-        >
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject"
-            >Si</v-btn
-          >
-          <v-btn small color="disabled" @click="dialogDeleteObject = false"
-            >No</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
+    
+    <Spinner 
+      v-if="!loaded"
+    />
+
+    <DeleteDialog
+      :status="deleteDialogStatus"
+      v-on:deleteConfirmation="deleteConfirmation"
+    />
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
 import Spinner from '../../components/Spinner';
+import Pagination from '../../components/Pagination';
+import SimpleTable from '../../components/SimpleTable';
+import DeleteDialog from '../../components/DeleteDialog';
 import XLSX from 'xlsx';
+import { errorAlert } from '../../helpers/alerts';
 
 export default {
   data: () => ({
-    objects: [],
+    atributos: [],
+    headers: [
+      "ID",
+      "Valor",
+      "Valor Numérico"
+    ],
+    tableValues:[
+      "id",
+      "valor",
+      "valorNumerico"
+    ],
+    actions:[
+      "editar",
+      "eliminar"
+    ],
     filterParams: {
       atributoValor: "",
       page: 1,
@@ -131,12 +105,15 @@ export default {
     tenant: "",
     service: "atributos",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false,
+    deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
 
   components:{
-    Spinner
+    Spinner,
+    Pagination,
+    SimpleTable,
+    DeleteDialog
   },
 
   mounted() {
@@ -145,11 +122,14 @@ export default {
   },
 
   methods: {
-    filterObjects() {
+    filterObjects(page) {
+      if(page){
+        this.filterParams.page = page;
+      }
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.objects = data.data.content;
+          this.atributos = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
@@ -163,19 +143,26 @@ export default {
       this.$router.push({ name: "atributosForm", params: { id: id } });
     },
 
-    openDelete(id) {
+    deleteItem(id) {
       this.idObjet = id;
-      this.dialogDeleteObject = true;
+      this.deleteDialogStatus = true;
+    },
+
+    deleteConfirmation(result){
+      return result ? this.deleteObject() : this.deleteDialogStatus = false;
     },
 
     deleteObject() {
       this.dialog = true;
-      this.dialogDeleteObject = false;
+      this.deleteDialogStatus = false;
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
           this.filterObjects();
-        });
+        })
+        .catch(()=>{
+          errorAlert("El atributo se encuentra asociado a otros registros del sistema");
+        })
     },
 
     importDocuments(event, type) {
@@ -212,7 +199,7 @@ export default {
       reader.readAsBinaryString(this.file);
     },
 
-    validateImport(objects, type) {
+    validateImport(atributos, type) {
       this.loader = true;
       var importacion = {
         status: true,
@@ -221,7 +208,7 @@ export default {
       };
 
       if(type === 'text'){
-        objects.forEach((element, index) => {
+        atributos.forEach((element, index) => {
           if (
             element.valor 
           ) {
@@ -236,7 +223,7 @@ export default {
         });
 
       }else{
-        objects.forEach((element, index) => {
+        atributos.forEach((element, index) => {
           if (
             element.valorNumerico 
           ) {
