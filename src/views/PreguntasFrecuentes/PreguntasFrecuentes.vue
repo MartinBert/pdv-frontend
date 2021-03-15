@@ -19,72 +19,30 @@
         </v-col>
       </v-row>
     </v-form>
-
-    <!-- List -->
-    <v-simple-table style="background-color: transparent">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody v-for="object in objects" :key="object.id">
-          <tr class="text-center">
-            <td style="height: 70px; font-size: 1.2rem; cursor: pointer" @click="response(object.respuesta)">{{ object.pregunta }}</td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <!-- End List -->
-
-    <!-- Loader -->
-    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
+    <PreguntasFrecuentesTable
+      :items="preguntasFrecuentes"
+      v-if="loaded"
+    />
+    <Pagination
       :page="filterParams.page"
-      :total-visible="8"
-      @input="filterObjects()"
-      v-if="filterParams.totalPages > 1"
-    ></v-pagination>
-    <!-- End filterParams -->
-
-    <!-- Dialog Delete-->
-    <v-dialog v-model="dialogDeleteObject" width="500">
-      <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center"
-          >¿Está seguro que desea realizar esta acción?</v-card-title
-        >
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject"
-            >Si</v-btn
-          >
-          <v-btn small color="disabled" @click="dialogDeleteObject = false"
-            >No</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog Delete -->
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
+    <Spinner v-if="!loaded" />
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
-import { infoAlert2 } from "../../helpers/alerts";
+import { errorAlert } from '../../helpers/alerts';
+import PreguntasFrecuentesTable from '../../components/Tables/PreguntasFrecuentesTable';
+import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 export default {
   data: () => ({
-    objects: [],
+    preguntasFrecuentes: [],
     filterParams: {
       preguntaFrecuenteQuestion: "",
       preguntaFrecuenteResponse: "",
@@ -99,18 +57,25 @@ export default {
     dialogDeleteObject: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
+
+  components: {
+    PreguntasFrecuentesTable,
+    Pagination,
+    Spinner
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects()
   },
 
   methods: {
-
-    filterObjects() {
+    filterObjects(page) {
+      if(page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.objects = data.data.content;
+          this.preguntasFrecuentes = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
@@ -124,24 +89,28 @@ export default {
       this.$router.push({ name: "preguntasFrecuentesForm", params: { id: id } });
     },
 
-    openDelete(id) {
+    deleteItem(id) {
       this.idObjet = id;
-      this.dialogDeleteObject = true;
+      this.deleteDialogStatus = true;
+    },
+
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
 
     deleteObject() {
-      this.dialog = true;
-      this.dialogDeleteObject = false;
+      this.deleteDialogStatus = false;
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
           this.filterObjects();
+        })
+        .catch(() => {
+          errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          );
         });
     },
-
-    response(response){
-      infoAlert2(response)
-    }
   },
 };
 </script>

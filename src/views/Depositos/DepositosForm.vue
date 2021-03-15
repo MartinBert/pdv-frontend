@@ -86,7 +86,9 @@ export default {
   }),
 
   mounted() {
-    this.sucursales = this.loguedUser.empresa.sucursales;
+    if(this.loguedUser.perfil > 1){
+      this.sucursales = this.loguedUser.empresa.sucursales;
+    }
     this.tenant = this.$route.params.tenant;
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);

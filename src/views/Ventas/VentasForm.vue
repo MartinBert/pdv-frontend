@@ -616,7 +616,6 @@ export default {
     },
 
     save() {
-      /*** Constants ***/
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
@@ -630,8 +629,6 @@ export default {
       const token = this.token;
       const service = this.service;
       const condVenta = this.checkSaleCondition(planesPago);
-
-      /*** Mutable vars ***/
       let comprobante;
       let file;
       let fileURL;
@@ -654,15 +651,12 @@ export default {
             totalVenta: totalVenta,
           };
 
-          /*** Format invoice according to type ***/
-          invoice = formatFiscalInvoice(
-            documento.letra,
-            dataForCreateInvoice
-          );
+          invoice = formatFiscalInvoice( documento.letra,dataForCreateInvoice);
 
           /*** Evaluate required sale form data ***/
           if (mediosPago !== undefined) {
             if (products.length > 0) {
+
               /*** Send invoice to AFIP ***/
               axios
                 .post(
@@ -679,7 +673,7 @@ export default {
                     cae +
                     formatDateWithoutSlash(dateOfCaeExpiration);
 
-                  /*** Create receipt ***/
+                  // Create receipt
                   comprobante = {
                     letra: documento.letra,
                     numeroCbte: numberOfReceipt,

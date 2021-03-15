@@ -7,11 +7,11 @@
         </v-col>
         <v-col cols="3">
           <v-file-input
-          v-model="file" 
-          class="mt-0"
-          placeholder="Importar documentos"
-          accept=".xlsx, xls"
-          @change="importDocuments($event)"
+            v-model="file"
+            class="mt-0"
+            placeholder="Importar documentos"
+            accept=".xlsx, xls"
+            @change="importDocuments($event)"
           ></v-file-input>
         </v-col>
         <v-col cols="4"></v-col>
@@ -29,135 +29,116 @@
         </v-col>
       </v-row>
     </v-form>
-
-    <!-- List -->
-    <v-simple-table style="background-color: transparent;">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Tipo de documento</th>
-            <th>Letra</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody v-for="object in objects" :key="object.id">
-          <tr>
-            <td>{{object.nombre}}</td>
-            <td>
-              <v-alert type="success" dense v-if="object.tipo">Fiscal</v-alert>
-              <v-alert color="secondary" icon="mdi-close-circle" dense dark v-if="!object.tipo">No fiscal</v-alert>
-            </td>
-            <td>{{object.letra}}</td>
-            <td>
-              <a title="Editar"><img src="/../../images/icons/edit.svg" @click="edit(object.id)" width="30" height="30"/></a>
-              <a title="Eliminar"><img src="/../../images/icons/delete.svg" @click="openDelete(object.id)" width="30" height="30"/></a>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <!-- End List -->
-
-    <!-- Loader -->
-    <div class="text-center" style="margin-top:15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
+    <DocumentosComercialesTable
+      :items="documentosComerciales"
+      v-on:editItem="edit"
+      v-on:deleteItem="deleteItem"
+      v-if="loaded"
+    />
+    <Pagination
       :page="filterParams.page"
-      :total-visible="8"
-      @input="filterObjects()"
-      v-if="filterParams.totalPages > 1"
-    ></v-pagination>
-    <!-- End filterParams -->
-
-    <!-- Dialog Delete-->
-    <v-dialog v-model="dialogDeleteObject" width="500">
-      <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center">¿Está seguro que desea realizar esta acción?</v-card-title>
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject">Si</v-btn>
-          <v-btn small color="disabled" @click="dialogDeleteObject = false">No</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog Delete -->
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
+    <Spinner v-if="!loaded" />
+    <DeleteDialog
+      :status="deleteDialogStatus"
+      v-on:deleteConfirmation="deleteConfirmation"
+    />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
-import XLSX from 'xlsx'
+import { errorAlert } from "../../helpers/alerts";
+import DocumentosComercialesTable from "../../components/Tables/DocumentosComercialesTable";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+import Spinner from "../../components/Spinner";
+import Pagination from "../../components/Pagination";
+import XLSX from "xlsx";
 
 export default {
   data: () => ({
-    objects: [],
+    documentosComerciales: [],
     file: null,
     filterParams: {
       documentoComercialName: "",
       sucursalId: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
     service: "documentosComerciales",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false,
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    deleteDialogStatus: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
+
+  components: {
+    DocumentosComercialesTable,
+    Pagination,
+    Spinner,
+    DeleteDialog,
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    if(this.loguedUser.perfil > 1){
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects();
   },
 
   methods: {
-    filterObjects(){
-      this.loaded = false;
+    filterObjects(page) {
+      if(page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.objects = data.data.content;
+          this.documentosComerciales = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
 
     newObject() {
-      this.$router.push({ name: "documentosComercialesForm", params: { id: 0 } });
+      this.$router.push({
+        name: "documentosComercialesForm",
+        params: { id: 0 },
+      });
     },
 
     edit(id) {
-      this.$router.push({ name: "documentosComercialesForm", params: { id: id } });
+      this.$router.push({
+        name: "documentosComercialesForm",
+        params: { id: id },
+      });
     },
 
-    openDelete(id) {
+    deleteItem(id) {
       this.idObjet = id;
-      this.dialogDeleteObject = true;
+      this.deleteDialogStatus = true;
+    },
+
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
 
     deleteObject() {
       this.dialog = true;
-      this.dialogDeleteObject = false;
+      this.deleteDialogStatus = false;
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
           this.filterObjects();
+        })
+        .catch(() => {
+          errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          );
         });
     },
 
@@ -165,12 +146,12 @@ export default {
       this.file = event;
       var excel = [];
       var reader = new FileReader();
-      reader.onload = e => {
+      reader.onload = (e) => {
         var data = e.target.result;
         var workbook = XLSX.read(data, { type: "binary" });
 
         var sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function(y) {
+        sheet_name_list.forEach(function (y) {
           var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
           if (exceljson.length > 0) {
             for (var i = 0; i < exceljson.length; i++) {
@@ -185,30 +166,30 @@ export default {
             .then(() => {
               this.filterObjects();
               this.loaderStatus = true;
-              window.setTimeout(()=>{
-                this.loader = false
-                this.loaderStatus=false;
-              }, 2000);              
+              window.setTimeout(() => {
+                this.loader = false;
+                this.loaderStatus = false;
+              }, 2000);
             });
         }
       };
       reader.readAsBinaryString(this.file);
     },
 
-    validateImport(objects) {
+    validateImport(documentosComerciales) {
       this.loader = true;
       var importacion = {
         status: true,
         data: [],
-        message: ""
+        message: "",
       };
-      objects.forEach((element, index) => {
+      documentosComerciales.forEach((element, index) => {
         if (
           element.nombre &&
           element.codigoDocumento &&
-          element.tipo  &&
+          element.tipo &&
           element.letra &&
-          element.ivaCat 
+          element.ivaCat
         ) {
           var obj = {
             nombre: element.nombre,
@@ -226,7 +207,6 @@ export default {
       });
       return importacion;
     },
-
-  }
+  },
 };
 </script>

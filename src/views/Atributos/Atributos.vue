@@ -7,20 +7,20 @@
         </v-col>
         <v-col cols="3">
           <v-file-input
-          v-model="file" 
-          class="mt-0"
-          placeholder="Importar atributos de texto"
-          accept=".xlsx, xls"
-          @change="importDocuments($event, 'text')"
+            v-model="file"
+            class="mt-0"
+            placeholder="Importar atributos de texto"
+            accept=".xlsx, xls"
+            @change="importDocuments($event, 'text')"
           ></v-file-input>
         </v-col>
         <v-col cols="3">
           <v-file-input
-          v-model="file" 
-          class="mt-0"
-          placeholder="Importar atributos numéricos"
-          accept=".xlsx, xls"
-          @change="importDocuments($event, 'number')"
+            v-model="file"
+            class="mt-0"
+            placeholder="Importar atributos numéricos"
+            accept=".xlsx, xls"
+            @change="importDocuments($event, 'number')"
           ></v-file-input>
         </v-col>
         <v-spacer></v-spacer>
@@ -38,17 +38,12 @@
         </v-col>
       </v-row>
     </v-form>
-
-    <SimpleTable
-      :headers="headers"
+    <AtributosTable
       :items="atributos"
-      :values="tableValues"
-      :actions="actions"
       v-on:editItem="edit"
       v-on:deleteItem="deleteItem"
       v-if="loaded"
     />
-
     <Pagination
       :page="filterParams.page"
       :totalPages="filterParams.totalPages"
@@ -56,49 +51,30 @@
       v-on:changePage="filterObjects"
       v-if="loaded"
     />
-    
-    <Spinner 
-      v-if="!loaded"
-    />
-
+    <Spinner v-if="!loaded" />
     <DeleteDialog
       :status="deleteDialogStatus"
       v-on:deleteConfirmation="deleteConfirmation"
     />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
-import Spinner from '../../components/Spinner';
-import Pagination from '../../components/Pagination';
-import SimpleTable from '../../components/SimpleTable';
-import DeleteDialog from '../../components/DeleteDialog';
-import XLSX from 'xlsx';
-import { errorAlert } from '../../helpers/alerts';
+import Spinner from "../../components/Spinner";
+import Pagination from "../../components/Pagination";
+import AtributosTable from "../../components/Tables/AtributosTable";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+import { errorAlert } from "../../helpers/alerts";
+import { importAttributes } from "../../helpers/importAttributes";
 
 export default {
   data: () => ({
     atributos: [],
-    headers: [
-      "ID",
-      "Valor",
-      "Valor Numérico"
-    ],
-    tableValues:[
-      "id",
-      "valor",
-      "valorNumerico"
-    ],
-    actions:[
-      "editar",
-      "eliminar"
-    ],
     filterParams: {
       atributoValor: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     file: {},
     loaded: false,
@@ -106,26 +82,24 @@ export default {
     service: "atributos",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
-  components:{
+  components: {
     Spinner,
     Pagination,
-    SimpleTable,
-    DeleteDialog
+    AtributosTable,
+    DeleteDialog,
   },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects()
+    this.filterObjects();
   },
 
   methods: {
     filterObjects(page) {
-      if(page){
-        this.filterParams.page = page;
-      }
+      if(page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -148,8 +122,8 @@ export default {
       this.deleteDialogStatus = true;
     },
 
-    deleteConfirmation(result){
-      return result ? this.deleteObject() : this.deleteDialogStatus = false;
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
 
     deleteObject() {
@@ -160,43 +134,35 @@ export default {
         .then(() => {
           this.filterObjects();
         })
-        .catch(()=>{
-          errorAlert("El atributo se encuentra asociado a otros registros del sistema");
-        })
+        .catch(() => {
+          errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          );
+        });
     },
 
     importDocuments(event, type) {
-      this.file = event;
-      var excel = [];
-      var reader = new FileReader();
-      reader.onload = e => {
-        var data = e.target.result;
-        var workbook = XLSX.read(data, { type: "binary" });
+      importAttributes(event).then((data) => {
+        this.saveInDatabase(this.validateImport(data, type));
+      });
+    },
 
-        var sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function(y) {
-          var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-          if (exceljson.length > 0) {
-            for (var i = 0; i < exceljson.length; i++) {
-              excel.push(exceljson[i]);
-            }
-          }
-        });
-        var doc = this.validateImport(excel, type);
-        if (doc.status) {
-          GenericService(this.tenant, this.service, this.token)
-            .saveAll(doc.data)
-            .then(() => {
-              this.filterObjects();
-              this.loaderStatus = true;
-              window.setTimeout(()=>{
-                this.loader = false
-                this.loaderStatus=false;
-              }, 2000);              
-            });
-        }
-      };
-      reader.readAsBinaryString(this.file);
+    saveInDatabase(doc) {
+      if (doc.status) {
+        GenericService(this.tenant, this.service, this.token)
+          .saveAll(doc.data)
+          .then(() => {
+            this.filterObjects();
+            this.loaderStatus = true;
+            window.setTimeout(() => {
+              this.loader = false;
+              this.loaderStatus = false;
+            }, 2000);
+          })
+          .catch((e) => {
+            console.error(e.message);
+          });
+      }
     },
 
     validateImport(atributos, type) {
@@ -204,14 +170,12 @@ export default {
       var importacion = {
         status: true,
         data: [],
-        message: ""
+        message: "",
       };
 
-      if(type === 'text'){
+      if (type === "text") {
         atributos.forEach((element, index) => {
-          if (
-            element.valor 
-          ) {
+          if (element.valor) {
             var obj = {
               valor: element.valor,
             };
@@ -221,12 +185,9 @@ export default {
             importacion.message = "Faltan datos en el renglón " + (index + 2);
           }
         });
-
-      }else{
+      } else {
         atributos.forEach((element, index) => {
-          if (
-            element.valorNumerico 
-          ) {
+          if (element.valorNumerico) {
             var obj = {
               valorNumerico: element.valorNumerico,
             };
@@ -237,9 +198,9 @@ export default {
           }
         });
       }
-      
+
       return importacion;
-    }
+    },
   },
 };
 </script>

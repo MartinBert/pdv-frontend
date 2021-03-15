@@ -19,112 +19,21 @@
         </v-col>
       </v-row>
     </v-form>
-
-    <!-- List -->
-    <v-simple-table style="background-color: transparent;">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th>Descripción</th>
-            <th>Fecha</th>
-            <th>Productos devueltos</th>
-            <th>Productos cedidos</th>
-            <th>Monto de operación</th>
-            <th>Comprobante</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody v-for="o in objects" :key="o.id">
-          <tr>
-            <td>{{o.descripcion}}</td>
-            <td>{{o.fecha}}</td>
-            <td>
-              <button type="button">
-                <img
-                  src="/../../images/icons/details.svg"
-                  @click="seeDetail('devueltos', o)"
-                  width="30"
-                  height="30"
-                />
-              </button>
-            </td>
-            <td>
-              <button type="button">
-                <img
-                  src="/../../images/icons/details.svg"
-                  @click="seeDetail('cedidos', o)"
-                  width="30"
-                  height="30"
-                />
-              </button>
-            </td>
-            <td>${{o.totalDevolucion}}</td>
-            <td>
-              <span v-if="o.comprobante">{{o.comprobante.nombreDocumento}}</span>
-              <span v-if="!o.comprobante">SIN COMPROBANTE</span>
-            </td>
-            <td>
-              <a title="Reimprimir comprobante" v-if="o.comprobante"><img src="/../../images/icons/printer.svg" @click="print(o.comprobante)" width="30" height="30"/></a>
-              <a title="Agregar comprobante" v-if="!o.comprobante"><img src="/../../images/icons/add.svg" @click="addReceipt(o)" width="30" height="30"/></a>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <!-- End List -->
-
-    <!-- Loader -->
-    <div class="text-center" style="margin-top:15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
+    <DevolucionesTable
+      :items="devoluciones"
+      v-on:add="add"
+      v-on:print="print"
+      v-if="loaded"
+    />
+    <Pagination
       :page="filterParams.page"
-      :total-visible="8"
-      @input="filterObjects()"
-      v-if="filterParams.totalPages > 1"
-    ></v-pagination>
-    <!-- End filterParams -->
-
-    <!-- Dialog Detail-->
-    <v-dialog v-model="activeDetailDialog" width="500">
-      <v-card>
-        <v-card-title class="d-flex">
-          <span class="text-center">Productos {{details[0]}}</span>
-        </v-card-title>
-        <v-card-text>
-          <v-simple-table style="background-color: transparent" ref="tab">
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th class="text-left">Nombre</th>
-                  <th class="text-left">Cantidad de unidades</th>
-                  <th class="text-left">Precio Unitario</th>
-                  <th class="text-left">Precio Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="p in details[1]" :key="p.id">
-                  <td>{{ p.nombre }}</td>
-                  <td>{{ p.cantUnidades }}</td>
-                  <td>{{ p.precioUnitario }}</td>
-                  <td>{{ p.precioTotal }}</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-card-text>
-      </v-card>
-        
-    </v-dialog>
-    <!-- End Dialog Detail -->
-
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
+    <Spinner v-if="!loaded"/>
+    <DevolucionDetails/>
     <ReceiptDialog v-on:receipt="saveChanges"/>
   </v-container>
 </template>
@@ -133,8 +42,12 @@
 import axios from "axios";
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-import { formatDate, getCurrentDate, getInternationalDate, formatDateWithoutSlash } from "../../helpers/dateHelper";
+import Pagination from "../../components/Pagination";
+import DevolucionesTable from "../../components/Tables/DevolucionesTable";
+import Spinner from "../../components/Spinner";
 import ReceiptDialog from "../../components/ReceiptDialog";
+import DevolucionDetails from "../../components/Details/DevolucionDetails";
+import { formatDate, getCurrentDate, getInternationalDate, formatDateWithoutSlash } from "../../helpers/dateHelper";
 import { questionAlert, errorAlert, successAlert } from "../../helpers/alerts";
 import { generateBarCode, generateFiveDecimalCode } from "../../helpers/mathHelper";
 import { processDetailReceipt } from "../../helpers/processObjectsHelper";
@@ -143,7 +56,7 @@ import { addZerosInString } from '../../helpers/stringHelper';
 
 export default {
   data: () => ({
-    objects: [],
+    devoluciones: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       sucursalId: "",
@@ -163,7 +76,11 @@ export default {
   }),
 
   components: {
-    ReceiptDialog
+    ReceiptDialog,
+    DevolucionDetails,
+    Pagination,
+    DevolucionesTable,
+    Spinner
   },
   
   mounted() {
@@ -175,12 +92,12 @@ export default {
   },
 
   methods: {
-    filterObjects(){
-      this.loaded = false
+    filterObjects(page){
+      if(page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then(data => {
-          this.objects = data.data.content;
+          this.devoluciones = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           if(this.filterParams.totalPages < this.filterParams.page){
               this.filterParams.page = 1;
@@ -206,15 +123,12 @@ export default {
     },
 
     seeDetail(type, object){
-      if(type === "devueltos"){
-        this.details = ['devueltos por clientes', object.productos];
-      }else{
-        this.details = ['cedidos a clientes', object.productosSalientes];
-      }
-      this.activeDetailDialog = true;
+      this.$store.commit('details/addTitleToDetail', (type === 'devueltos') ? 'devueltos por clientes' : 'cedidos a clientes');
+      this.$store.commit('details/addObjectsToDetail', object.productos);
+      this.$store.commit('details/mutateDialog');
     },
 
-    addReceipt(o){
+    add(o){
       this.temporalObject = o;
       this.$store.commit('receipt/receiptDialogMutation');
     },

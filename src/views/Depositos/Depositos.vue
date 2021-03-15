@@ -34,106 +34,27 @@
         </v-col>
       </v-row>
     </v-form>
-
-    <!-- List -->
-    <v-simple-table
-      style="background-color: transparent"
-      ref="tab"
+    <DepositosTable
+      :items="depositos"
+      v-on:deleteItem="deleteItem"
+      v-on:editItem="editItem"
+      v-on:selectDefaultDeposit="selectDefaultDeposit"
       v-if="loaded"
-    >
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Dirección</th>
-            <th>Telefono</th>
-            <th>Acciones</th>
-            <th>Depósito predeterminado</th>
-            <th v-if="loguedUser.perfil <= 2">Sucursal</th>
-          </tr>
-        </thead>
-        <tbody v-for="object in objects" :key="object.id">
-          <tr>
-            <td>{{ object.id }}</td>
-            <td>{{ object.nombre }}</td>
-            <td>{{ object.direccion }}</td>
-            <td>{{ object.telefono }}</td>
-            <td>
-              <a title="Editar"
-                ><img
-                  src="/../../images/icons/edit.svg"
-                  @click="edit(object.id)"
-                  width="30"
-                  height="30"
-              /></a>
-              <a title="Eliminar"
-                ><img
-                  src="/../../images/icons/delete.svg"
-                  @click="openDelete(object.id)"
-                  width="30"
-                  height="30"
-              /></a>
-            </td>
-            <td>
-              <span v-if="object.defaultDeposit == '1'">
-                <img src="/../../images/icons/success.svg" alt="success" width="30" height="30">
-              </span>
-              <span v-if="object.defaultDeposit !== '1'">
-                <v-btn class="primary" @click="selectDefaultDeposit(object)"
-                  >Elegir predeterminado</v-btn
-                >
-              </span>
-            </td>
-            <td v-if="loguedUser.perfil <= 2">
-              {{ object.sucursales.nombre }}
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <!-- End List -->
-
-    <!-- Loader -->
-    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
+    />
+    <Pagination
       :page="filterParams.page"
-      :total-visible="8"
-      @input="filterObjects()"
-      v-if="filterParams.totalPages > 1 && loaded"
-    ></v-pagination>
-    <!-- End filterParams -->
-
-    <!-- Dialog Delete-->
-    <v-dialog v-model="dialogDeleteObject" width="500">
-      <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center"
-          >¿Está seguro que desea realizar esta acción?</v-card-title
-        >
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject"
-            >Si</v-btn
-          >
-          <v-btn small color="disabled" @click="dialogDeleteObject = false"
-            >No</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog Delete -->
-
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
+    <Spinner 
+      v-if="!loaded"
+    />
+    <DeleteDialog
+      :status="deleteDialogStatus"
+      v-on:deleteConfirmation="deleteConfirmation"
+    />
     <StockHistoryDialog />
   </v-container>
 </template>
@@ -143,10 +64,14 @@ import GenericService from "../../services/GenericService";
 import XLSX from "xlsx";
 import { errorAlert } from "../../helpers/alerts";
 import StockHistoryDialog from "../../components/StockHistoryDialog";
+import DepositosTable from "../../components/Tables/DepositosTable";
+import Pagination from "../../components/Pagination";
+import Spinner from "../../components/Spinner";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 
 export default {
   data: () => ({
-    objects: [],
+    depositos: [],
     file: null,
     filterParams: {
       depositoName: "",
@@ -160,12 +85,16 @@ export default {
     tenant: "",
     service: "depositos",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false,
+    deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
   components: {
     StockHistoryDialog,
+    DepositosTable,
+    DeleteDialog,
+    Spinner,
+    Pagination
   },
 
   mounted() {
@@ -178,12 +107,12 @@ export default {
   },
 
   methods: {
-    filterObjects() {
-      this.loaded = false;
+    filterObjects(page) {
+      if(page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.objects = data.data.content;
+          this.depositos = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
@@ -196,37 +125,30 @@ export default {
       this.$router.push({ name: "depositosForm", params: { id: 0 } });
     },
 
-    edit(id) {
+    editItem(id) {
       this.$router.push({ name: "depositosForm", params: { id: id } });
     },
 
-    openDelete(id) {
-      const checkObjectPriority = this.objects.filter(
-        (el) => el.defaultDeposit === "1"
-      )[0];
-      if (checkObjectPriority.id !== id) {
-        this.idObjet = id;
-        this.dialogDeleteObject = true;
-      } else {
-        errorAlert(
-          "No puede eliminar el depósito predeterminado para descontar stock en las ventas"
-        );
-      }
+    deleteItem(id) {
+      this.idObjet = id;
+      this.deleteDialogStatus = true;
+    },
+
+    deleteConfirmation(result){
+      return result ? this.deleteObject() : this.deleteDialogStatus = false;
     },
 
     deleteObject() {
       this.dialog = true;
-      this.dialogDeleteObject = false;
+      this.deleteDialogStatus = false;
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
           this.filterObjects();
         })
-        .catch(() => {
-          errorAlert(
-            "No se puede eliminar este depósito, todavía tiene productos en stock asociados"
-          );
-        });
+        .catch(()=>{
+          errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
+        })
     },
 
     importDocuments(event) {
@@ -263,14 +185,14 @@ export default {
       reader.readAsBinaryString(this.file);
     },
 
-    validateImport(objects) {
+    validateImport(depositos) {
       this.loader = true;
       var importacion = {
         status: true,
         data: [],
         message: "",
       };
-      objects.forEach((element, index) => {
+      depositos.forEach((element, index) => {
         if (element.nombre && element.direccion && element.telefono) {
           var obj = {
             nombre: element.nombre,

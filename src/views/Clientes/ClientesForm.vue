@@ -1,8 +1,8 @@
 <template>
   <v-container>
     <Error :errorStatus="errorStatus"/>
-    <v-card min-width="100%">
-      <div v-if="loaded">
+    <v-card min-width="100%" v-if="loaded">
+      <div>
         <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
           <v-row class="ma-1">
             <v-col>
@@ -114,7 +114,6 @@
               ></v-text-field>
             </v-col>
           </v-row>
-
           <div class="ma-1">
             <v-col class="col-6">
               <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid"
@@ -125,21 +124,15 @@
           </div>
         </v-form>
       </div>
-      <div v-if="!loaded">
-        <v-row class="ma-1">
-          <v-col class="col-12" style="text-align: center">
-            <v-progress-circular
-              indeterminate
-              color="primary"
-            ></v-progress-circular>
-          </v-col>
-        </v-row>
-      </div>
     </v-card>
+    <Spinner v-if="!loaded"/>
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+import Spinner from '../../components/Spinner';
+import Error from '../../components/Error';
+
 export default {
   data: () => ({
     valid: true,
@@ -157,6 +150,11 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
+  components: {
+    Spinner,
+    Error
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     if (this.$route.params.id && this.$route.params.id > 0) {
@@ -166,6 +164,7 @@ export default {
     }
     this.getCondicionesIva();
   },
+
   methods: {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
