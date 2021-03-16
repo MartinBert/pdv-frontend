@@ -495,6 +495,7 @@ export default {
     },
 
     getPropiedades(propiedades){
+      if(this.isEmptyString(propiedades)) return null;
       propiedades = propiedades.split(',');
       let propiedadesArray = [];
       
@@ -511,6 +512,7 @@ export default {
 
     getAtributos(element){
       const attributes = Object.entries(element).filter(el => el[0].substring(0,8) === 'atributo');
+      if(this.isEmptyArray(attributes)) return null;
       const attributesNames = attributes.map(el => {return el[1];});
       let listOfAttributes = [];
       attributesNames.forEach(attributeName => {
@@ -619,6 +621,16 @@ export default {
           }
         }
       })
+    },
+
+    isEmptyString(str){
+      if(str === undefined || str === null) return true;
+      return false;
+    },
+
+    isEmptyArray(array){
+      if(array.length === 0) return true;
+      return false;
     }
   },
 };
