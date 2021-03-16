@@ -18,14 +18,14 @@
                     <td>{{ item.fecha }}</td>
                     <td>
                         <Detail
-                            :objects="item.productos"
+                            :objectsArray="item.productos"
                             v-on:seeDetails="seeDetails"
                         />
                     </td>
                     <td>
                         <Detail 
-                            :itemId="item.productosSalientes" 
-                            v-on:editItem="editItem"
+                            :objectsArray="item.productosSalientes" 
+                            v-on:seeDetails="seeDetails"
                         />
                     </td>
                     <td>${{item.totalDevolucion}}</td>

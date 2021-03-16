@@ -213,6 +213,7 @@ export default {
       this.loaded = false;
       const filterParams = {
         depositoName: "",
+        perfilId: this.loguedUser.perfil,
         sucursalId: this.loguedUser.sucursal.id,
         page: 1,
         size: 100000

@@ -12,6 +12,7 @@
             dense
             outlined
             rounded
+            type="number"
             class="text-left"
             placeholder="Búsqueda especial"
             append-icon="mdi-magnify"
@@ -23,6 +24,7 @@
       :items="devoluciones"
       v-on:add="add"
       v-on:print="print"
+      v-on:seeDetails="seeDetails"
       v-if="loaded"
     />
     <Pagination
@@ -112,7 +114,7 @@ export default {
 
     print(object){
       ReportsService(this.tenant, "ventas", this.token)
-      .onCloseSaleReport(object)
+      .onCloseSaleReport(object.comprobante)
       .then((res) => {
         let file = new Blob([res["data"]], {
           type: "application/pdf",
@@ -122,9 +124,9 @@ export default {
       });
     },
 
-    seeDetail(type, object){
-      this.$store.commit('details/addTitleToDetail', (type === 'devueltos') ? 'devueltos por clientes' : 'cedidos a clientes');
-      this.$store.commit('details/addObjectsToDetail', object.productos);
+    seeDetails(object){
+      this.$store.commit('details/addTitleToDetail', "Productos")
+      this.$store.commit('details/addObjectsToDetail', object);
       this.$store.commit('details/mutateDialog');
     },
 
@@ -150,6 +152,7 @@ export default {
     },
 
     processAndSaveFiscal() {
+      this.loaded = false;
       /*** Constants ***/
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
@@ -246,6 +249,7 @@ export default {
                 .save(devolucion)
                 .then(() => {
                   successAlert("Comprobante Agregado");
+                  this.loaded = true;
                 })
                 .then(() => {
                   ReportsService(tenant, service, token)
@@ -274,6 +278,7 @@ export default {
     },
 
     processAndSaveNoFiscal() {
+      this.loaded = false;
       /* Constants */ 
       const mediosPago = this.receiptDialogData.mediosPago;
       const planesPago = this.receiptDialogData.planPago;
@@ -341,6 +346,7 @@ export default {
         GenericService(tenant, this.service, token).save(devolucion)
           .then(() => {
             successAlert("Comprobante agregado");
+            this.loaded = true;
           })
           .then(() => {
             ReportsService(tenant, service, token)

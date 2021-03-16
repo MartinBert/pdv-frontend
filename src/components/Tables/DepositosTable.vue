@@ -55,7 +55,7 @@ export default {
             this.$emit("deleteItem", itemId);
         },
         selectDefaultDeposit(object){
-            this.$emmit('selectDefaultDeposit', object);
+            this.$emit('selectDefaultDeposit', object);
         }
     }
 }

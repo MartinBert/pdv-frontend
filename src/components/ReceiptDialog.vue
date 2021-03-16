@@ -355,12 +355,12 @@ export default {
 
     filterObjects(){
       GenericService(this.tenant, "ventas", this.token)
-        .filter(this.filterParams["ventas"])
+        .filter(this.filterParams.ventas)
         .then(data => {
           this.comprobantes = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          if(this.filterParams.totalPages < this.filterParams.page){
-              this.filterParams.page = 1;
+          this.filterParams.ventas.totalPages = data.data.totalPages;
+          if(this.filterParams.ventas.totalPages < this.filterParams.ventas.page){
+              this.filterParams.ventas.page = 1;
           }
         });
     },

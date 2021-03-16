@@ -2,7 +2,7 @@
   <v-dialog v-model="$store.state.details.dialog" width="500">
       <v-card>
         <v-card-title class="d-flex">
-          <span class="text-center">Productos {{$store.state.details.title}}</span>
+          <span class="text-center">{{$store.state.details.title}}</span>
         </v-card-title>
         <v-card-text>
           <v-simple-table style="background-color: transparent" ref="tab">

@@ -167,6 +167,11 @@ export default {
     } else {
       this.loaded = true;
     }
+    this.filterParams.perfiles.perfilId = this.loguedUser.perfil;
+    this.filterParams.empresas.perfilId = this.loguedUser.perfil;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.empresas.empresaId = this.loguedUser.empresa.id;
+    }
     this.getAllObjects();
   },
 

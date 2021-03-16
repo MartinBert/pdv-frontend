@@ -30,6 +30,12 @@
                         <Delete 
                             :itemId="item.id" 
                             v-on:deleteItem="deleteItem"
+                            v-if="item.estado != 2"
+                        />
+                        <Add
+                            :object="item"
+                            v-on:add="add"
+                            v-if="item.estado == 2"
                         />
                     </td>
                 </tr>
@@ -40,13 +46,15 @@
 <script>
 import Edit from '../Buttons/Edit';
 import Delete from '../Buttons/Delete';
+import Add from '../Buttons/Add';
 export default {
     props:{
         items: Array,
     },
     components:{
         Edit,
-        Delete
+        Delete,
+        Add
     },
     methods:{
         editItem(itemId){
@@ -54,6 +62,9 @@ export default {
         },
         deleteItem(itemId){
             this.$emit("deleteItem", itemId);
+        },
+        add(object){
+            this.$emit("add", object)
         },
         setAttributesValues(atributes){
             let str = atributes.reduce((acc, element) => {
