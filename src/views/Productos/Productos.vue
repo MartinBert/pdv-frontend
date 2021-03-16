@@ -496,17 +496,23 @@ export default {
 
     getPropiedades(propiedades){
       if(this.isEmptyString(propiedades)) return null;
-      propiedades = propiedades.split(',');
       let propiedadesArray = [];
-      
-      propiedades.forEach(el => {
-        this.propiedades.forEach(e => {
-          if(el == e.id){
-            propiedadesArray.push(e);
+      if(propiedades.length > 1){
+        propiedades = propiedades.split(',');
+        propiedades.forEach(el => {
+          this.propiedades.forEach(e => {
+            if(el == e.id){
+              propiedadesArray.push(e);
+            }
+          })
+        })
+      }else{
+        this.propiedades.forEach(el => {
+          if(el.id == propiedades){
+            propiedadesArray.push(el);
           }
         })
-      })
-      
+      }
       return propiedadesArray;
     },
 
@@ -525,13 +531,10 @@ export default {
           }
         })
       })
-
       listOfAttributes = [...new Set(listOfAttributes)];
-
       if(listOfAttributes.length === 0){
         this.createNewAtributes(attributesNames);
       }
-
       return listOfAttributes;
     },
 
@@ -551,7 +554,6 @@ export default {
             }
           })
         });
-
         return distribuidoresArray;
       }else{
         return this.distribuidores.filter(el => el.id === distribuidores);
@@ -580,7 +582,6 @@ export default {
           return acc + element.valorNumerico.toString() + ",";
         }
       }, "");
-
       return str;
     },
 
