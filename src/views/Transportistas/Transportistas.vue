@@ -62,79 +62,41 @@
         </v-col>
       </v-row>
     </v-form>
-
-    <!-- List -->
-    <v-simple-table style="background-color: transparent;">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Razón Social</th>
-            <th>CUIT</th>
-            <th>Detalles</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody v-for="object in objects" :key="object.id">
-          <tr>
-            <td>{{object.nombre}}</td>
-            <td>{{object.razonSocial}}</td>
-            <td>{{object.cuit}}</td>
-            <td>
-                <v-icon title="Stock" @click="showStock(object.id)">mdi-text-box</v-icon>
-            </td>
-            <td>
-              <a title="Editar"><img src="/../../images/icons/edit.svg" @click="edit(object.id)" width="30" height="30"/></a>
-              <a title="Eliminar"><img src="/../../images/icons/delete.svg" @click="openDelete(object.id)" width="30" height="30"/></a>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <!-- End List -->
-
-    <!-- Loader -->
-    <div class="text-center" style="margin-top:15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
+    <TransportistasTable
+      :items="transportistas"
+      v-on:editItem="edit"
+      v-on:deleteItem="deleteItem"
+      v-on:seeDetails="seeDetails"
+      v-if="loaded"
+    />
+    <Pagination
       :page="filterParams.page"
-      :total-visible="8"
-      @input="filterObjects()"
-      v-if="filterParams.totalPages > 1"
-    ></v-pagination>
-    <!-- End filterParams -->
-
-    <!-- Dialog Delete-->
-    <v-dialog v-model="dialogDeleteObject" width="500">
-      <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center">¿Está seguro que desea realizar esta acción?</v-card-title>
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject">Si</v-btn>
-          <v-btn small color="disabled" @click="dialogDeleteObject = false">No</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog Delete -->
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
+    <Spinner v-if="!loaded"/>
+    <DeleteDialog
+      :status="deleteDialogStatus"
+      v-on:deleteConfirmation="deleteConfirmation"
+    />
+    <TransportistaDetails/>
   </v-container>
 </template>
 
 <script>
 import GenericService from "../../services/GenericService";
+import { errorAlert } from "../../helpers/alerts";
+import Spinner from "../../components/Spinner";
+import Pagination from "../../components/Pagination";
+import TransportistasTable from "../../components/Tables/TransportistasTable";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+import TransportistaDetails from "../../components/Details/TransportistaDetails";
 
 export default {
   data: () => ({
-    objects: [],
+    transportistas: [],
     filterParams: {
       sucursalId: "",
       personaSocialReason: "",
@@ -150,9 +112,18 @@ export default {
     tenant: "",
     service: "transportistas",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false,
+    deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
+
+  components:{
+    Spinner,
+    Pagination,
+    TransportistasTable,
+    DeleteDialog,
+    TransportistaDetails
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     if(this.loguedUser.perfil > 1){
@@ -160,14 +131,14 @@ export default {
     }
     this.filterObjects();
   },
+
   methods: {
-    
-    filterObjects(){
-      this.loaded = false;
+    filterObjects(page){
+      if(page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.objects = data.data.content;
+          this.transportistas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
@@ -181,19 +152,31 @@ export default {
       this.$router.push({ name: "transportistasForm", params: { id: id } });
     },
 
-    openDelete(id) {
+   deleteItem(id) {
       this.idObjet = id;
-      this.dialogDeleteObject = true;
+      this.deleteDialogStatus = true;
+    },
+
+    deleteConfirmation(result){
+      return result ? this.deleteObject() : this.deleteDialogStatus = false;
     },
 
     deleteObject() {
       this.dialog = true;
-      this.dialogDeleteObject = false;
+      this.deleteDialogStatus = false;
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
           this.filterObjects();
-        });
+        })
+        .catch(()=>{
+          errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
+        })
+    },
+
+    seeDetails(object){
+      this.$store.commit('details/mutateDialog');
+      this.$store.commit('details/addObjectToDetail', object);
     }
   }
 };

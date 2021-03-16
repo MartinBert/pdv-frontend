@@ -111,7 +111,6 @@ export default {
   },
 
   methods: {
-
     filterObjects(page) {
       if(page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
@@ -156,7 +155,7 @@ export default {
     seeDetails(object){
       this.$store.commit('details/mutateDialog');
       this.$store.commit('details/addObjectToDetail', object);
-    },
+    }
   },
 };
 </script>

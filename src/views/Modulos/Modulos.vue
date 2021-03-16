@@ -39,7 +39,6 @@
     />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import { errorAlert } from "../../helpers/alerts";

@@ -4,20 +4,14 @@
       <thead>
         <tr>
           <th>Nombre</th>
-          <th>Razón Social</th>
-          <th>CUIT</th>
-          <th>Detalles</th>
+          <th>ID Fiscal</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody v-for="item in items" :key="item.id">
         <tr>
           <td>{{ item.nombre }}</td>
-          <td>{{ item.razonSocial }}</td>
-          <td>{{ item.cuit }}</td>
-          <td>
-            <Detail :object="item" v-on:seeDetails="seeDetails" />
-          </td>
+          <td>{{ item.idFiscal }}</td>
           <td>
             <Edit :itemId="item.id" v-on:editItem="editItem" />
             <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
@@ -30,7 +24,6 @@
 <script>
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
-import Detail from "../Buttons/Detail";
 export default {
   props: {
     items: Array,
@@ -38,7 +31,6 @@ export default {
   components: {
     Edit,
     Delete,
-    Detail,
   },
   methods: {
     editItem(itemId) {
@@ -46,9 +38,6 @@ export default {
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
-    },
-    seeDetails(object) {
-      this.$emit("seeDetails", object);
     },
   },
 };

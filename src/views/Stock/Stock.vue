@@ -23,13 +23,13 @@
             item-value="id"
             label="Depósito"
             v-model="typeList"
-            @change="filterObjects(typeList)"
+            @change="filterObjects()"
           />
         </v-col>
         <v-col>
           <v-text-field
             v-model="filterParams.productoName"
-            v-on:input="filterObjects(typeList)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -41,7 +41,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoCodigo"
-            v-on:input="filterObjects(typeList)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -53,7 +53,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoCodigoBarras"
-            v-on:input="filterObjects(typeList)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -65,7 +65,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoMarcaName"
-            v-on:input="filterObjects(typeList)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -77,7 +77,7 @@
         <v-col>
           <v-text-field
             v-model="filterParams.productoPrimerAtributoName"
-            v-on:input="filterObjects(typeList)"
+            v-on:input="filterObjects()"
             dense
             outlined
             rounded
@@ -88,98 +88,27 @@
         </v-col>
       </v-row>
     </v-form>
-
-    <!-- List with pagination-->
-    <v-simple-table
-      style="background-color: transparent"
+    <StocksTable
+      :items="stocks"
+      v-on:editItem="edit"
+      v-on:deleteItem="deleteItem"
+      v-on:add="addToMigration"
+      v-on:uncheck="removeOfMigration"
       v-if="loaded"
-      ref="tab"
-    >
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Atributos</th>
-            <th>Marca</th>
-            <th>Codigo de barras</th>
-            <th>Codigo de producto</th>
-            <th>Cantidad</th>
-            <th>Cant. mínima</th>
-            <th>Depósito</th>
-            <th>Acciones</th>
-            <th class="text-center">Migrar a otro depósito</th>
-          </tr>
-        </thead>
-        <tbody v-for="object in objects" :key="object.id">
-          <tr>
-            <td>{{ object.producto.nombre }}</td>
-            <td>{{ setAtributesValues(object.producto.atributos) }}</td>
-            <td>{{ object.producto.marca.nombre }}</td>
-            <td>{{ object.producto.codigoBarra }}</td>
-            <td>{{ object.producto.codigoProducto}}</td>
-            <td>{{ object.cantidad }}</td>
-            <td>
-              <span v-if="!object.cantidadMinima"
-                >Sin existencias mínimas asignadas</span
-              >
-              <span v-if="object.cantidadMinima">{{
-                object.cantidadMinima
-              }}</span>
-            </td>
-            <td>{{ object.deposito.nombre }}</td>
-            <td>
-              <a title="Editar"
-                ><img
-                  src="/../../images/icons/edit.svg"
-                  @click="edit(object.id)"
-                  width="30"
-                  height="30"
-              /></a>
-              <a title="Eliminar"
-                ><img
-                  src="/../../images/icons/delete.svg"
-                  @click="openDelete(object.id)"
-                  width="30"
-                  height="30"
-              /></a>
-            </td>
-            <td class="text-center">
-              <button type="button" v-if="!object.selected">
-                <img
-                  src="/../../images/icons/add.svg"
-                  @click="addToMigration(object)"
-                  width="30"
-                  height="30"
-                />
-              </button>
-              <button type="button" v-if="object.selected === true">
-                <img
-                  src="/../../images/icons/success.svg"
-                  @click="removeOfMigration(object)"
-                  width="30"
-                  height="30"
-                />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-
-    <v-pagination
-      v-model="filterParams.page"
-      :length="filterParams.totalPages"
-      next-icon="mdi-chevron-right"
-      prev-icon="mdi-chevron-left"
+      ref="stockTable"
+    />
+    <Pagination
       :page="filterParams.page"
-      :total-visible="8"
-      @input="
-        filterObjects(typeList)
-      "
-      v-if="filterParams.totalPages > 1"
-    ></v-pagination>
-    <!-- End List with pagination -->
-
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
+    <Spinner v-if="!loaded"/>
+    <DeleteDialog
+      :status="deleteDialogStatus"
+      v-on:deleteConfirmation="deleteConfirmation"
+    />
     <v-row>
       <v-col cols="12">
         <form @submit.prevent="migrateStockToOtherDeposit()">
@@ -196,47 +125,18 @@
         </form>
       </v-col>
     </v-row>
-
-    <!-- Dialog Delete-->
-    <v-dialog v-model="dialogDeleteObject" width="500">
-      <v-card>
-        <v-toolbar class="d-flex justify-center" color="primary" dark>
-          <v-toolbar-title>Eliminar objeto</v-toolbar-title>
-        </v-toolbar>
-        <v-card-title class="d-flex justify-center"
-          >¿Está seguro que desea realizar esta acción?</v-card-title
-        >
-        <v-card-actions class="d-flex justify-center pb-4">
-          <v-btn small color="disabled" class="mr-5" @click="deleteObject"
-            >Si</v-btn
-          >
-          <v-btn small color="disabled" @click="dialogDeleteObject = false"
-            >No</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Dialog Delete -->
-
     <ModifyMinimumStocksDialog
       v-on:stocksRestrictions="applyMassiveStocksRestrictions()"
     />
     <DepositMigrationDialog
       v-on:depositsForMigrationProcess="applyMassiveChangesInDeposits()"
     />
-
     <StockReportsDialog
       :loguedUser="loguedUser"
       :tenant="tenant"
       :service="service"
       :token="token"
     /> 
-
-    <!-- Loader -->
-    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
-    <!-- End Loader -->
   </v-container>
 </template>
 
@@ -245,13 +145,17 @@ import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
 import ModifyMinimumStocksDialog from "../../components/ModifyMinimumStocksDialog";
 import StockReportsDialog from "../../components/StockReportsDialog";
+import StocksTable from "../../components/Tables/StocksTable";
+import Pagination from "../../components/Pagination";
+import Spinner from "../../components/Spinner";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import DepositMigrationDialog from "../../components/DepositMigrationDialog";
 import { errorAlert } from '../../helpers/alerts';
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 
 export default {
   data: () => ({
-    objects: [],
+    stocks: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       productoName: "",
@@ -280,7 +184,7 @@ export default {
     tenant: "",
     service: "stock",
     token: localStorage.getItem("token"),
-    dialogDeleteObject: false,
+    deleteDialogStatus: false,
     depositos: [],
     realDeposits: [],
     typeList: 0,
@@ -291,7 +195,11 @@ export default {
   components: {
     ModifyMinimumStocksDialog,
     DepositMigrationDialog,
-    StockReportsDialog
+    StockReportsDialog,
+    StocksTable,
+    Pagination,
+    Spinner,
+    DeleteDialog
   },
 
   mounted() {
@@ -302,14 +210,15 @@ export default {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
       this.depositsFilterParams.sucursalId = this.loguedUser.sucursal.id;
     }
-    this.filterObjects(this.typeList);
+    this.filterObjects();
     this.getOtherModels();
   },
 
   methods: {
-    filterObjects(typeList) {
-      if (typeList > 0) {
-        this.searchForDeposit(typeList);
+    filterObjects(page) {
+      if(page) this.filterParams.page = page;
+      if (this.typeList > 0) {
+        this.searchForDeposit(this.typeList);
       } else {
         this.search();
       }
@@ -319,10 +228,10 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.objects = data.data.content;
+          this.stocks = data.data.content;
           if(this.migration.length > 0){
             this.migration.filter(el => {
-              this.objects.filter(e => {
+              this.stocks.filter(e => {
                 if(el.id === e.id){
                   e.selected = true;
                 }
@@ -342,10 +251,10 @@ export default {
       StocksService(this.tenant, "stock", this.token)
         .filterStockForDepositId(this.filterParams)
         .then((data) => {
-          this.objects = data.data.content;
+          this.stocks = data.data.content;
           if(this.migration.length > 0){
             this.migration.filter(el => {
-              this.objects.filter(e => {
+              this.stocks.filter(e => {
                 if(el.id === e.id){
                   e.selected = true;
                 }
@@ -381,19 +290,26 @@ export default {
       this.$router.push({ name: "stockForm", params: { id: id } });
     },
 
-    openDelete(id) {
+    deleteItem(id) {
       this.idObjet = id;
-      this.dialogDeleteObject = true;
+      this.deleteDialogStatus = true;
+    },
+
+    deleteConfirmation(result){
+      return result ? this.deleteObject() : this.deleteDialogStatus = false;
     },
 
     deleteObject() {
       this.dialog = true;
-      this.dialogDeleteObject = false;
+      this.deleteDialogStatus = false;
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects(this.typeList);
-        });
+          this.filterObjects();
+        })
+        .catch(()=>{
+          errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
+        })
     },
 
     applyMassiveStocksRestrictions() {
@@ -488,14 +404,14 @@ export default {
 
     addToMigration(object){
       this.migration.push(object);
-      this.objects.filter(el => el.id === object.id)[0].selected = true;
-      this.$refs.tab.$forceUpdate();
+      this.stocks.filter(el => el.id === object.id)[0].selected = true;
+      this.$refs.stockTable.$forceUpdate();
     },
 
     removeOfMigration(object){
       this.migration = this.migration.filter(el => el.id !== object.id);
-      this.objects.filter(el => el.id === object.id)[0].selected = false;
-      this.$refs.tab.$forceUpdate();
+      this.stocks.filter(el => el.id === object.id)[0].selected = false;
+      this.$refs.stockTable.$forceUpdate();
     },
 
     migrateStockToOtherDeposit(){
