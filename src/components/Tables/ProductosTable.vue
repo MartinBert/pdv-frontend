@@ -4,32 +4,24 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Planes asociados</th>
-                    <th>Suma en arqueo de caja</th>
+                    <th>Código de barras</th>
+                    <th>Código de producto</th>
+                    <th>Atributos</th>
+                    <th>Marca</th>
+                    <th>Precio de costo</th>
+                    <th>Precio de venta</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody v-for="item in items" :key="item.id">
                 <tr>
                     <td>{{ item.nombre }}</td>
-                    <td>
-                        <Detail
-                        :objectsArray="item.planPago"
-                        v-on:seeDetails="seeDetails"
-                        />
-                    </td>
-                    <td>
-                        <Add
-                            :object="item"
-                            v-on:add="add"
-                            v-if="!item.sumaEnCierreDeCaja"
-                        />
-                        <Checked
-                            :object="item"
-                            v-on:uncheck="uncheck"
-                            v-if="item.sumaEnCierreDeCaja"
-                        />
-                    </td>
+                    <td>{{ item.codigoBarra }}</td>
+                    <td>{{ item.codigoProducto }}</td>
+                    <td>{{ setAttributesValues(item.atributos) }}</td>
+                    <td>{{ item.marca.nombre }}</td>
+                    <td>${{ item.costoBruto }}</td>
+                    <td>${{ item.precioTotal }}</td>
                     <td>
                         <Edit 
                             :itemId="item.id" 
@@ -48,19 +40,13 @@
 <script>
 import Edit from '../Buttons/Edit';
 import Delete from '../Buttons/Delete';
-import Detail from '../Buttons/Detail';
-import Add from '../Buttons/Add';
-import Checked from '../Buttons/Checked';
 export default {
     props:{
         items: Array,
     },
     components:{
         Edit,
-        Delete,
-        Detail,
-        Add,
-        Checked
+        Delete
     },
     methods:{
         editItem(itemId){
@@ -69,14 +55,16 @@ export default {
         deleteItem(itemId){
             this.$emit("deleteItem", itemId);
         },
-        add(object){
-            this.$emit("add", object);
-        },
-        uncheck(object){
-            this.$emit("uncheck", object);
-        },
-        seeDetails(objects){
-            this.$emit('seeDetails', objects);
+        setAttributesValues(atributes){
+            let str = atributes.reduce((acc, element) => {
+                if(element.valor){
+                return acc + element.valor + ",";
+                }else{
+                return acc + element.valorNumerico.toString() + ",";
+                }
+            }, "");
+
+            return str;
         },
     }
 }

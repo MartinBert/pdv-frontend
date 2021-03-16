@@ -1,8 +1,8 @@
 <template>
     <a title="Imprimir"
         ><img
-            src="/../../images/icons/add.svg"
-            @click="add()"
+            src="/../../images/icons/success.svg"
+            @click="uncheck()"
             width="30"
             height="30"
         />
@@ -14,8 +14,8 @@ export default {
         object: Object
     },
     methods:{
-        add(){
-            this.$emit('add', this.object);
+        uncheck(){
+            this.$emit('uncheck', this.object);
         }
     }
 }

@@ -14,27 +14,27 @@
                         <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody v-for="object in objects" :key="object.id">
+                    <tbody v-for="producto in productos" :key="producto.id">
                         <tr>
-                        <td>{{object.nombre}}</td>
-                        <td>{{setAtributesValues(object.atributos)}}</td>
-                        <td>{{object.marca.nombre}}</td>
-                        <td>{{object.codigoBarra}}</td>
-                        <td>{{object.codigoProducto}}</td>
+                        <td>{{producto.nombre}}</td>
+                        <td>{{setAtributesValues(producto.atributos)}}</td>
+                        <td>{{producto.marca.nombre}}</td>
+                        <td>{{producto.codigoBarra}}</td>
+                        <td>{{producto.codigoProducto}}</td>
                         <td>
                             <a title="Agregar"
-                            v-if="!object.selected"
+                            v-if="!producto.selected"
                             ><img
                                 src="/../../images/icons/add.svg"
-                                @click="addProductToTagsList(object)"
+                                @click="addProductToTagsList(producto)"
                                 width="30"
                                 height="30"
                             /></a>
                             <a title="Quitar"
-                            v-if="object.selected"
+                            v-if="producto.selected"
                             ><img
                                 src="/../../images/icons/success.svg"
-                                @click="deleteLine(object)"
+                                @click="deleteLine(producto)"
                                 width="30"
                                 height="30"
                             /></a>
@@ -73,13 +73,13 @@
                                 <th>Cantidad</th>
                                 </tr>
                             </thead>
-                            <tbody v-for="object in $store.state.productos.products" :key="object.id">
+                            <tbody v-for="producto in $store.state.productos.products" :key="producto.id">
                                 <tr>
-                                <td>{{object.nombre}}</td>
-                                <td>{{setAtributesValues(object.atributos)}}</td>
-                                <td>{{object.marca.nombre}}</td>
-                                <td>{{object.codigoBarra}}</td>
-                                <td>{{object.codigoProducto}}</td>
+                                <td>{{producto.nombre}}</td>
+                                <td>{{setAtributesValues(producto.atributos)}}</td>
+                                <td>{{producto.marca.nombre}}</td>
+                                <td>{{producto.codigoBarra}}</td>
+                                <td>{{producto.codigoProducto}}</td>
                                 <td>
                                     <v-text-field
                                     autocomplete="off"
@@ -87,14 +87,14 @@
                                     counter="3"
                                     maxlength="3"
                                     id="inputQuantity"
-                                    @input="setQuantity(object, $event)"
+                                    @input="setQuantity(producto, $event)"
                                     />
                                 </td>
                                 <td>
                                     <a title="Agregar"
                                     ><img
                                         src="/../../images/icons/delete.svg"
-                                        @click="deleteLine(object)"
+                                        @click="deleteLine(producto)"
                                         width="30"
                                         height="30"
                                     /></a>
@@ -121,7 +121,7 @@ import Pagination from './Pagination';
 export default {
     name: 'LabelPrinting',
     props: {
-        objects: Array,
+        productos: Array,
         page: Number,
         totalVisible: Number,
         totalPages: Number,
@@ -144,24 +144,24 @@ export default {
         changePage(page){
             this.$emit('changePage', page);
         },
-        addProductToTagsList(object){
-           this.$store.commit('productos/addProductsToList', object);
-           this.$emit('checkProduct', object);
+        addProductToTagsList(producto){
+           this.$store.commit('productos/addProductsToList', producto);
+           this.$emit('checkProduct', producto);
            this.$refs.tableOfProducts.$forceUpdate();
         },
-        deleteLine(object){
-            this.$store.commit('productos/removeProductsToList', object.id);
-            this.labelList = this.labelList.filter(el => el.codigoBarra !== object.codigoBarra);
-            this.$emit('checkProduct', object);
+        deleteLine(producto){
+            this.$store.commit('productos/removeProductsToList', producto.id);
+            this.labelList = this.labelList.filter(el => el.codigoBarra !== producto.codigoBarra);
+            this.$emit('checkProduct', producto);
             this.$refs.tableOfProducts.$forceUpdate();
         },
-        setQuantity(object, $event){
+        setQuantity(producto, $event){
             if($event !== ''){
                 if($event < 0) $event = 0; 
                 if($event.length > 3) $event = $event.slice(0, 3);
-                this.labelList = this.labelList.filter(el => el.codigoBarra !== object.codigoBarra);
-                object.attributes = this.setAtributesValues(object.atributos);
-                const labelList = Array(parseInt($event)).fill({nombre: object.nombre, codigoBarra: object.codigoBarra, attributes: object.attributes});
+                this.labelList = this.labelList.filter(el => el.codigoBarra !== producto.codigoBarra);
+                producto.attributes = this.setAtributesValues(producto.atributos);
+                const labelList = Array(parseInt($event)).fill({nombre: producto.nombre, codigoBarra: producto.codigoBarra, attributes: producto.attributes});
                 labelList.forEach(el => {
                     this.labelList.push(el);
                 });

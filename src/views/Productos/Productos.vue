@@ -102,75 +102,22 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-container v-if="loaded && view === 'listOfProducts'">
-      <v-simple-table style="background-color: transparent">
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Código de barras</th>
-              <th>Código de producto</th>
-              <th>Atributos</th>
-              <th>Marca</th>
-              <th>Precio de costo</th>
-              <th>Precio de venta</th>
-              <th v-if="perfil < 3">Acciones</th>
-            </tr>
-          </thead>
-          <tbody v-for="object in objects" :key="object.id">
-            <tr>
-              <td>{{ object.nombre }}</td>
-              <td>{{ object.codigoBarra }}</td>
-              <td>{{ object.codigoProducto }}</td>
-              <td>{{ setAtributesValues(object.atributos) }}</td>
-              <td>{{ object.marca.nombre }}</td>
-              <td>${{ object.costoBruto }}</td>
-              <td>${{ object.precioTotal }}</td>
-              <td v-if="perfil < 3">
-                <a title="Editar"
-                  ><img
-                    src="/../../images/icons/edit.svg"
-                    @click="edit(object.id)"
-                    width="30"
-                    height="30"
-                /></a>
-                <a title="Eliminar"
-                v-if="object.estado == 1"
-                  ><img
-                    src="/../../images/icons/delete.svg"
-                    @click="deleteObject(object)"
-                    width="30"
-                    height="30"
-                /></a>
-                <a title="Eliminar"
-                v-if="object.estado != 1"
-                  ><img
-                    src="/../../images/icons/add.svg"
-                    @click="reactivationOfProduct(object)"
-                    width="30"
-                    height="30"
-                /></a>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
-      <v-pagination
-        v-model="filterParams.page"
-        :length="filterParams.totalPages"
-        next-icon="mdi-chevron-right"
-        prev-icon="mdi-chevron-left"
-        :page="filterParams.page"
-        :total-visible="8"
-        @input="filterObjects()"
-        v-if="filterParams.totalPages > 1 && loaded"
-      ></v-pagination>
-    </v-container>
-    
-
+    <ProductosTable
+      :items="productos"
+      v-on:editItem="edit"
+      v-on:deleteItem="deleteItem"
+      v-if="loaded && view === 'listOfProducts'"
+    />
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded && view === 'listOfProducts'"
+    />
     <LabelPrinting 
     v-if="view === 'labelPrinting'" 
-    :objects="objects" 
+    :productos="productos" 
     :page="filterParams.page" 
     :totalVisible="filterParams.size" 
     :totalPages="filterParams.totalPages"
@@ -179,9 +126,11 @@
     v-on:changePage="changePage"
     v-on:checkProduct="checkProductInList"
     />
-
     <Spinner v-if="!loaded"/>
-    <!-- Dialog Loader -->
+    <DeleteDialog
+      :status="deleteDialogStatus"
+      v-on:deleteConfirmation="deleteConfirmation"
+    />
     <template>
       <v-dialog
         v-model="loader"
@@ -227,8 +176,11 @@ import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import LabelPrinting from "../../components/LabelPrinting";
 import Spinner from "../../components/Spinner";
+import Pagination from "../../components/Pagination";
+import ProductosTable from '../../components/Tables/ProductosTable';
+import DeleteDialog from '../../components/Dialogs/DeleteDialog';
 import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
-import { successAlert, questionAlert, infoAlert } from "../../helpers/alerts";
+import { successAlert, questionAlert, infoAlert, errorAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
 
 export default {
@@ -241,7 +193,7 @@ export default {
     file: null,
     object: null,
     stock: [],
-    objects: [],
+    productos: [],
     marcas: [],
     distribuidores: [],
     depositos: [],
@@ -269,16 +221,21 @@ export default {
     },
     loaded: false,
     tenant: "",
+    idObject: "",
     service: "productos",
     token: localStorage.getItem("token"),
     dialogStock: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     checkImportStatus: 0,
+    deleteDialogStatus: false
   }),
 
   components: {
     LabelPrinting,
-    Spinner
+    Spinner,
+    Pagination,
+    ProductosTable,
+    DeleteDialog
   },
 
   mounted() {
@@ -289,7 +246,8 @@ export default {
   },
 
   methods: {
-    filterObjects() {
+    filterObjects(page) {
+      if(page) this.filterParams.page = page;
       if(this.estadoSelecionado.id > 1){
         this.filterParams.productoEstado = 2
       }else{
@@ -306,7 +264,7 @@ export default {
           })
         })
 
-        this.objects = data.data.content;
+        this.productos = data.data.content;
         this.filterParams.totalPages = data.data.totalPages;
         this.loaded = true;
       });
@@ -356,18 +314,43 @@ export default {
       this.$router.push({ name: "productosForm", params: { id: id } });
     },
 
-    deleteObject(object) {
-      questionAlert('Atención, esta acción deshabilitará el producto en el sistema y el mismo no se mostrará para otras operaciones', 'Desea continuar')
-      .then(result => {
-        if(result.isConfirmed){
-          object.estado = 2;
-          GenericService(this.tenant, this.service, this.token)
-          .save(object);
+    deleteItem(id) {
+      this.idObject = id;
+      this.deleteDialogStatus = true;
+    },
 
+    deleteConfirmation(result){
+      return result ? this.deleteObject() : this.deleteDialogStatus = false;
+    },
+
+    deleteObject() {
+      this.dialog = true;
+      this.deleteDialogStatus = false;
+      GenericService(this.tenant, this.service, this.token)
+        .delete(this.idObject)
+        .then(() => {
           this.filterObjects();
-          this.getOtherModels(0, 100000);
-        }
-      })
+        })
+        .catch(()=>{
+          errorAlert("El registro se encuentra asociado a otros elementos en el sistema")
+          .then(result => {
+            if(result.isDismissed){
+              questionAlert('Puede desactivar el producto para no verlo en la tabla', 'Desea hacerlo')
+              .then(result => {
+                if(result.isConfirmed){
+                  let inactiveProduct = this.productos.filter(el => el.id === this.idObject)[0];
+                  inactiveProduct.estado = 2;
+                  GenericService(this.tenant, this.service, this.token)
+                  .save(inactiveProduct)
+                  .then(this.filterObjects())
+                  .catch(err => {
+                    console.error(err);
+                  });
+                }
+              })
+            }
+          })
+        })
     },
 
     reactivationOfProduct(object) {
@@ -383,9 +366,7 @@ export default {
             this.getOtherModels(0, 100000);
           })
         }
-        
       })
-
     },
 
     //Load excel
@@ -434,13 +415,13 @@ export default {
       reader.readAsBinaryString(this.file);
     },
 
-    validateImport(objects) {
+    validateImport(productos) {
       let importacion = {
         status: true,
         data: [],
         message: "",
       };
-      objects.forEach((element, index) => {
+      productos.forEach((element, index) => {
         if (
           element.nombre &&
           element.codigoBarra &&
@@ -628,7 +609,7 @@ export default {
     },
 
     checkProductInList(data){
-      this.objects.forEach(product => {
+      this.productos.forEach(product => {
         if(product.id === data.id){
           if(product.selected){
             product.selected = false;

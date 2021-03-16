@@ -34,6 +34,8 @@
       v-on:editItem="edit"
       v-on:deleteItem="deleteItem"
       v-on:seeDetails="seeDetails"
+      v-on:add="add"
+      v-on:uncheck="uncheck"
       v-if="loaded"
     />
     <Pagination
@@ -147,6 +149,38 @@ export default {
     seeDetails(objects){
       this.$store.commit('details/mutateDialog');
       this.$store.commit('details/addObjectsToDetail', objects);
+    },
+
+    add(object){
+      this.loaded = false;
+      object.sumaEnCierreDeCaja = true;
+      GenericService(this.tenant, this.service, this.token)
+      .save(object)
+      .then(()=>{
+        this.refreshView();
+      })
+      .catch(err =>{
+        console.error(err);
+      })
+    },
+
+    uncheck(object){
+      this.loaded = false;
+      object.sumaEnCierreDeCaja = false;
+      GenericService(this.tenant, this.service, this.token)
+      .save(object)
+      .then(()=>{
+        this.refreshView();
+      })
+      .catch(err =>{
+        console.error(err);
+      })
+    },
+
+    refreshView(){
+      setTimeout(() => {
+          this.filterObjects();
+      }, 500);
     },
 
     onChange(event) {
