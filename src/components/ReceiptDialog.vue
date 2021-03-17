@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="$store.state.receipt.receiptDialog">
-    <v-card>
+    <v-card color="var(--main-bg-color)">
       <form @submit.prevent="handleSubmit()">
         <v-card-title>
           <span class="ml-5">
@@ -210,8 +210,6 @@ import GenericService from "../services/GenericService";
 import { checkIfNote } from "../helpers/processObjectsHelper";
 
 export default {
-  name: "ReceiptDialog",
-
   data() {
     return {
       loguedUser: JSON.parse(localStorage.getItem("userData")),

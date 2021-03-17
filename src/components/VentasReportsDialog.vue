@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="$store.state.eventual.eventualDialog">
-    <v-card>
+    <v-card color="var(--main-bg-color)">
       <v-card-title class="d-flex justify-center">
         <span>Generar reportes de ventas</span>
       </v-card-title>
@@ -197,8 +197,8 @@ import GenericService from '../services/GenericService';
 import DocumentosService from '../services/DocumentosService';
 import { generateIntegerDate, getYearsList, monthsList } from '../helpers/dateHelper';
 import { exportPDF } from '../helpers/exportFileHelper';
+
 export default {
-  name: "VentasReportsDialog",
   data(){
     return {
       tenant: null,

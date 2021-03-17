@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="$store.state.stocks.dialog" width="550px">
-    <v-card>
+    <v-card color="var(--main-bg-color)">
         <v-card-title>
             <h3>Asigne las existencias mínimas de su stock</h3>
         </v-card-title>

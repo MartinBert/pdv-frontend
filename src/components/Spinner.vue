@@ -3,11 +3,6 @@
       <div class="loader"></div>
     </v-container>
 </template>
-<script>
-export default {
-    name: 'Spinner'
-}
-</script>
 <style>
 .loader {
   animation:spin 1s infinite linear;

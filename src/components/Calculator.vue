@@ -225,7 +225,7 @@ export default {
 .calculadora {
   margin: 0px 0px 0px 0px;
   font-family: Century Gothic, CenturyGothic, AppleGothic, sans-serif;
-  background-color: #d2d2ff;
+  background-color: var(--main-bg-color);
   border: solid 1px;
   text-align: center;
   border-radius: 10px 10px 10px 10px;

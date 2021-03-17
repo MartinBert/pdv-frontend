@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="$store.state.stocks.stockHistoryDialog" width="1000px">
-    <v-card>
+    <v-card color="var(--main-bg-color)">
       <v-card-title>
         <h3>Historial de movimientos en stocks</h3>
       </v-card-title>
@@ -64,8 +64,6 @@ import GenericService from '../services/GenericService';
 import ProductListOfStockDialog from '../components/ProductListOfStockDialog.vue'
 
 export default {
-    name: "StockHistoryDialog",
-
     data() {
         return {
             loguedUser: JSON.parse(localStorage.getItem("userData")),

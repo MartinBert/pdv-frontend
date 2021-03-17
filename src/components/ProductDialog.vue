@@ -1,9 +1,9 @@
 <template>
     <v-dialog v-model="$store.state.productos.dialogProd" scrollable max-width="1200px">
-      <v-card height="780px">
+      <v-card height="780px" color="var(--main-bg-color)">
         <v-card-title>
           <v-row>
-            <v-col cols="6">
+            <v-col cols="6" class="mt-5">
                 <h3>Búsqueda de productos</h3>
             </v-col>
             <v-col cols="6">
@@ -13,13 +13,13 @@
                 item-text="text"
                 item-value="id"
                 label="Lista en la que buscar productos"
-                @change="filterObjects(typeList)"
+                @change="filterObjects()"
               />
             </v-col>
           </v-row>
         </v-card-title>
         <v-card-text>
-          <v-row>
+          <v-row class="mt-1">
             <v-col>
               <v-text-field
                 v-model="filterParams.productos.productoName"
@@ -27,7 +27,7 @@
                 outlined
                 rounded
                 label="Nombre"
-                @input="filterObjects(typeList)"
+                @input="filterObjects()"
               ></v-text-field>
             </v-col>
             <v-col>
@@ -37,7 +37,7 @@
                 outlined
                 rounded
                 label="Codigo de producto"
-                @input="filterObjects(typeList)"
+                @input="filterObjects()"
               ></v-text-field>
             </v-col>
             <v-col>
@@ -47,7 +47,7 @@
                 outlined
                 rounded
                 label="Codigo de barras"
-                @input="filterObjects(typeList)"
+                @input="filterObjects()"
               ></v-text-field>
             </v-col>
             <v-col>
@@ -57,7 +57,7 @@
                 outlined
                 rounded
                 label="Marca"
-                @input="filterObjects(typeList)"
+                @input="filterObjects()"
               ></v-text-field>
             </v-col>
             <v-col>
@@ -67,64 +67,57 @@
                 outlined
                 rounded
                 label="Atributo"
-                @input="filterObjects(typeList)"
+                @input="filterObjects()"
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-container fluid>
-            <v-row>
-              <v-col>
-                <v-simple-table style="background-color: transparent" ref="pTable">
-                  <template v-slot:default>
-                    <thead>
-                      <tr>
-                        <th>Elegir</th>
-                        <th>Producto</th>
-                        <th>Marca</th>
-                        <th>Atributos</th>
-                        <th>Código de barras</th>
-                        <th>Código de producto</th>
-                        <th v-if="typeList !== 0">Cantidad en stock</th>
-                      </tr>
-                    </thead>
-                    <tbody v-for="producto in productos" :key="producto.id">
-                      <tr>
-                        <td>
-                          <v-checkbox
-                            v-model="producto.selected"
-                            @change="checkProduct(producto.id)"
-                          ></v-checkbox>
-                        </td>
-                        <td>{{ producto.nombre }}</td>
-                        <td>{{ producto.marca.nombre }}</td>
-                        <td>{{setAtributesValues(producto.atributos)}}</td>
-                        <td>{{ producto.codigoBarra }}</td>
-                        <td>{{ producto.codigoProducto }}</td>
-                        <td v-if="typeList !== 0">{{producto.cantidad}}</td>
-                      </tr>
-                    </tbody>
-                  </template>
-                  
-                </v-simple-table>
-                <v-pagination
-                  v-model="filterParams.productos.page"
-                  :length="filterParams.productos.totalPages"
-                  next-icon="mdi-chevron-right"
-                  prev-icon="mdi-chevron-left"
-                  :page="filterParams.productos.page"
-                  :total-visible="8"
-                  @input="filterObjects(typeList)"
-                  v-if="filterParams.totalPages > 1"
-                ></v-pagination>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" class="text-end">
-                <v-btn class="primary" @click="loadProducts()">CARGAR PRODUCTOS</v-btn>
-                <v-btn class="default ml-1" @click="clearSelection()">LIMPIAR</v-btn>
-              </v-col>
-            </v-row>
-          </v-container>
+          <v-row>
+            <v-col>
+              <v-simple-table style="background-color: transparent" ref="pTable">
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th>Elegir</th>
+                      <th>Producto</th>
+                      <th>Marca</th>
+                      <th>Atributos</th>
+                      <th>Código de barras</th>
+                      <th>Código de producto</th>
+                      <th v-if="typeList !== 0">Cantidad en stock</th>
+                    </tr>
+                  </thead>
+                  <tbody v-for="producto in productos" :key="producto.id">
+                    <tr>
+                      <td>
+                        <v-checkbox
+                          v-model="producto.selected"
+                          @change="checkProduct(producto.id)"
+                        ></v-checkbox>
+                      </td>
+                      <td>{{ producto.nombre }}</td>
+                      <td>{{ producto.marca.nombre }}</td>
+                      <td>{{setAtributesValues(producto.atributos)}}</td>
+                      <td>{{ producto.codigoBarra }}</td>
+                      <td>{{ producto.codigoProducto }}</td>
+                      <td v-if="typeList !== 0">{{producto.cantidad}}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+              <Pagination
+                :page="filterParams.productos.page"
+                :totalPages="filterParams.productos.totalPages"
+                :totalVisible="7"
+                v-on:changePage="filterObjects"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" class="text-end">
+              <v-btn class="primary" @click="loadProducts()">CARGAR PRODUCTOS</v-btn>
+              <v-btn class="default ml-1 mr-3" @click="clearSelection()">LIMPIAR</v-btn>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -132,6 +125,7 @@
 <script>
 import GenericService from "../services/GenericService";
 import StocksService from "../services/StocksService";
+import Pagination from './Pagination';
 export default {
   name: "ProductDialog",
 
@@ -162,7 +156,7 @@ export default {
           sucursalId: "",
           perfilId: "",
           page: 1,
-          size: 10,
+          size: 5,
           totalPages: 0
         },
         depositos:{
@@ -174,6 +168,10 @@ export default {
         }
       },
     }
+  },
+
+  components: {
+    Pagination
   },
 
   mounted(){
@@ -211,36 +209,13 @@ export default {
       }
     },
 
-    filterObjects(typeList) {
-      this.loaded = false;
-      if(typeList === 0){
+    filterObjects(page) {
+      if(page) this.filterParams.productos.page = page;
+      if(this.typeList === 0){
         this.generalSearch();
       }else{
-        this.searchForDeposit(typeList);
+        this.searchForDeposit(this.typeList);
       }
-    },
-
-    checkProduct(id) {
-      const productosFiltrados = this.productos.filter((el) => el.id === id)[0];
-      if (productosFiltrados.selected) {
-        productosFiltrados.cantUnidades = 1;
-        productosFiltrados.total = productosFiltrados.precioTotal;
-        this.$store.commit('productos/addProductsToList', productosFiltrados);
-      } else {
-        this.$store.commit('productos/removeProductsToList', id);
-      }
-    },
-
-    checkSelected(){
-      this.productos.forEach(el => {
-        el.selected = false;
-      })
-
-      this.$store.state.productos.products.forEach(el => {
-        this.productos.filter(e => e.id == el.id)[0].selected = true;
-      })
-
-      this.$refs.pTable.$forceUpdate();
     },
 
     generalSearch(){
@@ -297,6 +272,29 @@ export default {
       });
       this.$store.commit('productos/clearProductsState');
       this.$store.commit('productos/dialogProductosMutation');
+    },
+
+    checkProduct(id) {
+      const productosFiltrados = this.productos.filter((el) => el.id === id)[0];
+      if (productosFiltrados.selected) {
+        productosFiltrados.cantUnidades = 1;
+        productosFiltrados.total = productosFiltrados.precioTotal;
+        this.$store.commit('productos/addProductsToList', productosFiltrados);
+      } else {
+        this.$store.commit('productos/removeProductsToList', id);
+      }
+    },
+
+    checkSelected(){
+      this.productos.forEach(el => {
+        el.selected = false;
+      })
+
+      this.$store.state.productos.products.forEach(el => {
+        this.productos.filter(e => e.id == el.id)[0].selected = true;
+      })
+
+      this.$refs.pTable.$forceUpdate();
     },
 
     setAtributesValues(atributes){

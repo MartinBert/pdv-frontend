@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-dialog v-model="status" width="500" persistent>
-      <v-card>
+      <v-card color="var(--main-bg-color)">
         <v-toolbar class="d-flex justify-center" color="primary" dark>
           <v-toolbar-title> Eliminar objeto </v-toolbar-title>
         </v-toolbar>

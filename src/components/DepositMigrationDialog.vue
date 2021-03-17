@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="$store.state.stocks.depositMigrationDialog" width="550px">
-    <v-card>
+    <v-card color="var(--main-bg-color)">
       <v-card-title>
         <h3>Migración de stock entre depósitos</h3>
       </v-card-title>

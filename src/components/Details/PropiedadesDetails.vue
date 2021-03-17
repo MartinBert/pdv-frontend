@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="$store.state.details.dialog" width="900px">
-    <v-card>
+    <v-card color="var(--main-bg-color)">
         <v-simple-table style="background-color: transparent">
           <template v-slot:default>
               <thead>

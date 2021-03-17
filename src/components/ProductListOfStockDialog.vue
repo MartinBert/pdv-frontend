@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="$store.state.eventual.eventualDialog" width="1000px">
-    <v-card>
+    <v-card color="var(--main-bg-color)">
       <v-card-title>
         <h3>Productos que sufrieron cambios</h3>
       </v-card-title>
@@ -33,8 +33,3 @@
     </v-card>
   </v-dialog>
 </template>
-<script>
-export default {
-    name: "ProductListOfStockDialog",
-};
-</script>

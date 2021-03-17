@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="$store.state.details.dialog" width="500">
-      <v-card>
+      <v-card color="var(--main-bg-color)">
         <v-card-title class="d-flex">
           <span class="text-center">{{$store.state.details.title}}</span>
         </v-card-title>
