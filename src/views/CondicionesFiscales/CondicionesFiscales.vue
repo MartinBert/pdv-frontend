@@ -43,9 +43,7 @@
     />
   </v-container>
 </template>
-
 <script>
-import { errorAlert } from '../../helpers/alerts';
 import GenericService from "../../services/GenericService";
 import CondicionesFiscalesTable from '../../components/Tables/CondicionesFiscalesTable';
 import Spinner from '../../components/Spinner';
@@ -121,7 +119,7 @@ export default {
           this.filterObjects();
         })
         .catch(()=>{
-          errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
+          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
         })
     },
 

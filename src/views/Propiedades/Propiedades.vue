@@ -50,7 +50,6 @@ import PropiedadesDetails from "../../components/Details/PropiedadesDetails";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Spinner";
-import { errorAlert } from "../../helpers/alerts";
  
 export default {
   data: () => ({
@@ -121,7 +120,7 @@ export default {
           this.filterObjects();
         })
         .catch(()=>{
-          errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
+          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
         })
     },
 

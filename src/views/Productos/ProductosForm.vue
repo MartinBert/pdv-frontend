@@ -244,7 +244,6 @@
 </template>
 
 <script>
-import { errorAlert } from '../../helpers/alerts';
 import {
   calculateAmountPlusPercentaje,
   calculateAmountMinusPercentaje,
@@ -414,7 +413,7 @@ export default {
       .filter(filterParams)
       .then(data => {
         if(this.isEmpty(data.data.content)) return;
-        errorAlert("El código de barras que ha introducido ya existe en otro producto: " + data.data.content[0].nombre)
+        this.$errorAlert("El código de barras que ha introducido ya existe en otro producto: " + data.data.content[0].nombre)
         .then(data => {
           if(data.dismiss){
             this.object.codigoBarra = "";

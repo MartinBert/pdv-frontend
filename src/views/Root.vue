@@ -88,7 +88,6 @@
 </template>
 <script>
 import axios from "axios";
-import { successAlert } from '../helpers/alerts';
 import Home from './Home';
 export default {
   props: {
@@ -423,7 +422,7 @@ export default {
 
     changeUserData(){
       localStorage.setItem("userData", JSON.stringify(this.loguedUser));
-      successAlert("Cambios aplicados")
+      this.$successAlert("Cambios aplicados")
       .then(()=>{
         location.reload();
       })

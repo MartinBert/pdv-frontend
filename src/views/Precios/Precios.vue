@@ -50,7 +50,6 @@
 </template>
 
 <script>
-import { errorAlert, questionAlert, successAlert } from "../../helpers/alerts";
 import {
   calculateAmountPlusPercentaje,
   calculateAmountMinusPercentaje,
@@ -101,7 +100,7 @@ export default {
       } else if (this.object.amount && this.object.amount !== 0) {
         this.applyModificationWithAmount();
       } else {
-        errorAlert("Debe indicar un valor porcentual o fijo distinto a cero");
+        this.$errorAlert("Debe indicar un valor porcentual o fijo distinto a cero");
       }
     },
 
@@ -119,7 +118,7 @@ export default {
     },
 
     applyPorcentualModification() {
-      questionAlert(
+      this.$questionAlert(
         "Atención, esta acción cambiará los precios en los productos",
         "Desea continuar"
       ).then((result) => {
@@ -137,7 +136,7 @@ export default {
               GenericService(this.tenant, this.service, this.token)
                 .saveAll(alterProducts)
                 .then(() => {
-                  successAlert("Procesado con éxito");
+                  this.$successAlert("Procesado con éxito");
                   this.back();
                 });
             });
@@ -146,7 +145,7 @@ export default {
     },
 
     applyModificationWithAmount() {
-      questionAlert(
+      this.$questionAlert(
         "Atención, esta acción cambiará los precios en los productos",
         "Desea continuar"
       ).then((result) => {
@@ -164,7 +163,7 @@ export default {
               GenericService(this.tenant, this.service, this.token)
                 .saveAll(alterProducts)
                 .then(() => {
-                  successAlert("Procesado con éxito");
+                  this.$successAlert("Procesado con éxito");
                   this.back();
                 });
             });

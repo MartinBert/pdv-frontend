@@ -207,7 +207,6 @@
 </template>
 <script>
 import GenericService from "../services/GenericService";
-import { errorAlert } from "../helpers/alerts";
 import { checkIfNote } from "../helpers/processObjectsHelper";
 
 export default {
@@ -323,7 +322,7 @@ export default {
         this.$store.commit('receipt/receiptDialogMutation');
       }else{
         if(!this.dialogObject.comprobanteAsociado){
-          errorAlert('Si emite un comprobante fiscal debe seleccionar un documento fiscal relacionado');
+          this.$errorAlert('Si emite un comprobante fiscal debe seleccionar un documento fiscal relacionado');
         }else{
           this.$store.commit('receipt/addReceipt', this.dialogObject);
           this.$emit('receipt', this.$store.state.receipt.receipt);

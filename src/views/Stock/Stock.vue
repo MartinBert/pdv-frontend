@@ -150,7 +150,6 @@ import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import DepositMigrationDialog from "../../components/DepositMigrationDialog";
-import { errorAlert } from '../../helpers/alerts';
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 
 export default {
@@ -308,7 +307,7 @@ export default {
           this.filterObjects();
         })
         .catch(()=>{
-          errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
+          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
         })
     },
 
@@ -431,7 +430,7 @@ export default {
 
         setTimeout(()=>{this.filterObjects(this.typeList);}, 500);
       }else{
-        errorAlert("Debe seleccionar al menos 1 producto para migrar su stock de depósito");
+        this.$errorAlert("Debe seleccionar al menos 1 producto para migrar su stock de depósito");
       }
     },
 

@@ -64,7 +64,6 @@ import Spinner from "../../components/Spinner";
 import Pagination from "../../components/Pagination";
 import AtributosTable from "../../components/Tables/AtributosTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
-import { errorAlert } from "../../helpers/alerts";
 import { importAttributes } from "../../helpers/importAttributes";
 
 export default {
@@ -135,7 +134,7 @@ export default {
           this.filterObjects();
         })
         .catch(() => {
-          errorAlert(
+          this.$errorAlert(
             "El registro se encuentra asociado a otros elementos en el sistema"
           );
         });

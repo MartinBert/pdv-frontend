@@ -199,7 +199,6 @@ import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import { getCurrentDate, formatDate, getInternationalDate, formatDateWithoutSlash } from "../../helpers/dateHelper";
 import { processDetailReceipt } from "../../helpers/processObjectsHelper";
-import { successAlert, errorAlert, questionAlert } from "../../helpers/alerts";
 import {
   generateBarCode,
   generateFiveDecimalCode,
@@ -360,10 +359,10 @@ export default {
 
     save() {
       if (this.object.productosEntrantes.length === 0) {
-        errorAlert("Debe seleccionar al menos un producto devuelto");
+        this.$errorAlert("Debe seleccionar al menos un producto devuelto");
       } else {
         if (!this.receiptDialogData) {
-          questionAlert(
+          this.$questionAlert(
             "Atención, no agregó un comprobante",
             "Desea continuar de todos modos"
           ).then((result) => {
@@ -546,7 +545,7 @@ export default {
                         );
                       })
                       .then(() => {
-                        successAlert("Devolución realizada").then((result) => {
+                        this.$successAlert("Devolución realizada").then((result) => {
                           if (result.dismiss) {
                             this.$router.push({ name: "devoluciones" });
                           }
@@ -566,7 +565,7 @@ export default {
                   });
 
                 } else {
-                  errorAlert("Tipo de comprobante no disponible");
+                  this.$errorAlert("Tipo de comprobante no disponible");
                 }
               })
               .catch((err) => {
@@ -574,10 +573,10 @@ export default {
                 console.log(err);
               })
           } else {
-            errorAlert("No hay productos seleccionados en la venta");
+            this.$errorAlert("No hay productos seleccionados en la venta");
           }
         } else {
-          errorAlert("Debe seleccionar un medio de pago");
+          this.$errorAlert("Debe seleccionar un medio de pago");
         }
       });
 
@@ -704,7 +703,7 @@ export default {
               GenericService(tenant, this.service, token).save(devolucion);
             })
             .then(() => {
-              successAlert("Devolución realizada").then((result) => {
+              this.$successAlert("Devolución realizada").then((result) => {
                 if (result.dismiss) {
                   this.$router.push({ name: "devoluciones" });
                 }
@@ -788,7 +787,7 @@ export default {
           GenericService(tenant, this.service, token).save(devolucion);
         })
         .then(() => {
-          successAlert("Devolución realizada").then((result) => {
+          this.$successAlert("Devolución realizada").then((result) => {
             if (result.dismiss) {
               this.$router.push({ name: "devoluciones" });
             }

@@ -20,7 +20,6 @@
 </template>
 <script>
 import ReportsService from '../services/ReportsService';
-import { errorAlert } from '../helpers/alerts';
 import { exportPDF } from '../helpers/exportFileHelper';
 
 export default {
@@ -37,7 +36,7 @@ export default {
 
     /**** Export PDF ****/
     allStocksReport(){
-      if(this.loguedUser.sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      if(this.loguedUser.sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = this.loguedUser.sucursal.id;
 
       ReportsService(this.tenant, this.service, this.token)

@@ -26,8 +26,6 @@
   </v-dialog>
 </template>
 <script>
-import { questionAlert } from '../helpers/alerts';
-
 export default {
   name: "ModifyMinimumStocksDialog",
   data(){
@@ -37,7 +35,7 @@ export default {
   },
   methods:{
     assignExistences(){
-        questionAlert(
+        this.$questionAlert(
         "Atención, esta acción modificará las existencias mínimas de todos los productos",
         "Desea continuar"
         )

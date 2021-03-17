@@ -41,8 +41,6 @@
   </v-dialog>
 </template>
 <script>
-import { questionAlert } from "../helpers/alerts";
-
 export default {
   name: "ModifyMinimumStocksDialog",
   data() {
@@ -55,7 +53,7 @@ export default {
   },
   methods: {
     reasignDeposit() {
-      questionAlert(
+      this.$questionAlert(
         "Atención, esta acción migrará todos los productos de un depósito a otro",
         "Desea continuar"
       ).then((result) => {

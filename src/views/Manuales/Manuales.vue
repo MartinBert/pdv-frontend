@@ -76,7 +76,6 @@
 </template>
 <script>
 import GenericService from '../../services/GenericService';
-import { successAlert2 } from '../../helpers/alerts';
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 
 export default {
@@ -102,7 +101,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
       .save(this.object)
       .then(()=>{
-        successAlert2("Mensaje enviado", "Responderemos a la brevedad");
+        this.$successAlert2("Mensaje enviado", "Responderemos a la brevedad");
         this.object = {}
       })
     }

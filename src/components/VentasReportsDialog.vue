@@ -197,8 +197,6 @@ import GenericService from '../services/GenericService';
 import DocumentosService from '../services/DocumentosService';
 import { generateIntegerDate, getYearsList, monthsList } from '../helpers/dateHelper';
 import { exportPDF } from '../helpers/exportFileHelper';
-import { errorAlert, infoAlert2 } from '../helpers/alerts';
-
 export default {
   name: "VentasReportsDialog",
   data(){
@@ -285,7 +283,7 @@ export default {
 
     /**** Export PDF ****/
     allSalesReport(sucursal) {
-      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      if(sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .allSalesReport(id)
@@ -295,7 +293,7 @@ export default {
     },
 
     allSalesGroupBy(sucursal, type){
-      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      if(sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = sucursal.id;
       ReportsService(this.tenant, "ventas", this.token)
       .allSalesGroupBy(id, type)
@@ -305,7 +303,7 @@ export default {
     },
 
     salesForReceipt(sucursal, receipt) {
-      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      if(sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForReceipt(id, receipt)
@@ -315,7 +313,7 @@ export default {
     },
 
     salesForClient(sucursal, client) {
-      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      if(sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForClient(id, client)
@@ -325,7 +323,7 @@ export default {
     },
 
     salesForDate(sucursal, fechaDesde, fechaHasta) {
-      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      if(sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForDate(id, fechaDesde, fechaHasta)
@@ -335,7 +333,7 @@ export default {
     },
 
     salesForMonth(sucursal, year, month){
-      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      if(sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForMonth(id, year, month)
@@ -345,7 +343,7 @@ export default {
     },
 
     salesForYear(sucursal, year){
-      if(sucursal === undefined) return errorAlert("Debe seleccionar una sucursal para generar el documento");
+      if(sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForYear(id, year)
@@ -367,7 +365,7 @@ export default {
     },
 
     comingSoon(){
-      infoAlert2("Disponible muy pronto");
+      this.$infoAlert2("Disponible muy pronto");
     }
     /**** Transform data functions ****/
   }

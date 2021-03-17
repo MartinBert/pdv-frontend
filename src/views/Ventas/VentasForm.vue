@@ -272,7 +272,6 @@ import {
   decimalPercent,
   generateFiveDecimalCode,
 } from "../../helpers/mathHelper";
-import { errorAlert, successAlert } from "../../helpers/alerts";
 import {
   formatFiscalInvoice
 } from "../../helpers/receiptFormatHelper";
@@ -475,7 +474,7 @@ export default {
           }
         })
         .catch(() => {
-          errorAlert("No existe un producto con ese código de barras");
+          this.$errorAlert("No existe un producto con ese código de barras");
         });
     },
 
@@ -550,7 +549,7 @@ export default {
           this.products.push(obj);
         }
       } else {
-        errorAlert("No hay productos seleccionados en la venta");
+        this.$errorAlert("No hay productos seleccionados en la venta");
       }
     },
 
@@ -717,7 +716,7 @@ export default {
                             const productsWithoutStockOnDefaultDeposit =
                               data[1];
                             const productsOutOfStockAndDeposits = data[2];
-                            successAlert("Venta realizada").then(() => {
+                            this.$successAlert("Venta realizada").then(() => {
                               VentasService(
                                 this.tenant,
                                 this.service,
@@ -736,7 +735,7 @@ export default {
                           });
                       });
                   } else {
-                    errorAlert("Tipo de comprobante no disponible")
+                    this.$errorAlert("Tipo de comprobante no disponible")
                     .then(result => {
                       if(result.isDismissed){
                         this.loaded = true;
@@ -752,7 +751,7 @@ export default {
                   this.loaded = true;
                 });
             } else {
-              errorAlert("No hay productos seleccionados en la venta")
+              this.$errorAlert("No hay productos seleccionados en la venta")
               .then(result => {
                 if(result.isDismissed){
                   this.loaded = true;
@@ -760,7 +759,7 @@ export default {
               })
             }
           } else {
-            errorAlert("Debe seleccionar un medio de pago")
+            this.$errorAlert("Debe seleccionar un medio de pago")
             .then(result => {
               if(result.isDismissed){
                 this.loaded = true;
@@ -836,7 +835,7 @@ export default {
                       const productsBelowMinimumStock = data[0];
                       const productsWithoutStockOnDefaultDeposit = data[1];
                       const productsOutOfStockAndDeposits = data[2];
-                      successAlert("Venta realizada").then(() => {
+                      this.$successAlert("Venta realizada").then(() => {
                         VentasService(
                           this.tenant,
                           this.service,
@@ -856,7 +855,7 @@ export default {
                 });
             });
         } else {
-          errorAlert("No hay productos seleccionados en la venta")
+          this.$errorAlert("No hay productos seleccionados en la venta")
           .then(result => {
             if(result.isDismissed){
               this.loaded = true;
@@ -864,7 +863,7 @@ export default {
           })
         }
       } else {
-        errorAlert("Debe seleccionar un medio de pago")
+        this.$errorAlert("Debe seleccionar un medio de pago")
         .then(result => {
           if(result.isDismissed){
             this.loaded = true;
@@ -884,7 +883,7 @@ export default {
           this.saveNoFiscal();
         }
       } else {
-        errorAlert(
+        this.$errorAlert(
           "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
         ).then(result => {
           if(result.isDismissed){

@@ -50,7 +50,6 @@ import Spinner from "../../components/Spinner";
 import ReceiptDialog from "../../components/ReceiptDialog";
 import DevolucionDetails from "../../components/Details/DevolucionDetails";
 import { formatDate, getCurrentDate, getInternationalDate, formatDateWithoutSlash } from "../../helpers/dateHelper";
-import { questionAlert, errorAlert, successAlert } from "../../helpers/alerts";
 import { generateBarCode, generateFiveDecimalCode } from "../../helpers/mathHelper";
 import { processDetailReceipt } from "../../helpers/processObjectsHelper";
 import { formatFiscalInvoice } from '../../helpers/receiptFormatHelper';
@@ -137,7 +136,7 @@ export default {
 
     saveChanges(){
       this.receiptDialogData = this.$store.state.receipt.receipt;
-      questionAlert('Atención, esta acción generará un comprobante en el sistema', 'Desea continuar')
+      this.$questionAlert('Atención, esta acción generará un comprobante en el sistema', 'Desea continuar')
       .then(result =>{
         if(result.isConfirmed){
           if(this.receiptDialogData.documento.tipo === true){
@@ -248,7 +247,7 @@ export default {
                 GenericService(tenant, this.service, token)
                 .save(devolucion)
                 .then(() => {
-                  successAlert("Comprobante Agregado");
+                  this.$successAlert("Comprobante Agregado");
                   this.loaded = true;
                 })
                 .then(() => {
@@ -264,7 +263,7 @@ export default {
                 });
               });
             } else {
-              errorAlert("Tipo de comprobante no disponible");
+              this.$errorAlert("Tipo de comprobante no disponible");
             }
           })
           .catch((err) => {
@@ -272,7 +271,7 @@ export default {
             console.log(err);
           })
         } else {
-          errorAlert("Debe seleccionar un medio de pago");
+          this.$errorAlert("Debe seleccionar un medio de pago");
         }
       });
     },
@@ -345,7 +344,7 @@ export default {
         
         GenericService(tenant, this.service, token).save(devolucion)
           .then(() => {
-            successAlert("Comprobante agregado");
+            this.$successAlert("Comprobante agregado");
             this.loaded = true;
           })
           .then(() => {

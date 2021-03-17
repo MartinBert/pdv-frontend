@@ -235,7 +235,6 @@
   </v-card>
 </template>
 <script>
-import { errorAlert } from '../../helpers/alerts';
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
 
@@ -363,7 +362,7 @@ export default {
 
     save() {
       if(this.object.producto.length < 1){
-        errorAlert("No ha seleccionado productos");
+        this.$errorAlert("No ha seleccionado productos");
       }else{
         this.$refs.form.validate();
         if (this.urlId > 0) {
@@ -451,7 +450,7 @@ export default {
           }
         })
         .catch(() => {
-          errorAlert("No existe un producto con ese código de barras");
+          this.$errorAlert("No existe un producto con ese código de barras");
         });
     },
 

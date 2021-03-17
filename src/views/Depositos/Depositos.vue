@@ -62,7 +62,6 @@
 <script>
 import GenericService from "../../services/GenericService";
 import XLSX from "xlsx";
-import { errorAlert } from "../../helpers/alerts";
 import StockHistoryDialog from "../../components/StockHistoryDialog";
 import DepositosTable from "../../components/Tables/DepositosTable";
 import Pagination from "../../components/Pagination";
@@ -147,7 +146,7 @@ export default {
           this.filterObjects();
         })
         .catch(()=>{
-          errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
+          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
         })
     },
 

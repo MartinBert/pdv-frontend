@@ -15,8 +15,8 @@ export default {
         state.headers = [],
         state.values = []
       },
-      addTitleToDetail(state, text){
-        state.title = text;
+      addTitleToDetail(state, str){
+        state.title = str;
       },
       addObjectToDetail(state, any){
         state.object = any;

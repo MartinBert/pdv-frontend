@@ -2,7 +2,7 @@
     <a title="Imprimir"
         ><img
             src="/../../images/icons/printer.svg"
-            @click="print(object)"
+            @click="print()"
             width="30"
             height="30"
         />
@@ -14,8 +14,8 @@ export default {
         object: Object
     },
     methods:{
-        print(object){
-            this.$emit('print', object);
+        print(){
+            this.$emit('print', this.object);
         }
     }
 }

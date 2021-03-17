@@ -15,14 +15,13 @@
   </v-container>
 </template>
 <script>
-import { infoAlert2 } from '../../helpers/alerts';
 export default {
   props: {
     items: Array,
   },
   methods: {
     response(response){
-        infoAlert2(response);
+      this.$infoAlert2(response);
     }
   },
 };

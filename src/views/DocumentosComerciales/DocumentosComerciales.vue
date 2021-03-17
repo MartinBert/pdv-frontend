@@ -51,7 +51,6 @@
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import { errorAlert } from "../../helpers/alerts";
 import DocumentosComercialesTable from "../../components/Tables/DocumentosComercialesTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import Spinner from "../../components/Spinner";
@@ -136,7 +135,7 @@ export default {
           this.filterObjects();
         })
         .catch(() => {
-          errorAlert(
+          this.$errorAlert(
             "El registro se encuentra asociado a otros elementos en el sistema"
           );
         });

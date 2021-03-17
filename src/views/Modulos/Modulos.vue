@@ -41,7 +41,6 @@
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import { errorAlert } from "../../helpers/alerts";
 import ModulosTable from "../../components/Tables/ModulosTable";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Spinner";
@@ -113,7 +112,7 @@ export default {
           this.filterObjects();
         })
         .catch(() => {
-          errorAlert(
+          this.$errorAlert(
             "El registro se encuentra asociado a otros elementos en el sistema"
           );
         });

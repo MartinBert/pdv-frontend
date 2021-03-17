@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 
-export function errorAlert(str) {
+export const errorAlert = (str) => {
     return Swal.fire({
         html:
             "<div class='text-alert-error'>" +
@@ -13,7 +13,7 @@ export function errorAlert(str) {
         showConfirmButton: false,
     });
 }
-export function successAlert(str) {
+export const successAlert = (str) => {
     return Swal.fire({
         width: 300,
         html:
@@ -26,7 +26,7 @@ export function successAlert(str) {
         showConfirmButton: false,
     });
 }
-export function successAlert2(str, str2) {
+export const successAlert2 = (str, str2) => {
     return Swal.fire({
         html:
             "<div class='text-alert-success'>" +
@@ -41,7 +41,7 @@ export function successAlert2(str, str2) {
         showConfirmButton: false,
     });
 }
-export function questionAlert(strTitle, strText) {
+export const questionAlert = (strTitle, strText) => {
     return Swal.fire({
         width: 400,
         html:
@@ -62,7 +62,7 @@ export function questionAlert(strTitle, strText) {
         denyButtonColor: 'rgb(172, 171, 171)'
     });
 }
-export function infoAlert(str) {
+export const infoAlert = (str) => {
     return Swal.fire({
         width: 400,
         html:
@@ -76,7 +76,7 @@ export function infoAlert(str) {
         showDenyButton: false,
     });
 }
-export function infoAlert2(str) {
+export const infoAlert2 = (str) => {
     return Swal.fire({
         html:
             "<div class='text-alert-info'>" +

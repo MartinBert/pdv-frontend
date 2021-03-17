@@ -65,7 +65,6 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import { errorAlert } from "../../helpers/alerts";
 import Spinner from "../../components/Spinner";
 import Pagination from "../../components/Pagination";
 import VendedoresTable from "../../components/Tables/VendedoresTable";
@@ -148,7 +147,7 @@ export default {
           this.filterObjects();
         })
         .catch(()=>{
-          errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
+          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
         })
     },
 

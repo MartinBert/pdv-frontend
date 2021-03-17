@@ -181,7 +181,6 @@ import Pagination from "../../components/Pagination";
 import ProductosTable from '../../components/Tables/ProductosTable';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
 import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
-import { successAlert, questionAlert, infoAlert, errorAlert } from "../../helpers/alerts";
 import XLSX from "xlsx";
 
 export default {
@@ -333,10 +332,10 @@ export default {
           this.filterObjects();
         })
         .catch(()=>{
-          errorAlert("El registro se encuentra asociado a otros elementos en el sistema")
+          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema")
           .then(result => {
             if(result.isDismissed){
-              questionAlert('Puede desactivar el producto para no verlo en la tabla', 'Desea hacerlo')
+              this.$questionAlert('Puede desactivar el producto para no verlo en la tabla', 'Desea hacerlo')
               .then(result => {
                 if(result.isConfirmed){
                   let inactiveProduct = this.productos.filter(el => el.id === this.idObject)[0];
@@ -355,7 +354,7 @@ export default {
     },
 
     reactivationOfProduct(object) {
-      questionAlert('Atención, esta acción activará el producto en el sistema', 'Desea continuar')
+      this.$questionAlert('Atención, esta acción activará el producto en el sistema', 'Desea continuar')
       .then(result => {
         if(result.isConfirmed){
           this.loaded = false;
@@ -401,10 +400,10 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(() => {
-              successAlert('Importación exitosa')
+              this.$successAlert('Importación exitosa')
               .then(() => {
                 if(this.checkImportStatus > 0){
-                  infoAlert("Se agregaron nuevos atributos al sistema. Realice nuevamente la importación para asignarlos correctamente");
+                  this.$infoAlert("Se agregaron nuevos atributos al sistema. Realice nuevamente la importación para asignarlos correctamente");
                 }
               })
               this.filterObjects();
