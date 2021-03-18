@@ -17,7 +17,17 @@ export function formatDateWithoutSlash(str){
     let year = firstDate.substring(0, 4);
     let month = firstDate.substring(4, 6);
     let day = firstDate.substring(6, 8);
-    let date = day + month + year;
+    let date = year + month + day;
+
+    return date;
+}
+
+export function formatWitSlash(){
+    const stringDate = getCurrentDate();
+    let year = stringDate.substring(0, 4);
+    let month = stringDate.substring(4, 6);
+    let day = stringDate.substring(6, 8);
+    let date = year +'-'+ month +'-'+ day;
 
     return date;
 }

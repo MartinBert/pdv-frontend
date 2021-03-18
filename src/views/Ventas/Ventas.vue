@@ -3,7 +3,9 @@
     <v-form class="mb-3">
       <v-row>
         <v-col cols="1">
-          <v-btn class="primary" @click="seeReports()" raised>Reporte de Ventas</v-btn>
+          <v-btn class="primary" @click="filterObjects()" raised
+            >Reporte de Ventas</v-btn
+          >
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="3">
@@ -62,26 +64,21 @@
       v-on:changePage="filterObjects"
       v-if="loaded"
     />
-    <Spinner 
-      v-if="!loaded"
-    />
-    <VentaDetails/>
+    <Spinner v-if="!loaded" />
+    <VentaDetails />
     <VentasReportsDialog />
-
   </v-container>
 </template>
-
 <script>
-import GenericService from '../../services/GenericService';
-import ReportsService from '../../services/ReportsService';
-import VentasReportsDialog from '../../components/VentasReportsDialog';
-import Pagination from '../../components/Pagination';
-import Spinner from '../../components/Spinner';
-import VentasTable from '../../components/Tables/VentasTable';
-import VentaDetails from '../../components/Details/VentaDetails';
+import GenericService from "../../services/GenericService";
+import ReportsService from "../../services/ReportsService";
+import VentasReportsDialog from "../../components/VentasReportsDialog";
+import Pagination from "../../components/Pagination";
+import Spinner from "../../components/Spinner";
+import VentasTable from "../../components/Tables/VentasTable";
+import VentaDetails from "../../components/Details/VentaDetails";
 
 export default {
-   
   data: () => ({
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -95,94 +92,94 @@ export default {
       totalVenta: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
     service: "comprobantesFiscales",
-    token: localStorage.getItem("token")
+    token: localStorage.getItem("token"),
   }),
 
-  components:{
+  components: {
     VentasReportsDialog,
     Pagination,
     Spinner,
     VentasTable,
-    VentaDetails
+    VentaDetails,
   },
 
   mounted() {
-    this.$store.commit('eventual/resetStates');
+    this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
-    if(this.loguedUser.perfil > 1){
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects();
   },
 
   methods: {
-    filterObjects(page){
-      if(page) this.filterParams.page = page;
-      GenericService(this.tenant, "ventas", this.token)
-        .filter(this.filterParams)
-        .then(data => {
-          this.ventas = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          if(this.filterParams.totalPages < this.filterParams.page){
+      filterObjects(page) {
+        if(page) this.filterParams.page = page;
+        GenericService(this.tenant, "ventas", this.token)
+          .filter(this.filterParams)
+          .then((data) => {
+            this.ventas = data.data.content;
+            this.filterParams.totalPages = data.data.totalPages;
+            if(this.filterParams.totalPages < this.filterParams.page){
               this.filterParams.page = 1;
-          }
-          this.loaded = true;
-        });
+            }
+            this.loaded = true;
+          });
     },
 
-    seeDetails(objects){
-      let title = "Productos"
-      if(objects[0] && objects[0].cuotas) title = "Planes de pago";
-      if(objects[0] && objects[0].planPago) title = "Medios de pago";
-      this.$store.commit('details/mutateDialog');
-      this.$store.commit('details/addTitleToDetail', title)
-      this.$store.commit('details/addObjectsToDetail', objects);
+    seeDetails(objects) {
+      let title = "Productos";
+      if (objects[0] && objects[0].cuotas) title = "Planes de pago";
+      if (objects[0] && objects[0].planPago) title = "Medios de pago";
+      this.$store.commit("details/mutateDialog");
+      this.$store.commit("details/addTitleToDetail", title);
+      this.$store.commit("details/addObjectsToDetail", objects);
     },
 
-    print(object){
+    print(object) {
       ReportsService(this.tenant, "ventas", this.token)
-      .onCloseSaleReport(object)
-      .then((res) => {
-        let file = new Blob([res["data"]], {
-          type: "application/pdf",
+        .onCloseSaleReport(object)
+        .then((res) => {
+          let file = new Blob([res["data"]], {
+            type: "application/pdf",
+          });
+          let fileURL = URL.createObjectURL(file);
+          window.open(fileURL, "_blank");
         });
-        let fileURL = URL.createObjectURL(file);
-        window.open(fileURL, "_blank");
-      });
     },
 
-    seeReports(){
-      this.$store.commit('eventual/mutateEventualDialog');
+    seeReports() {
+      this.$store.commit("eventual/mutateEventualDialog");
     },
 
-    containValue(value){
-      if(value !== "" || value !== undefined || value !== null){
+    containValue(value) {
+      if (value !== "" || value !== undefined || value !== null) {
         return true;
-      }else{
+      } else {
         return false;
       }
     },
 
-    isEmpty(value){
-      if(value === "" || value === undefined || value === null){
+    isEmpty(value) {
+      if (value === "" || value === undefined || value === null) {
         return true;
-      }else{
+      } else {
         return false;
       }
     },
 
-    isEmptyDate(date){
-      if(date === "" || date === undefined || date === null || date === '//'){
+    isEmptyDate(date) {
+      if (date === "" || date === undefined || date === null || date === "//") {
         return true;
-      }else{
+      } else {
         return false;
       }
-    }
+    },
   },
 };
 </script>

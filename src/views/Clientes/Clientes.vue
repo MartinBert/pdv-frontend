@@ -152,6 +152,7 @@ export default {
     },
 
     seeDetails(object){
+      console.log(object);
       this.$store.commit('details/mutateDialog');
       this.$store.commit('details/addObjectToDetail', object);
     }

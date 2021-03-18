@@ -271,6 +271,7 @@ import {
   calculatePercentaje,
   decimalPercent,
   generateFiveDecimalCode,
+  roundTwoDecimals
 } from "../../helpers/mathHelper";
 import {
   formatFiscalInvoice
@@ -324,7 +325,7 @@ export default {
 
   computed: {
     totalVenta() {
-      const total = this.products.reduce((acc, el) => {
+      let total = this.products.reduce((acc, el) => {
         if (this.object.planPago) {
           const cleanPorcent = decimalPercent(this.object.planPago.porcentaje);
           const impPorcent = el.precioTotal * cleanPorcent;
@@ -337,8 +338,12 @@ export default {
           return acc + Number(el.precioTotal);
         }
       }, 0);
+      
+      if(this.object.cliente && this.object.cliente.alicIngBrutos > 0){
+        total = total + total * this.object.cliente.alicIngBrutos / 100;
+      }
 
-      return total;
+      return roundTwoDecimals(total);
     },
 
     totalItems() {
@@ -644,6 +649,7 @@ export default {
             ptoVentaId: ptoVenta.idFiscal,
             receiptCode: documento.codigoDocumento,
             clientCuit: cliente.cuit,
+            percentIngBrutos: cliente.alicIngBrutos,
             numberOfReceipt: numberOfReceipt,
             date: getInternationalDate(),
             products: products,

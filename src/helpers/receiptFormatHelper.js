@@ -1,7 +1,7 @@
-import { ordenarMayorMenor, sumarNumeros, roundTwoDecimals, restarNumeros, calculatePercentReductionInAmount } from './mathHelper';
+import { ordenarMayorMenor, sumarNumeros, roundTwoDecimals, restarNumeros, calculatePercentReductionInAmount, decimalPercent } from './mathHelper';
 
 export function formatReceiptA(object){
-    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt } = object;
+    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt, percentIngBrutos } = object;
     const productsWithIva = products.filter(el => el.ivaVentas);
     const iva21Object = productsWithIva.filter(el => el.ivaVentas === 21);
     const iva10Object = productsWithIva.filter(el => el.ivaVentas === 10.5);
@@ -49,7 +49,8 @@ export function formatReceiptA(object){
         'ImpTrib' 	: 0, //Importe total de tributos
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
-        'Iva'       : []
+        'Iva'       : [],
+        'Tributos'  : []
     };
     
     if(baseImp21 > 0){
@@ -86,11 +87,24 @@ export function formatReceiptA(object){
         voucherA.CbtesAsoc = asociatedReceipt;
     }
 
+    if(percentIngBrutos > 0){
+        voucherA.Tributos.push(
+            {
+                'Id' 		:  2, // Id del tipo de tributo (ver tipos disponibles) 
+                'Desc' 		: 'Ingresos Brutos', // (Opcional) Descripcion
+                'BaseImp' 	: importeTotalNeto, // Base imponible para el tributo
+                'Alic' 		: percentIngBrutos, // Alícuota
+                'Importe' 	: roundTwoDecimals(importeTotalNeto * percentIngBrutos / 100) // Importe del tributo
+            }
+        );
+        voucherA.ImpTrib = voucherA.Tributos[0].Importe;
+    }
+
     return voucherA;
 }
 
 export function formatReceiptB(object){
-    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt } = object;
+    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt, percentIngBrutos } = object;
     const productsWithIva = products.filter(el => el.ivaVentas);
     const iva21Object = productsWithIva.filter(el => el.ivaVentas === 21);
     const iva10Object = productsWithIva.filter(el => el.ivaVentas === 10.5);
@@ -138,7 +152,8 @@ export function formatReceiptB(object){
         'ImpTrib' 	: 0, //Importe total de tributos
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
-        'Iva'       : []
+        'Iva'       : [],
+        'Tributos'  : []
     };
     
     if(baseImp21 > 0){
@@ -175,11 +190,25 @@ export function formatReceiptB(object){
         voucherB.CbtesAsoc = asociatedReceipt;
     }
 
+    if(percentIngBrutos > 0){
+        voucherB.Tributos.push(
+            {
+                'Id' 		:  2, // Id del tipo de tributo (ver tipos disponibles) 
+                'Desc' 		: 'Ingresos Brutos', // (Opcional) Descripcion
+                'BaseImp' 	: totalVenta / (1 + decimalPercent(percentIngBrutos)), // Base imponible para el tributo
+                'Alic' 		: percentIngBrutos, // Alícuota
+                'Importe' 	: roundTwoDecimals((totalVenta / (1 + decimalPercent(percentIngBrutos))) * percentIngBrutos / 100) // Importe del tributo
+            }
+        );
+        voucherB.ImpTrib = voucherB.Tributos[0].Importe;
+        console.log(voucherB.Tributos[0]);
+    }
+    console.log(voucherB);
     return voucherB;
 }
 
 export function formatReceiptC(object){
-    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, totalVenta, asociatedReceipt } = object;
+    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, totalVenta, asociatedReceipt, percentIngBrutos } = object;
     let voucherC = {
         'CantReg' 	: 1, // Cantidad de comprobantes a registrar
         'PtoVta' 	: ptoVentaId, // Punto de venta
@@ -198,10 +227,24 @@ export function formatReceiptC(object){
         'ImpTrib' 	: 0, //Importe total de tributos
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
+        'Tributos'  : []
     };
     
     if(asociatedReceipt){
         voucherC.CbtesAsoc = asociatedReceipt;
+    }
+
+    if(percentIngBrutos > 0){
+        voucherC.Tributos.push(
+            {
+                'Id' 		:  2, // Id del tipo de tributo (ver tipos disponibles) 
+                'Desc' 		: 'Ingresos Brutos', // (Opcional) Descripcion
+                'BaseImp' 	: totalVenta, // Base imponible para el tributo
+                'Alic' 		: percentIngBrutos, // Alícuota
+                'Importe' 	: roundTwoDecimals(totalVenta * percentIngBrutos / 100) // Importe del tributo
+            }
+        );
+        voucherC.ImpTrib = voucherC.Tributos[0].Importe;
     }
 
     return voucherC;

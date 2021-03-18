@@ -12,6 +12,7 @@
                 <th>Teléfono</th>
                 <th>Teléfono alternativo</th>
                 <th>Nombre de contacto</th>
+                <th>Alícuota de Ingresos Brutos</th>
               </tr>
             </thead>
             <tbody>
@@ -21,6 +22,7 @@
                 <td>{{ $store.state.details.object.telefono }}</td>
                 <td>{{ $store.state.details.object.telefonoAlternativo }}</td>
                 <td>{{ $store.state.details.object.nombreContacto }}</td>
+                <td>{{ $store.state.details.object.alicIngBrutos }}</td>
               </tr>
             </tbody>
           </template>

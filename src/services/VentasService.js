@@ -2,7 +2,6 @@ import axios from "axios";
 
 export default (tenant,service,token) =>{
     return{
-
         filterNotCloseReceipts(object){
             return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filterNotCloseReceipts`, object, {
                 headers: { Authorization: "Bearer " + token }

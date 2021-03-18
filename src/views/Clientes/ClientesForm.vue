@@ -113,6 +113,16 @@
                 :rules="[(v) => !!v || 'Campo requerido...']"
               ></v-text-field>
             </v-col>
+            <v-col>
+              <v-text-field
+                type="number"
+                v-model="object.alicIngBrutos"
+                :counter="50"
+                label="Porcentaje de alic. ing. brutos"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-text-field>
+            </v-col>
           </v-row>
           <div class="ma-1">
             <v-col class="col-6">
