@@ -1,4 +1,4 @@
-import { ordenarMayorMenor, sumarNumeros, roundTwoDecimals, restarNumeros, calculatePercentReductionInAmount, decimalPercent } from './mathHelper';
+import { ordenarMayorMenor, sumarNumeros, roundTwoDecimals, restarNumeros, calculatePercentReductionInAmount } from './mathHelper';
 
 export function formatReceiptA(object){
     const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt, percentIngBrutos } = object;
@@ -105,6 +105,7 @@ export function formatReceiptA(object){
 
 export function formatReceiptB(object){
     const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, products, totalVenta, asociatedReceipt, percentIngBrutos } = object;
+    
     const productsWithIva = products.filter(el => el.ivaVentas);
     const iva21Object = productsWithIva.filter(el => el.ivaVentas === 21);
     const iva10Object = productsWithIva.filter(el => el.ivaVentas === 10.5);
@@ -113,14 +114,27 @@ export function formatReceiptB(object){
     let totalImp10 = roundTwoDecimals(iva10Object.reduce((acc, product) => acc + Number(product.precioTotal), 0));
     let totalImp27 = roundTwoDecimals(iva27Object.reduce((acc, product) => acc + Number(product.precioTotal), 0));
     const diferenceForSalesMountModifications = roundTwoDecimals(sumarNumeros([totalImp21, totalImp10, totalImp27]) - Number(totalVenta));
+    const ingresosBrutos = roundTwoDecimals(totalVenta * percentIngBrutos / 100);
     let orderForHigerValue = ordenarMayorMenor([totalImp21, totalImp10, totalImp27]);
     
     if(totalImp21 === orderForHigerValue[2]){
-        totalImp21 = totalImp21 - diferenceForSalesMountModifications;
+        if(ingresosBrutos > 1){
+            totalImp21 = totalImp21 - diferenceForSalesMountModifications - ingresosBrutos;
+        }else{
+            totalImp21 = totalImp21 - diferenceForSalesMountModifications;
+        }
     }else if(totalImp10 === orderForHigerValue[2]){
-        totalImp10 = totalImp10 - diferenceForSalesMountModifications;
+        if(ingresosBrutos > 1){
+            totalImp10 = totalImp10 - diferenceForSalesMountModifications - ingresosBrutos;
+        }else{
+            totalImp10 = totalImp10 - diferenceForSalesMountModifications;
+        }
     }else{
-        totalImp27 = totalImp27 - diferenceForSalesMountModifications;
+        if(ingresosBrutos > 1){
+            totalImp27 = totalImp27 - diferenceForSalesMountModifications - ingresosBrutos;
+        }else{
+            totalImp27 = totalImp27 - diferenceForSalesMountModifications;
+        }
     }
 
     
@@ -133,7 +147,7 @@ export function formatReceiptB(object){
 
     const importeTotalIva = sumarNumeros([importIva21, importIva10, importIva27]);
     const importeTotalNeto = sumarNumeros([baseImp21,baseImp10,baseImp27]);
-
+    
     let voucherB = {
         'CantReg' 	: 1, // Cantidad de comprobantes a registrar
         'PtoVta' 	: ptoVentaId, // Punto de venta
@@ -149,7 +163,7 @@ export function formatReceiptB(object){
         'ImpNeto' 	: importeTotalNeto, // Importe neto gravado
         'ImpOpEx' 	: 0, // Importe exento de IVA
         'ImpIVA' 	: importeTotalIva, //Importe total de IVA
-        'ImpTrib' 	: 0, //Importe total de tributos
+        'ImpTrib' 	: ingresosBrutos, //Importe total de tributos
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
         'Iva'       : [],
@@ -186,23 +200,22 @@ export function formatReceiptB(object){
         )
     }
 
-    if(asociatedReceipt){
-        voucherB.CbtesAsoc = asociatedReceipt;
-    }
-
     if(percentIngBrutos > 0){
         voucherB.Tributos.push(
             {
                 'Id' 		:  2, // Id del tipo de tributo (ver tipos disponibles) 
                 'Desc' 		: 'Ingresos Brutos', // (Opcional) Descripcion
-                'BaseImp' 	: totalVenta / (1 + decimalPercent(percentIngBrutos)), // Base imponible para el tributo
+                'BaseImp' 	: totalVenta, // Base imponible para el tributo
                 'Alic' 		: percentIngBrutos, // Alícuota
-                'Importe' 	: roundTwoDecimals((totalVenta / (1 + decimalPercent(percentIngBrutos))) * percentIngBrutos / 100) // Importe del tributo
+                'Importe' 	: ingresosBrutos // Importe del tributo
             }
         );
-        voucherB.ImpTrib = voucherB.Tributos[0].Importe;
-        console.log(voucherB.Tributos[0]);
     }
+
+    if(asociatedReceipt){
+        voucherB.CbtesAsoc = asociatedReceipt;
+    }
+
     console.log(voucherB);
     return voucherB;
 }

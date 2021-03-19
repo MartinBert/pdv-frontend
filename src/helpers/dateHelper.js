@@ -22,7 +22,7 @@ export function formatDateWithoutSlash(str){
     return date;
 }
 
-export function formatWitSlash(){
+export function formatWithSlash(){
     const stringDate = getCurrentDate();
     let year = stringDate.substring(0, 4);
     let month = stringDate.substring(4, 6);
