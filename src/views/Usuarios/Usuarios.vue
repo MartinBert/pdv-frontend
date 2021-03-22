@@ -83,7 +83,7 @@
 import GenericService from "../../services/GenericService";
 import UsuariosTable from "../../components/Tables/UsuariosTable";
 import Pagination from "../../components/Pagination";
-import Spinner from "../../components/Spinner";
+import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 
 export default {

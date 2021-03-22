@@ -206,8 +206,8 @@
   </v-dialog>
 </template>
 <script>
-import GenericService from "../services/GenericService";
-import { checkIfNote } from "../helpers/processObjectsHelper";
+import GenericService from "../../services/GenericService";
+import { checkIfNote } from "../../helpers/processObjectsHelper";
 
 export default {
   data() {

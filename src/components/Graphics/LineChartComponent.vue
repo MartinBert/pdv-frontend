@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import BarChart from '../plugins/chart';
+import BarChart from '../../plugins/chart';
 export default {
   data:() => ({
     charData: {

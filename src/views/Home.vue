@@ -11,8 +11,8 @@
   </v-container>
 </template>
 <script >
-import LineChartComponent from "../components/LineChartComponent";
-import DataPicker from "../components/DataPicker";
+import LineChartComponent from "../components/Graphics/LineChartComponent";
+import DataPicker from "../components/Graphics/DataPicker";
 export default {
   data: () => ({
   }),

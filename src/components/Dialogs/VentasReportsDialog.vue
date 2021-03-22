@@ -192,11 +192,11 @@
   </v-dialog>
 </template>
 <script>
-import ReportsService from '../services/ReportsService';
-import GenericService from '../services/GenericService';
-import DocumentosService from '../services/DocumentosService';
-import { generateIntegerDate, getYearsList, monthsList } from '../helpers/dateHelper';
-import { exportPDF } from '../helpers/exportFileHelper';
+import ReportsService from '../../services/ReportsService';
+import GenericService from '../../services/GenericService';
+import DocumentosService from '../../services/DocumentosService';
+import { generateIntegerDate, getYearsList, monthsList } from '../../helpers/dateHelper';
+import { exportPDF } from '../../helpers/exportFileHelper';
 
 export default {
   data(){

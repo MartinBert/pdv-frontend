@@ -26,7 +26,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import CajaDetails from '../../components/Details/CajaDetails';
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/Graphics/Spinner';
 import CajaTable from '../../components/Tables/CajaTable';
 import Pagination from '../../components/Pagination';
 

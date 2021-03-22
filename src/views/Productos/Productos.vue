@@ -176,7 +176,7 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import LabelPrinting from "../../components/LabelPrinting";
-import Spinner from "../../components/Spinner";
+import Spinner from "../../components/Graphics/Spinner";
 import Pagination from "../../components/Pagination";
 import ProductosTable from '../../components/Tables/ProductosTable';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
@@ -266,7 +266,7 @@ export default {
 
         this.productos = data.data.content;
         this.filterParams.totalPages = data.data.totalPages;
-        this.loaded = true;
+        // this.loaded = true;
       });
     },
 

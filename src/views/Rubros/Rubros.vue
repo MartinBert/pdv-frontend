@@ -54,7 +54,7 @@
 import GenericService from "../../services/GenericService";
 import RubrosTable from '../../components/Tables/RubrosTable'
 import Pagination from '../../components/Pagination';
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/Graphics/Spinner';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
 import XLSX from 'xlsx';
 

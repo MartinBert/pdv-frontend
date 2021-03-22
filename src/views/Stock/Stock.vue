@@ -143,13 +143,13 @@
 <script>
 import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
-import ModifyMinimumStocksDialog from "../../components/ModifyMinimumStocksDialog";
-import StockReportsDialog from "../../components/StockReportsDialog";
+import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
+import StockReportsDialog from "../../components/Dialogs/StockReportsDialog";
 import StocksTable from "../../components/Tables/StocksTable";
 import Pagination from "../../components/Pagination";
-import Spinner from "../../components/Spinner";
+import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
-import DepositMigrationDialog from "../../components/DepositMigrationDialog";
+import DepositMigrationDialog from "../../components/Dialogs/DepositMigrationDialog";
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 
 export default {

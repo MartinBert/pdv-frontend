@@ -256,9 +256,9 @@
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
-import Calculator from "../../components/Calculator";
-import Spinner from "../../components/Spinner";
-import ProductDialog from "../../components/ProductDialog";
+import Calculator from "../../components/Graphics/Calculator";
+import Spinner from "../../components/Graphics/Spinner";
+import ProductDialog from "../../components/Dialogs/ProductDialog";
 import {
   formatDate,
   getCurrentDate,

@@ -206,8 +206,8 @@ import {
 } from "../../helpers/mathHelper";
 import { formatFiscalInvoice } from '../../helpers/receiptFormatHelper';
 import { addZerosInString } from '../../helpers/stringHelper';
-import ProductDialog from "../../components/ProductDialog";
-import ReceiptDialog from "../../components/ReceiptDialog";
+import ProductDialog from "../../components/Dialogs/ProductDialog";
+import ReceiptDialog from "../../components/Dialogs/ReceiptDialog";
 
 export default {
   data: () => ({

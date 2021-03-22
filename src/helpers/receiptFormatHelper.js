@@ -10,14 +10,27 @@ export function formatReceiptA(object){
     let totalImp10 = roundTwoDecimals(iva10Object.reduce((acc, product) => acc + Number(product.precioTotal), 0));
     let totalImp27 = roundTwoDecimals(iva27Object.reduce((acc, product) => acc + Number(product.precioTotal), 0));
     const diferenceForSalesMountModifications = roundTwoDecimals(sumarNumeros([totalImp21, totalImp10, totalImp27]) - Number(totalVenta));
+    const ingresosBrutos = roundTwoDecimals(totalVenta * percentIngBrutos / 100);
     let orderForHigerValue = ordenarMayorMenor([totalImp21, totalImp10, totalImp27]);
 
     if(totalImp21 === orderForHigerValue[2]){
-        totalImp21 = totalImp21 - diferenceForSalesMountModifications;
+        if(ingresosBrutos > 1){
+            totalImp21 = totalImp21 - diferenceForSalesMountModifications - ingresosBrutos;
+        }else{
+            totalImp21 = totalImp21 - diferenceForSalesMountModifications;
+        }
     }else if(totalImp10 === orderForHigerValue[2]){
-        totalImp10 = totalImp10 - diferenceForSalesMountModifications;
+        if(ingresosBrutos > 1){
+            totalImp10 = totalImp10 - diferenceForSalesMountModifications - ingresosBrutos;
+        }else{
+            totalImp10 = totalImp10 - diferenceForSalesMountModifications;
+        }
     }else{
-        totalImp27 = totalImp27 - diferenceForSalesMountModifications;
+        if(ingresosBrutos > 1){
+            totalImp27 = totalImp27 - diferenceForSalesMountModifications - ingresosBrutos;
+        }else{
+            totalImp27 = totalImp27 - diferenceForSalesMountModifications;
+        }
     }
 
     
@@ -46,7 +59,7 @@ export function formatReceiptA(object){
         'ImpNeto' 	: importeTotalNeto, // Importe neto gravado
         'ImpOpEx' 	: 0, // Importe exento de IVA
         'ImpIVA' 	: importeTotalIva, //Importe total de IVA
-        'ImpTrib' 	: 0, //Importe total de tributos
+        'ImpTrib' 	: ingresosBrutos, //Importe total de tributos
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
         'Iva'       : [],
@@ -83,23 +96,22 @@ export function formatReceiptA(object){
         )
     }
 
-    if(asociatedReceipt){
-        voucherA.CbtesAsoc = asociatedReceipt;
-    }
-
+    
     if(percentIngBrutos > 0){
         voucherA.Tributos.push(
             {
                 'Id' 		:  2, // Id del tipo de tributo (ver tipos disponibles) 
                 'Desc' 		: 'Ingresos Brutos', // (Opcional) Descripcion
-                'BaseImp' 	: importeTotalNeto, // Base imponible para el tributo
+                'BaseImp' 	: totalVenta, // Base imponible para el tributo
                 'Alic' 		: percentIngBrutos, // Alícuota
-                'Importe' 	: roundTwoDecimals(importeTotalNeto * percentIngBrutos / 100) // Importe del tributo
+                'Importe' 	: ingresosBrutos // Importe del tributo
             }
         );
-        voucherA.ImpTrib = voucherA.Tributos[0].Importe;
     }
-
+        
+    if(asociatedReceipt){
+        voucherA.CbtesAsoc = asociatedReceipt;
+    }
     return voucherA;
 }
 
@@ -221,7 +233,7 @@ export function formatReceiptB(object){
 }
 
 export function formatReceiptC(object){
-    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, totalVenta, asociatedReceipt, percentIngBrutos } = object;
+    const { ptoVentaId, receiptCode, clientCuit, numberOfReceipt, date, totalVenta, asociatedReceipt } = object;
     let voucherC = {
         'CantReg' 	: 1, // Cantidad de comprobantes a registrar
         'PtoVta' 	: ptoVentaId, // Punto de venta
@@ -240,24 +252,10 @@ export function formatReceiptC(object){
         'ImpTrib' 	: 0, //Importe total de tributos
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
-        'Tributos'  : []
     };
     
     if(asociatedReceipt){
         voucherC.CbtesAsoc = asociatedReceipt;
-    }
-
-    if(percentIngBrutos > 0){
-        voucherC.Tributos.push(
-            {
-                'Id' 		:  2, // Id del tipo de tributo (ver tipos disponibles) 
-                'Desc' 		: 'Ingresos Brutos', // (Opcional) Descripcion
-                'BaseImp' 	: totalVenta, // Base imponible para el tributo
-                'Alic' 		: percentIngBrutos, // Alícuota
-                'Importe' 	: roundTwoDecimals(totalVenta * percentIngBrutos / 100) // Importe del tributo
-            }
-        );
-        voucherC.ImpTrib = voucherC.Tributos[0].Importe;
     }
 
     return voucherC;

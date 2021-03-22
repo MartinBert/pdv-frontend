@@ -19,8 +19,8 @@
   </v-dialog>
 </template>
 <script>
-import ReportsService from '../services/ReportsService';
-import { exportPDF } from '../helpers/exportFileHelper';
+import ReportsService from '../../services/ReportsService';
+import { exportPDF } from '../../helpers/exportFileHelper';
 
 export default {
   props:{

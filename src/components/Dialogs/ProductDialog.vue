@@ -123,9 +123,9 @@
     </v-dialog>
 </template>
 <script>
-import GenericService from "../services/GenericService";
-import StocksService from "../services/StocksService";
-import Pagination from './Pagination';
+import GenericService from "../../services/GenericService";
+import StocksService from "../../services/StocksService";
+import Pagination from '../Pagination';
 export default {
   name: "ProductDialog",
 

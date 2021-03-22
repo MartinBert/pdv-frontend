@@ -72,9 +72,9 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-import VentasReportsDialog from "../../components/VentasReportsDialog";
+import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
 import Pagination from "../../components/Pagination";
-import Spinner from "../../components/Spinner";
+import Spinner from "../../components/Graphics/Spinner";
 import VentasTable from "../../components/Tables/VentasTable";
 import VentaDetails from "../../components/Details/VentaDetails";
 

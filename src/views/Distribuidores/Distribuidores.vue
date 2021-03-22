@@ -66,7 +66,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import DistribuidoresTable from '../../components/Tables/DistribuidoresTable';
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/Graphics/Spinner';
 import Pagination from '../../components/Pagination';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
 import DistribuidorDetail from '../../components/Details/DistribuidorDetails';

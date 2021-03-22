@@ -79,7 +79,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/Graphics/Spinner';
 import Error from '../../components/Error';
 import { restarNumeros } from "../../helpers/mathHelper";
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";

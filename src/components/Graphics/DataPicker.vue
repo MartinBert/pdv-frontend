@@ -7,7 +7,7 @@
     </v-date-picker>
 </template>
 <script>
-import { formatWithSlash } from '../helpers/dateHelper';
+import { formatWithSlash } from '../../helpers/dateHelper';
 export default {
   data: () => ({
     fechas: [formatWithSlash()]

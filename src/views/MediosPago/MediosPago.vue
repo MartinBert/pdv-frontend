@@ -56,7 +56,7 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-import Spinner from "../../components/Spinner";
+import Spinner from "../../components/Graphics/Spinner";
 import Pagination from "../../components/Pagination";
 import MediosPagoTable from "../../components/Tables/MediosPagoTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";

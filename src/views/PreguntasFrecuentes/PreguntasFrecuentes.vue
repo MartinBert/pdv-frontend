@@ -38,7 +38,7 @@
 import GenericService from "../../services/GenericService";
 import PreguntasFrecuentesTable from '../../components/Tables/PreguntasFrecuentesTable';
 import Pagination from '../../components/Pagination';
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/Graphics/Spinner';
 export default {
   data: () => ({
     preguntasFrecuentes: [],

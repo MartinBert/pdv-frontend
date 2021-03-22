@@ -46,7 +46,7 @@ import GenericService from "../../services/GenericService";
 import PuntosVentaTable from '../../components/Tables/PuntosVentaTable';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
 import Pagination from '../../components/Pagination';
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/Graphics/Spinner';
 
 export default {
   data: () => ({

@@ -53,7 +53,7 @@
 import GenericService from "../../services/GenericService";
 import DocumentosComercialesTable from "../../components/Tables/DocumentosComercialesTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
-import Spinner from "../../components/Spinner";
+import Spinner from "../../components/Graphics/Spinner";
 import Pagination from "../../components/Pagination";
 import XLSX from "xlsx";
 

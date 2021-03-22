@@ -60,8 +60,8 @@
   </v-dialog>
 </template>
 <script>
-import GenericService from '../services/GenericService';
-import ProductListOfStockDialog from '../components/ProductListOfStockDialog.vue'
+import GenericService from '../../services/GenericService';
+import ProductListOfStockDialog from '../Dialogs/ProductListOfStockDialog.vue'
 
 export default {
     data() {
