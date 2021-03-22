@@ -59,11 +59,10 @@ export function formatReceiptA(object){
         'ImpNeto' 	: importeTotalNeto, // Importe neto gravado
         'ImpOpEx' 	: 0, // Importe exento de IVA
         'ImpIVA' 	: importeTotalIva, //Importe total de IVA
-        'ImpTrib' 	: ingresosBrutos, //Importe total de tributos
+        'ImpTrib' 	: 0, //Importe total de tributos
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
-        'Iva'       : [],
-        'Tributos'  : []
+        'Iva'       : []
     };
     
     if(baseImp21 > 0){
@@ -98,7 +97,7 @@ export function formatReceiptA(object){
 
     
     if(percentIngBrutos > 0){
-        voucherA.Tributos.push(
+        voucherA.Tributos = [
             {
                 'Id' 		:  2, // Id del tipo de tributo (ver tipos disponibles) 
                 'Desc' 		: 'Ingresos Brutos', // (Opcional) Descripcion
@@ -106,7 +105,9 @@ export function formatReceiptA(object){
                 'Alic' 		: percentIngBrutos, // Alícuota
                 'Importe' 	: ingresosBrutos // Importe del tributo
             }
-        );
+        ];
+
+        voucherA.ImpTrib = voucherA.Tributos[0].Importe;
     }
         
     if(asociatedReceipt){
@@ -175,11 +176,10 @@ export function formatReceiptB(object){
         'ImpNeto' 	: importeTotalNeto, // Importe neto gravado
         'ImpOpEx' 	: 0, // Importe exento de IVA
         'ImpIVA' 	: importeTotalIva, //Importe total de IVA
-        'ImpTrib' 	: ingresosBrutos, //Importe total de tributos
+        'ImpTrib' 	: 0, //Importe total de tributos
         'MonId' 	: 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz' 	: 1, // Cotización de la moneda usada (1 para pesos argentinos)
-        'Iva'       : [],
-        'Tributos'  : []
+        'Iva'       : []
     };
     
     if(baseImp21 > 0){
@@ -213,7 +213,7 @@ export function formatReceiptB(object){
     }
 
     if(percentIngBrutos > 0){
-        voucherB.Tributos.push(
+        voucherB.Tributos = [
             {
                 'Id' 		:  2, // Id del tipo de tributo (ver tipos disponibles) 
                 'Desc' 		: 'Ingresos Brutos', // (Opcional) Descripcion
@@ -221,7 +221,9 @@ export function formatReceiptB(object){
                 'Alic' 		: percentIngBrutos, // Alícuota
                 'Importe' 	: ingresosBrutos // Importe del tributo
             }
-        );
+        ];
+
+        voucherB.ImpTrib = voucherB.Tributos[0].Importe;
     }
 
     if(asociatedReceipt){
