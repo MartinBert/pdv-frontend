@@ -266,7 +266,7 @@ export default {
 
         this.productos = data.data.content;
         this.filterParams.totalPages = data.data.totalPages;
-        // this.loaded = true;
+        this.loaded = true;
       });
     },
 

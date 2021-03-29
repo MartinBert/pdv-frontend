@@ -26,7 +26,6 @@
             @click="testcert()"
           >TEST CERTIFICADO</v-btn> -->
           <!-- TEST CERT -->
-          
         </v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">
@@ -249,7 +248,7 @@
       </v-card>
     </v-dialog>
 
-    <Spinner v-if="!loaded"/>
+    <Spinner v-if="!loaded" />
   </v-container>
 </template>
 
@@ -271,11 +270,9 @@ import {
   calculatePercentaje,
   decimalPercent,
   generateFiveDecimalCode,
-  roundTwoDecimals
+  roundTwoDecimals,
 } from "../../helpers/mathHelper";
-import {
-  formatFiscalInvoice
-} from "../../helpers/receiptFormatHelper";
+import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
@@ -312,7 +309,7 @@ export default {
   components: {
     Calculator,
     ProductDialog,
-    Spinner
+    Spinner,
   },
 
   created() {
@@ -338,11 +335,9 @@ export default {
           return acc + Number(el.precioTotal);
         }
       }, 0);
-      
-      if(this.object.cliente && this.object.cliente.alicIngBrutos > 0){
-        total = total + total * this.object.cliente.alicIngBrutos / 100;
+      if (this.object.cliente && this.object.cliente.alicIngBrutos > 0) {
+        total = total + (total * this.object.cliente.alicIngBrutos) / 100;
       }
-
       return roundTwoDecimals(total);
     },
 
@@ -364,7 +359,7 @@ export default {
   methods: {
     getObjects() {
       let sucursalId;
-      if(this.loguedUser.perfil > 1){
+      if (this.loguedUser.perfil > 1) {
         sucursalId = this.loguedUser.sucursal.id;
       }
       const clientFilter = {
@@ -376,21 +371,21 @@ export default {
         personaContactName: "",
         page: 1,
         size: 100000,
-      }
+      };
       const medioPagoFilter = {
         sucursalId: sucursalId,
         medioPagoName: "",
         page: 1,
-        size: 100000
-      }
+        size: 100000,
+      };
       const depositoFilter = {
         depositoName: "",
         perfilId: this.loguedUser.perfil,
         sucursalId: sucursalId,
         page: 1,
         size: 10,
-        totalPages: 0
-      }
+        totalPages: 0,
+      };
 
       GenericService(this.tenant, "clientes", this.token)
         .filter(clientFilter)
@@ -448,8 +443,8 @@ export default {
         productoEstado: "",
         page: 1,
         size: 1,
-        totalPages: 0
-      }
+        totalPages: 0,
+      };
       GenericService(this.tenant, "productos", this.token)
         .filter(filterParams)
         .then((data) => {
@@ -501,7 +496,6 @@ export default {
           }
         });
       }
-
       this.databaseItems.documentos = checkIfInvoice(AllDocuments);
     },
 
@@ -512,7 +506,6 @@ export default {
     deleteLine(id) {
       const filter = this.products.filter((el) => el.id !== id);
       const filterForStore = this.products.filter((el) => el.id === id)[0].id;
-
       this.products = filter;
       this.$store.commit("productos/removeProductsToList", filterForStore);
       this.listennerOfListChange = id;
@@ -566,7 +559,6 @@ export default {
     addProduct(data) {
       data = [...new Set(data)];
       let processPorducts = [];
-
       data.forEach((el) => {
         processPorducts.push(this.processProductsObject(el));
       });
@@ -619,6 +611,211 @@ export default {
       this.listennerOfListChange = 0;
     },
 
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR FISCAL CONTROLLER ---------------------------------------------------------------*/
+    /******************************************************************************************************/
+    saveTicket(documentName) {
+      switch (documentName) {
+        case "TIQUE FACTURA A":
+          this.saveTicketInvoiceA();
+          break;
+
+        case "TIQUE FACTURA B":
+          this.saveTicketInvoiceB();
+          break;
+
+        default:
+          this.saveTicketInvoiceC();
+          break;
+      }
+    },
+
+    saveTicketInvoiceA() {
+      this.sendTicketData(this.createJsonForTicketInvoiceA(), "ticket_a");
+    },
+
+    saveTicketInvoiceB() {
+      this.sendTicketData(this.createJsonForTicketInvoiceB(), "ticket_b");
+    },
+
+    saveTicketInvoiceC() {
+      this.sendTicketData(this.createJsonForTicketInvoiceC(), "ticket");
+    },
+
+    sendTicketData(jsonToFiscalController, ticketRoute) {
+      axios
+        .post(
+          `${process.env.VUE_APP_API_FISCAL_CONTROLLER}/${ticketRoute}`, jsonToFiscalController
+        )
+        .then(() => {
+          this.$successAlert("Venta realizada");
+          this.clear();
+          this.loaded = true;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+
+    createJsonForTicketInvoiceA() {
+      const jsonToFiscalController = {
+        client: this.getClientData(),
+        surcharge: this.getTotalSurcharges("A"),
+        discount: this.getTotalDiscounts("A"),
+        items: this.getItemsForFiscalTicketInvoice("A"),
+      };
+      return jsonToFiscalController;
+    },
+
+    createJsonForTicketInvoiceB() {
+      const jsonToFiscalController = {
+        client: this.getClientData(),
+        surcharge: this.getTotalSurcharges(),
+        discount: this.getTotalDiscounts(),
+        items: this.getItemsForFiscalTicketInvoice("B"),
+      };
+      return jsonToFiscalController;
+    },
+
+    createJsonForTicketInvoiceC() {
+      const jsonToFiscalController = {
+        surcharge: this.getTotalSurcharges("C"),
+        discount: this.getTotalDiscounts("C"),
+        items: this.getItemsForFiscalTicketInvoice("C"),
+      };
+      return jsonToFiscalController;
+    },
+
+    getClientData(){
+      const formattedObject = {
+        name: this.object.cliente.nombre,
+        socialReason: this.object.cliente.razonSocial,
+        cuit: this.object.cliente.cuit,
+        direction: this.object.cliente.direccion
+      }
+      return formattedObject;
+    },
+
+    getTotalSurcharges(letter) {
+      let total = this.products.reduce((acc, el) => {
+        if (el.nombre.includes("RECARGO")) {
+          acc += Number(el.precioTotal * 1);
+        }
+        return Math.ceil(acc * 100) / 100;
+      }, 0);
+      if(letter === "A"){
+        total = total / 1.21;
+      }
+      return total.toString();
+    },
+
+    getTotalDiscounts(letter) {
+      let total = this.products.reduce((acc, el) => {
+        if (el.nombre.includes("DESCUENTO")) {
+          acc += Number(el.precioTotal * -1);
+        }
+        return Math.ceil(acc * 100) / 100;
+      }, 0);
+      if(letter === "A"){
+        total = total / 1.21;
+      }
+      return total.toString();
+    },
+
+    getItemsForFiscalTicketInvoice(letter) {
+      let items = [];
+      switch (letter) {
+        case "A":
+            items = this.itemsInvoiceA();
+          break;
+        case "B":
+            items = this.itemsInvoiceB();
+          break;
+        default:
+            items = this.itemsInvoiceC();
+          break;
+      }
+      return items;
+    },
+
+    itemsInvoiceA(){
+      let items = [];
+      const validItems = this.products.filter(
+        (el) =>
+          !el.nombre.includes("DESCUENTO") && !el.nombre.includes("RECARGO")
+      );
+      validItems.forEach((el) => {
+        const formattedObject = {
+          name: el.nombre,
+          quantity: el.cantUnidades.toString(),
+          price: roundTwoDecimals(el.precioTotal / (1 + decimalPercent(el.ivaVentas))).toString(),
+        };
+        items.push(formattedObject);
+      });
+      return items;
+    },
+
+    itemsInvoiceB(){
+      let items = [];
+      const validItems = this.products.filter(
+        (el) =>
+          !el.nombre.includes("DESCUENTO") && !el.nombre.includes("RECARGO")
+      );
+      validItems.forEach((el) => {
+        const formattedObject = {
+          name: el.nombre,
+          quantity: el.cantUnidades.toString(),
+          price: roundTwoDecimals(el.precioTotal / (1 + decimalPercent(el.ivaVentas))).toString(),
+        };
+        items.push(formattedObject);
+      });
+      return items;
+    },
+
+    itemsInvoiceC(){
+      let items = [];
+      const validItems = this.products.filter(
+        (el) =>
+          !el.nombre.includes("DESCUENTO") && !el.nombre.includes("RECARGO")
+      );
+      validItems.forEach((el) => {
+        const formattedObject = {
+          name: el.nombre,
+          quantity: el.cantUnidades.toString(),
+          price: el.precioTotal.toString(),
+        };
+        items.push(formattedObject);
+      });
+      return items;
+    },
+
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR ELECTRONIC BILLING --------------------------------------------------------------*/
+    /******************************************************************************************************/
+    saveSale() {
+      this.loaded = false;
+      const documento = this.object.documento;
+      if (documento !== undefined) {
+        if (documento.tipo === true) {
+          if (documento.ticket === true) {
+            this.saveTicket(documento.nombre);
+          } else {
+            this.save();
+          }
+        } else {
+          this.saveNoFiscal();
+        }
+      } else {
+        this.$errorAlert(
+          "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
+        ).then((result) => {
+          if (result.isDismissed) {
+            this.loaded = true;
+          }
+        });
+      }
+    },
+
     save() {
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
@@ -637,7 +834,6 @@ export default {
       let file;
       let fileURL;
       let invoice;
-
       /*** Get last invoice emmited number ***/
       axios
         .get(
@@ -655,13 +851,10 @@ export default {
             products: products,
             totalVenta: totalVenta,
           };
-
-          invoice = formatFiscalInvoice( documento.letra,dataForCreateInvoice);
-
+          invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice);
           /*** Evaluate required sale form data ***/
           if (mediosPago !== undefined) {
             if (products.length > 0) {
-
               /*** Send invoice to AFIP ***/
               axios
                 .post(
@@ -677,7 +870,6 @@ export default {
                     addZerosInString("04", ptoVenta.idFiscal) +
                     cae +
                     formatDateWithoutSlash(dateOfCaeExpiration);
-
                   // Create receipt
                   comprobante = {
                     letra: documento.letra,
@@ -698,7 +890,6 @@ export default {
                     planesPago: [planesPago],
                     nombreDocumento: documento.nombre,
                   };
-
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -741,12 +932,13 @@ export default {
                           });
                       });
                   } else {
-                    this.$errorAlert("Tipo de comprobante no disponible")
-                    .then(result => {
-                      if(result.isDismissed){
-                        this.loaded = true;
+                    this.$errorAlert("Tipo de comprobante no disponible").then(
+                      (result) => {
+                        if (result.isDismissed) {
+                          this.loaded = true;
+                        }
                       }
-                    })
+                    );
                   }
                 })
                 .catch((err) => {
@@ -757,26 +949,27 @@ export default {
                   this.loaded = true;
                 });
             } else {
-              this.$errorAlert("No hay productos seleccionados en la venta")
-              .then(result => {
-                if(result.isDismissed){
+              this.$errorAlert(
+                "No hay productos seleccionados en la venta"
+              ).then((result) => {
+                if (result.isDismissed) {
                   this.loaded = true;
                 }
-              })
+              });
             }
           } else {
-            this.$errorAlert("Debe seleccionar un medio de pago")
-            .then(result => {
-              if(result.isDismissed){
-                this.loaded = true;
+            this.$errorAlert("Debe seleccionar un medio de pago").then(
+              (result) => {
+                if (result.isDismissed) {
+                  this.loaded = true;
+                }
               }
-            })
+            );
           }
         });
     },
 
     saveNoFiscal() {
-      /*** Constants ***/
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
       const totalVenta = this.totalVenta;
@@ -791,13 +984,9 @@ export default {
       const token = this.token;
       const service = this.service;
       const condVenta = this.checkSaleCondition(planesPago);
-
-      /*** Mutable vars ***/
       let file;
       let fileURL;
-      var comprobante;
-
-      /*** Create receipt ***/
+      let comprobante;
       comprobante = {
         letra: "X",
         numeroCbte: generateFiveDecimalCode(),
@@ -817,7 +1006,6 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-
       /*** Evaluate required sale form data ***/
       if (comprobante.mediosPago[0] !== undefined) {
         if (Number(comprobante.totalVenta) !== 0) {
@@ -861,68 +1049,21 @@ export default {
                 });
             });
         } else {
-          this.$errorAlert("No hay productos seleccionados en la venta")
-          .then(result => {
-            if(result.isDismissed){
-              this.loaded = true;
+          this.$errorAlert("No hay productos seleccionados en la venta").then(
+            (result) => {
+              if (result.isDismissed) {
+                this.loaded = true;
+              }
             }
-          })
+          );
         }
       } else {
-        this.$errorAlert("Debe seleccionar un medio de pago")
-        .then(result => {
-          if(result.isDismissed){
+        this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
+          if (result.isDismissed) {
             this.loaded = true;
           }
-        })
-      }
-    },
-
-    saveSale() {
-      this.loaded = false
-      const documento = this.object.documento;
-
-      if (documento !== undefined) {
-        if (documento.tipo === true) {
-          this.save();
-        } else {
-          this.saveNoFiscal();
-        }
-      } else {
-        this.$errorAlert(
-          "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
-        ).then(result => {
-          if(result.isDismissed){
-            this.loaded = true;
-          }
-        })
-      }
-    },
-
-    clear() {
-      this.object = {};
-      this.products = [];
-      this.modificator = "";
-      this.priceModificationPorcent = 0;
-      this.individualPercent = "";
-      this.listennerOfListChange = 999999999;
-      this.$store.commit("productos/resetStates");
-    },
-
-    testcert() {
-      const cuitSucursal = 30715876775;
-      const ptoVenta = 2;
-      const compType = 1;
-      axios
-        .get(
-          `${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuitSucursal}/${ptoVenta}/${compType}`
-        )
-        .then((data) => {
-          console.log(data.data.responseOfAfip);
-        })
-        .catch((err) => {
-          console.log(err);
         });
+      }
     },
 
     async applyStockModifications(comprobante) {
@@ -934,14 +1075,13 @@ export default {
         productoCodigoBarras: "",
         productoPrimerAtributoName: "",
         page: 1,
-        size: 100000
+        size: 100000,
       };
       let productsBelowMinimumStock = [];
       let productsWithoutStockOnDefaultDeposit = [];
       let productsOutOfStockAndDeposits = [];
       let stocks;
       let receiptData = comprobante;
-
       await GenericService(this.tenant, "stock", this.token)
         .filter(filterParam)
         .then((data) => {
@@ -968,7 +1108,6 @@ export default {
                       stock
                     );
                     break;
-
                   default:
                     stock.cantidad =
                       parseInt(stock.cantidad) -
@@ -991,7 +1130,6 @@ export default {
               }
             });
           });
-
           const viewCheckedProductsInReceipt = receiptData.productos.filter(
             (el) => !el.checked
           );
@@ -1022,8 +1160,33 @@ export default {
       } else {
         saleCondition = true;
       }
-
       return saleCondition;
+    },
+
+    clear() {
+      this.object = {};
+      this.products = [];
+      this.modificator = "";
+      this.priceModificationPorcent = 0;
+      this.individualPercent = "";
+      this.listennerOfListChange = 999999999;
+      this.$store.commit("productos/resetStates");
+    },
+
+    testcert() {
+      const cuitSucursal = 30715876775;
+      const ptoVenta = 2;
+      const compType = 1;
+      axios
+        .get(
+          `${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuitSucursal}/${ptoVenta}/${compType}`
+        )
+        .then((data) => {
+          console.log(data.data.responseOfAfip);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 };
