@@ -1,20 +1,35 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 /***LOGIN***/
+
 .backgroundclass {
-    background: rgb(2,0,36);
-    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(3,1,45,1) 9%, rgba(10,10,158,1) 50%, rgba(4,3,69,1) 95%, rgba(2,0,36,1) 100%);
+    background: rgb(2, 0, 36);
+    background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(3, 1, 45, 1) 9%, rgba(10, 10, 158, 1) 50%, rgba(4, 3, 69, 1) 95%, rgba(2, 0, 36, 1) 100%);
     background-size: 100%;
     animation: toColor 4s linear alternate infinite;
     transition: 2s;
 }
 
 @keyframes toColor {
-    0%    { -webkit-filter: grayscale(100%); filter: grayscale(100%); }
-    25%   { -webkit-filter: grayscale(75%); filter: grayscale(75%); }
-    50%   { -webkit-filter: grayscale(50%); filter: grayscale(50%); }
-    75%   { -webkit-filter: grayscale(25%); filter: grayscale(25%); }
-    100%  { -webkit-filter: grayscale(0%); filter: grayscale(0%); }
+    0% {
+        -webkit-filter: grayscale(100%);
+        filter: grayscale(100%);
+    }
+    25% {
+        -webkit-filter: grayscale(75%);
+        filter: grayscale(75%);
+    }
+    50% {
+        -webkit-filter: grayscale(50%);
+        filter: grayscale(50%);
+    }
+    75% {
+        -webkit-filter: grayscale(25%);
+        filter: grayscale(25%);
+    }
+    100% {
+        -webkit-filter: grayscale(0%);
+        filter: grayscale(0%);
+    }
 }
 
 .toolbarclass {
@@ -52,9 +67,11 @@
 /*******/
 
 /***ROOT***/
-:root{
+
+:root {
     --main-bg-color: #d2d2ff;
 }
+
 .root-container {
     background-color: var(--main-bg-color);
     opacity: 90%;
@@ -65,7 +82,7 @@
 }
 
 #app {
-    font-family:'Roboto', sans-serif;
+    font-family: 'Roboto', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
@@ -73,16 +90,12 @@
     margin-top: 60px;
 }
 
-.v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
-.v-data-table > .v-data-table__wrapper > table > thead > tr > th,
-.v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
-   font-size: 12px !important;
+.v-data-table>.v-data-table__wrapper>table>tbody>tr>th, .v-data-table>.v-data-table__wrapper>table>thead>tr>th, .v-data-table>.v-data-table__wrapper>table>tfoot>tr>th {
+    font-size: 12px !important;
 }
 
-.v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-.v-data-table > .v-data-table__wrapper > table > thead > tr > td,
-.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td {
-   font-size: 12px !important;
+.v-data-table>.v-data-table__wrapper>table>tbody>tr>td, .v-data-table>.v-data-table__wrapper>table>thead>tr>td, .v-data-table>.v-data-table__wrapper>table>tfoot>tr>td {
+    font-size: 12px !important;
 }
 
 .verticalSeparator {
@@ -172,7 +185,8 @@
 /*******/
 
 /***IMAGES***/
-.text-alert-error img{
+
+.text-alert-error img {
     width: 150px;
     height: 150px;
     margin-top: 5%;
@@ -180,7 +194,7 @@
     transform-origin: 50% 50%;
 }
 
-.text-alert-success img{
+.text-alert-success img {
     width: 150px;
     height: 150px;
     margin-top: 5%;
@@ -188,7 +202,7 @@
     transform-origin: 50% 50%;
 }
 
-.text-alert-question img{
+.text-alert-question img {
     width: 150px;
     height: 150px;
     margin-top: 5%;
@@ -196,7 +210,7 @@
     transform-origin: 50% 50%;
 }
 
-.text-alert-info img{
+.text-alert-info img {
     width: 150px;
     height: 150px;
     margin-top: 5%;
@@ -224,11 +238,14 @@
     cursor: pointer;
     border-radius: 15px 15px 15px 15px;
 }
+
 /*******/
 
 /*** MAIN NAVIGATION ***/
+
 .main_navigation {
     font-family: 'Roboto', sans-serif;
     font-weight: 900;
 }
+
 /*******/
