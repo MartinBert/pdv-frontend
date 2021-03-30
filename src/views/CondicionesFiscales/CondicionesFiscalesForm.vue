@@ -105,6 +105,7 @@ export default {
 
     save() {
       this.$refs.form.validate();
+      this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
@@ -113,6 +114,7 @@ export default {
         .catch(error => {
           if (error.response.status == 500) {
             this.errorStatus = true;
+            this.loaded = true;
           }
         });
     },

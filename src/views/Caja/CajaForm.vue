@@ -175,6 +175,7 @@ export default {
 
     save() {
       this.$refs.form.validate();
+      this.loaded = false;
       this.object.sucursal = this.loguedUser.sucursal;
       this.object.diferencia = this.diferencia;
       this.ventas.forEach(el => {
@@ -192,6 +193,7 @@ export default {
         .catch(error => {
           if (error.response.status == 500) {
             this.errorStatus = true;
+            this.loaded = true;
           }
         });
     },

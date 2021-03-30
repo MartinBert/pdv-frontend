@@ -232,6 +232,7 @@ export default {
     },
 
     save() {
+      this.loaded = false;
       if(!this.object.condicionIva || !this.object.cuit || !this.object.fechaInicioAct || !this.object.ingBruto || !this.object.razonSocial){
         this.object.condicionIva = this.object.empresa.condicionIva;
         this.object.cuit = this.object.empresa.cuit;
@@ -248,6 +249,7 @@ export default {
         .catch(error => {
           if (error.response.status == 500) {
             this.errorStatus = true;
+            this.loaded = true;
           }
         });
     },

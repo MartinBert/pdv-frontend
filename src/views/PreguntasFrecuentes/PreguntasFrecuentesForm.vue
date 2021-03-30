@@ -86,6 +86,7 @@ export default {
 
     save() {
       this.$refs.form.validate();
+      this.loaded = false;
       this.object.sucursales = [this.loguedUser.sucursal];
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
@@ -95,6 +96,7 @@ export default {
         .catch(error => {
           if (error.response.status == 500) {
             this.errorStatus = true;
+            this.loaded = true;
           }
         });
     },

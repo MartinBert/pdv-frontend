@@ -429,11 +429,13 @@ export default {
     },
 
     save() {
+      this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .catch((error) => {
           if (error.response.status == 500) {
             this.errorStatus = true;
+            this.loaded = true;
           }
         });
       this.$router.push({ name: "productos" });

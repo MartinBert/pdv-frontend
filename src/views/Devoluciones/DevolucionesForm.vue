@@ -342,8 +342,10 @@ export default {
     },
 
     save() {
+      this.loaded = false;
       if (this.object.productosEntrantes.length === 0) {
         this.$errorAlert("Debe seleccionar al menos un producto devuelto");
+        this.loaded = true;
       } else {
         if (!this.receiptDialogData) {
           this.$questionAlert(
@@ -354,6 +356,7 @@ export default {
               this.saveWithoutReceipt();
             } else {
               this.$store.commit("receipt/receiptDialogMutation");
+              this.loaded = true;
             }
           });
         } else {

@@ -351,6 +351,7 @@ export default {
     },
 
     save() {
+      this.loaded = false;
       if(this.object.producto.length < 1){
         this.$errorAlert("No ha seleccionado productos");
       }else{

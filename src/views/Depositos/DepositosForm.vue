@@ -104,7 +104,8 @@ export default {
         });
     },
 
-    save() {      
+    save() {
+      this.loaded = false;
       this.$refs.form.validate();
       if(this.loguedUser.perfil > 2){
         this.object.sucursales = this.loguedUser.sucursal;
@@ -116,8 +117,8 @@ export default {
         })
         .catch(error => {
           if (error.response.status == 500) {
-            this.snackError = true;
-            this.errorMessage = "Ocurrio un error";
+            this.errorStatus = true;
+            this.loaded = true;
           }
         });
     },

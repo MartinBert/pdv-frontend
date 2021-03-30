@@ -88,6 +88,7 @@ export default {
     },
 
     save() {
+      this.loaded = false;
       this.$refs.form.validate();
       this.object.sucursales = [this.loguedUser.sucursal];
       GenericService(this.tenant, this.service, this.token)
@@ -97,8 +98,8 @@ export default {
         })
         .catch(error => {
           if (error.response.status == 500) {
-            this.snackError = true;
-            this.errorMessage = "Ocurrio un error";
+            this.errorStatus = true;
+            this.loaded = true;
           }
         });
     },

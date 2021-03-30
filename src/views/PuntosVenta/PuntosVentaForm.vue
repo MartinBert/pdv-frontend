@@ -112,6 +112,7 @@ export default {
 
     save() {
       this.$refs.form.validate();
+      this.loaded = false;
       this.sucursal.forEach(el => {
         this.object.sucursal = el;
         GenericService(this.tenant, this.service, this.token)
@@ -119,6 +120,7 @@ export default {
         .catch(error => {
           if (error.response.status == 500) {
             this.errorStatus = true;
+            this.loaded = true;
           }
         });
       })
