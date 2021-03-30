@@ -13,6 +13,7 @@ export const errorAlert = (str) => {
         showConfirmButton: false,
     });
 }
+
 export const successAlert = (str) => {
     return Swal.fire({
         width: 300,
@@ -26,6 +27,7 @@ export const successAlert = (str) => {
         showConfirmButton: false,
     });
 }
+
 export const successAlert2 = (str, str2) => {
     return Swal.fire({
         html:
@@ -34,13 +36,14 @@ export const successAlert2 = (str, str2) => {
             "<h1>¡" +
             str +
             "!<h1>" +
-            "<p>¡"+
+            "<p>¡" +
             str2 +
-            "!</p>"+
+            "!</p>" +
             "</div>",
         showConfirmButton: false,
     });
 }
+
 export const questionAlert = (strTitle, strText) => {
     return Swal.fire({
         width: 400,
@@ -62,6 +65,7 @@ export const questionAlert = (strTitle, strText) => {
         denyButtonColor: 'rgb(172, 171, 171)'
     });
 }
+
 export const infoAlert = (str) => {
     return Swal.fire({
         width: 400,
@@ -76,6 +80,7 @@ export const infoAlert = (str) => {
         showDenyButton: false,
     });
 }
+
 export const infoAlert2 = (str) => {
     return Swal.fire({
         html:

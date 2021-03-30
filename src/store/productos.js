@@ -21,10 +21,10 @@ export default {
       const productos = state.products.filter(el => el.id !== id);
       state.products = productos;
     },
-    clearProductsState(state){
+    clearProductsState(state) {
       state.products = [];
     },
-    addDetailList(state, object){
+    addDetailList(state, object) {
       state.detailList = object;
     },
   },

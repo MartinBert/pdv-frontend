@@ -130,6 +130,22 @@
               v-on:input="calculations()"
             />
           </v-col>
+          <v-col>
+            <v-container class="d-flex justify-end">
+              <v-radio-group v-model="object.editable" row label="¿Precio editable en ventas?">
+                <v-radio
+                  label="Si"
+                  :value="true"
+                  color="primary"
+                ></v-radio>
+                <v-radio
+                  label="No"
+                  :value="false"
+                  color="primary"
+                ></v-radio>
+              </v-radio-group>
+            </v-container>
+          </v-col>
         </v-row>
         <v-row class="ma-1">
           <v-col>
@@ -271,6 +287,7 @@ export default {
       codigoBarra: '',
       ivaComprasObject: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
+      editable: false
     },
     filterParams: {
       productoName: "",
@@ -331,24 +348,19 @@ export default {
               case "marcas":
                 this.marcas = data.data.content;
                 break;
-
               case "distribuidores":
                 this.distribuidores = data.data.content;
                 break;
-
               case "rubros":
                 this.rubros = data.data.content;
                 break;
-
               case "ivas":
                 this.ivasCompra = data.data.content.filter(el => el.tipo);
                 this.ivasVenta = data.data.content.filter(el => !el.tipo);
                 break;
-
               case "propiedades":
                 this.propiedades = data.data.content;
                 break;
-
               default:
                 data.data.content.filter(el => {
                   if(el.valor === undefined || el.valor === null){

@@ -4,7 +4,7 @@
       <thead>
         <tr>
           <th>Nombre</th>
-            <th>Acciones</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody v-for="item in items" :key="item.id">

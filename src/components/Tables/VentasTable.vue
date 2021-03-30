@@ -24,13 +24,22 @@
           <td>{{ item.barCode }}</td>
           <td>{{ item.nombreDocumento }}</td>
           <td>
-            <Detail :objectsArray="item.productos" v-on:seeDetails="seeDetails" />
+            <Detail
+              :objectsArray="item.productos"
+              v-on:seeDetails="seeDetails"
+            />
           </td>
           <td>
-            <Detail :objectsArray="item.mediosPago" v-on:seeDetails="seeDetails" />
+            <Detail
+              :objectsArray="item.mediosPago"
+              v-on:seeDetails="seeDetails"
+            />
           </td>
           <td>
-            <Detail :objectsArray="item.planesPago" v-on:seeDetails="seeDetails" />
+            <Detail
+              :objectsArray="item.planesPago"
+              v-on:seeDetails="seeDetails"
+            />
           </td>
           <td>${{ item.totalVenta }}</td>
           <td>

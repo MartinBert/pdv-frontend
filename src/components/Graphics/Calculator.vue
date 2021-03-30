@@ -1,12 +1,16 @@
 <template>
-<v-container>
+  <v-container>
     <v-row>
       <v-col class="calculadora">
         <v-row>
           <v-col class="syntax ml-3 mr-3 mt-3">
-            <input class="historicSyntax" v-model="historicSyntax" type="text">
-            <input class="currentSyntax" v-model="currentSyntax" type="text">
-            <input class="result" v-model="result" type="text">
+            <input
+              class="historicSyntax"
+              v-model="historicSyntax"
+              type="text"
+            />
+            <input class="currentSyntax" v-model="currentSyntax" type="text" />
+            <input class="result" v-model="result" type="text" />
           </v-col>
         </v-row>
         <v-row>
@@ -112,11 +116,10 @@
         </v-row>
       </v-col>
     </v-row>
-    </v-container>
-  </template>
+  </v-container>
+</template>
 <script>
 export default {
-  name: "Calculator",
   data() {
     return {
       result: 0,
@@ -135,71 +138,93 @@ export default {
 
       if (matchNumbers) {
         this.currentSyntax += e.toString();
-      }else if(matchOperators[0] == '+' || matchOperators[0] == '-' || matchOperators[0] == '/' || matchOperators[0] == '*'){
-        if(this.historicSyntax && this.currentSyntax){
-          let previosSimbol = this.historicSyntax.slice(this.historicSyntax.length - 1, this.historicSyntax.length);
+      } else if (
+        matchOperators[0] == "+" ||
+        matchOperators[0] == "-" ||
+        matchOperators[0] == "/" ||
+        matchOperators[0] == "*"
+      ) {
+        if (this.historicSyntax && this.currentSyntax) {
+          let previosSimbol = this.historicSyntax.slice(
+            this.historicSyntax.length - 1,
+            this.historicSyntax.length
+          );
           this.historicSyntax = `${this.historicSyntax} ${this.currentSyntax} ${e}`;
           this.processCalculation(this.currentSyntax, previosSimbol);
           this.currentSyntax = "";
-        }else if(this.historicSyntax && !this.currentSyntax){
-          this.historicSyntax = this.historicSyntax.slice(0, this.historicSyntax.length - 1);
+        } else if (this.historicSyntax && !this.currentSyntax) {
+          this.historicSyntax = this.historicSyntax.slice(
+            0,
+            this.historicSyntax.length - 1
+          );
           this.historicSyntax = this.historicSyntax + e;
-        }else if(this.result == 0 && !this.historicSyntax && !this.currentSyntax){
+        } else if (
+          this.result == 0 &&
+          !this.historicSyntax &&
+          !this.currentSyntax
+        ) {
           this.result = 0;
           this.currentSyntax = "";
           this.historicSyntax = "";
-        }else if(this.result != 0 && !this.historicSyntax && !this.currentSyntax){
+        } else if (
+          this.result != 0 &&
+          !this.historicSyntax &&
+          !this.currentSyntax
+        ) {
           this.historicSyntax = `${this.result} ${e}`;
-        }else{
+        } else {
           this.historicSyntax = `${this.historicSyntax} ${this.currentSyntax} ${e}`;
           this.result = this.currentSyntax;
           this.currentSyntax = "";
         }
-      }else if(matchOperators[0] == '.'){
-        if(!this.historicSyntax && !this.currentSyntax){
+      } else if (matchOperators[0] == ".") {
+        if (!this.historicSyntax && !this.currentSyntax) {
           this.currentSyntax = "";
           this.historicSyntax = "";
-        }else if(!this.currentSyntax && this.historicSyntax){
+        } else if (!this.currentSyntax && this.historicSyntax) {
           this.currentSyntax = "";
-        }else{
+        } else {
           this.currentSyntax = this.currentSyntax + e;
         }
-      }else{
-        if(this.historicSyntax){
-          let previosSimbol = this.historicSyntax.slice(this.historicSyntax.length - 1, this.historicSyntax.length);
+      } else {
+        if (this.historicSyntax) {
+          let previosSimbol = this.historicSyntax.slice(
+            this.historicSyntax.length - 1,
+            this.historicSyntax.length
+          );
           this.processCalculation(this.currentSyntax, previosSimbol);
           this.currentSyntax = "";
           this.historicSyntax = "";
-        }else if(!this.historicSyntax && !this.currentSyntax){
+        } else if (!this.historicSyntax && !this.currentSyntax) {
           this.currentSyntax = "";
           this.historicSyntax = "";
-        }else{
+        } else {
           this.result = parseFloat(this.currentSyntax).toFixed(2);
           this.currentSyntax = "";
         }
       }
     },
 
-    processCalculation(e, previosSimbol){
+    processCalculation(e, previosSimbol) {
       switch (previosSimbol) {
-        case '+':
-            this.result = parseFloat(this.result) + parseFloat(e);
-            this.result = this.result.toFixed(2)
+        case "+":
+          this.result = parseFloat(this.result) + parseFloat(e);
+          this.result = this.result.toFixed(2);
           break;
 
-        case '-':
-            this.result = parseFloat(this.result) - parseFloat(e);
-            this.result = this.result.toFixed(2)
+        case "-":
+          this.result = parseFloat(this.result) - parseFloat(e);
+          this.result = this.result.toFixed(2);
           break;
 
-        case '/':
-            this.result = parseFloat(this.result) / parseFloat(e);
-            this.result = this.result.toFixed(2)
+        case "/":
+          this.result = parseFloat(this.result) / parseFloat(e);
+          this.result = this.result.toFixed(2);
           break;
 
         default:
-            this.result = parseFloat(this.result) * parseFloat(e);
-            this.result = this.result.toFixed(2)
+          this.result = parseFloat(this.result) * parseFloat(e);
+          this.result = this.result.toFixed(2);
           break;
       }
     },
@@ -214,10 +239,12 @@ export default {
       this.currentSyntax = "";
     },
 
-    partialClear(){
-      this.currentSyntax = this.currentSyntax.slice(0, this.currentSyntax.length - 1);
-    }
-    
+    partialClear() {
+      this.currentSyntax = this.currentSyntax.slice(
+        0,
+        this.currentSyntax.length - 1
+      );
+    },
   },
 };
 </script>
@@ -260,20 +287,19 @@ export default {
   border-radius: 10px 10px 10px 10px;
 }
 
-.syntax .historicSyntax{
+.syntax .historicSyntax {
   text-align: right;
   width: 100%;
 }
 
-.syntax .currentSyntax{
+.syntax .currentSyntax {
   text-align: right;
   width: 100%;
 }
 
-.syntax .result{
+.syntax .result {
   width: 100%;
   font-size: 30px;
 }
-
 </style>
 

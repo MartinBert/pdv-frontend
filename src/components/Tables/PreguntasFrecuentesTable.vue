@@ -8,7 +8,12 @@
       </thead>
       <tbody v-for="item in items" :key="item.id">
         <tr class="text-center">
-          <td style="height: 70px; font-size: 1.2rem; cursor: pointer" @click="response(item.respuesta)">{{ item.pregunta }}</td>
+          <td
+            style="height: 70px; font-size: 1.2rem; cursor: pointer"
+            @click="response(item.respuesta)"
+          >
+            {{ item.pregunta }}
+          </td>
         </tr>
       </tbody>
     </v-simple-table>
@@ -20,9 +25,9 @@ export default {
     items: Array,
   },
   methods: {
-    response(response){
+    response(response) {
       this.$infoAlert2(response);
-    }
+    },
   },
 };
 </script>

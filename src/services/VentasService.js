@@ -1,4 +1,5 @@
 import axios from "axios";
+import { infoAlert2 } from '../helpers/alerts';
 
 export default (tenant,service,token) =>{
     return{
@@ -14,21 +15,21 @@ export default (tenant,service,token) =>{
                 productsBelowMinimumStock.forEach(el => {
                 lowStockProducts += `${el.producto.nombre}, `
                 });
-                this.$infoAlert2(`Vaya, parece que te estas quedando sin stock: ${lowStockProducts}`)
+                infoAlert2(`Vaya, parece que te estas quedando sin stock: ${lowStockProducts}`)
                 .then(()=>{
                 if(productsOutOfStockAndDeposits.length > 0){
                     let productsNotRegisteredInStock = '';
                     productsOutOfStockAndDeposits.forEach(el => {
                     productsNotRegisteredInStock += `${el.nombre}, `
                     });
-                    this.$infoAlert2(`Estos productos no se encuentran en ningún depósito: ${productsNotRegisteredInStock}`);
+                    infoAlert2(`Estos productos no se encuentran en ningún depósito: ${productsNotRegisteredInStock}`);
                 }else{
                     if(productsWithoutStockOnDefaultDeposit.length > 0){
                     let productsOnSecondaryDeposits = '';
                     productsWithoutStockOnDefaultDeposit.forEach(el => {
                         productsOnSecondaryDeposits += `${el.producto.nombre}, `
                     });
-                    this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
+                    infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
                     }
                 }
                 })
@@ -37,14 +38,14 @@ export default (tenant,service,token) =>{
                 productsOutOfStockAndDeposits.forEach(el => {
                 productsNotRegisteredInStock += `${el.nombre}, `
                 });
-                this.$infoAlert2(`Estos productos no se encuentran en ningún depósito: ${productsNotRegisteredInStock}`)
+                infoAlert2(`Estos productos no se encuentran en ningún depósito: ${productsNotRegisteredInStock}`)
                 .then(()=>{
                 if(productsWithoutStockOnDefaultDeposit.length > 0){
                     let productsOnSecondaryDeposits = '';
                     productsWithoutStockOnDefaultDeposit.forEach(el => {
                     productsOnSecondaryDeposits += `${el.producto.nombre}, `
                     });
-                    this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
+                    infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
                 }
                 })
             }else{
@@ -53,7 +54,7 @@ export default (tenant,service,token) =>{
                 productsWithoutStockOnDefaultDeposit.forEach(el => {
                     productsOnSecondaryDeposits += `${el.producto.nombre}, `
                 });
-                this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
+                infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
                 }
             }
         }

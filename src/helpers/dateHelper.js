@@ -10,7 +10,7 @@ export function formatDate(str) {
     return date;
 }
 
-export function formatDateWithoutSlash(str){
+export function formatDateWithoutSlash(str) {
     let character = /-/gi;
     let firstDate = str.replace(character, '');
     firstDate = firstDate.substring(0, 8);
@@ -22,12 +22,12 @@ export function formatDateWithoutSlash(str){
     return date;
 }
 
-export function formatWithSlash(){
+export function formatWithSlash() {
     const stringDate = getCurrentDate();
     let year = stringDate.substring(0, 4);
     let month = stringDate.substring(4, 6);
     let day = stringDate.substring(6, 8);
-    let date = year +'-'+ month +'-'+ day;
+    let date = year + '-' + month + '-' + day;
 
     return date;
 }
@@ -51,36 +51,36 @@ export function generateIntegerDate(date) {
     return integerDate;
 }
 
-export function getYearsList(){
+export function getYearsList() {
     const currentYear = new Date().getFullYear()
     let years = []
-    if(currentYear > 2020){
-        for(var i = currentYear; i >= 2020; i--){
+    if (currentYear > 2020) {
+        for (var i = currentYear; i >= 2020; i--) {
             years.push(i);
         }
-    }else{
+    } else {
         years.push(currentYear);
     }
 
     return years;
 }
 
-export function getInternationalDate(){
+export function getInternationalDate() {
     const date = new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60000)).toISOString().split('T')[0];
     return parseInt(date.replace(/-/g, ''));
 }
 
 export const monthsList = [
-    {'value': '01','text': 'Enero',},
-    {'value': '02','text': 'Febrero',},
-    {'value': '03','text': 'Marzo',},
-    {'value': '04','text': 'Abril',},
-    {'value': '05','text': 'Mayo',},
-    {'value': '06','text': 'Junio',},
-    {'value': '07','text': 'Julio',},
-    {'value': '08','text': 'Agosto',},
-    {'value': '09','text': 'Septiembre',},
-    {'value': '10','text': 'Octubre',},
-    {'value': '11','text': 'Noviembre',},
-    {'value': '12','text': 'Diciembre'}
+    { 'value': '01', 'text': 'Enero', },
+    { 'value': '02', 'text': 'Febrero', },
+    { 'value': '03', 'text': 'Marzo', },
+    { 'value': '04', 'text': 'Abril', },
+    { 'value': '05', 'text': 'Mayo', },
+    { 'value': '06', 'text': 'Junio', },
+    { 'value': '07', 'text': 'Julio', },
+    { 'value': '08', 'text': 'Agosto', },
+    { 'value': '09', 'text': 'Septiembre', },
+    { 'value': '10', 'text': 'Octubre', },
+    { 'value': '11', 'text': 'Noviembre', },
+    { 'value': '12', 'text': 'Diciembre' }
 ]

@@ -18,14 +18,6 @@
               <span v-if="!defaultDeposit"> No definido </span>
             </h3>
           </div>
-
-          <!-- TEST CERT -->
-          <!-- <v-btn
-            class="ml-1"
-            color="primary"
-            @click="testcert()"
-          >TEST CERTIFICADO</v-btn> -->
-          <!-- TEST CERT -->
         </v-col>
         <v-col class="text-right">
           <select class="select-ventas-import" v-model="modificator">
@@ -165,7 +157,15 @@
                           />
                         </td>
                         <td>${{ p.precioUnitario }}</td>
-                        <td>${{ p.precioTotal }}</td>
+                        <td>
+                          <div v-if="p.editable === false">${{ p.precioTotal }}</div>
+                          <div class="d-flex align-center" v-if="p.editable === true">
+                            <p class="mt-4">$</p>
+                            <input
+                              type="number"
+                              v-model="p.precioTotal"
+                            />
+                          </div>
                         <td>
                           <button type="button">
                             <img
@@ -247,7 +247,7 @@
         </v-container>
       </v-card>
     </v-dialog>
-
+    
     <Spinner v-if="!loaded" />
   </v-container>
 </template>
@@ -418,6 +418,7 @@ export default {
         precioTotal,
         ivaVentasObject,
         total,
+        editable
       } = producto;
       let object = {
         id: id,
@@ -427,6 +428,7 @@ export default {
         precioUnitario: parseFloat(precioTotal).toFixed(2),
         ivaVentas: ivaVentasObject.porcentaje,
         precioTotal: parseFloat(total).toFixed(2),
+        editable: editable
       };
       return object;
     },
@@ -529,6 +531,7 @@ export default {
             ivaVentas: 8888,
             precioUnitario: percent,
             precioTotal: percent,
+            editable:false
           };
           this.products.push(obj);
         } else {
@@ -543,6 +546,7 @@ export default {
             ivaVentas: 8888,
             precioUnitario: percent,
             precioTotal: percent,
+            editable:false
           };
           this.products.push(obj);
         }
@@ -588,6 +592,7 @@ export default {
             percent
           ),
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
+          editable: false
         };
       } else {
         object = {
@@ -601,6 +606,7 @@ export default {
             percent
           ),
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
+          editable: false
         };
       }
       this.products.push(object);
@@ -619,11 +625,9 @@ export default {
         case "TIQUE FACTURA A":
           this.saveTicketInvoiceA();
           break;
-
         case "TIQUE FACTURA B":
           this.saveTicketInvoiceB();
           break;
-
         default:
           this.saveTicketInvoiceC();
           break;
@@ -1171,22 +1175,6 @@ export default {
       this.individualPercent = "";
       this.listennerOfListChange = 999999999;
       this.$store.commit("productos/resetStates");
-    },
-
-    testcert() {
-      const cuitSucursal = 30715876775;
-      const ptoVenta = 2;
-      const compType = 1;
-      axios
-        .get(
-          `${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuitSucursal}/${ptoVenta}/${compType}`
-        )
-        .then((data) => {
-          console.log(data.data.responseOfAfip);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
     },
   },
 };

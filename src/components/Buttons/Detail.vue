@@ -16,9 +16,9 @@ export default {
   },
   methods: {
     seeDetails() {
-        (Array.isArray(this.objectsArray)) ? 
-        this.$emit("seeDetails", this.objectsArray) : 
-        this.$emit("seeDetails", this.object);
+      Array.isArray(this.objectsArray)
+        ? this.$emit("seeDetails", this.objectsArray)
+        : this.$emit("seeDetails", this.object);
     },
   },
 };

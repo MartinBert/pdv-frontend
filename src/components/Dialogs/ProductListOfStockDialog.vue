@@ -7,25 +7,28 @@
       <v-card-text>
         <v-row>
           <v-col cols="12">
-            <v-simple-table style="background-color: transparent;">
-                <template v-slot:default>
-                    <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Código de barras</th>
-                        <th>Código de producto</th>
-                        <th>Cantidad</th>
-                    </tr>
-                    </thead>
-                    <tbody v-for="object in $store.state.eventual.eventual" :key="object.id">
-                    <tr>
-                        <td>{{object.producto.nombre}}</td>
-                        <td>{{object.producto.codigoBarra}}</td>
-                        <td>{{object.producto.codigoProducto}}</td>
-                        <td>{{object.cantidad}}</td>
-                    </tr>
-                    </tbody>
-                </template>
+            <v-simple-table style="background-color: transparent">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Código de barras</th>
+                    <th>Código de producto</th>
+                    <th>Cantidad</th>
+                  </tr>
+                </thead>
+                <tbody
+                  v-for="object in $store.state.eventual.eventual"
+                  :key="object.id"
+                >
+                  <tr>
+                    <td>{{ object.producto.nombre }}</td>
+                    <td>{{ object.producto.codigoBarra }}</td>
+                    <td>{{ object.producto.codigoProducto }}</td>
+                    <td>{{ object.cantidad }}</td>
+                  </tr>
+                </tbody>
+              </template>
             </v-simple-table>
           </v-col>
         </v-row>

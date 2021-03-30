@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="$store.state.details.dialog" width="750px">
     <v-card color="var(--main-bg-color)">
-      <v-card-title> {{$store.state.details.title}} </v-card-title>
+      <v-card-title> {{ $store.state.details.title }} </v-card-title>
       <v-card-text>
         <v-simple-table style="background-color: transparent">
           <template v-slot:default>
@@ -24,7 +24,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="object in $store.state.details.objects" :key="object.id">
+              <tr
+                v-for="object in $store.state.details.objects"
+                :key="object.id"
+              >
                 <td>{{ object.nombre }}</td>
                 <td v-if="$store.state.details.objects[0].cuotas">
                   {{ object.cuotas }}

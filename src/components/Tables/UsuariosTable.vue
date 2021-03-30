@@ -17,9 +17,7 @@
           <td>{{ item.perfil.nombre }}</td>
           <td>
             <span v-if="item.empresa == null">Todas</span>
-            <span v-if="item.empresa != null">{{
-              item.empresa.alias
-            }}</span>
+            <span v-if="item.empresa != null">{{ item.empresa.alias }}</span>
           </td>
           <td>
             <Edit :itemId="item.id" v-on:editItem="editItem" />

@@ -58,7 +58,7 @@ import Add from "../Buttons/Add";
 import Checked from "../Buttons/Checked";
 export default {
   props: {
-    items: Array
+    items: Array,
   },
   components: {
     Edit,

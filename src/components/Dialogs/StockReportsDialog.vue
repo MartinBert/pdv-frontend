@@ -7,11 +7,11 @@
       <v-card-text>
         <v-container>
           <v-row>
-              <v-col class="text-center">
-                  <v-btn class="primary" @click="allStocksReport()">
-                    Reporte general de existencias
-                  </v-btn>
-              </v-col>
+            <v-col class="text-center">
+              <v-btn class="primary" @click="allStocksReport()">
+                Reporte general de existencias
+              </v-btn>
+            </v-col>
           </v-row>
         </v-container>
       </v-card-text>
@@ -19,22 +19,24 @@
   </v-dialog>
 </template>
 <script>
-import ReportsService from '../../services/ReportsService';
-import { exportPDF } from '../../helpers/exportFileHelper';
+import ReportsService from "../../services/ReportsService";
+import { exportPDF } from "../../helpers/exportFileHelper";
 
 export default {
-  props:{
+  props: {
     loguedUser: Object,
     tenant: String,
     service: String,
-    token: String
+    token: String,
   },
 
-  methods:{
-
+  methods: {
     /**** Export PDF ****/
-    allStocksReport(){
-      if(this.loguedUser.sucursal === undefined) return this.$errorAlert("Debe seleccionar una sucursal para generar el documento");
+    allStocksReport() {
+      if (this.loguedUser.sucursal === undefined)
+        return this.$errorAlert(
+          "Debe seleccionar una sucursal para generar el documento"
+        );
       let id = this.loguedUser.sucursal.id;
 
       ReportsService(this.tenant, this.service, this.token)
@@ -42,8 +44,7 @@ export default {
         .then((res) => {
           exportPDF(res);
         });
-    }
-
-  }
+    },
+  },
 };
 </script>

@@ -1,34 +1,38 @@
 import axios from "axios";
 
-export default (tenant,service,token) =>{
-    return{
-    /**** PRODUCTS REPORTS ****/
-        listAllProducts(){
+export default (tenant, service, token) => {
+    return {
+        /******************************************************************************************************/
+        /* ALL FUNCTIONS FOR PRODUCTS REPORTS ----------------------------------------------------------------*/
+        /******************************************************************************************************/
+        listAllProducts() {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/generalReport/${tenant}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
                 dataType: 'blob'
             })
         },
-        labels(labelList){
+        
+        labels(labelList) {
             return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/labels`, labelList, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
                 dataType: 'blob'
             })
         },
-    /**** PRODUCTS REPORTS ****/
 
-    /**** SALES REPORTS ****/
-        onCloseSaleReport(object){
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/onCloseSaleReport/${tenant}`, object,{
+        /******************************************************************************************************/
+        /* ALL FUNCTIONS FOR SALE REPORTS --------------------------------------------------------------------*/
+        /******************************************************************************************************/
+        onCloseSaleReport(object) {
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/onCloseSaleReport/${tenant}`, object, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
                 dataType: 'blob'
             })
         },
-        
-        allSalesReport(id){
+
+        allSalesReport(id) {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/allSalesReport/${tenant}/${id}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
@@ -36,7 +40,7 @@ export default (tenant,service,token) =>{
             })
         },
 
-        salesForReceipt(id, receipt){
+        salesForReceipt(id, receipt) {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/salesForReceiptReport/${tenant}/${id}/${receipt}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
@@ -44,7 +48,7 @@ export default (tenant,service,token) =>{
             })
         },
 
-        salesForClient(id, client){
+        salesForClient(id, client) {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/salesForClientReport/${tenant}/${id}/${client}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
@@ -52,7 +56,7 @@ export default (tenant,service,token) =>{
             })
         },
 
-        salesForDate(id, fechaDesde, fechaHasta){
+        salesForDate(id, fechaDesde, fechaHasta) {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/salesForDateReport/${tenant}/${id}/${fechaDesde}/${fechaHasta}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
@@ -60,7 +64,7 @@ export default (tenant,service,token) =>{
             })
         },
 
-        salesForMonth(id, year, month){
+        salesForMonth(id, year, month) {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/salesForMonthReport/${tenant}/${id}/${year}/${month}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
@@ -68,7 +72,7 @@ export default (tenant,service,token) =>{
             })
         },
 
-        salesForYear(id, year){
+        salesForYear(id, year) {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/salesForYearReport/${tenant}/${id}/${year}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
@@ -76,24 +80,23 @@ export default (tenant,service,token) =>{
             })
         },
 
-        allSalesGroupBy(id, type){
+        allSalesGroupBy(id, type) {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/allSalesGroupBy/${tenant}/${id}/${type}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
                 dataType: 'blob'
             })
         },
-    /**** SALES REPORTS ****/
 
-    /**** STOCKS REPORTS ****/
-        allStocksReport(id){
+        /******************************************************************************************************/
+        /* ALL FUNCTIONS FOR STOCK REPORTS -------------------------------------------------------------------*/
+        /******************************************************************************************************/
+        allStocksReport(id) {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/allStocksReport/${tenant}/${id}`, {
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
                 dataType: 'blob'
             })
         },
-    /**** SALES REPORTS ****/
-        
     }
 }

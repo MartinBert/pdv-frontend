@@ -1,21 +1,17 @@
 <template>
-    <v-date-picker
-      v-model="fechas"
-      multiple
-      @input="funcionDelOrto"
-      >
-    </v-date-picker>
+  <v-date-picker v-model="fechas" multiple @input="funcionDelOrto">
+  </v-date-picker>
 </template>
 <script>
-import { formatWithSlash } from '../../helpers/dateHelper';
+import { formatWithSlash } from "../../helpers/dateHelper";
 export default {
   data: () => ({
-    fechas: [formatWithSlash()]
+    fechas: [formatWithSlash()],
   }),
-  methods:{
-    funcionDelOrto(){
-      this.$emit('dateData', this.fechas);
-    }
-  }
-}
+  methods: {
+    funcionDelOrto() {
+      this.$emit("dateData", this.fechas);
+    },
+  },
+};
 </script>
