@@ -42,9 +42,7 @@
         <v-btn @click="back()">VOLVER</v-btn>
       </div>
     </v-card-text>
-    <div class="text-center" style="margin-top: 15px" v-if="!loaded">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
+    <Spinner v-if="!loaded"/>
   </v-card>
 </template>
 <script>
@@ -55,6 +53,7 @@ import {
   sumarNumeros,
 } from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
+import Spinner from '../../components/Graphics/Spinner';
 export default {
   data: () => ({
     loaded: false,
@@ -85,6 +84,10 @@ export default {
     },
     token: localStorage.getItem("token"),
   }),
+
+  components:{
+    Spinner
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;

@@ -1,6 +1,6 @@
 <template>
   <v-card min-width="100%">
-    <v-snackbar v-model="snackError" :color="'#E53935'" :timeout="3000" :top="true">{{errorMessage}}</v-snackbar>
+    <Error :errorStatus="errorStatus"/>
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-1">
@@ -111,17 +111,13 @@
         </div>
       </v-form>
     </div>
-    <div v-if="!loaded">
-      <v-row class="ma-1">
-        <v-col class="col-12" style="text-align:center">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
-        </v-col>
-      </v-row>
-    </div>
+    <Spinner v-if="!loaded"/>
   </v-card>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+import Spinner from '../../components/Graphics/Spinner';
+import Error from '../../components/Error';
 export default {
   data: () => ({
     valid:true,
@@ -153,9 +149,13 @@ export default {
     tenant: "",
     service: "usuarios",
     token: localStorage.getItem("token"),
-    snackError: false,
-    errorMessage: ""
+    errorStatus: false,
   }),
+
+  components:{
+    Spinner,
+    Error
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -218,8 +218,7 @@ export default {
         })
         .catch(error => {
           if (error.response.status == 500) {
-            this.snackError = true;
-            this.errorMessage = error.response.data;
+            this.errorStatus = true;
           }
         });
     },

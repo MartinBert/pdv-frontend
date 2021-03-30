@@ -1,12 +1,6 @@
 `<template>
   <v-card min-width="100%">
-    <v-snackbar
-      v-model="snackError"
-      :color="'#E53935'"
-      :timeout="3000"
-      :top="true"
-      >{{ errorMessage }}</v-snackbar
-    >
+    <Error :errorStatus="errorStatus"/>
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false">
         <v-row>
@@ -174,17 +168,7 @@
         </v-row>
       </v-form>
     </div>
-    <div v-if="!loaded">
-      <v-row class="ma-1">
-        <v-col class="col-12" style="text-align: center">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
-        </v-col>
-      </v-row>
-    </div>
-    <!-- Dialog Components -->
+    <Spinner v-if="!loaded"/>
     <ProductDialog v-on:productList="addProduct" v-on:resetListStatus="resetListOfDialog" :refreshListStatus="listennerOfListChange"/>
     <ReceiptDialog
       v-on:receipt="receiptDialogData = $store.state.receipt.receipt"
@@ -206,6 +190,8 @@ import { formatFiscalInvoice } from '../../helpers/receiptFormatHelper';
 import { addZerosInString } from '../../helpers/stringHelper';
 import ProductDialog from "../../components/Dialogs/ProductDialog";
 import ReceiptDialog from "../../components/Dialogs/ReceiptDialog";
+import Spinner from '../../components/Graphics/Spinner';
+import Error from '../../components/Error';
 export default {
   data: () => ({
     tiposOperacion: [
@@ -227,8 +213,7 @@ export default {
     tenant: "",
     service: "devoluciones",
     token: localStorage.getItem("token"),
-    snackError: false,
-    errorMessage: "",
+    errorStatus: false,
     paginate: {
       page: 1,
       size: 5,
@@ -255,6 +240,8 @@ export default {
   components: {
     ProductDialog,
     ReceiptDialog,
+    Spinner,
+    Error
   },
 
   computed: {

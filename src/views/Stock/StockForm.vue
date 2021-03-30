@@ -1,12 +1,6 @@
 <template>
   <v-card min-width="100%">
-    <v-snackbar
-      v-model="snackError"
-      :color="'#E53935'"
-      :timeout="3000"
-      :top="true"
-      >{{ errorMessage }}</v-snackbar
-    >
+    <Error :errorStatus="errorStatus"/>
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row v-if="urlId == 0" class="ml-5 mr-5">
@@ -222,21 +216,14 @@
         </div>
       </v-form>
     </div>
-    <div v-if="!loaded">
-      <v-row class="ma-1">
-        <v-col class="col-12" style="text-align: center">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
-        </v-col>
-      </v-row>
-    </div>
+    <Spinner v-if="!loaded"/>
   </v-card>
 </template>
 <script>
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
+import Spinner from '../../components/Graphics/Spinner';
+import Error from '../../components/Error';
 export default {
   data: () => ({
     valid: true,
@@ -251,8 +238,7 @@ export default {
     tenant: "",
     service: "stock",
     token: localStorage.getItem("token"),
-    snackError: false,
-    errorMessage: "",
+    errorStatus: false,
     filterParams: {
       productoName: "",
       productoCodigo: "",
@@ -279,6 +265,11 @@ export default {
     radioGroup: "",
     checked: false,
   }),
+
+  components:{
+    Spinner,
+    Error
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -372,6 +363,10 @@ export default {
             this.saveHistorial([this.object], `Cambio en stock de ${this.object.producto.nombre}`)
             this.$router.push({ name: "stock" });
           })
+          .catch(()=>{
+            this.errorStatus = true;
+            this.$router.push({ name: "stock" });
+          })
         } else {
           var stocks = [];
           this.object.deposito.forEach((ele) => {
@@ -391,10 +386,13 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(stocks)
             .then(() => {
+              this.saveHistorial(stocks, `Carga de stock`);
               this.$router.push({ name: "stock" });
-            });
-
-          this.saveHistorial(stocks, `Carga de stock`);
+            })
+            .catch(()=>{
+              this.errorStatus = true;
+              this.$router.push({ name: "stock" });
+            })
         }
       }
     },
