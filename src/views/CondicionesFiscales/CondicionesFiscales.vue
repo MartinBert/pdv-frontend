@@ -26,7 +26,6 @@
       v-on:deleteItem="deleteItem"
       v-if="loaded"
     />
-
     <Pagination
       :page="filterParams.page"
       :totalPages="filterParams.totalPages"
@@ -34,9 +33,7 @@
       v-on:changePage="filterObjects"
       v-if="loaded"
     />
-
     <Spinner v-if="!loaded"/>
-
     <DeleteDialog
       :status="deleteDialogStatus"
       v-on:deleteConfirmation="deleteConfirmation"
@@ -49,7 +46,6 @@ import CondicionesFiscalesTable from '../../components/Tables/CondicionesFiscale
 import Spinner from '../../components/Graphics/Spinner';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
 import Pagination from '../../components/Pagination';
-
 export default {
   data: () => ({
     condiciones: [],

@@ -48,7 +48,6 @@
     />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import PlanesPagoTable from "../../components/Tables/PlanesPagoTable";
@@ -56,7 +55,6 @@ import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import XLSX from 'xlsx';
-
 export default {
   data: () => ({
     planesPago: [],

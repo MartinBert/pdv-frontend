@@ -142,7 +142,6 @@
 import GenericService from "../../services/GenericService";
 import Spinner from '../../components/Graphics/Spinner';
 import Error from '../../components/Error';
-
 export default {
   data: () => ({
     valid: true,

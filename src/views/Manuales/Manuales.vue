@@ -77,7 +77,6 @@
 <script>
 import GenericService from '../../services/GenericService';
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
-
 export default {
   mounted() {
     this.tenant = this.$route.params.tenant;

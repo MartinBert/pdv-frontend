@@ -42,9 +42,7 @@
 </template>
 <script>
 import axios from "axios";
-
 export default {
-  name: "login",
   data: function() {
     return {
       username: "",

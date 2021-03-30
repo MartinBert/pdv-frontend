@@ -41,14 +41,12 @@
     />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import PerfilesTable from "../../components/Tables/PerfilesTable";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
-
 export default {
   data: () => ({
     perfiles: [],

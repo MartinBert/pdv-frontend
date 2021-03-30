@@ -168,10 +168,8 @@
         </v-card>
       </v-dialog>
     </template>
-    <!-- End Dialog Loader -->
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
@@ -182,7 +180,6 @@ import ProductosTable from '../../components/Tables/ProductosTable';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
 import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
 import XLSX from "xlsx";
-
 export default {
   data: () => ({
     icon: "mdi-check-circle",

@@ -84,7 +84,6 @@
     <TransportistaDetails/>
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
@@ -92,7 +91,6 @@ import Pagination from "../../components/Pagination";
 import TransportistasTable from "../../components/Tables/TransportistasTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import TransportistaDetails from "../../components/Details/TransportistaDetails";
-
 export default {
   data: () => ({
     transportistas: [],

@@ -69,7 +69,6 @@ import Pagination from "../../components/Pagination";
 import EmpresasTable from "../../components/Tables/EmpresasTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import EmpresaDetails from "../../components/Details/EmpresaDetails";
-
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),

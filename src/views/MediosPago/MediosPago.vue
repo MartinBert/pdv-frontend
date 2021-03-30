@@ -53,7 +53,6 @@
     <MedioPagoDetails/>
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
@@ -62,7 +61,6 @@ import MediosPagoTable from "../../components/Tables/MediosPagoTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import MedioPagoDetails from "../../components/Details/MedioPagoDetails";
 import XLSX from 'xlsx';
-
 export default {
   data: () => ({
     plans: "",

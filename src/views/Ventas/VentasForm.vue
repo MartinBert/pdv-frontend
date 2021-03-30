@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <!-- Body -->
     <v-col cols="12" v-if="loaded">
       <v-row class="mb-1">
         <v-col cols="6">
@@ -221,15 +220,11 @@
         </v-col>
       </v-row>
     </v-col>
-
-    <!-- Add products dialog -->
     <ProductDialog
       v-on:productList="addProduct"
       v-on:resetListStatus="resetListOfDialog"
       :refreshListStatus="listennerOfListChange"
     />
-
-    <!-- Individual percent dialog -->
     <v-dialog v-model="dialogIndividualPercent" width="500">
       <v-card>
         <v-card-title class="headline grey lighten-2">
@@ -247,11 +242,9 @@
         </v-container>
       </v-card>
     </v-dialog>
-    
     <Spinner v-if="!loaded" />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
@@ -276,7 +269,6 @@ import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
-
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),

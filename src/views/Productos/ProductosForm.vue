@@ -258,7 +258,6 @@
     </div>
   </v-card>
 </template>
-
 <script>
 import {
   calculateAmountPlusPercentaje,
@@ -269,7 +268,6 @@ import {
   generateBarCode,
 } from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
-
 export default {
   data: () => ({
     atributosNumericos: [],

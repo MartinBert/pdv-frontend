@@ -49,12 +49,10 @@
       <Spinner v-if="!loaded"/>
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import Error from '../../components/Error';
 import Spinner from '../../components/Graphics/Spinner';
-
 export default {
   data: () => ({
     valid: true,

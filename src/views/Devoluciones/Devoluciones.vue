@@ -39,7 +39,6 @@
     <ReceiptDialog v-on:receipt="saveChanges"/>
   </v-container>
 </template>
-
 <script>
 import axios from "axios";
 import GenericService from "../../services/GenericService";
@@ -54,7 +53,6 @@ import { generateBarCode, generateFiveDecimalCode } from "../../helpers/mathHelp
 import { processDetailReceipt } from "../../helpers/processObjectsHelper";
 import { formatFiscalInvoice } from '../../helpers/receiptFormatHelper';
 import { addZerosInString } from '../../helpers/stringHelper';
-
 export default {
   data: () => ({
     devoluciones: [],

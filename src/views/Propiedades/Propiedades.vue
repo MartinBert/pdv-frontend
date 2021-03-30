@@ -42,7 +42,6 @@
     <PropiedadesDetails/>
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import PropiedadesTable from "../../components/Tables/PropiedadesTable";
@@ -50,7 +49,6 @@ import PropiedadesDetails from "../../components/Details/PropiedadesDetails";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
- 
 export default {
   data: () => ({
     propiedades: [],

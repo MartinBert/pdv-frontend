@@ -184,7 +184,6 @@
         </v-col>
       </v-row>
     </div>
-
     <!-- Dialog Components -->
     <ProductDialog v-on:productList="addProduct" v-on:resetListStatus="resetListOfDialog" :refreshListStatus="listennerOfListChange"/>
     <ReceiptDialog
@@ -192,7 +191,6 @@
     />
   </v-card>
 </template>
-
 <script>
 import axios from "axios";
 import GenericService from "../../services/GenericService";
@@ -208,7 +206,6 @@ import { formatFiscalInvoice } from '../../helpers/receiptFormatHelper';
 import { addZerosInString } from '../../helpers/stringHelper';
 import ProductDialog from "../../components/Dialogs/ProductDialog";
 import ReceiptDialog from "../../components/Dialogs/ReceiptDialog";
-
 export default {
   data: () => ({
     tiposOperacion: [

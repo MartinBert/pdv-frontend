@@ -69,7 +69,6 @@ import Pagination from "../../components/Pagination";
 import SucursalesTable from "../../components/Tables/SucursalesTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import SucursalDetails from "../../components/Details/SucursalDetails";
-
 export default {
   data: () => ({
     sucursales: [],

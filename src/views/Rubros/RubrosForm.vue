@@ -32,7 +32,6 @@
     </div>
   </v-card>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 export default {
@@ -55,6 +54,7 @@ export default {
       this.loaded = true;
     }
   },
+  
   methods: {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)

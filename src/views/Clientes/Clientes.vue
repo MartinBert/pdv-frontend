@@ -70,7 +70,6 @@ import Pagination from "../../components/Pagination";
 import ClientesTable from "../../components/Tables/ClientesTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import ClienteDetails from "../../components/Details/ClienteDetails";
-
 export default {
   data: () => ({
     clientes: [],

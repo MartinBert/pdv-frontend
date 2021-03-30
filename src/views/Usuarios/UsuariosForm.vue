@@ -103,7 +103,6 @@
             >Restaurar contraseña</v-btn>
           </v-col>
         </v-row>
-
         <div class="ma-1">
           <v-col class="col-6">
             <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
@@ -121,10 +120,8 @@
     </div>
   </v-card>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
-
 export default {
   data: () => ({
     valid:true,

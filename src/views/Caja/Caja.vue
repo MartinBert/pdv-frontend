@@ -29,7 +29,6 @@ import CajaDetails from '../../components/Details/CajaDetails';
 import Spinner from '../../components/Graphics/Spinner';
 import CajaTable from '../../components/Tables/CajaTable';
 import Pagination from '../../components/Pagination';
-
 export default {
   data: () => ({
     objects: [],

@@ -33,7 +33,6 @@ import IvasTable from '../../components/Tables/IvasTable'
 import Pagination from '../../components/Pagination';
 import Spinner from '../../components/Graphics/Spinner';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
-
 export default {
   data: () => ({
     ivas: [],

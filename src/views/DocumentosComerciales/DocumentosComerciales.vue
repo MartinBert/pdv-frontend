@@ -56,7 +56,6 @@ import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import Spinner from "../../components/Graphics/Spinner";
 import Pagination from "../../components/Pagination";
 import XLSX from "xlsx";
-
 export default {
   data: () => ({
     documentosComerciales: [],

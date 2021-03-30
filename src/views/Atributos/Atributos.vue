@@ -65,7 +65,6 @@ import Pagination from "../../components/Pagination";
 import AtributosTable from "../../components/Tables/AtributosTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import { importAttributes } from "../../helpers/importAttributes";
-
 export default {
   data: () => ({
     atributos: [],

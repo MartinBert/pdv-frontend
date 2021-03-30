@@ -42,13 +42,11 @@
         <v-btn @click="back()">VOLVER</v-btn>
       </div>
     </v-card-text>
-
     <div class="text-center" style="margin-top: 15px" v-if="!loaded">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
   </v-card>
 </template>
-
 <script>
 import {
   calculateAmountPlusPercentaje,

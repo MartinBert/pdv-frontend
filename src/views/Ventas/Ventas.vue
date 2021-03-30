@@ -77,7 +77,6 @@ import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import VentasTable from "../../components/Tables/VentasTable";
 import VentaDetails from "../../components/Details/VentaDetails";
-
 export default {
   data: () => ({
     icon: "mdi-check-circle",

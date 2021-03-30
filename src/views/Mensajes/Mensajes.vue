@@ -49,8 +49,6 @@
         </v-col>
       </v-row>
     </v-form>
-
-    <!-- List -->
     <v-simple-table style="background-color: transparent">
       <template v-slot:default>
         <thead>
@@ -80,15 +78,9 @@
         </tbody>
       </template>
     </v-simple-table>
-    <!-- End List -->
-
-    <!-- Loader -->
     <div class="text-center" style="margin-top: 15px" v-if="!loaded">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
-    <!-- End Loader -->
-
-    <!-- filterParams -->
     <v-pagination
       v-model="filterParams.page"
       :length="filterParams.totalPages"
@@ -99,9 +91,6 @@
       @input="filterObjects()"
       v-if="filterParams.totalPages > 1"
     ></v-pagination>
-    <!-- End filterParams -->
-
-    <!-- Dialog Detail-->
     <v-dialog v-model="$store.state.eventual.eventualDialog" width="500">
       <v-card>
         <v-card-title class="d-flex justify-center">
@@ -112,12 +101,10 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <!-- End Dialog Detail -->
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-
 export default {
   data: () => ({
     objects: [],

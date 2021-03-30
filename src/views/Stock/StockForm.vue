@@ -237,7 +237,6 @@
 <script>
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
-
 export default {
   data: () => ({
     valid: true,

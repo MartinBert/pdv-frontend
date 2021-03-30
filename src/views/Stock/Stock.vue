@@ -139,7 +139,6 @@
     /> 
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
@@ -151,7 +150,6 @@ import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import DepositMigrationDialog from "../../components/Dialogs/DepositMigrationDialog";
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
-
 export default {
   data: () => ({
     stocks: [],

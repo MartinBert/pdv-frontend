@@ -33,7 +33,6 @@
     <Spinner v-if="!loaded" />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import PreguntasFrecuentesTable from '../../components/Tables/PreguntasFrecuentesTable';

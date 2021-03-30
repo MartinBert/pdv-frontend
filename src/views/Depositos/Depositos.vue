@@ -58,7 +58,6 @@
     <StockHistoryDialog />
   </v-container>
 </template>
-
 <script>
 import GenericService from "../../services/GenericService";
 import XLSX from "xlsx";
@@ -67,7 +66,6 @@ import DepositosTable from "../../components/Tables/DepositosTable";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
-
 export default {
   data: () => ({
     depositos: [],
