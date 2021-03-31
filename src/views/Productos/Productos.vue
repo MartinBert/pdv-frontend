@@ -3,14 +3,24 @@
     <v-form class="mb-3">
       <v-row>
         <v-col cols="12" v-if="perfil < 3">
-          <v-btn class="primary ml-1" @click="view = 'listOfProducts'" raised>LISTA</v-btn>
+          <v-btn class="primary ml-1" @click="view = 'listOfProducts'" raised
+            >LISTA</v-btn
+          >
           <v-btn class="primary ml-1" @click="newObject()" raised>NUEVO</v-btn>
-          <v-btn class="primary ml-1" @click="view = 'labelPrinting'">GENERAR ETIQUETAS</v-btn>
-          <v-btn class="primary ml-1" @click="goPricesManagerView()">MODIFICAR PRECIOS</v-btn>
+          <v-btn class="primary ml-1" @click="view = 'labelPrinting'"
+            >GENERAR ETIQUETAS</v-btn
+          >
+          <v-btn class="primary ml-1" @click="goPricesManagerView()"
+            >MODIFICAR PRECIOS</v-btn
+          >
           <v-btn class="primary ml-1" @click="getReport()" raised
             >REPORTE</v-btn
           >
-          <v-btn v-if="loaded" class="primary ml-1" @click="exportGeneralExcel()" raised
+          <v-btn
+            v-if="loaded"
+            class="primary ml-1"
+            @click="exportGeneralExcel()"
+            raised
             >EXPORTAR EXCEL</v-btn
           >
         </v-col>
@@ -119,18 +129,18 @@
       v-on:changePage="filterObjects"
       v-if="loaded && view === 'listOfProducts'"
     />
-    <LabelPrinting 
-    v-if="view === 'labelPrinting'" 
-    :productos="productos" 
-    :page="filterParams.page" 
-    :totalVisible="filterParams.size" 
-    :totalPages="filterParams.totalPages"
-    :tenant="tenant"
-    :token="token"
-    v-on:changePage="changePage"
-    v-on:checkProduct="checkProductInList"
+    <LabelPrinting
+      v-if="view === 'labelPrinting'"
+      :productos="productos"
+      :page="filterParams.page"
+      :totalVisible="filterParams.size"
+      :totalPages="filterParams.totalPages"
+      :tenant="tenant"
+      :token="token"
+      v-on:changePage="changePage"
+      v-on:checkProduct="checkProductInList"
     />
-    <Spinner v-if="!loaded"/>
+    <Spinner v-if="!loaded" />
     <DeleteDialog
       :status="deleteDialogStatus"
       v-on:deleteConfirmation="deleteConfirmation"
@@ -179,16 +189,20 @@ import ReportsService from "../../services/ReportsService";
 import LabelPrinting from "../../components/LabelPrinting";
 import Spinner from "../../components/Graphics/Spinner";
 import Pagination from "../../components/Pagination";
-import ProductosTable from '../../components/Tables/ProductosTable';
-import DeleteDialog from '../../components/Dialogs/DeleteDialog';
-import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
-import { exportExcel } from '../../helpers/exportFileHelper';
+import ProductosTable from "../../components/Tables/ProductosTable";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+import {
+  generateBarCode,
+  roundTwoDecimals,
+  decimalPercent,
+} from "../../helpers/mathHelper";
+import { exportExcel } from "../../helpers/exportFileHelper";
 import XLSX from "xlsx";
 export default {
   data: () => ({
     icon: "mdi-check-circle",
-    view: 'listOfProducts',
-    perfil: '',
+    view: "listOfProducts",
+    perfil: "",
     loader: false,
     loaderStatus: false,
     file: null,
@@ -201,7 +215,7 @@ export default {
     rubros: [],
     propiedades: [],
     atributos: [],
-    ivas:[],
+    ivas: [],
     estados: [
       { id: 1, text: "Activos" },
       { id: 2, text: "Inactivos" },
@@ -218,7 +232,7 @@ export default {
       productoEstado: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
@@ -228,7 +242,7 @@ export default {
     dialogStock: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     checkImportStatus: 0,
-    deleteDialogStatus: false
+    deleteDialogStatus: false,
   }),
 
   components: {
@@ -236,7 +250,7 @@ export default {
     Spinner,
     Pagination,
     ProductosTable,
-    DeleteDialog
+    DeleteDialog,
   },
 
   mounted() {
@@ -248,63 +262,70 @@ export default {
 
   methods: {
     filterObjects(page) {
-      if(page) this.filterParams.page = page;
-      if(this.estadoSelecionado.id > 1){
-        this.filterParams.productoEstado = 2
-      }else{
-        this.filterParams.productoEstado = 0
+      if (page) this.filterParams.page = page;
+      if (this.estadoSelecionado.id > 1) {
+        this.filterParams.productoEstado = 2;
+      } else {
+        this.filterParams.productoEstado = 0;
       }
       GenericService(this.tenant, "productos", this.token)
-      .filter(this.filterParams)
-      .then((data) => {
-        data.data.content.forEach(el => {
-          this.$store.state.productos.products.forEach(e => {
-            if(el.codigoBarra == e.codigoBarra){
-              el.selected = true;
-            }
-          })
-        })
+        .filter(this.filterParams)
+        .then((data) => {
+          data.data.content.forEach((el) => {
+            this.$store.state.productos.products.forEach((e) => {
+              if (el.codigoBarra == e.codigoBarra) {
+                el.selected = true;
+              }
+            });
+          });
 
-        this.productos = data.data.content;
-        this.filterParams.totalPages = data.data.totalPages;
-        this.loaded = true;
-      });
+          this.productos = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
     },
 
     getOtherModels(page, size) {
-      const services = ["marcas", "distribuidores", "rubros", "propiedades", "atributos", "ivas"];
+      const services = [
+        "marcas",
+        "distribuidores",
+        "rubros",
+        "propiedades",
+        "atributos",
+        "ivas",
+      ];
 
-      services.forEach(service => {
+      services.forEach((service) => {
         GenericService(this.tenant, service, this.token)
-        .getAll(page, size)
-        .then(data => {
-          switch (service) {
-            case "marcas":
+          .getAll(page, size)
+          .then((data) => {
+            switch (service) {
+              case "marcas":
                 this.marcas = data.data.content;
-              break;
+                break;
 
-            case "distribuidores":
+              case "distribuidores":
                 this.distribuidores = data.data.content;
-              break;
+                break;
 
-            case "rubros":
+              case "rubros":
                 this.rubros = data.data.content;
-              break;
+                break;
 
-            case "propiedades":
+              case "propiedades":
                 this.propiedades = data.data.content;
-              break;
+                break;
 
-            case "atributos":
+              case "atributos":
                 this.atributos = data.data.content;
-              break;
-          
-            default:
+                break;
+
+              default:
                 this.ivas = data.data.content;
-              break;
-          }
-        })
-      })
+                break;
+            }
+          });
+      });
     },
 
     newObject() {
@@ -320,8 +341,8 @@ export default {
       this.deleteDialogStatus = true;
     },
 
-    deleteConfirmation(result){
-      return result ? this.deleteObject() : this.deleteDialogStatus = false;
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
 
     deleteObject() {
@@ -332,42 +353,49 @@ export default {
         .then(() => {
           this.filterObjects();
         })
-        .catch(()=>{
-          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema")
-          .then(result => {
-            if(result.isDismissed){
-              this.$questionAlert('Puede desactivar el producto para no verlo en la tabla', 'Desea hacerlo')
-              .then(result => {
-                if(result.isConfirmed){
-                  let inactiveProduct = this.productos.filter(el => el.id === this.idObject)[0];
+        .catch(() => {
+          this.$errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          ).then((result) => {
+            if (result.isDismissed) {
+              this.$questionAlert(
+                "Puede desactivar el producto para no verlo en la tabla",
+                "Desea hacerlo"
+              ).then((result) => {
+                if (result.isConfirmed) {
+                  let inactiveProduct = this.productos.filter(
+                    (el) => el.id === this.idObject
+                  )[0];
                   inactiveProduct.estado = 2;
                   GenericService(this.tenant, this.service, this.token)
-                  .save(inactiveProduct)
-                  .then(this.filterObjects())
-                  .catch(err => {
-                    console.error(err);
-                  });
+                    .save(inactiveProduct)
+                    .then(this.filterObjects())
+                    .catch((err) => {
+                      console.error(err);
+                    });
                 }
-              })
+              });
             }
-          })
-        })
+          });
+        });
     },
 
     reactivationOfProduct(object) {
-      this.$questionAlert('Atención, esta acción activará el producto en el sistema', 'Desea continuar')
-      .then(result => {
-        if(result.isConfirmed){
+      this.$questionAlert(
+        "Atención, esta acción activará el producto en el sistema",
+        "Desea continuar"
+      ).then((result) => {
+        if (result.isConfirmed) {
           this.loaded = false;
           object.estado = 1;
           GenericService(this.tenant, this.service, this.token)
-          .save(object)
-          .then(()=>{
-            this.filterObjects();
-            this.getOtherModels(0, 100000);
-          })
+            .save(object)
+            .then(() => {
+              this.filterObjects();
+              this.getOtherModels(0, 100000);
+            });
         }
-      })
+      });
     },
 
     //Load excel
@@ -401,12 +429,13 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(() => {
-              this.$successAlert('Importación exitosa')
-              .then(() => {
-                if(this.checkImportStatus > 0){
-                  this.$infoAlert("Se agregaron nuevos atributos al sistema. Realice nuevamente la importación para asignarlos correctamente");
+              this.$successAlert("Importación exitosa").then(() => {
+                if (this.checkImportStatus > 0) {
+                  this.$infoAlert(
+                    "Se agregaron nuevos atributos al sistema. Realice nuevamente la importación para asignarlos correctamente"
+                  );
                 }
-              })
+              });
               this.filterObjects();
               this.loaderStatus = true;
               this.loaded = true;
@@ -447,13 +476,37 @@ export default {
             distribuidores: this.getDistribuidores(element.idDistribuidores),
             ivaComprasObject: this.getIva(element.idIvaCompras),
             ivaVentasObject: this.getIva(element.idIvaVentas),
-            precioCosto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(ivaComp))),
-            costoNeto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(ivaComp)) / (1 + decimalPercent(ivaComp))),
-            costoBruto: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(ivaComp))),
-            ivaCompra: roundTwoDecimals(element.precioTotal / (1 + ganancia) / (1 + decimalPercent(ivaComp)) - element.precioTotal / (1 + ganancia) / (1 + ivaComp) / (1 + ivaComp)),
+            precioCosto: roundTwoDecimals(
+              element.precioTotal /
+                (1 + ganancia) /
+                (1 + decimalPercent(ivaComp))
+            ),
+            costoNeto: roundTwoDecimals(
+              element.precioTotal /
+                (1 + ganancia) /
+                (1 + decimalPercent(ivaComp)) /
+                (1 + decimalPercent(ivaComp))
+            ),
+            costoBruto: roundTwoDecimals(
+              element.precioTotal /
+                (1 + ganancia) /
+                (1 + decimalPercent(ivaComp))
+            ),
+            ivaCompra: roundTwoDecimals(
+              element.precioTotal /
+                (1 + ganancia) /
+                (1 + decimalPercent(ivaComp)) -
+                element.precioTotal /
+                  (1 + ganancia) /
+                  (1 + ivaComp) /
+                  (1 + ivaComp)
+            ),
             ganancia: element.ganancia,
             precioSinIva: roundTwoDecimals(element.precioTotal / (1 + ivaComp)),
-            ivaVenta: roundTwoDecimals(element.precioTotal - element.precioTotal / (1 + decimalPercent(ivaComp))),
+            ivaVenta: roundTwoDecimals(
+              element.precioTotal -
+                element.precioTotal / (1 + decimalPercent(ivaComp))
+            ),
             precioTotal: element.precioTotal,
             estado: 1,
           };
@@ -467,96 +520,104 @@ export default {
     },
 
     getMarca(str) {
-      const marca = this.marcas.filter(el => el.nombre.toLowerCase() === str.toLowerCase())[0];
-      if(marca){
+      const marca = this.marcas.filter(
+        (el) => el.nombre.toLowerCase() === str.toLowerCase()
+      )[0];
+      if (marca) {
         return marca;
-      }else{
-        GenericService(this.tenant, 'marcas', this.token)
-        .save({nombre: str})
-        .then(data =>{
-          this.marcas.push(data.data);
-          return data.data;
-        })
+      } else {
+        GenericService(this.tenant, "marcas", this.token)
+          .save({ nombre: str })
+          .then((data) => {
+            this.marcas.push(data.data);
+            return data.data;
+          });
       }
     },
 
     getRubro(str) {
-      const rubro = this.rubros.filter(el => el.nombre.toLowerCase() === str.toLowerCase())[0];
-      if(rubro){
+      const rubro = this.rubros.filter(
+        (el) => el.nombre.toLowerCase() === str.toLowerCase()
+      )[0];
+      if (rubro) {
         return rubro;
-      }else{
-        GenericService(this.tenant, 'rubros', this.token)
-        .save({nombre: str})
-        .then(data =>{
-          this.rubros.push(data.data);
-          return data.data;
-        })
+      } else {
+        GenericService(this.tenant, "rubros", this.token)
+          .save({ nombre: str })
+          .then((data) => {
+            this.rubros.push(data.data);
+            return data.data;
+          });
       }
     },
 
-    getPropiedades(propiedades){
-      if(this.isEmptyString(propiedades)) return null;
+    getPropiedades(propiedades) {
+      if (this.isEmptyString(propiedades)) return null;
       let propiedadesArray = [];
-      if(propiedades.length > 1){
-        propiedades = propiedades.split(',');
-        propiedades.forEach(el => {
-          this.propiedades.forEach(e => {
-            if(el == e.id){
+      if (propiedades.length > 1) {
+        propiedades = propiedades.split(",");
+        propiedades.forEach((el) => {
+          this.propiedades.forEach((e) => {
+            if (el == e.id) {
               propiedadesArray.push(e);
             }
-          })
-        })
-      }else{
-        this.propiedades.forEach(el => {
-          if(el.id == propiedades){
+          });
+        });
+      } else {
+        this.propiedades.forEach((el) => {
+          if (el.id == propiedades) {
             propiedadesArray.push(el);
           }
-        })
+        });
       }
       return propiedadesArray;
     },
 
-    getAtributos(element){
-      const attributes = Object.entries(element).filter(el => el[0].substring(0,8) === 'atributo');
-      if(this.isEmptyArray(attributes)) return null;
-      const attributesNames = attributes.map(el => {return el[1];});
+    getAtributos(element) {
+      const attributes = Object.entries(element).filter(
+        (el) => el[0].substring(0, 8) === "atributo"
+      );
+      if (this.isEmptyArray(attributes)) return null;
+      const attributesNames = attributes.map((el) => {
+        return el[1];
+      });
       let listOfAttributes = [];
-      attributesNames.forEach(attributeName => {
-        this.atributos.forEach(attribute => {
-          if(attributeName && attributeName == attribute.valor){
+      attributesNames.forEach((attributeName) => {
+        this.atributos.forEach((attribute) => {
+          if (attributeName && attributeName == attribute.valor) {
             listOfAttributes.push(attribute);
           }
-          if(attributeName && attributeName == attribute.valorNumerico){
+          if (attributeName && attributeName == attribute.valorNumerico) {
             listOfAttributes.push(attribute);
           }
-        })
-      })
+        });
+      });
       listOfAttributes = [...new Set(listOfAttributes)];
-      if(listOfAttributes.length === 0){
+      if (listOfAttributes.length === 0) {
         this.createNewAtributes(attributesNames);
       }
       return listOfAttributes;
     },
 
-    getIva(id){
-      return this.ivas.filter(el => el.id === id)[0];
+    getIva(id) {
+      return this.ivas.filter((el) => el.id === id)[0];
     },
 
     getDistribuidores(distribuidores) {
-      if(distribuidores.length > 1){
+      if (distribuidores.length > 1) {
         distribuidores = distribuidores.split(",");
         let distribuidoresArray = [];
 
-        distribuidores.forEach(el => {
-          this.distribuidores.forEach(e => {
-            if(el == e.id){
+        distribuidores.forEach((el) => {
+          this.distribuidores.forEach((e) => {
+            if (el == e.id) {
               distribuidoresArray.push(e);
             }
-          })
+          });
         });
         return distribuidoresArray;
-      }else{
-        return this.distribuidores.filter(el => el.id === distribuidores);
+      } else {
+        return this.distribuidores.filter((el) => el.id === distribuidores);
       }
     },
 
@@ -570,82 +631,82 @@ export default {
         });
     },
 
-    goPricesManagerView(){
+    goPricesManagerView() {
       this.$router.push({ name: "precios" });
     },
 
-    setAtributesValues(atributes){
+    setAtributesValues(atributes) {
       let str = atributes.reduce((acc, element) => {
-        if(element.valor){
+        if (element.valor) {
           return acc + element.valor + ",";
-        }else{
+        } else {
           return acc + element.valorNumerico.toString() + ",";
         }
       }, "");
       return str;
     },
 
-    createNewAtributes(atributeNames){
-      atributeNames.forEach(el => {
+    createNewAtributes(atributeNames) {
+      atributeNames.forEach((el) => {
         let obj = {
           valor: null,
-          valorNumerico: null
-        }
-        if(el && typeof(el) === 'string'){
+          valorNumerico: null,
+        };
+        if (el && typeof el === "string") {
           obj.valor = el;
-        }else{
-          if(el){
+        } else {
+          if (el) {
             obj.valorNumerico = el;
           }
         }
         GenericService(this.tenant, "atributos", this.token)
-        .save(obj)
-        .then(data => {
-          this.atributos.push(data.data);
-        })
-      })
+          .save(obj)
+          .then((data) => {
+            this.atributos.push(data.data);
+          });
+      });
       this.checkImportStatus += 1;
-    }, 
+    },
 
-    changePage(data){
+    changePage(data) {
       this.filterParams.page = data;
       this.filterObjects();
     },
 
-    checkProductInList(data){
-      this.productos.forEach(product => {
-        if(product.id === data.id){
-          if(product.selected){
+    checkProductInList(data) {
+      this.productos.forEach((product) => {
+        if (product.id === data.id) {
+          if (product.selected) {
             product.selected = false;
-          }else{
+          } else {
             product.selected = true;
           }
         }
-      })
+      });
     },
 
-    isEmptyString(str){
-      if(str === undefined || str === null) return true;
+    isEmptyString(str) {
+      if (str === undefined || str === null) return true;
       return false;
     },
 
-    isEmptyArray(array){
-      if(array.length === 0) return true;
+    isEmptyArray(array) {
+      if (array.length === 0) return true;
       return false;
     },
 
-    async exportGeneralExcel(){
+    async exportGeneralExcel() {
       this.loaded = false;
       const headers = [
-        "NOMBRE", 
-        "CODIGO DE PRODUCTO", 
-        "CODIGO DE BARRAS", 
-        "DISTRIBUIDORES", 
-        "MARCA", 
-        "RUBRO", 
-        "PROPIEDADES", 
-        "ATRIBUTOS", 
-        "ALICUOTA IVA COMPRAS", 
+        "NOMBRE",
+        "CODIGO DE PRODUCTO",
+        "CODIGO DE BARRAS",
+        "DISTRIBUIDORES",
+        "MARCA",
+        "RUBRO",
+        "PROPIEDADES",
+        "ATRIBUTOS",
+        "ALICUOTA IVA COMPRAS",
         "ALICUOTA IVA VENTAS",
         "COSTO BRUTO",
         "COSTO NETO",
@@ -653,14 +714,14 @@ export default {
         "PORCENTAJE DE GANANCIA",
         "PRECIO SIN IVA",
         "IMPORTE DE IVA VENTAS",
-        "PRECIO TOTAL"
-      ]
-      const data = await this.setDataToExcel()
+        "PRECIO TOTAL",
+      ];
+      const data = await this.setDataToExcel();
       exportExcel(headers, data);
       this.loaded = true;
     },
 
-    async setDataToExcel(){
+    async setDataToExcel() {
       let dataForExcel = [];
       let filters = {
         productoName: "",
@@ -673,49 +734,55 @@ export default {
         productoEstado: "",
         page: 1,
         size: 100000,
-        totalPages: 0
-      }
+        totalPages: 0,
+      };
       await GenericService(this.tenant, this.service, this.token)
-      .filter(filters)
-      .then(data => {
-        let products = data.data.content
-        products.forEach(el => {
-          el = this.formatForExcel(el);
-          dataForExcel.push(el);
-        })
-      })
+        .filter(filters)
+        .then((data) => {
+          let products = data.data.content;
+          products.forEach((el) => {
+            el = this.formatForExcel(el);
+            dataForExcel.push(el);
+          });
+        });
       return dataForExcel;
     },
 
-    formatForExcel(product){
-      if(product.marca){
+    formatForExcel(product) {
+      if (product.marca) {
         product.marca = product.marca.nombre;
       }
-      if(product.rubro){
+      if (product.rubro) {
         product.rubro = product.rubro.nombre;
       }
-      if(product.atributos){
+      if (product.atributos) {
         product.atributos = product.atributos.reduce((acc, el) => {
-        if(el.valor){
-          acc = acc + el.valor + ",";
-          return acc;
-        }else{
-          acc = acc + el.valorNumerico + ",";
-          return acc;
-        }
-      }, "")
+          if (el.valor) {
+            acc = acc + el.valor + ",";
+            return acc;
+          } else {
+            acc = acc + el.valorNumerico + ",";
+            return acc;
+          }
+        }, "");
       }
-      if(product.distribuidores){
-        product.distribuidores = product.distribuidores.reduce((acc, el) => acc + el.razonSocial + "," ,"")
+      if (product.distribuidores) {
+        product.distribuidores = product.distribuidores.reduce(
+          (acc, el) => acc + el.razonSocial + ",",
+          ""
+        );
       }
-      if(product.propiedades){
-        product.propiedades = product.propiedades.reduce((acc, el) => acc + el.nombre + "," ,"");
+      if (product.propiedades) {
+        product.propiedades = product.propiedades.reduce(
+          (acc, el) => acc + el.nombre + ",",
+          ""
+        );
       }
       product.ivaComprasObject = product.ivaComprasObject.porcentaje;
       product.ivaVentasObject = product.ivaVentasObject.porcentaje;
       console.log(product);
       return product;
-    }
+    },
   },
 };
 </script>
