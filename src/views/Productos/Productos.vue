@@ -10,6 +10,9 @@
           <v-btn class="primary ml-1" @click="getReport()" raised
             >REPORTE</v-btn
           >
+          <v-btn class="primary ml-1" @click="exportGeneralExcel()" raised
+            >EXPORTAR EXCEL</v-btn
+          >
         </v-col>
       </v-row>
       <v-row>
@@ -179,6 +182,7 @@ import Pagination from "../../components/Pagination";
 import ProductosTable from '../../components/Tables/ProductosTable';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
 import { generateBarCode, roundTwoDecimals, decimalPercent } from "../../helpers/mathHelper";
+import { exportExcel } from '../../helpers/exportFileHelper';
 import XLSX from "xlsx";
 export default {
   data: () => ({
@@ -628,6 +632,89 @@ export default {
     isEmptyArray(array){
       if(array.length === 0) return true;
       return false;
+    },
+
+    async exportGeneralExcel(){
+      this.loaded = false;
+      const headers = [
+        "NOMBRE", 
+        "CODIGO DE PRODUCTO", 
+        "CODIGO DE BARRAS", 
+        "DISTRIBUIDORES", 
+        "MARCA", 
+        "RUBRO", 
+        "PROPIEDADES", 
+        "ATRIBUTOS", 
+        "ALICUOTA IVA COMPRAS", 
+        "ALICUOTA IVA VENTAS",
+        "COSTO BRUTO",
+        "COSTO NETO",
+        "IMPORTE DE IVA COMPRAS",
+        "PORCENTAJE DE GANANCIA",
+        "PRECIO SIN IVA",
+        "IMPORTE DE IVA VENTAS",
+        "PRECIO TOTAL"
+      ]
+      const data = await this.setDataToExcel()
+      exportExcel(headers, data);
+      this.loaded = true;
+    },
+
+    async setDataToExcel(){
+      let dataForExcel = [];
+      let filters = {
+        productoName: "",
+        productoCodigo: "",
+        productoCodigoBarras: "",
+        productoMarcaName: "",
+        productoPrimerAtributoName: "",
+        productoSegundoAtributoName: "",
+        productoTercerAtributoName: "",
+        productoEstado: "",
+        page: 1,
+        size: 100000,
+        totalPages: 0
+      }
+      await GenericService(this.tenant, this.service, this.token)
+      .filter(filters)
+      .then(data => {
+        let products = data.data.content
+        products.forEach(el => {
+          el = this.formatForExcel(el);
+          dataForExcel.push(el);
+        })
+      })
+      return dataForExcel;
+    },
+
+    formatForExcel(product){
+      if(product.marca){
+        product.marca = product.marca.nombre;
+      }
+      if(product.rubro){
+        product.rubro = product.rubro.nombre;
+      }
+      if(product.atributos){
+        product.atributos = product.atributos.reduce((acc, el) => {
+        if(el.valor){
+          acc = acc + el.valor + ",";
+          return acc;
+        }else{
+          acc = acc + el.valorNumerico + ",";
+          return acc;
+        }
+      }, "")
+      }
+      if(product.distribuidores){
+        product.distribuidores = product.distribuidores.reduce((acc, el) => acc + el.razonSocial + "," ,"")
+      }
+      if(product.propiedades){
+        product.propiedades = product.propiedades.reduce((acc, el) => acc + el.nombre + "," ,"");
+      }
+      product.ivaComprasObject = product.ivaComprasObject.porcentaje;
+      product.ivaVentasObject = product.ivaVentasObject.porcentaje;
+      console.log(product);
+      return product;
     }
   },
 };
