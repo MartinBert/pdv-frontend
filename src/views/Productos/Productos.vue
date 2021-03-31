@@ -10,7 +10,7 @@
           <v-btn class="primary ml-1" @click="getReport()" raised
             >REPORTE</v-btn
           >
-          <v-btn class="primary ml-1" @click="exportGeneralExcel()" raised
+          <v-btn v-if="loaded" class="primary ml-1" @click="exportGeneralExcel()" raised
             >EXPORTAR EXCEL</v-btn
           >
         </v-col>
