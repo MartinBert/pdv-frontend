@@ -296,6 +296,7 @@ export default {
     renglon: {},
     individualPercent: "",
     listennerOfListChange: 0,
+    clientIp: ""
   }),
 
   components: {
@@ -346,9 +347,13 @@ export default {
     this.$store.commit("productos/resetStates");
     this.tenant = this.$route.params.tenant;
     this.getObjects();
+    this.getClientIpForFiscalController();
   },
 
   methods: {
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR GET OBJECTS ---------------------------------------------------------------------*/
+    /******************************************************************************************************/
     getObjects() {
       let sucursalId;
       if (this.loguedUser.perfil > 1) {
@@ -401,28 +406,11 @@ export default {
         });
     },
 
-    processProductsObject(producto) {
-      const {
-        id,
-        nombre,
-        codigoBarra,
-        cantUnidades,
-        precioTotal,
-        ivaVentasObject,
-        total,
-        editable
-      } = producto;
-      let object = {
-        id: id,
-        nombre: nombre,
-        codigoBarra: codigoBarra,
-        cantUnidades: cantUnidades,
-        precioUnitario: parseFloat(precioTotal).toFixed(2),
-        ivaVentas: ivaVentasObject.porcentaje,
-        precioTotal: parseFloat(total).toFixed(2),
-        editable: editable
-      };
-      return object;
+    getClientIpForFiscalController(){
+      axios.get('https://api.ipify.org?format=json')
+      .then(data => {
+        this.clientIp = data.data.ip;
+      })
     },
 
     onBarcodeScanned(barcode) {
@@ -472,13 +460,22 @@ export default {
         });
     },
 
-    updateTotal(id) {
-      return this.products.reduce((acc, el) => {
-        if (el.id == id) {
-          el.precioTotal = acc;
-          el.precioTotal = parseFloat(el.precioUnitario) * el.cantUnidades;
-        }
-      }, 0);
+    addProduct(data) {
+      data = [...new Set(data)];
+      let processPorducts = [];
+      data.forEach((el) => {
+        processPorducts.push(this.processProductsObject(el));
+      });
+      if (this.products.length > 0) {
+        this.products.forEach((el) => {
+          processPorducts = processPorducts.filter((e) => e.id !== el.id);
+        });
+        processPorducts.forEach((el) => {
+          this.products.push(el);
+        });
+      } else {
+        this.products = processPorducts;
+      }
     },
 
     getComercialDocuments(clientCond, businessCond) {
@@ -495,6 +492,42 @@ export default {
 
     getPaymentPlans(id) {
       this.databaseItems.planes = id.planPago;
+    },
+
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR PROCESS SALE DATA ---------------------------------------------------------------*/
+    /******************************************************************************************************/
+    updateTotal(id) {
+      return this.products.reduce((acc, el) => {
+        if (el.id == id) {
+          el.precioTotal = acc;
+          el.precioTotal = parseFloat(el.precioUnitario) * el.cantUnidades;
+        }
+      }, 0);
+    },
+
+    processProductsObject(producto) {
+      const {
+        id,
+        nombre,
+        codigoBarra,
+        cantUnidades,
+        precioTotal,
+        ivaVentasObject,
+        total,
+        editable
+      } = producto;
+      let object = {
+        id: id,
+        nombre: nombre,
+        codigoBarra: codigoBarra,
+        cantUnidades: cantUnidades,
+        precioUnitario: parseFloat(precioTotal).toFixed(2),
+        ivaVentas: ivaVentasObject.porcentaje,
+        precioTotal: parseFloat(total).toFixed(2),
+        editable: editable
+      };
+      return object;
     },
 
     deleteLine(id) {
@@ -550,24 +583,6 @@ export default {
     applyIndividualPercent(p) {
       this.dialogIndividualPercent = true;
       this.renglon = p;
-    },
-
-    addProduct(data) {
-      data = [...new Set(data)];
-      let processPorducts = [];
-      data.forEach((el) => {
-        processPorducts.push(this.processProductsObject(el));
-      });
-      if (this.products.length > 0) {
-        this.products.forEach((el) => {
-          processPorducts = processPorducts.filter((e) => e.id !== el.id);
-        });
-        processPorducts.forEach((el) => {
-          this.products.push(el);
-        });
-      } else {
-        this.products = processPorducts;
-      }
     },
 
     applyToLine(percent) {
@@ -641,7 +656,7 @@ export default {
     sendTicketData(jsonToFiscalController, ticketRoute) {
       axios
         .post(
-          `${process.env.VUE_APP_API_FISCAL_CONTROLLER}/${ticketRoute}`, jsonToFiscalController
+          `http://${this.clientIp}:8009/${ticketRoute}`, jsonToFiscalController
         )
         .then(() => {
           this.$successAlert("Venta realizada");
@@ -1159,6 +1174,9 @@ export default {
       return saleCondition;
     },
 
+    /******************************************************************************************************/
+    /* CLEAR SALE FORM DATA ------------------------------------------------------------------------------*/
+    /******************************************************************************************************/
     clear() {
       this.object = {};
       this.products = [];
