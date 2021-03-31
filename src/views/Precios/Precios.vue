@@ -14,6 +14,16 @@
           item-value="id"
           placeholder="Seleccione un concepto de filtrado"
         />
+        <v-radio-group v-model="salePriceModification" label="Aplicar modificación">
+          <v-radio
+            label="Sobre el precio de costo"
+            :value="false"
+          ></v-radio>
+          <v-radio
+            label="Sobre el precio de venta"
+            :value="true"
+          ></v-radio>
+        </v-radio-group>
         <v-select
           filled
           dense
@@ -90,6 +100,8 @@
 import {
   calculateAmountPlusPercentaje,
   calculateAmountMinusPercentaje,
+  roundTwoDecimals,
+  calculatePercentReductionInAmount,
   restarNumeros,
   sumarNumeros,
 } from "../../helpers/mathHelper";
@@ -127,6 +139,7 @@ export default {
     tenant: "",
     service: "productos",
     products: [],
+    salePriceModification: false,
     filterParams: {
       productoName: "",
       productoCodigo: "",
@@ -217,7 +230,11 @@ export default {
         this.products = data.data.content;
         const filteredProductsWithTradeMark = this.filterProducts()
         const alterProducts = filteredProductsWithTradeMark.map((el) => {
-          el = this.processModification(el, modificationType);
+          if(this.salePriceModification === true){
+            el = this.processModificationSalePrice(el, modificationType);
+          }else{
+            el = this.processModificationCostPrice(el, modificationType);
+          }
           return el;
         });
         GenericService(this.tenant, this.service, this.token)
@@ -237,7 +254,11 @@ export default {
         this.products = data.data.content;
         const filteredProductsWithLines = this.filterProducts()
         const alterProducts = filteredProductsWithLines.map((el) => {
-          el = this.processModification(el, modificationType);
+          if(this.salePriceModification === true){
+            el = this.processModificationSalePrice(el, modificationType);
+          }else{
+            el = this.processModificationCostPrice(el, modificationType);
+          }
           return el;
         });
         GenericService(this.tenant, this.service, this.token)
@@ -257,7 +278,11 @@ export default {
         this.products = data.data.content;
         const filteredProductsWithDistribuitors = this.filterProducts()
         const alterProducts = filteredProductsWithDistribuitors.map((el) => {
-          el = this.processModification(el, modificationType);
+          if(this.salePriceModification === true){
+            el = this.processModificationSalePrice(el, modificationType);
+          }else{
+            el = this.processModificationCostPrice(el, modificationType);
+          }
           return el;
         });
         GenericService(this.tenant, this.service, this.token)
@@ -277,7 +302,11 @@ export default {
       .then((data) => {
         this.products = data.data.content;
         const alterProducts = this.products.map((el) => {
-          el = this.processModification(el, modificationType);
+          if(this.salePriceModification === true){
+            el = this.processModificationSalePrice(el, modificationType);
+          }else{
+            el = this.processModificationCostPrice(el, modificationType);
+          }
           return el;
         });
         GenericService(this.tenant, this.service, this.token)
@@ -296,7 +325,11 @@ export default {
       .then((data) => {
         this.products = data.data.content;
         const alterProducts = this.products.map((el) => {
-          el = this.processModification(el, modificationType);
+          if(this.salePriceModification === true){
+            el = this.processModificationSalePrice(el, modificationType);
+          }else{
+            el = this.processModificationCostPrice(el, modificationType);
+          }
           return el;
         });
         GenericService(this.tenant, this.service, this.token)
@@ -362,7 +395,7 @@ export default {
       return filteredProducts;
     },
 
-    processModification(product, type) {
+    processModificationCostPrice(product, type) {
       if (type === "percent") {
         product.costoBruto = calculateAmountPlusPercentaje(
           product.costoBruto,
@@ -395,7 +428,34 @@ export default {
         product.precioTotal,
         product.precioSinIva,
       ]);
+      return product;
+    },
 
+    processModificationSalePrice(product, type){
+      if (type === "percent") {
+        product.precioTotal = calculateAmountPlusPercentaje(
+          product.precioTotal,
+          this.object.percent
+        );
+      } else {
+        product.precioTotal = sumarNumeros([
+          product.precioTotal,
+          this.object.amount,
+        ]);
+      }
+      product.ganancia = roundTwoDecimals(
+        calculatePercentReductionInAmount(
+          product.precioTotal,
+          product.ivaVentasObject.porcentaje
+        ) - product.costoBruto
+      );
+      product.precioSinIva = calculatePercentReductionInAmount(
+        product.precioTotal,
+        product.ivaVentasObject.porcentaje
+      );
+      product.ivaVenta = roundTwoDecimals(
+        restarNumeros([product.precioTotal, product.precioSinIva])
+      );
       return product;
     },
 
