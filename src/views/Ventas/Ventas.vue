@@ -3,7 +3,7 @@
     <v-form class="mb-3">
       <v-row>
         <v-col cols="1">
-          <v-btn class="primary" @click="filterObjects()" raised
+          <v-btn class="primary" @click="seeReports()" raised
             >Reporte de Ventas</v-btn
           >
         </v-col>

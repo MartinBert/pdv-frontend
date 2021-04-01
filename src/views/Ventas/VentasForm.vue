@@ -157,14 +157,18 @@
                         </td>
                         <td>${{ p.precioUnitario }}</td>
                         <td>
-                          <div v-if="p.editable === false">${{ p.precioTotal }}</div>
-                          <div class="d-flex align-center" v-if="p.editable === true">
-                            <p class="mt-4">$</p>
-                            <input
-                              type="number"
-                              v-model="p.precioTotal"
-                            />
+                          <div v-if="p.editable === false">
+                            ${{ p.precioTotal }}
                           </div>
+                          <div
+                            class="d-flex align-center"
+                            v-if="p.editable === true"
+                          >
+                            <p class="mt-4">$</p>
+                            <input type="number" v-model="p.precioTotal" />
+                          </div>
+                        </td>
+
                         <td>
                           <button type="button">
                             <img
@@ -296,7 +300,7 @@ export default {
     renglon: {},
     individualPercent: "",
     listennerOfListChange: 0,
-    clientIp: ""
+    clientIp: "",
   }),
 
   components: {
@@ -406,11 +410,10 @@ export default {
         });
     },
 
-    getClientIpForFiscalController(){
-      axios.get('https://api.ipify.org?format=json')
-      .then(data => {
+    getClientIpForFiscalController() {
+      axios.get("https://api.ipify.org?format=json").then((data) => {
         this.clientIp = data.data.ip;
-      })
+      });
     },
 
     onBarcodeScanned(barcode) {
@@ -515,7 +518,7 @@ export default {
         precioTotal,
         ivaVentasObject,
         total,
-        editable
+        editable,
       } = producto;
       let object = {
         id: id,
@@ -525,7 +528,7 @@ export default {
         precioUnitario: parseFloat(precioTotal).toFixed(2),
         ivaVentas: ivaVentasObject.porcentaje,
         precioTotal: parseFloat(total).toFixed(2),
-        editable: editable
+        editable: editable,
       };
       return object;
     },
@@ -556,7 +559,7 @@ export default {
             ivaVentas: 8888,
             precioUnitario: percent,
             precioTotal: percent,
-            editable:false
+            editable: false,
           };
           this.products.push(obj);
         } else {
@@ -571,7 +574,7 @@ export default {
             ivaVentas: 8888,
             precioUnitario: percent,
             precioTotal: percent,
-            editable:false
+            editable: false,
           };
           this.products.push(obj);
         }
@@ -599,7 +602,7 @@ export default {
             percent
           ),
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
-          editable: false
+          editable: false,
         };
       } else {
         object = {
@@ -613,7 +616,7 @@ export default {
             percent
           ),
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
-          editable: false
+          editable: false,
         };
       }
       this.products.push(object);
@@ -656,7 +659,8 @@ export default {
     sendTicketData(jsonToFiscalController, ticketRoute) {
       axios
         .post(
-          `http://${this.clientIp}:8009/${ticketRoute}`, jsonToFiscalController
+          `http://192.168.1.180:8009/${ticketRoute}`,
+          jsonToFiscalController
         )
         .then(() => {
           this.$successAlert("Venta realizada");
@@ -681,8 +685,8 @@ export default {
     createJsonForTicketInvoiceB() {
       const jsonToFiscalController = {
         client: this.getClientData(),
-        surcharge: this.getTotalSurcharges(),
-        discount: this.getTotalDiscounts(),
+        surcharge: this.getTotalSurcharges("B"),
+        discount: this.getTotalDiscounts("B"),
         items: this.getItemsForFiscalTicketInvoice("B"),
       };
       return jsonToFiscalController;
@@ -697,13 +701,13 @@ export default {
       return jsonToFiscalController;
     },
 
-    getClientData(){
+    getClientData() {
       const formattedObject = {
         name: this.object.cliente.nombre,
         socialReason: this.object.cliente.razonSocial,
         cuit: this.object.cliente.cuit,
-        direction: this.object.cliente.direccion
-      }
+        direction: this.object.cliente.direccion,
+      };
       return formattedObject;
     },
 
@@ -714,7 +718,7 @@ export default {
         }
         return Math.ceil(acc * 100) / 100;
       }, 0);
-      if(letter === "A"){
+      if (letter === "A") {
         total = total / 1.21;
       }
       return total.toString();
@@ -727,7 +731,7 @@ export default {
         }
         return Math.ceil(acc * 100) / 100;
       }, 0);
-      if(letter === "A"){
+      if (letter === "A") {
         total = total / 1.21;
       }
       return total.toString();
@@ -737,19 +741,19 @@ export default {
       let items = [];
       switch (letter) {
         case "A":
-            items = this.itemsInvoiceA();
+          items = this.itemsInvoiceA();
           break;
         case "B":
-            items = this.itemsInvoiceB();
+          items = this.itemsInvoiceB();
           break;
         default:
-            items = this.itemsInvoiceC();
+          items = this.itemsInvoiceC();
           break;
       }
       return items;
     },
 
-    itemsInvoiceA(){
+    itemsInvoiceA() {
       let items = [];
       const validItems = this.products.filter(
         (el) =>
@@ -759,14 +763,16 @@ export default {
         const formattedObject = {
           name: el.nombre,
           quantity: el.cantUnidades.toString(),
-          price: roundTwoDecimals(el.precioTotal / (1 + decimalPercent(el.ivaVentas))).toString(),
+          price: roundTwoDecimals(
+            el.precioTotal / (1 + decimalPercent(el.ivaVentas))
+          ).toString(),
         };
         items.push(formattedObject);
       });
       return items;
     },
 
-    itemsInvoiceB(){
+    itemsInvoiceB() {
       let items = [];
       const validItems = this.products.filter(
         (el) =>
@@ -776,14 +782,16 @@ export default {
         const formattedObject = {
           name: el.nombre,
           quantity: el.cantUnidades.toString(),
-          price: roundTwoDecimals(el.precioTotal / (1 + decimalPercent(el.ivaVentas))).toString(),
+          price: roundTwoDecimals(
+            el.precioTotal / (1 + decimalPercent(el.ivaVentas))
+          ).toString(),
         };
         items.push(formattedObject);
       });
       return items;
     },
 
-    itemsInvoiceC(){
+    itemsInvoiceC() {
       let items = [];
       const validItems = this.products.filter(
         (el) =>
