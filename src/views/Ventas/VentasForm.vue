@@ -659,7 +659,7 @@ export default {
     sendTicketData(jsonToFiscalController, ticketRoute) {
       axios
         .post(
-          `http://192.168.1.180:8009/${ticketRoute}`,
+          `http://190.228.229.150:8009/${ticketRoute}`,
           jsonToFiscalController
         )
         .then(() => {
