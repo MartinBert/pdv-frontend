@@ -222,6 +222,7 @@ export default {
     ],
     estadoSelecionado: { id: 1, text: "Activos" },
     filterParams: {
+      sucursalId: "",
       productoName: "",
       productoCodigo: "",
       productoCodigoBarras: "",
@@ -268,9 +269,13 @@ export default {
       } else {
         this.filterParams.productoEstado = 0;
       }
+      if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      }
       GenericService(this.tenant, "productos", this.token)
         .filter(this.filterParams)
         .then((data) => {
+          console.log(data);
           data.data.content.forEach((el) => {
             this.$store.state.productos.products.forEach((e) => {
               if (el.codigoBarra == e.codigoBarra) {

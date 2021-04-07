@@ -83,7 +83,21 @@
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row class="mt-5"></v-row>
+        <v-row class="ma-1">
+          <v-col cols="12" class="text-center">
+            <h4>Este campo altera la ganancia en la lista de productos. Si el valor se deja en cero, la tabla de productos no sufre alteraciones</h4>
+          </v-col>
+          <v-col></v-col>
+          <v-col cols="3" class="text-center">
+            <v-text-field
+              type="number"
+              v-model="object.variacionGanancia"
+              :counter="50"
+              label="Margen de ganancia"
+            ></v-text-field>
+          </v-col>
+          <v-col></v-col>
+        </v-row>
         <v-row class="mt-5"></v-row>
         <v-row class="mt-5"></v-row>
         <v-row class="mt-5"></v-row>
@@ -177,7 +191,9 @@ export default {
       }
     },
     condicioniva: [],
-    object: {},
+    object: {
+      variacionGanancia: 0
+    },
     empresas: [],
     loaded: false,
     tenant: "",
