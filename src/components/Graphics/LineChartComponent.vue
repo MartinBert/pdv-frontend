@@ -71,7 +71,6 @@ export default {
         this.loaded = true 
       })
     },
-
     testDate(){
       console.log(this.$store.state.eventual.eventual);
     }

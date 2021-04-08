@@ -16,16 +16,15 @@ import DataPicker from "../components/Graphics/DataPicker";
 export default {
   data: () => ({
     newDates: 0,
-    checkIfDateIsEmitted: ""
   }),
-  watch:{
-    checkIfDateIsEmitted(){
-      this.newDates++
-    }
-  },
   components: {
     LineChartComponent,
     DataPicker,
+  },
+  methods:{
+    checkIfDateIsEmitted(){
+      this.newDates++
+    }
   }
 };
 </script>
