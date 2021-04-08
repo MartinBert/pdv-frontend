@@ -319,7 +319,6 @@ export default {
     },
 
     applyModificationToAllProducts(modificationType){
-      if(this.selectedMarcas.length === 0) return this.$errorAlert("No ha escrito ningún código de producto");
       GenericService(this.tenant, this.service, this.token)
       .filter(this.filterParams)
       .then((data) => {

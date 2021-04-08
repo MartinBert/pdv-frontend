@@ -9,25 +9,25 @@ import BarChart from "../../plugins/chart";
 import Spinner from "./Spinner";  
 import GenericService from "../../services/GenericService";
 export default {
+  props:{
+    newDatesEmitted: Number
+  },
   data: () => ({
     tenant:"",
     token : localStorage.getItem("token"),
     loaded : true,
     filterParams: {
+      blackReceiptFilter: "",
       sucursalId: "",
-      productoName: "",
-      productoCodigo: "",
-      productoCodigoBarras: "",
-      productoMarcaName: "",
-      productoPrimerAtributoName: "",
-      productoSegundoAtributoName: "",
-      productoTercerAtributoName: "",
-      productoEstado: "",
+      fechaEmision: "",
+      comprobanteCerrado: "",
+      numeroComprobante: "",
+      totalVenta: "",
       page: 1,
-      size: 10,
+      size: 30,
       totalPages: 0,
     },
-    productos : [], 
+    ventas : [], 
     charData: {
       labels:[],
       datasets: [
@@ -40,6 +40,12 @@ export default {
       ],
     },
   }),
+
+  watch:{
+    newDatesEmitted(){
+      this.testDate();
+    }
+  },
 
   components: {
     BarChart,
@@ -54,23 +60,28 @@ export default {
   methods:{
     getData (){
       this.loaded = false
-      GenericService(this.tenant,"productos", this.token)
+      GenericService(this.tenant,"ventas", this.token)
       .filter(this.filterParams)
       .then(data=>{
-        this.productos = data.data.content
-        this.productos.forEach(producto => {
-          this.charData.labels.push(producto.nombre)
-          this.charData.datasets[0].data.push(producto.precioTotal)
+        this.ventas = data.data.content
+        this.ventas.forEach(venta => {
+          this.charData.labels.push(venta.fechaEmision)
+          this.charData.datasets[0].data.push(Number(venta.totalVenta))
         });
         this.loaded = true 
       })
+    },
+
+    testDate(){
+      console.log(this.$store.state.eventual.eventual);
     }
   }
 };
 </script>
 <style>
 .small {
-  max-width: 400px;
-  max-height: 300px;
+  margin: auto;
+  width: 100%;
+  height: 100%;
 }
 </style>

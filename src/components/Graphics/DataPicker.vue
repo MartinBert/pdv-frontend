@@ -1,5 +1,5 @@
 <template>
-  <v-date-picker v-model="fechas" multiple @input="funcionDelOrto">
+  <v-date-picker v-model="fechas" multiple @input="emitFormatDate">
   </v-date-picker>
 </template>
 <script>
@@ -9,8 +9,8 @@ export default {
     fechas: [formatWithSlash()],
   }),
   methods: {
-    funcionDelOrto() {
-      this.$emit("dateData", this.fechas);
+    emitFormatDate() {
+      this.$store.commit('eventual/addEventual', this.fechas);
     },
   },
 };
