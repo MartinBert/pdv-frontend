@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const loguedUser = localStorage.getItem('userData');
+
 export default (tenant, service, token) => {
     return {
         getAll: function (page, size) {
@@ -32,10 +34,21 @@ export default (tenant, service, token) => {
             })
         },
 
-        filter: function (object) {
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
+        filter: async function (object) {
+            let data = await axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
                 headers: { Authorization: "Bearer " + token }
             })
+            
+            if(service === "productos"){
+                if(loguedUser.perfil > 1){
+                    data.data.content.forEach(el => {
+                        el.precioTotal = 500;
+                    })
+                }
+            }
+            
+            console.log(data);
+            return data;
         },
 
         update(object) {
