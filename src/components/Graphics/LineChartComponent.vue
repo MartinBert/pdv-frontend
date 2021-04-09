@@ -44,7 +44,7 @@ export default {
 
   watch:{
     newDatesEmitted(){
-      this.testDate();
+      this.getData();
     }
   },
 
@@ -64,8 +64,10 @@ export default {
       GenericService(this.tenant,"ventas", this.token)
       .filter(this.filterParams)
       .then(data=>{
-        this.ventas = data.data.content
-        this.ventas.forEach(venta => {
+        this.ventas = data.data.content;
+        const filteredSales = this.getFilteredDates();
+        console.log(filteredSales);
+        filteredSales.forEach(venta => {
           this.charData.labels.push(venta.fechaEmision)
           this.charData.datasets[0].data.push(Number(venta.totalVenta))
         });
@@ -78,7 +80,7 @@ export default {
       return - 1;
     },
 
-    testDate(){
+    getFilteredDates(){
       let fechas = this.$store.state.eventual.eventual.map(el => {
         return formatDate(formatDateWithoutSlash(el))
       }) 
@@ -90,7 +92,7 @@ export default {
           }
         })
       });
-      console.log(selectVentas);
+      return selectVentas;
     }
   }
 };
