@@ -3,16 +3,20 @@
   </v-date-picker>
 </template>
 <script>
-import { formatWithSlash } from "../../helpers/dateHelper";
+import { formatWithSlash,getCurrentDate} from "../../helpers/dateHelper";
 export default {
   data: () => ({
-    fechas: [formatWithSlash()],
+    fechas: [formatWithSlash(getCurrentDate())],
   }),
+  mounted(){
+    this.emitFormatDate()
+
+  },
   methods: {
     emitFormatDate() {
       this.$store.commit('eventual/addEventual', this.fechas);
       this.$emit('emitDate');
-    },
+    }
   },
 };
 </script>

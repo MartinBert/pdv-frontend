@@ -5,6 +5,7 @@
   </div>
 </template>
 <script>
+import {formatDateWithoutSlash, formatDate} from "../../helpers/dateHelper"
 import BarChart from "../../plugins/chart";
 import Spinner from "./Spinner";  
 import GenericService from "../../services/GenericService";
@@ -68,11 +69,27 @@ export default {
           this.charData.labels.push(venta.fechaEmision)
           this.charData.datasets[0].data.push(Number(venta.totalVenta))
         });
+        this.charData.datasets[0].data.sort(this.sortResults)
         this.loaded = true 
       })
     },
+    sortResults (a,b){
+      return  a - b 
+    },
+
     testDate(){
-      console.log(this.$store.state.eventual.eventual);
+      let fechas = this.$store.state.eventual.eventual.map(el => {
+        return formatDate(formatDateWithoutSlash(el))
+      }) 
+      let selectVentas = [];
+      this.ventas.forEach(venta => {
+        fechas.forEach(fecha => {
+          if(venta.fechaEmision == fecha){
+            selectVentas.push(venta)
+          }
+        })
+      });
+      console.log(selectVentas);
     }
   }
 };
