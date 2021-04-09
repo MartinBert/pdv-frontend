@@ -67,6 +67,8 @@ export default {
         this.ventas = data.data.content;
         const filteredSales = this.getFilteredDates();
         console.log(filteredSales);
+        this.charData.labels = []
+        this.charData.datasets[0].data = []
         filteredSales.forEach(venta => {
           this.charData.labels.push(venta.fechaEmision)
           this.charData.datasets[0].data.push(Number(venta.totalVenta))
@@ -75,6 +77,7 @@ export default {
         this.loaded = true 
       })
     },
+
     sortResults (a,b){
       if(a > b) return 1;
       return - 1;
