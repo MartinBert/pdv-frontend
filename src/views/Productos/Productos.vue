@@ -195,6 +195,8 @@ import {
   generateBarCode,
   roundTwoDecimals,
   decimalPercent,
+  calculateAmountPlusPercentaje,
+  calculatePercentaje
 } from "../../helpers/mathHelper";
 import { exportExcel } from "../../helpers/exportFileHelper";
 import XLSX from "xlsx";
@@ -275,19 +277,28 @@ export default {
       GenericService(this.tenant, "productos", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          console.log(data);
-          data.data.content.forEach((el) => {
-            this.$store.state.productos.products.forEach((e) => {
-              if (el.codigoBarra == e.codigoBarra) {
-                el.selected = true;
-              }
-            });
-          });
-
-          this.productos = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          this.loaded = true;
+          if(this.loguedUser.perfil > 2) return this.getSucursalProducts(data);
+          return this.getAdminProducts(data);
         });
+    },
+
+    getSucursalProducts(data){
+      const percentaje = this.loguedUser.sucursal.variacionGanancia;
+      this.productos = data.data.content.map(product => {
+        product.ganacia = percentaje;
+        product.precioSinIva = calculateAmountPlusPercentaje(product.costoBruto, percentaje);
+        product.ivaVenta = calculatePercentaje(product.precioSinIva, product.ivaVentasObject.porcentaje);
+        product.precioTotal = product.precioSinIva + product.ivaVenta;
+        return product;
+      })
+      this.filterParams.totalPages = data.data.totalPages;
+      this.loaded = true;
+    },
+
+    getAdminProducts(data){
+      this.productos = data.data.content;
+      this.filterParams.totalPages = data.data.totalPages;
+      this.loaded = true;
     },
 
     getOtherModels(page, size) {

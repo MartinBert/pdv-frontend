@@ -16,6 +16,7 @@ export default {
   methods: {
     editItem(itemId) {
       this.$emit("editItem", itemId);
+      console.log("EMMITED EVENT");
     },
   },
 };
