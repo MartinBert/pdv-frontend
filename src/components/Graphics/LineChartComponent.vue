@@ -33,7 +33,7 @@ export default {
       labels:[],
       datasets: [
         {
-          label :"Productos" , 
+          label :"Ventas" , 
           backgroundColor: "rgb(63, 81, 181)",
           data: [],
         },
