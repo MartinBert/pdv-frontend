@@ -1,5 +1,5 @@
-<template>
-  <div class="small">
+<template> 
+<div class="small">
     <BarChart :chartData="charData"  v-if="loaded"/>
     <Spinner v-if="!loaded"/>
   </div>
