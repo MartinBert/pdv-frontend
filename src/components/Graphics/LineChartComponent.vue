@@ -1,148 +1,40 @@
-<template> 
-<div class="small">
-    <BarChart :chartData="charData"  v-if="loaded"/>
-    <Spinner v-if="!loaded"/>
+<template>
+  <div class="small" ref="grafic" >
+    <BarChart :chartData="chartData"/>
   </div>
 </template>
 <script>
-import {formatDateWithoutSlash, formatDate} from "../../helpers/dateHelper"
 import BarChart from "../../plugins/chart";
-import Spinner from "./Spinner";  
-import GenericService from "../../services/GenericService";
+
 export default {
-  props:{
-    newDatesEmitted: Number
+  props: {
+    charData: Object,
+    detected: Number 
   },
-  data: () => ({
-    tenant:"",
-    token : localStorage.getItem("token"),
-    loaded : true,
-    filterParams: {
-      blackReceiptFilter: "",
-      sucursalId: "",
-      fechaEmision: "",
-      comprobanteCerrado: "",
-      numeroComprobante: "",
-      totalVenta: "",
-      page: 1,
-      size: 100000,
-      totalPages: 0,
-    },
-    
-    daySaleQuantities :[], 
-    ventas : [], 
-    charData: {
-      labels:[],
+  data: ()=>({
+    chartData: {
+      labels: [],
       datasets: [
         {
-          label :"Ventas" , 
+          label: "Total",
           backgroundColor: "rgb(63, 81, 181)",
           data: [],
         },
-
       ],
-    },
+    }
   }),
-
   watch:{
-    newDatesEmitted(){
-      this.getDaySaleQuantities();
+    detected(){
+      this.chartData.labels = this.charData.labels;
+      this.chartData.datasets.data = [5, 10, 15, 20];
+      this.chartData.datasets.label = this.charData.datasets.label;
+      console.log(this.chartData)
     }
   },
 
   components: {
     BarChart,
-    Spinner
   },
-
-  mounted(){
-    this.tenant = this.$route.params.tenant
-    this.getDaySaleQuantities()
-  }, 
-  
-  methods:{
-    getDaySaleAmonth (){
-      this.loaded = false
-      GenericService(this.tenant,"ventas", this.token)
-      .filter(this.filterParams)
-      .then(data=>{
-        this.ventas = data.data.content;
-        const filteredSales = this.getFilteredDates();
-        this.charData.labels = []
-        this.charData.datasets[0].data = []
-        filteredSales.forEach(venta => {
-          this.charData.labels.push(venta.fechaEmision)
-          this.charData.datasets[0].data.push(Number(venta.totalVenta))
-        });
-        this.charData.datasets[0].data.sort(this.sortResults)
-        this.loaded = true 
-      })
-    },
-
-    getDaySaleQuantities(){
-      this.loaded = false
-      GenericService(this.tenant,"ventas", this.token)
-      .filter(this.filterParams)
-      .then(data => {
-        this.ventas = data.data.content;
-        const filteredSales = this.getFilteredDates();
-        console.log(filteredSales);
-        let fechas = []
-        for (let index = 0; index < filteredSales.length; index++) {
-          const element = filteredSales[index];
-          fechas.push(element.fechaEmision);
-        }
-        fechas = new Set(...[fechas])
-        let dateSales = {}        
-        fechas.forEach(element => {
-              dateSales[element] = []       
-        });
-        fechas.forEach(element => {
-          filteredSales.forEach(el => {
-            if(element == el.fechaEmision){
-                dateSales[el.fechaEmision].push(el);
-            }
-          });
-        });
-        const kays = Object.keys(dateSales)
-        kays.forEach(element => {
-             dateSales[element] = dateSales[element].length
-        });
-
-        this.charData.labels = []
-        this.charData.datasets[0].data = []
-
-         kays.forEach(element => {
-           dateSales[kays]
-           this.charData.labels.push(element)
-            this.charData.datasets[0].data.push(Number(dateSales[element]))
-        });
-
-        console.log(dateSales);
-        this.loaded = true;
-      })
-    },
-
-    sortResults (a,b){
-      if(a > b) return 1;
-      return - 1;
-    },
-
-    getFilteredDates(){
-      let fechas = this.$store.state.eventual.eventual.map(el => {
-        return formatDate(formatDateWithoutSlash(el))
-      }) 
-      let selectVentas = [];
-      this.ventas.forEach(venta => {
-        fechas.forEach(fecha => {
-          if(venta.fechaEmision == fecha){
-            selectVentas.push(venta)
-          }
-        })
-      });
-      return selectVentas;
-    }
-  }
 };
 </script>
 <style>

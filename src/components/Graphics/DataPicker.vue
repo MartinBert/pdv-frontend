@@ -14,11 +14,10 @@ export default {
   },
   methods: {
     emitFormatDate() {
-      this.$store.commit('eventual/addEventual', this.fechas);
-      this.$emit('emitDate');
+      this.$emit('emitDate', this.fechas);
+      
     }
   },
 };
 </script>
 
-https://txstreet.com/

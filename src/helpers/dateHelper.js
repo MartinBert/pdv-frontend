@@ -47,7 +47,7 @@ export function getCurrentDate() {
 }
 
 export function generateIntegerDate(date) {
-    const integerDate = new Date(date).getTime();
+    const integerDate  = new Date(date).getTime();
     return integerDate;
 }
 
