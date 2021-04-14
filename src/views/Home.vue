@@ -1,7 +1,7 @@
 <template>
   <v-container class="home-content">
     <v-row>
-      <v-col md="6" sm="12">
+      <v-col md="3" sm="12">
         <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
         
         <v-text-field
@@ -16,11 +16,13 @@
             @input="newDates++"
           ></v-text-field>
       </v-col>
-     
-     
-      <v-col md="6" sm="12">
+      <v-col md="3" sm="12">
         <LineChartComponent :newDatesEmitted="newDates"/>
       </v-col>
+      <v-col md="3" sm="12">
+        <LineChartComponent :newDatesEmitted="newDates"/>
+      </v-col>
+
     </v-row>
   </v-container>
 </template>

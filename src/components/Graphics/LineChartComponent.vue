@@ -1,5 +1,5 @@
-<template>
-  <div class="small">
+<template> 
+<div class="small">
     <BarChart :chartData="charData"  v-if="loaded"/>
     <Spinner v-if="!loaded"/>
   </div>
@@ -18,16 +18,18 @@ export default {
     token : localStorage.getItem("token"),
     loaded : true,
     filterParams: {
-      blackReceiptFilter: 999999999,
+      blackReceiptFilter: "",
       sucursalId: "",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
       totalVenta: "",
       page: 1,
-      size: 30,
+      size: 100000,
       totalPages: 0,
     },
+    
+    daySaleQuantities :[], 
     ventas : [], 
     charData: {
       labels:[],
@@ -44,7 +46,7 @@ export default {
 
   watch:{
     newDatesEmitted(){
-      this.getData();
+      this.getDaySaleQuantities();
     }
   },
 
@@ -55,11 +57,11 @@ export default {
 
   mounted(){
     this.tenant = this.$route.params.tenant
-    this.getData()
+    this.getDaySaleQuantities()
   }, 
   
   methods:{
-    getData (){
+    getDaySaleAmonth (){
       this.loaded = false
       GenericService(this.tenant,"ventas", this.token)
       .filter(this.filterParams)
@@ -74,6 +76,50 @@ export default {
         });
         this.charData.datasets[0].data.sort(this.sortResults)
         this.loaded = true 
+      })
+    },
+
+    getDaySaleQuantities(){
+      this.loaded = false
+      GenericService(this.tenant,"ventas", this.token)
+      .filter(this.filterParams)
+      .then(data => {
+        this.ventas = data.data.content;
+        const filteredSales = this.getFilteredDates();
+        console.log(filteredSales);
+        let fechas = []
+        for (let index = 0; index < filteredSales.length; index++) {
+          const element = filteredSales[index];
+          fechas.push(element.fechaEmision);
+        }
+        fechas = new Set(...[fechas])
+        let dateSales = {}        
+        fechas.forEach(element => {
+              dateSales[element] = []       
+        });
+        fechas.forEach(element => {
+          filteredSales.forEach(el => {
+            if(element == el.fechaEmision){
+                dateSales[el.fechaEmision].push(el);
+            }
+          });
+        });
+        const kays = Object.keys(dateSales)
+        kays.forEach(element => {
+             dateSales[element] = dateSales[element].length
+        });
+
+        this.charData.labels = []
+        this.charData.datasets[0].data = []
+
+         kays.forEach(element => {
+           dateSales[kays]
+           this.charData.labels.push(element)
+            this.charData.datasets[0].data.push(Number(dateSales[element]))
+        });
+
+        console.log(dateSales);
+        this.loaded = true;
       })
     },
 
