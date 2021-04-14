@@ -66,7 +66,6 @@ export default {
       .then(data=>{
         this.ventas = data.data.content;
         const filteredSales = this.getFilteredDates();
-        console.log(filteredSales);
         this.charData.labels = []
         this.charData.datasets[0].data = []
         filteredSales.forEach(venta => {

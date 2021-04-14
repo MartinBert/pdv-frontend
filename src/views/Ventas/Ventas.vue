@@ -2,13 +2,13 @@
   <v-container>
     <v-form class="mb-3">
       <v-row>
-        <v-col cols="1">
+        <v-col>
           <v-btn class="primary" @click="seeReports()" raised
             >Reporte de Ventas</v-btn
           >
         </v-col>
         <v-spacer></v-spacer>
-        <v-col cols="3">
+        <v-col>
           <v-text-field
             type="text"
             v-model="filterParams.fechaEmision"
@@ -21,7 +21,7 @@
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col cols="3">
+        <v-col>
           <v-text-field
             type="number"
             v-model="filterParams.numeroComprobante"
@@ -35,7 +35,7 @@
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col cols="3">
+        <v-col>
           <v-text-field
             type="number"
             v-model="filterParams.blackReceiptFilter"
@@ -104,7 +104,7 @@ export default {
     Pagination,
     Spinner,
     VentasTable,
-    VentaDetails,
+    VentaDetails
   },
 
   mounted() {

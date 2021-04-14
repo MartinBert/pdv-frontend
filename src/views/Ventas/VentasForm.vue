@@ -289,6 +289,7 @@ export default {
     },
     productos: [],
     products: [],
+    productsDetail: [],
     depositos: [],
     defaultDeposit: {},
     tenant: "",
@@ -839,6 +840,7 @@ export default {
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
+      const productsDetail = this.productsDetail;
       const documento = this.object.documento;
       const empresa = this.loguedUser.empresa;
       const cliente = this.object.cliente;
@@ -897,6 +899,7 @@ export default {
                     fechaVto: formatDate(dateOfCaeExpiration),
                     condicionVenta: condVenta,
                     productos: products,
+                    productosDetalle: productsDetail,
                     barCode: barCode,
                     cae: cae,
                     puntoVenta: ptoVenta,
@@ -998,6 +1001,7 @@ export default {
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
+      const productsDetail = this.productsDetail;
       const fecha = this.fecha;
       const tenant = this.tenant;
       const token = this.token;
@@ -1006,6 +1010,9 @@ export default {
       let file;
       let fileURL;
       let comprobante;
+
+      console.log(products);
+      
       comprobante = {
         letra: "X",
         numeroCbte: generateFiveDecimalCode(),
@@ -1013,6 +1020,7 @@ export default {
         fechaVto: formatDate(fecha),
         condicionVenta: condVenta,
         productos: products,
+        productosDetalle: productsDetail,
         barCode: generateBarCode(),
         cae: "",
         puntoVenta: ptoVenta,
@@ -1112,8 +1120,8 @@ export default {
                 switch (stock.deposito.id) {
                   case this.defaultDeposit.id:
                     stock.cantidad =
-                      parseInt(stock.cantidad) -
-                      parseInt(productInReceipt.cantUnidades);
+                      parseFloat(stock.cantidad) -
+                      parseFloat(productInReceipt.cantUnidades);
                     receiptData.productos = receiptData.productos.filter(
                       (el) => el.id !== productInReceipt.id
                     );
@@ -1129,8 +1137,8 @@ export default {
                     break;
                   default:
                     stock.cantidad =
-                      parseInt(stock.cantidad) -
-                      parseInt(productInReceipt.cantUnidades);
+                      parseFloat(stock.cantidad) -
+                      parseFloat(productInReceipt.cantUnidades);
                     receiptData.productos = receiptData.productos.filter(
                       (el) => el.id !== productInReceipt.id
                     );

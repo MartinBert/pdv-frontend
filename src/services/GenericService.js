@@ -1,6 +1,31 @@
 import axios from "axios";
+import { calculateAmountPlusPercentaje, calculatePercentaje, sumarNumeros } from '../helpers/mathHelper';
 
-const loguedUser = localStorage.getItem('userData');
+const loguedUser = JSON.parse(localStorage.getItem("userData"));
+const perfil = loguedUser.perfil;
+
+const possibleVariationInProducts = (data) => {
+    if(isSuperAdmin(perfil)){
+        return data;
+    }else{
+        return varyProductProfit(data);
+    }
+}
+
+const isSuperAdmin = (perfil) => {
+    if(perfil > 1) return false;
+    return true;
+}
+
+const varyProductProfit = (data) => {
+    data.data.content.forEach(el => {
+        el.ganancia = loguedUser.sucursal.variacionGanancia;
+        el.precioSinIva = calculateAmountPlusPercentaje(el.costoBruto, el.ganancia);
+        el.ivaVenta = calculatePercentaje(el.precioSinIva, el.ivaVentasObject.porcentaje);
+        el.precioTotal = sumarNumeros([el.precioSinIva, el.ivaVenta]);
+    })
+    return data;
+}
 
 export default (tenant, service, token) => {
     return {
@@ -38,16 +63,7 @@ export default (tenant, service, token) => {
             let data = await axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
                 headers: { Authorization: "Bearer " + token }
             })
-            
-            if(service === "productos"){
-                if(loguedUser.perfil > 1){
-                    data.data.content.forEach(el => {
-                        el.precioTotal = 500;
-                    })
-                }
-            }
-            
-            console.log(data);
+            if(service === "productos") return possibleVariationInProducts(data);
             return data;
         },
 

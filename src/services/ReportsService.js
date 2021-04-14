@@ -88,6 +88,14 @@ export default (tenant, service, token) => {
             })
         },
 
+        salesForSelectedProductsAndDateRange(id, object) {
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/salesForSelectedProductsAndDateRange/${id}`, object, {
+                headers: { Authorization: "Bearer " + token },
+                responseType: 'arraybuffer',
+                dataType: 'blob'
+            })
+        },
+
         /******************************************************************************************************/
         /* ALL FUNCTIONS FOR STOCK REPORTS -------------------------------------------------------------------*/
         /******************************************************************************************************/

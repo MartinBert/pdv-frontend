@@ -217,10 +217,56 @@
               </form>
             </v-col>
             <v-col>
-              <form @submit.prevent="comingSoon()" class="ml-5">
-                <v-btn class="default v-btn--block" type="submit" raised
-                  >VENTAS POR MEDIO DE PAGO</v-btn
-                >
+              <form
+                @submit.prevent="
+                  salesForSelectedProductsAndDateRange(
+                    loguedUser.sucursal
+                  )
+                "
+              >
+                <v-row>
+                  <v-col cols="12">
+                    <v-btn class="primary v-btn--block" type="submit"
+                      >VENTAS POR SELECCIÓN DE PRODUCTOS Y FECHAS</v-btn
+                    >
+                  </v-col>
+                  <v-col>
+                    <v-row>
+                      <v-col cols="12" class="text-center">
+                        <v-btn 
+                          class="primary" 
+                          @click="openProductsDialog()"
+                        >
+                          SELECCIONE LOS PRODUCTOS
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col>
+                    <v-row>
+                      <v-col cols="6">
+                        <v-text-field
+                          id="input3"
+                          name="input3"
+                          type="date"
+                          v-model="fechaDesde2"
+                          label="Fecha desde"
+                          required
+                        />
+                      </v-col>
+                      <v-col cols="6">
+                        <v-text-field
+                          id="input4"
+                          name="input4"
+                          type="date"
+                          label="Fecha hasta"
+                          v-model="fechaHasta2"
+                          required
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
               </form>
             </v-col>
           </v-row>
@@ -255,16 +301,22 @@
         </v-container>
       </v-card-text>
     </v-card>
+    <ProductDialog
+      v-on:productList="addProduct"
+      v-on:resetListStatus="resetListOfDialog"
+    />
   </v-dialog>
 </template>
 <script>
 import ReportsService from "../../services/ReportsService";
 import GenericService from "../../services/GenericService";
 import DocumentosService from "../../services/DocumentosService";
+import ProductDialog from "./ProductDialog";
 import {
   generateIntegerDate,
   getYearsList,
   monthsList,
+  formatDate,
 } from "../../helpers/dateHelper";
 import { exportPDF } from "../../helpers/exportFileHelper";
 
@@ -291,7 +343,14 @@ export default {
       },
       fechaDesde: null,
       fechaHasta: null,
+      fechaDesde2: null,
+      fechaHasta2: null,
+      products: []
     };
+  },
+
+  components:{
+    ProductDialog
   },
 
   mounted() {
@@ -301,7 +360,9 @@ export default {
   },
 
   methods: {
-    /**** USER AND MODELS ****/
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR GET THE NECESARY MODELS ---------------------------------------------------------*/
+    /******************************************************************************************************/
     getObjects() {
       let id;
       if (this.loguedUser.perfil > 1) {
@@ -348,14 +409,29 @@ export default {
           this.documentos = data.data;
         });
     },
-    /**** USER AND MODELS ****/
 
-    /**** Export PDF ****/
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR GET OTHER OBJECTS AND COMPONENTS ------------------------------------------------*/
+    /******************************************************************************************************/
+    openProductsDialog(){
+      this.$store.commit('productos/dialogProductosMutation');
+    },
+
+    addProduct(data) {
+      data = [...new Set(data)];
+      this.products = data;
+      console.log(this.products);
+    },
+
+    resetListOfDialog(){
+      this.products = null;
+    },
+
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR EXPORT PDF REPORTS --------------------------------------------------------------*/
+    /******************************************************************************************************/
     allSalesReport(sucursal) {
-      if (sucursal === undefined)
-        return this.$errorAlert(
-          "Debe seleccionar una sucursal para generar el documento"
-        );
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .allSalesReport(id)
@@ -365,10 +441,7 @@ export default {
     },
 
     allSalesGroupBy(sucursal, type) {
-      if (sucursal === undefined)
-        return this.$errorAlert(
-          "Debe seleccionar una sucursal para generar el documento"
-        );
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
       ReportsService(this.tenant, "ventas", this.token)
         .allSalesGroupBy(id, type)
@@ -378,10 +451,7 @@ export default {
     },
 
     salesForReceipt(sucursal, receipt) {
-      if (sucursal === undefined)
-        return this.$errorAlert(
-          "Debe seleccionar una sucursal para generar el documento"
-        );
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForReceipt(id, receipt)
@@ -391,10 +461,7 @@ export default {
     },
 
     salesForClient(sucursal, client) {
-      if (sucursal === undefined)
-        return this.$errorAlert(
-          "Debe seleccionar una sucursal para generar el documento"
-        );
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForClient(id, client)
@@ -404,10 +471,7 @@ export default {
     },
 
     salesForDate(sucursal, fechaDesde, fechaHasta) {
-      if (sucursal === undefined)
-        return this.$errorAlert(
-          "Debe seleccionar una sucursal para generar el documento"
-        );
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForDate(id, fechaDesde, fechaHasta)
@@ -417,10 +481,7 @@ export default {
     },
 
     salesForMonth(sucursal, year, month) {
-      if (sucursal === undefined)
-        return this.$errorAlert(
-          "Debe seleccionar una sucursal para generar el documento"
-        );
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForMonth(id, year, month)
@@ -430,10 +491,7 @@ export default {
     },
 
     salesForYear(sucursal, year) {
-      if (sucursal === undefined)
-        return this.$errorAlert(
-          "Debe seleccionar una sucursal para generar el documento"
-        );
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForYear(id, year)
@@ -442,9 +500,26 @@ export default {
         });
     },
 
-    /**** Export PDF ****/
+    salesForSelectedProductsAndDateRange(sucursal){
+      if(this.notPassProductsValidations()) return this.error('products');
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
+      let id = sucursal.id;
+      const object = {
+        fechaDesde: formatDate(this.fechaDesde2),
+        fechaHasta: formatDate(this.fechaHasta2),
+        products: this.products
+      }
+      console.log(object);
+      ReportsService(this.tenant, this.service, this.token)
+        .salesForSelectedProductsAndDateRange(id, object)
+        .then((res) => {
+          exportPDF(res);
+        });
+    },
 
-    /**** Transform data functions ****/
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS TO FORMAT OBJECTS -------------------------------------------------------------------*/
+    /******************************************************************************************************/
     createDate(date, param) {
       const integerDate = generateIntegerDate(date);
       if (param === "fechaDesde") {
@@ -454,10 +529,40 @@ export default {
       }
     },
 
+    /******************************************************************************************************/
+    /* FORMS VALIDATIONS ---------------------------------------------------------------------------------*/
+    /******************************************************************************************************/
+    notPassProductsValidations(){
+      if(this.products.length > 0) return false;
+      return true;
+    },
+
+    notPassSucursalValidations(){
+      if(this.loguedUser.sucursal) return false;
+      return true;
+    },
+
+    error(type){
+      let error = '';
+      switch (type) {
+        case 'products':
+            error = "Debe seleccionar al menos un producto para este reporte";
+          break;
+        default:
+            error = "Debe seleccionar una sucursal para realizar el reporte";
+          break;
+      }
+      this.$errorAlert(error);
+      return;
+    },
+
+    /******************************************************************************************************/
+    /* SYSTEM MESSAGES -----------------------------------------------------------------------------------*/
+    /******************************************************************************************************/
     comingSoon() {
       this.$infoAlert2("Disponible muy pronto");
     },
-    /**** Transform data functions ****/
+    
   },
 };
 </script>
