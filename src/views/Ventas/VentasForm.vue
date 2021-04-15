@@ -466,6 +466,7 @@ export default {
 
     addProduct(data) {
       data = [...new Set(data)];
+      this.productsDetail = data;
       let processPorducts = [];
       data.forEach((el) => {
         processPorducts.push(this.processProductsObject(el));
@@ -1010,8 +1011,6 @@ export default {
       let file;
       let fileURL;
       let comprobante;
-
-      console.log(products);
       
       comprobante = {
         letra: "X",
@@ -1033,6 +1032,7 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
+
       /*** Evaluate required sale form data ***/
       if (comprobante.mediosPago[0] !== undefined) {
         if (Number(comprobante.totalVenta) !== 0) {
