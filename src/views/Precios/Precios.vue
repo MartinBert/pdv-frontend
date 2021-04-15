@@ -152,6 +152,16 @@ export default {
       page: 1,
       size: 100000
     },
+    filterParamsMarcas: {
+      marcaName: "",
+      page: 1,
+      size: 100000
+    },
+    filterParamsRubros: {
+      rubroName: "",
+      page: 1,
+      size: 100000
+    },
     token: localStorage.getItem("token"),
   }),
 
@@ -172,12 +182,12 @@ export default {
           this.distribuidores = data.data.content;
         });
       GenericService(this.tenant, "marcas", this.token)
-        .getAll()
+        .filter(this.filterParamsMarcas)
         .then((data) => {
           this.marcas = data.data.content;
         });
       GenericService(this.tenant, "rubros", this.token)
-        .getAll()
+        .filter(this.filterParamsRubros)
         .then((data) => {
           this.rubros = data.data.content;
         });

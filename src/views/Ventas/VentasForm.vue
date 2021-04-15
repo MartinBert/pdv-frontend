@@ -290,6 +290,7 @@ export default {
     productos: [],
     products: [],
     productsDetail: [],
+    productsDescription:[],
     depositos: [],
     defaultDeposit: {},
     tenant: "",
@@ -465,8 +466,32 @@ export default {
     },
 
     addProduct(data) {
+      this.productsDescription = [];
       data = [...new Set(data)];
       this.productsDetail = data;
+      data.forEach(product => {
+        const objectForProductsDescription = {
+          name: product.nombre,
+          barCode: product.codigoBarra,
+          code: product.codigoProducto,
+          tradeMarkName: product.marca.nombre,
+          tradeMarkId: product.marca.id,
+          rubroName: product.rubro.nombre,
+          rubroId: product.rubro.id,
+          attributes: product.atributos,
+          properties: product.propiedades,
+          quantity: product.cantUnidades,
+          costPrice: product.precioCosto,
+          salePrice: product.precioTotal,
+          buyIvaPercent: product.ivaComprasObject.porcentaje,
+          saleIvaPercent: product.ivaVentasObject.porcentaje,
+          buyIvaAmount: product.ivaCompra,
+          saleIvaAmount: product.ivaVenta,
+          providerData: (product.proveedores) ? product.proveedores : [],
+        }
+        this.productsDescription.push(objectForProductsDescription);
+      })
+      
       let processPorducts = [];
       data.forEach((el) => {
         processPorducts.push(this.processProductsObject(el));
@@ -481,6 +506,8 @@ export default {
       } else {
         this.products = processPorducts;
       }
+
+      console.log(this.productsDescription);
     },
 
     getComercialDocuments(clientCond, businessCond) {
@@ -503,6 +530,13 @@ export default {
     /* ALL FUNCTIONS FOR PROCESS SALE DATA ---------------------------------------------------------------*/
     /******************************************************************************************************/
     updateTotal(id) {
+      this.products.forEach(el => {
+        this.productsDescription.forEach(e => {
+          if(el.codigoBarra == e.barCode){
+            e.quantity = el.cantUnidades;
+          }
+        })
+      })
       return this.products.reduce((acc, el) => {
         if (el.id == id) {
           el.precioTotal = acc;
@@ -842,6 +876,7 @@ export default {
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
       const productsDetail = this.productsDetail;
+      const productsDescription = this.productsDescription;
       const documento = this.object.documento;
       const empresa = this.loguedUser.empresa;
       const cliente = this.object.cliente;
@@ -901,6 +936,7 @@ export default {
                     condicionVenta: condVenta,
                     productos: products,
                     productosDetalle: productsDetail,
+                    productoDescription: productsDescription,
                     barCode: barCode,
                     cae: cae,
                     puntoVenta: ptoVenta,
@@ -1003,6 +1039,7 @@ export default {
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
       const productsDetail = this.productsDetail;
+      const productsDescription = this.productsDescription;
       const fecha = this.fecha;
       const tenant = this.tenant;
       const token = this.token;
@@ -1020,6 +1057,7 @@ export default {
         condicionVenta: condVenta,
         productos: products,
         productosDetalle: productsDetail,
+        productoDescription: productsDescription,
         barCode: generateBarCode(),
         cae: "",
         puntoVenta: ptoVenta,
@@ -1032,6 +1070,8 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
+
+      console.log(comprobante);
 
       /*** Evaluate required sale form data ***/
       if (comprobante.mediosPago[0] !== undefined) {
