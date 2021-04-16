@@ -4,13 +4,14 @@
     scrollable
     max-width="1200px"
   >
-    <v-card height="780px" color="var(--main-bg-color)">
+    <v-card color="var(--main-bg-color)">
       <v-card-title>
         <v-row>
-          <v-col cols="6" class="mt-5">
+          <v-col class="mt-5">
             <h3>Búsqueda de productos</h3>
           </v-col>
-          <v-col cols="6">
+          <v-spacer></v-spacer>
+          <v-col>
             <v-autocomplete
               :items="typeProductsList"
               v-model="typeList"
@@ -24,7 +25,8 @@
       </v-card-title>
       <v-card-text>
         <v-row class="mt-1">
-          <v-col>
+          <v-col></v-col>
+          <v-col cols="2">
             <v-text-field
               v-model="filterParams.productos.productoName"
               dense
@@ -34,7 +36,7 @@
               @input="filterObjects()"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="2">
             <v-text-field
               v-model="filterParams.productos.productoCodigo"
               dense
@@ -44,7 +46,7 @@
               @input="filterObjects()"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="2">
             <v-text-field
               v-model="filterParams.productos.productoCodigoBarras"
               dense
@@ -54,7 +56,7 @@
               @input="filterObjects()"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="2">
             <v-text-field
               v-model="filterParams.productos.productoMarcaName"
               dense
@@ -64,7 +66,7 @@
               @input="filterObjects()"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="2">
             <v-text-field
               v-model="filterParams.productos.productoPrimerAtributoName"
               dense
@@ -74,6 +76,7 @@
               @input="filterObjects()"
             ></v-text-field>
           </v-col>
+          <v-col></v-col>
         </v-row>
         <v-row>
           <v-col>
