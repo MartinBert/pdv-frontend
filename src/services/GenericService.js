@@ -2,7 +2,11 @@ import axios from "axios";
 import { calculateAmountPlusPercentaje, calculatePercentaje, sumarNumeros } from '../helpers/mathHelper';
 
 const loguedUser = JSON.parse(localStorage.getItem("userData"));
-const perfil = loguedUser.perfil;
+let perfil;
+
+if(loguedUser){
+    perfil = loguedUser.perfil;
+}
 
 const possibleVariationInProducts = (data) => {
     if(isSuperAdmin(perfil)){
