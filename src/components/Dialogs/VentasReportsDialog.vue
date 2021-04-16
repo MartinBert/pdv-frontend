@@ -277,10 +277,54 @@
           </v-row>
           <v-row>
             <v-col>
-              <form @submit.prevent="comingSoon()">
-                <v-btn class="default v-btn--block" type="submit"
-                  >VENTAS POR MES Y COMPROBANTE</v-btn
-                >
+              <form
+                @submit.prevent="
+                  findQuantityOfProductsSold(
+                    loguedUser.sucursal
+                  )
+                "
+              >
+                <v-row>
+                  <v-col cols="12">
+                    <v-btn class="primary v-btn--block" type="submit"
+                      >UNIDADES VENDIDAS DE UN PRODUCTO</v-btn
+                    >
+                  </v-col>
+                  <v-col>
+                    <v-row>
+                      <v-text-field
+                        v-model="searchQuantityofProductsSold"
+                        placeholder="Ingrese el nombre de un producto"
+                        type="text"
+                        class="ml-5 mr-5"
+                      />
+                    </v-row>
+                  </v-col>
+                  <v-col>
+                    <v-row>
+                      <v-col cols="6">
+                        <v-text-field
+                          id="input3"
+                          name="input3"
+                          type="date"
+                          v-model="fechaDesde3"
+                          label="Fecha desde"
+                          required
+                        />
+                      </v-col>
+                      <v-col cols="6">
+                        <v-text-field
+                          id="input4"
+                          name="input4"
+                          type="date"
+                          label="Fecha hasta"
+                          v-model="fechaHasta3"
+                          required
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
               </form>
             </v-col>
             <v-col>
@@ -345,7 +389,10 @@ export default {
       fechaHasta: null,
       fechaDesde2: null,
       fechaHasta2: null,
-      products: []
+      fechaDesde3: null,
+      fechaHasta3: null,
+      products: [],
+      searchQuantityofProductsSold: ""
     };
   },
 
@@ -517,6 +564,22 @@ export default {
         });
     },
 
+    findQuantityOfProductsSold(sucursal){
+      if(this.notPassProductNameValidation()) return this.error('products');
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
+      let id = sucursal.id;
+      const filterObject = {
+        search: this.searchQuantityofProductsSold,
+        initDate: formatDate(this.fechaDesde3),
+        finishDate: formatDate(this.fechaHasta3)
+      }
+      ReportsService(this.tenant, this.service, this.token)
+        .findQuantityOfProductsSold(id, filterObject)
+        .then((res) => {
+          exportPDF(res);
+        });
+    },
+
     /******************************************************************************************************/
     /* ALL FUNCTIONS TO FORMAT OBJECTS -------------------------------------------------------------------*/
     /******************************************************************************************************/
@@ -539,6 +602,11 @@ export default {
 
     notPassSucursalValidations(){
       if(this.loguedUser.sucursal) return false;
+      return true;
+    },
+
+    notPassProductNameValidation(){
+      if(this.searchQuantityofProductsSold) return false;
       return true;
     },
 

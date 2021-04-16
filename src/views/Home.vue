@@ -5,11 +5,11 @@
         <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
       </v-col>
       <v-col md="3" sm="12">
-        <LineChartComponent :charData="charData" :detected="detected"/>
+        <LineChartComponent :charData="charData"/>
       </v-col>
-      <!-- <v-col md="3" sm="12">
+      <v-col md="3" sm="12">
         <LineChartComponent :charData="charData2"/>
-      </v-col> -->
+      </v-col>
        <v-col>
         <Spinner v-if="!loaded" />
        </v-col>
@@ -20,7 +20,7 @@
 import Spinner from "../components/Graphics/Spinner";
 import LineChartComponent from "../components/Graphics/LineChartComponent";
 import DataPicker from "../components/Graphics/DataPicker";
-import { formatDateWithoutSlash, formatDate } from "../helpers/dateHelper";
+import { formatDateWithoutSlash, formatDate, getCurrentDate, formatWithSlash } from "../helpers/dateHelper";
 import GenericService from "../services/GenericService";
 export default {
   data: () => ({
@@ -73,6 +73,8 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.GetFechas([formatWithSlash(getCurrentDate())]);
+    this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
   },
 
   methods: {
@@ -97,8 +99,6 @@ export default {
     checkIfDateIsEmitted(fechas){
       this.getDaySaleQuantities(fechas)
       this.GetFechas(fechas)
-
-
     },
 
     GetFechas(fechas) {

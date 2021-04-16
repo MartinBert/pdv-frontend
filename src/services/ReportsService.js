@@ -96,6 +96,14 @@ export default (tenant, service, token) => {
             })
         },
 
+        findQuantityOfProductsSold(id, filterObject) {
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/findQuantityOfProductsSold/${id}`, filterObject, {
+                headers: { Authorization: "Bearer " + token },
+                responseType: 'arraybuffer',
+                dataType: 'blob'
+            })
+        },
+
         /******************************************************************************************************/
         /* ALL FUNCTIONS FOR STOCK REPORTS -------------------------------------------------------------------*/
         /******************************************************************************************************/
