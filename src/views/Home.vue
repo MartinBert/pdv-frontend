@@ -1,17 +1,24 @@
 <template>
   <v-container class="home-content">
     <v-row>
-      <v-col md="6" sm="12">
+      <v-col md="4" sm="12">
         <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
       </v-col>
-      <v-col md="3" sm="12">
+      <v-col md="4" sm="12">
         <LineChartComponent :charData="charData"/>
       </v-col>
-      <v-col md="3" sm="12">
+      <v-col md="4" sm="12">
         <LineChartComponent :charData="charData2"/>
       </v-col>
        <v-col>
         <Spinner v-if="!loaded" />
+       </v-col>
+       <v-col md="4" sm="12">
+         <v-select
+          :items="opciones"
+          label="Seleciona un grafico"
+        ></v-select>
+
        </v-col>
     </v-row>
   </v-container>
@@ -24,6 +31,7 @@ import { formatDateWithoutSlash, formatDate, getCurrentDate, formatWithSlash } f
 import GenericService from "../services/GenericService";
 export default {
   data: () => ({
+    opciones:['rojo','azul','amarillo'],
     tenant: "",
     token: localStorage.getItem("token"),
     loaded: true,

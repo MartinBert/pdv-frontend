@@ -13,7 +13,10 @@ export default {
   components: {
     BarChart,
   },
-};
+  methods:{
+  
+  }
+}
 </script>
 <style>
 .small {

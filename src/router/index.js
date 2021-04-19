@@ -58,6 +58,7 @@ import Ivas from "../views/Ivas/Ivas.vue";
 import IvasForm from "../views/Ivas/IvasForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
 import Mensajes from "../views/Mensajes/Mensajes.vue";
+import Calendar from "../views/Calendar/Calendar.vue";
 
 Vue.use(VueRouter)
 
@@ -151,6 +152,14 @@ const routes = [
                 component: MarcasForm,
                 meta: { requiresAuth: true }
             },
+
+            {
+                path: 'calendar',
+                name: 'calendar',
+                component: Calendar,
+                meta: { requiresAuth: true }
+            },
+
             {
                 path: 'clientes',
                 name: 'clientes',
