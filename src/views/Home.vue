@@ -5,21 +5,27 @@
         <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent :charData="charData"/>
+        <LineChartComponent v-if="loaded" :charData="charData"/>
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent :charData="charData2"/>
+        <LineChartComponent v-if="loaded"  :charData="charData2"/>
       </v-col>
        <v-col>
         <Spinner v-if="!loaded" />
        </v-col>
-       <v-col md="4" sm="12">
+       <v-col 
+       md="12"
+      class="ml-md-auto"
+       >
+          <v-btn @click="Calendar">Generar Evento</v-btn>
+       </v-col>
+       <v-col md="3" sm="12" class="ml-md-auto">
          <v-select
           :items="opciones"
           label="Seleciona un grafico"
         ></v-select>
+      </v-col>
 
-       </v-col>
     </v-row>
   </v-container>
 </template>
@@ -109,7 +115,7 @@ export default {
       this.GetFechas(fechas)
     },
 
-    GetFechas(fechas) {
+    async GetFechas(fechas) {
       let fechasRecibidas = fechas; 
       this.loaded = false;
       GenericService('pdv', "ventas", this.token)
@@ -117,7 +123,6 @@ export default {
         .then((data) => {
           this.ventas = data.data.content;
           const filteredSales = this.getFilteredDates(fechasRecibidas);
-
           let fechas = [];
           for (let index = 0; index < filteredSales.length; index++) {
             const element = filteredSales[index];
@@ -151,11 +156,12 @@ export default {
             this.charData2.datasets[0].data.push(Number(dateSales[element]));
           });
 
-          this.loaded = true;
+           this.loaded = true;
         });
+       
     },
 
-    getDaySaleQuantities(fechas) {
+   async getDaySaleQuantities(fechas) {
       const fechasRecibidas = fechas;
       this.loaded = false;
       GenericService('pdv', "ventas", this.token)

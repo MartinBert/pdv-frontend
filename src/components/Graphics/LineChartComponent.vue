@@ -9,11 +9,14 @@ import BarChart from "../../plugins/chart";
 export default {
   props: {
     charData: Object
+  
   },
   components: {
     BarChart,
   },
+
   methods:{
+
   
   }
 }
