@@ -1,45 +1,4 @@
 import axios from "axios";
-import { calculateAmountPlusPercentaje, calculatePercentaje, sumarNumeros } from '../helpers/mathHelper';
-
-const possibleVariationInProducts = async (data) => {
-    const products = data;
-    return callUserData()
-    .then(dataOfUser => {
-        if(isSuperAdmin(dataOfUser.perfil)){
-            return products;
-        }else{
-            return varyProductProfit(products, dataOfUser);
-        }
-    })
-}
-
-const callUserData = async() => {
-    const loguedUser = await getLoguedUser();
-    if(loguedUser){
-        return loguedUser;
-    }else{
-        return setTimeout(() => callUserData(), 1000);
-    }
-}
-
-const getLoguedUser = async () => {
-    return JSON.parse(localStorage.getItem('userData'));
-}
-
-const isSuperAdmin = (perfil) => {
-    if(perfil > 1) return false;
-    return true;
-}
-
-const varyProductProfit = (data, loguedUser) => {
-    data.data.content.forEach(el => {
-        el.ganancia = loguedUser.sucursal.variacionGanancia;
-        el.precioSinIva = calculateAmountPlusPercentaje(el.costoBruto, el.ganancia);
-        el.ivaVenta = calculatePercentaje(el.precioSinIva, el.ivaVentasObject.porcentaje);
-        el.precioTotal = sumarNumeros([el.precioSinIva, el.ivaVenta]);
-    })
-    return data;
-}
 
 export default (tenant, service, token) => {
     return {
@@ -73,11 +32,10 @@ export default (tenant, service, token) => {
             })
         },
 
-        filter: async function (object) {
+        filter: function (object) {
             let data = await axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
                 headers: { Authorization: "Bearer " + token }
             })
-            if(service === "productos") return possibleVariationInProducts(data);
             return data;
         },
 
