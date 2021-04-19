@@ -1,8 +1,16 @@
 import axios from "axios";
 import { calculateAmountPlusPercentaje, calculatePercentaje, sumarNumeros } from '../helpers/mathHelper';
 
-const getLoguedUser = async () => {
-    return JSON.parse(localStorage.getItem('userData'));
+const possibleVariationInProducts = async (data) => {
+    const products = data;
+    return callUserData()
+    .then(dataOfUser => {
+        if(isSuperAdmin(dataOfUser.perfil)){
+            return products;
+        }else{
+            return varyProductProfit(products, dataOfUser);
+        }
+    })
 }
 
 const callUserData = async() => {
@@ -14,16 +22,8 @@ const callUserData = async() => {
     }
 }
 
-const possibleVariationInProducts = async (data) => {
-    const products = data;
-    return callUserData()
-    .then(dataOfUser => {
-        if(isSuperAdmin(dataOfUser.perfil)){
-            return products;
-        }else{
-            return varyProductProfit(products, dataOfUser);
-        }
-    })
+const getLoguedUser = async () => {
+    return JSON.parse(localStorage.getItem('userData'));
 }
 
 const isSuperAdmin = (perfil) => {
