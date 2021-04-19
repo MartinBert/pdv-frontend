@@ -13,19 +13,12 @@
        <v-col>
         <Spinner v-if="!loaded" />
        </v-col>
-       <v-col 
-       md="12"
-      class="ml-md-auto"
-       >
-          <v-btn @click="Calendar">Generar Evento</v-btn>
-       </v-col>
        <v-col md="3" sm="12" class="ml-md-auto">
          <v-select
           :items="opciones"
           label="Seleciona un grafico"
         ></v-select>
       </v-col>
-
     </v-row>
   </v-container>
 </template>
