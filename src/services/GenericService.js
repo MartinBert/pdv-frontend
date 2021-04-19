@@ -1,19 +1,29 @@
 import axios from "axios";
 import { calculateAmountPlusPercentaje, calculatePercentaje, sumarNumeros } from '../helpers/mathHelper';
 
-const loguedUser = JSON.parse(localStorage.getItem("userData"));
-let perfil;
-
-if(loguedUser){
-    perfil = loguedUser.perfil;
+const getLoguedUser = async () => {
+    return JSON.parse(localStorage.getItem('userData'));
 }
 
-const possibleVariationInProducts = (data) => {
-    if(isSuperAdmin(perfil)){
-        return data;
+const callUserData = async() => {
+    const loguedUser = await getLoguedUser();
+    if(loguedUser){
+        return loguedUser;
     }else{
-        return varyProductProfit(data);
+        return setTimeout(() => callUserData(), 1000);
     }
+}
+
+const possibleVariationInProducts = async (data) => {
+    const products = data;
+    return callUserData()
+    .then(dataOfUser => {
+        if(isSuperAdmin(dataOfUser.perfil)){
+            return products;
+        }else{
+            return varyProductProfit(products, dataOfUser);
+        }
+    })
 }
 
 const isSuperAdmin = (perfil) => {
@@ -21,7 +31,7 @@ const isSuperAdmin = (perfil) => {
     return true;
 }
 
-const varyProductProfit = (data) => {
+const varyProductProfit = (data, loguedUser) => {
     data.data.content.forEach(el => {
         el.ganancia = loguedUser.sucursal.variacionGanancia;
         el.precioSinIva = calculateAmountPlusPercentaje(el.costoBruto, el.ganancia);

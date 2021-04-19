@@ -24,7 +24,7 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-row class="mt-1">
+        <v-row>
           <v-col></v-col>
           <v-col cols="2">
             <v-text-field
