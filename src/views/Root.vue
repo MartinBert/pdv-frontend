@@ -348,7 +348,13 @@ export default {
             visible: false
           },
         ]
-      }
+      },
+       {
+        name: "calendar",
+        title: "Calendario",
+        visible: false,
+        icon: "/../images/icons/calendar.svg",
+       }
     ],
     modulosVisibles: []
   }),
