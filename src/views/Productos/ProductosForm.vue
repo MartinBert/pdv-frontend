@@ -246,7 +246,7 @@
 <script>
 import {
   calculateAmountPlusPercentaje,
-  calculateAmountMinusPercentaje,
+  calculateImportWithoutIvaPercent,
   restarNumeros,
   roundTwoDecimals,
   calculatePercentReductionInAmount,
@@ -365,7 +365,7 @@ export default {
     },
 
     calculations() {
-      this.object.costoNeto = calculateAmountMinusPercentaje(
+      this.object.costoNeto = calculateImportWithoutIvaPercent(
         this.object.costoBruto,
         this.object.ivaComprasObject.porcentaje
       );

@@ -1,5 +1,5 @@
-export function calculateAlicIvaBaseImpVentas(totalVenta) {
-    return roundTwoDecimals(totalVenta / 1.21);
+export function calculateImportWithoutIvaPercent(totalVenta, ivaPercent) {
+    return roundTwoDecimals(totalVenta / (1 + decimalPercent(ivaPercent)));
 }
 
 export function calculateAlicIvaImporteVentas(totalVenta, baseImp) {
