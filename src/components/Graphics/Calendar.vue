@@ -159,7 +159,8 @@
       this.$refs.calendar.checkChange()
     },
     methods: {
-      viewDay ({ date }) {
+      async getEvents(){},//Lee los eventos provenientes de la db 
+        viewDay ({ date }) {
         this.focus = date
         this.type = 'day'
       },
