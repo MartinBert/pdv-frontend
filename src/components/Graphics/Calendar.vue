@@ -134,7 +134,8 @@
 <script>
   export default {
     data: () => ({
-      focus: '',
+      today: new Date().toString().substr(0,10),
+      focus: new Date().toString().substr(0,10),
       type: 'month',
       typeToLabel: {
         month: 'Month',
@@ -146,6 +147,11 @@
       selectedElement: null,
       selectedOpen: false,
       events: [],
+      name: null,
+      details:null,
+      color:'',
+      dialog:false,
+      currentlyEditing:null, //Edit events
       colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
       names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
     }),
