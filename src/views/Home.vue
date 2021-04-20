@@ -79,6 +79,7 @@ export default {
     Spinner
   },
 
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.GetFechas([formatWithSlash(getCurrentDate())]);
@@ -110,6 +111,8 @@ export default {
         body: 'This is an example!'
       }, {})
     },
+    
+
 
     checkIfDateIsEmitted(fechas){
       this.getDaySaleQuantities(fechas)
