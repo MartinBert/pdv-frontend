@@ -18,6 +18,7 @@
           :items="opciones"
           label="Seleciona un grafico"
         ></v-select>
+         <button type="button" @click="notify">Show notification</button>
       </v-col>
     </v-row>
   </v-container>
@@ -101,6 +102,13 @@ export default {
           this.charData.datasets[0].data.sort(this.sortResults);
           this.loaded = true;
         });
+    },
+
+     notify () {
+      // https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification#Parameters
+      this.$notification.show('Hello World', {
+        body: 'This is an example!'
+      }, {})
     },
 
     checkIfDateIsEmitted(fechas){

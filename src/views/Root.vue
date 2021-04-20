@@ -349,12 +349,21 @@ export default {
           },
         ]
       },
-       {
-        name: "calendar",
-        title: "Calendario",
-        visible: false,
-        icon: "/../images/icons/calendar.svg",
-       }
+      {
+      name: "calendar",
+      title: "Calendario",
+      visible: false,
+      icon: "/../images/icons/calendar.svg",
+      childs: [
+          {
+            path: "/calendar",
+            name: "calendar",
+            title: "Calendario",
+            visible: false
+          },
+        ]
+      }
+
     ],
     modulosVisibles: []
   }),

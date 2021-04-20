@@ -146,8 +146,14 @@
       selectedElement: null,
       selectedOpen: false,
       events: [],
-      colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
-      names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
+      event:{},
+      name: null,
+      details: null,
+      color:'#F0F8FF',
+      dialog:false,
+      currentlyEditing:null,
+      colors: [],
+      names: [],
     }),
     mounted () {
       this.$refs.calendar.checkChange()
