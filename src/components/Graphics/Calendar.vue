@@ -136,8 +136,7 @@
 import GenericService from "../../services/GenericService";
   export default {
     data: () => ({
-      today: new Date().toString().substr(0,10),
-      focus: new Date().toString().substr(0,10),
+      today: '',
       type: 'month',
       typeToLabel: {
         month: 'Month',
