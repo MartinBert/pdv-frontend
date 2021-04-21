@@ -8,11 +8,12 @@
           <v-btn
             outlined
             class="mr-4"
-            color="grey darken-2"
-            @click="setToday"
+            color="primary"
+            @click="dialog = true"
           >
-            Today
+            Agregar
           </v-btn>
+          
           <v-btn
             fab
             text
@@ -151,8 +152,8 @@ import GenericService from "../../services/GenericService";
       name: null,
       details:null,
       color:'',
-      dialog:false,
-      currentlyEditing:null, //Edit events
+      dialog:false, 
+      currentlyEditing:null,
       colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
       names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
     }),
@@ -160,7 +161,7 @@ import GenericService from "../../services/GenericService";
       this.$refs.calendar.checkChange()
     },
     methods: {
-      async getEvents(){},//Lee los eventos provenientes de la db 
+      async getEvents(){},
         viewDay ({ date }) {
         this.focus = date
         this.type = 'day'
