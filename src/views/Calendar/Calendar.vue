@@ -9,7 +9,7 @@
             outlined
             class="mr-4"
             color="grey darken-2"
-            @click="setToday"
+            
           >
             Today
           </v-btn>
@@ -21,7 +21,7 @@
             text
             small
             color="grey darken-2"
-            @click="prev"
+           
           >
             <v-icon small>
               mdi-chevron-left
@@ -32,7 +32,7 @@
             text
             small
             color="grey darken-2"
-            @click="next"
+           
           >
             <v-icon small>
               mdi-chevron-right
@@ -81,28 +81,24 @@
           ref="calendar"
           v-model="focus"
           color="primary"
-          :events="events"
-          :event-color="getEventColor"
           :type="type"
-          @click:event="showEvent"
-          @click:more="viewDay"
-          @click:date="viewDay"
-          @change="updateRange"
         ></v-calendar>
         
         <v-dialog v-model="dialog">
           <v-card>
             <v-container>
-              <v-form @submit.prevent="AddEvent"> 
-                <v-text-field type="text" label="Agregar Nombre" v-model="name">
+              <v-form @submit.prevent="addEvent"> 
+                <v-text-field type="text" label="Agregar Nombre" v-model="object.name">
                 </v-text-field>
-                <v-text-field type="text" label="Agregar Detalle" v-model="details">
+                <v-text-field type="text" label="Agregar Detalle" v-model="object.details">
                 </v-text-field>
-                <v-text-field type="Date" label="Inicio del evento" v-model="start">
+                <v-text-field type="Date" label="Inicio del evento" v-model="object.startEvent" @change="formatDate()">
                 </v-text-field>
-                <v-text-field type="color" label="Color del evento" v-model="color">
+                <v-text-field type="Date" label="Finalizacion del evento" v-model="object.endEvent">
                 </v-text-field>
-                <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false">Agregar</v-btn>
+                <v-text-field type="color" label="Color del evento" v-model="object.color">
+                </v-text-field>
+                <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false" @click="save">Agregar</v-btn>
               </v-form>
             </v-container>
           </v-card>
@@ -141,7 +137,6 @@
               <v-btn
                 text
                 color="secondary"
-                @click="selectedOpen = false"
               >
                 Cancel
               </v-btn>
@@ -153,8 +148,23 @@
   </v-row>
 </template>
 <script>
+import GenericService from '../../services/GenericService';
   export default {
     data: () => ({
+      notes:[],
+      filterParams:{
+      name:"",
+      details:"",
+      endEvent:"",
+      startEvent:"",
+      page: 1,
+      size: 10,
+      totalPages: 0
+      },
+      loaded:false,
+      tenant: "",
+      service: "notes",
+      token: localStorage.getItem("token"),
       focus: '',
       type: 'month',
       typeToLabel: {
@@ -163,13 +173,16 @@
         day: 'Day',
         '4day': '4 Days',
       },
+      object:{
+        name: "",
+        details:"",
+        endEvent:"",
+        startEvent:"",
+        color:""
+      },
       selectedEvent: {},
       selectedElement: null,
       selectedOpen: false,
-      events: [],
-      event:{},
-      name: null,
-      details: null,
       color:'#F0F8FF',
       dialog:false,
       currentlyEditing:null,
@@ -178,72 +191,45 @@
     }),
     mounted () {
       this.$refs.calendar.checkChange()
+      this.tenant = this.$route.params.tenant;
+      this.getEvent()
+
     },
     methods: {
-      viewDay ({ date }) {
-        this.focus = date
-        this.type = 'day'
+      
+      getEvent() {
+        GenericService(this.tenant,this.service,this.token)
+        .filter(this.filterParams)
+        .then((data)=>{
+          this.notes = data.data.content;
+          console.log(this.notes)
+        })
       },
 
-      getEventColor (event) {
-        return event.color
+      formatDate(){
+        console.log(this.object);
       },
-      setToday () {
-        this.focus = ''
+
+      save(){
+       this.loaded = false;
+       GenericService(this.tenant,this.service,this.token)
+       .save(this.object)
+       .then(() => {
+          this.getEvent()
+        })
+        .catch((error) => {
+          if (error.response.status == 500) {
+            this.errorStatus = true;
+            this.loaded = true;
+          }
+        });
       },
-      prev () {
-        this.$refs.calendar.prev()
-      },
-      next () {
-        this.$refs.calendar.next()
-      },
-      showEvent ({ nativeEvent, event }) {
-        const open = () => {
-          this.selectedEvent = event
-          this.selectedElement = nativeEvent.target
-          setTimeout(() => {
-            this.selectedOpen = true
-          }, 10)
-        }
+    },
 
-        if (this.selectedOpen) {
-          this.selectedOpen = false
-          setTimeout(open, 10)
-        } else {
-          open()
-        }
-
-        nativeEvent.stopPropagation()
-      },
-      updateRange ({ start, end }) {
-        const events = []
-
-        const min = new Date(`${start.date}T00:00:00`)
-        const max = new Date(`${end.date}T23:59:59`)
-        const days = (max.getTime() - min.getTime()) / 86400000
-        const eventCount = this.rnd(days, days + 20)
-
-        for (let i = 0; i < eventCount; i++) {
-          const allDay = this.rnd(0, 3) === 0
-          const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-          const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-          const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-          const second = new Date(first.getTime() + secondTimestamp)
-
-          events.push({
-            name: this.names[this.rnd(0, this.names.length - 1)],
-            start: first,
-            end: second,
-            color: this.colors[this.rnd(0, this.colors.length - 1)],
-            timed: !allDay,
-          })
-        }
-
-        this.events = events
-      },
+     
+     
       rnd (a, b) {
         return Math.floor((b - a + 1) * Math.random()) + a
       },
-    },
-  }
+    }
 </script>
