@@ -5,9 +5,6 @@
         <v-toolbar
           flat
         >
-          <v-btn >
-            Agregar
-          </v-btn>
           <v-btn
             outlined
             class="mr-4"
