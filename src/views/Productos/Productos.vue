@@ -23,6 +23,13 @@
             raised
             >EXPORTAR EXCEL</v-btn
           >
+          <v-btn
+            v-if="perfil === 1"
+            class="primary ml-1"
+            @click="correctPriceInList()"
+            raised
+            >Corregir lista de precios</v-btn
+          >
         </v-col>
       </v-row>
       <v-row>
@@ -53,7 +60,8 @@
         <v-col class="mt-2 ml-3" v-if="view == 'labelPrinting'">
           <h2>Seleccion de productos</h2>
         </v-col>
-        <v-col>
+        <v-col></v-col>
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.productoName"
             v-on:input="filterObjects()"
@@ -65,7 +73,7 @@
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col>
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.productoCodigo"
             v-on:input="filterObjects()"
@@ -77,7 +85,7 @@
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col>
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.productoCodigoBarras"
             v-on:input="filterObjects()"
@@ -89,7 +97,7 @@
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col>
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.productoMarcaName"
             v-on:input="filterObjects()"
@@ -101,7 +109,7 @@
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col>
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.productoPrimerAtributoName"
             v-on:input="filterObjects()"
@@ -113,6 +121,7 @@
             append-icon="mdi-magnify"
           />
         </v-col>
+        <v-col></v-col>
       </v-row>
     </v-form>
     <ProductosTable
@@ -194,7 +203,10 @@ import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import {
   generateBarCode,
   roundTwoDecimals,
-  decimalPercent
+  decimalPercent,
+  calculateImportWithoutIvaPercent,
+  restarNumeros,
+  calculateAmountPlusPercentaje
 } from "../../helpers/mathHelper";
 import { exportExcel } from "../../helpers/exportFileHelper";
 import XLSX from "xlsx";
@@ -460,6 +472,7 @@ export default {
           }
 
           let ivaComp = this.getIva(element.idIvaCompras).porcentaje;
+          let ivaVent = this.getIva(element.idIvaVentas).porcentaje;
           let ganancia = element.ganancia / 100;
           let obj = {
             nombre: element.nombre,
@@ -475,34 +488,25 @@ export default {
             precioCosto: roundTwoDecimals(
               element.precioTotal /
                 (1 + ganancia) /
-                (1 + decimalPercent(ivaComp))
-            ),
-            costoNeto: roundTwoDecimals(
-              element.precioTotal /
-                (1 + ganancia) /
-                (1 + decimalPercent(ivaComp)) /
-                (1 + decimalPercent(ivaComp))
+                (1 + decimalPercent(ivaVent))
             ),
             costoBruto: roundTwoDecimals(
               element.precioTotal /
                 (1 + ganancia) /
-                (1 + decimalPercent(ivaComp))
+                (1 + decimalPercent(ivaVent))
+            ),
+            costoNeto: roundTwoDecimals(
+              element.precioTotal / (1 + decimalPercent(ivaVent)) / (1 + ganancia) / (1 + decimalPercent(ivaComp))
             ),
             ivaCompra: roundTwoDecimals(
-              element.precioTotal /
+              (element.precioTotal /
                 (1 + ganancia) /
-                (1 + decimalPercent(ivaComp)) -
-                element.precioTotal /
-                  (1 + ganancia) /
-                  (1 + ivaComp) /
-                  (1 + ivaComp)
+                (1 + decimalPercent(ivaVent))) -
+                element.precioTotal / (1 + decimalPercent(ivaVent)) / (1 + ganancia) / (1 + decimalPercent(ivaComp))
             ),
             ganancia: element.ganancia,
-            precioSinIva: roundTwoDecimals(element.precioTotal / (1 + ivaComp)),
-            ivaVenta: roundTwoDecimals(
-              element.precioTotal -
-                element.precioTotal / (1 + decimalPercent(ivaComp))
-            ),
+            precioSinIva: roundTwoDecimals(element.precioTotal / (1 + decimalPercent(ivaVent))),
+            ivaVenta: roundTwoDecimals(element.precioTotal - roundTwoDecimals(element.precioTotal / (1 + decimalPercent(ivaVent)))),
             precioTotal: element.precioTotal,
             estado: 1,
           };
@@ -779,7 +783,46 @@ export default {
       console.log(product);
       return product;
     },
+
+    correctPriceInList(){
+      this.filterParams.page = 1;
+      this.filterParams.size = 1;
+      GenericService(this.tenant, this.service, this.token)
+      .filter(this.filterParams)
+      .then(data => {
+        const products = data.data.content;
+        products.forEach(el => {
+          el = this.calculations(el);
+          console.log(el)
+        })
+      })
+    },
+
+    calculations(object) {
+      object.costoNeto = calculateImportWithoutIvaPercent(
+        object.costoBruto,
+        object.ivaComprasObject.porcentaje
+      );
+      object.precioCosto = object.costoNeto;
+      object.ivaCompra = restarNumeros([
+        object.costoBruto,
+        object.costoNeto,
+      ]);
+      object.precioSinIva = calculateAmountPlusPercentaje(
+        object.costoBruto,
+        object.ganancia
+      );
+      object.precioTotal = calculateAmountPlusPercentaje(
+        object.precioSinIva,
+        object.ivaVentasObject.porcentaje
+      );
+      object.ivaVenta = restarNumeros([
+        object.precioTotal,
+        object.precioSinIva,
+      ]);
+
+      return object;
+    },
   },
 };
 </script>
-
