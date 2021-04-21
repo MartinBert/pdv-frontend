@@ -785,15 +785,25 @@ export default {
     },
 
     correctPriceInList(){
+      this.loaded = false;
       this.filterParams.page = 1;
-      this.filterParams.size = 1;
+      this.filterParams.size = 1000000;
       GenericService(this.tenant, this.service, this.token)
       .filter(this.filterParams)
       .then(data => {
         const products = data.data.content;
-        products.forEach(el => {
+        let correctedProducts = products.map(el => {
           el = this.calculations(el);
-          console.log(el)
+          return el;
+        })
+        GenericService(this.tenant, this.service, this.token)
+        .saveAll(correctedProducts)
+        .then(()=>{
+          this.$successAlert("Precios corregidos")
+          this.loaded = true;
+        })
+        .catch(err => {
+          console.error(err);
         })
       })
     },
@@ -818,7 +828,7 @@ export default {
       );
       object.ivaVenta = restarNumeros([
         object.precioTotal,
-        object.precioSinIva,
+        object.precioSinIva
       ]);
 
       return object;
