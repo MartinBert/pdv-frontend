@@ -5,6 +5,9 @@
         <v-toolbar
           flat
         >
+          <v-btn color="primary" dark class="mr-4" @click="dialog = true">
+            Agregar
+          </v-btn>
           <v-btn
             outlined
             class="mr-4"
@@ -86,6 +89,24 @@
           @click:date="viewDay"
           @change="updateRange"
         ></v-calendar>
+        <v-dialog v-model="dialog">
+          <v-card>
+            <v-container>
+              <v-form @submit.prevent="AddEvent"> 
+                <v-text-field type="text" label="Agregar Nombre" v-model="name">
+                </v-text-field>
+                <v-text-field type="text" label="Agregar Detalle" v-model="details">
+                </v-text-field>
+                <v-text-field type="Date" label="Inicio del evento" v-model="start">
+                </v-text-field>
+                <v-text-field type="color" label="Color del evento" v-model="color">
+                </v-text-field>
+                <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false">Agregar</v-btn>
+              </v-form>
+            </v-container>
+          </v-card>
+
+        </v-dialog>
         <v-menu
           v-model="selectedOpen"
           :close-on-content-click="false"
