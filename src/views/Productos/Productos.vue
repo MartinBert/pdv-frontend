@@ -23,6 +23,15 @@
             raised
             >EXPORTAR EXCEL</v-btn
           >
+
+          <!-- 
+          Este servicio corrige los precios de la 
+          lista, calculando sus valores basados en los 
+          porcentajes de iva compra, iva venta, ganancia 
+          y costo bruto del producto, por lo que todos los 
+          cálculos se realizan partiendo del costo bruto
+          del artículo y no de de su precio final de venta.
+          -->
           <v-btn
             v-if="perfil === 1"
             class="primary ml-1"
@@ -30,6 +39,8 @@
             raised
             >Corregir lista de precios</v-btn
           >
+
+
         </v-col>
       </v-row>
       <v-row>
@@ -784,6 +795,9 @@ export default {
       return product;
     },
 
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS TO APPLY CORRECTIONS TO THE PRICE LIST ----------------------------------------------*/
+    /******************************************************************************************************/
     correctPriceInList(){
       this.loaded = false;
       this.filterParams.page = 1;
