@@ -163,6 +163,7 @@
         this.focus = date
         this.type = 'day'
       },
+
       getEventColor (event) {
         return event.color
       },

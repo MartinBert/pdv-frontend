@@ -5,6 +5,9 @@
         <v-toolbar
           flat
         >
+          <v-btn >
+            Agregar
+          </v-btn>
           <v-btn
             outlined
             class="mr-4"
@@ -132,6 +135,7 @@
   </v-row>
 </template>
 <script>
+import GenericService from "../../services/GenericService";
   export default {
     data: () => ({
       today: new Date().toString().substr(0,10),
