@@ -149,6 +149,8 @@
 </template>
 <script>
 import GenericService from '../../services/GenericService';
+import formatWithSlash from '../../helpers/dateHelper';
+
   export default {
     data: () => ({
       notes:[],
@@ -210,7 +212,7 @@ import GenericService from '../../services/GenericService';
         console.log(this.object);
       },
 
-      save(){
+      saveEvent(){
        this.loaded = false;
        GenericService(this.tenant,this.service,this.token)
        .save(this.object)
@@ -224,7 +226,34 @@ import GenericService from '../../services/GenericService';
           }
         });
       },
-    },
+
+      addEvent(){
+        this.loaded = false;
+        GenericService(this.tenant,this.service,this.token)
+        .saveAll(this.object)
+        .then(()=>{
+          
+          name :this.name;
+          details:this.details;
+          startEvent:this.startEvent;
+          endEvent:this.endEvent;
+          color:this.color;
+        })
+
+        this.getEvent();
+        this.name="";
+        this.details="";
+        this.startEvent="";
+        this.endEvent="";
+        this.color= '#F0F8FF';
+
+      },
+    }.catch((error) => {
+          if (error.response.status == 500) {
+            this.errorStatus = true;
+            this.loaded = true;
+          }
+        }),
 
      
      
