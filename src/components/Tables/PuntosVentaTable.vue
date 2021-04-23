@@ -5,6 +5,7 @@
         <tr>
           <th>Nombre</th>
           <th>ID Fiscal</th>
+          <th>IPV4</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -12,6 +13,7 @@
         <tr>
           <td>{{ item.nombre }}</td>
           <td>{{ item.idFiscal }}</td>
+          <td>{{ item.ipLocal }}</td>
           <td>
             <Edit :itemId="item.id" v-on:editItem="editItem" />
             <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
