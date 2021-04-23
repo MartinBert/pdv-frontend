@@ -79,7 +79,7 @@ export default {
     async closure(type){
       const clientPublicIp = await this.getClientPublicIp();
       axios
-        .post(`http://${clientPublicIp}/${type}_closure`)
+        .post(`http://192.168.1.100/${type}_closure`)
         .then(() => {
           this.$successAlert(`Cierre ${type} realizado`);
           this.loaded = true;
