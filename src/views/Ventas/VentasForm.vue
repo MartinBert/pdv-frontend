@@ -692,12 +692,12 @@ export default {
       this.sendTicketData(this.createJsonForTicketInvoiceC(), "ticket");
     },
 
-    async sendTicketData(jsonToFiscalController, ticketRoute) {
-      console.log(jsonToFiscalController, ticketRoute)
-      const clientPublicIp = await this.getClientPublicIp();
+    sendTicketData(jsonToFiscalController, ticketRoute) {
+      const clientIp = this.loguedUser.puntoVenta.ipLocal;
+      console.log(this.loguedUser)
       axios
         .post(
-          `http://${clientPublicIp}/${ticketRoute}`,
+          `http://${clientIp}/${ticketRoute}`,
           jsonToFiscalController
         )
         .then(() => {
@@ -708,12 +708,6 @@ export default {
         .catch((err) => {
           console.error(err);
         });
-    },
-
-    async getClientPublicIp(){
-      const response = await axios.get('http://ip-api.com/json');
-      const ip = response.data.query
-      return ip;
     },
 
     createJsonForTicketInvoiceA() {
