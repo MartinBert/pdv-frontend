@@ -77,7 +77,7 @@ export default {
     },
 
     async closure(type){
-      const clientPublicIp = await this.getClientPublicIp();
+      // const clientPublicIp = await this.getClientPublicIp();
       axios
         .post(`http://192.168.1.100/${type}_closure`)
         .then(() => {
