@@ -4,6 +4,8 @@
       <v-row>
         <v-col>
           <v-btn class="primary" @click="newObject()" raised>REALIZAR ARQUEO</v-btn>
+          <v-btn class="primary ml-1" @click="closure('z')" raised>REALIZAR CIERRE Z CONTROLADOR FISCAL</v-btn>
+          <v-btn class="primary ml-1" @click="closure('x')" raised>REALIZAR CIERRE X CONTROLADOR FISCAL</v-btn>
         </v-col>
       </v-row>
     </v-form>
@@ -29,6 +31,7 @@ import CajaDetails from '../../components/Details/CajaDetails';
 import Spinner from '../../components/Graphics/Spinner';
 import CajaTable from '../../components/Tables/CajaTable';
 import Pagination from '../../components/Pagination';
+import axios from 'axios';
 export default {
   data: () => ({
     objects: [],
@@ -71,6 +74,25 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+    },
+
+    async closure(type){
+      const clientPublicIp = await this.getClientPublicIp();
+      axios
+        .post(`http://${clientPublicIp}/${type}_closure`)
+        .then(() => {
+          this.$successAlert(`Cierre ${type} realizado`);
+          this.loaded = true;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+
+    async getClientPublicIp(){
+      const response = await axios.get('http://ip-api.com/json');
+      const ip = response.data.query
+      return ip;
     },
 
     newObject() {
