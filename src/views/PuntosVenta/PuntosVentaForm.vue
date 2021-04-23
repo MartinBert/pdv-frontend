@@ -21,6 +21,15 @@
             ></v-text-field>
           </v-col>
           <v-col>
+            <v-text-field 
+            type="text"
+            v-model="object.ipLocal"
+            :counter="50" 
+            label="IPV4 Local" 
+            required
+            ></v-text-field>
+          </v-col>
+          <v-col>
             <v-select
               type="text"
               :items="sucursales"
