@@ -64,9 +64,9 @@
           v-model="focus"
           color="primary"
           :type="type"
-          :events="events"
+          :events="notes"
           :event-color="getEventColor"
-          @click:event="showEvent"
+          @click:notes="showEvent"
           @click:more="viewDay"
           @click:date="viewDay"
           @change="updateRange"
@@ -249,8 +249,8 @@ export default {
         this.focus = date
         this.type = 'day'
       },
-      getEventColor (event) {
-        return event.color
+      getEventColor (notes) {
+        return notes.color
       },
       setToday () {
         this.focus = ''
@@ -261,9 +261,9 @@ export default {
       next () {
         this.$refs.calendar.next()
       },
-      showEvent ({ nativeEvent, event }) {
+      showEvent ({ nativeEvent, notes }) {
         const open = () => {
-          this.selectedEvent = event
+          this.selectedEvent = notes
           this.selectedElement = nativeEvent.target
           setTimeout(() => {
             this.selectedOpen = true
@@ -279,11 +279,11 @@ export default {
 
         nativeEvent.stopPropagation()
       },
-      updateRange ({ start, end }) {
+      updateRange ({ startEvent, endEvent }) {
         const events = []
 
-        const min = new Date(`${start.date}T00:00:00`)
-        const max = new Date(`${end.date}T23:59:59`)
+        const min = new Date(`${startEvent.date}T00:00:00`)
+        const max = new Date(`${endEvent.date}T23:59:59`)
         const days = (max.getTime() - min.getTime()) / 86400000
         const eventCount = this.rnd(days, days + 20)
 
@@ -294,10 +294,10 @@ export default {
           const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
           const second = new Date(first.getTime() + secondTimestamp)
 
-          events.push({
+          notes.push({
             name: this.names[this.rnd(0, this.names.length - 1)],
-            start: first,
-            end: second,
+            startEvent: first,
+            endEvent: second,
             color: this.colors[this.rnd(0, this.colors.length - 1)],
             timed: !allDay,
           })
