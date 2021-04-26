@@ -361,9 +361,9 @@ export default {
           });
         } else {
           if (this.receiptDialogData.documento.tipo === true) {
-            this.processAndSaveFiscal();
+            this.saveFiscalNote();
           } else {
-            this.processAndSaveNoFiscal();
+            this.saveNoFiscalNote();
           }
         }
       }
@@ -387,7 +387,7 @@ export default {
       }
     },
     
-    processAndSaveFiscal() {
+    saveFiscalNote() {
       /*** Constants ***/
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
@@ -428,7 +428,6 @@ export default {
       let file;
       let fileURL;
       let productos;
-      let condVenta;
       let invoice;
       let devolucion = {
         fecha: formatDate(getCurrentDate()),
@@ -443,24 +442,23 @@ export default {
       axios
       .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`)
       .then(data => {
-        const numberOfReceipt = parseInt(data.data.responseOfAfip) + 1;
+        const lastInvoiceNumber = data.data.responseOfAfip;
+        const numberOfCurrentInvoice = getNextInvoiceNumber(lastInvoiceNumber)
         const dataForCreateInvoice = {
             ptoVentaId: ptoVenta.idFiscal,
             receiptCode: documento.codigoDocumento,
             clientCuit: cliente.cuit,
-            numberOfReceipt: numberOfReceipt,
+            numberOfCurrentInvoice: numberOfCurrentInvoice,
             date: getInternationalDate(),
             products: [detail],
             totalVenta: totalVenta,
             asociatedReceipt: comprobanteAsociadoDetalle
         };
 
-        /*** Format invoice according to type ***/
         invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice)
       
-        /*** Evaluate required sales form data ***/
-        if (mediosPago !== undefined) {
-          if (productosEntrantes.length > 0) {
+        if (passPaymentsMethodsValidation(mediosPago)) {
+          if (containProducts(productosEntrantes)) {
             /*** Send invoice to AFIP ***/
               axios
               .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
@@ -468,15 +466,12 @@ export default {
                 const cae = data.data.CAE;
                 const dateOfCaeExpiration = data.data.CAEFchVto;
                 const barCode = sucursal.cuit + addZerosInString("02", documento.codigoDocumento) + addZerosInString("04", ptoVenta.idFiscal) + cae + formatDateWithoutSlash(dateOfCaeExpiration);
-                
-                if(planesPago.cuotas > 1){condVenta = false;}else{condVenta = true;}
-
                 comprobante = {
                   letra: documento.letra,
-                  numeroCbte: numberOfReceipt,
+                  numeroCbte: numberOfCurrentInvoice,
                   fechaEmision: formatDate(getCurrentDate()),
                   fechaVto: formatDate(dateOfCaeExpiration),
-                  condicionVenta: condVenta,
+                  condicionVenta: getSaleCondition(),
                   productos: [detail],
                   barCode: barCode,
                   cae: cae,
@@ -492,7 +487,7 @@ export default {
                 };
                 
                 /*** Save receipt in database ***/
-                if (comprobante.cae) {
+                if (invoiceContainCAE(comprobante)) {
                   GenericService(tenant, "comprobantesFiscales", token)
                   .save(comprobante)
                   .then((data) => {
@@ -567,9 +562,32 @@ export default {
         }
       });
 
+      const getNextInvoiceNumber = (lastInvoiceNumber) => {
+        return lastInvoiceNumber++;
+      }
+
+      const passPaymentsMethodsValidation = (mediosPago) => {
+        if(mediosPago) return true;
+        return false;
+      }
+
+      const containProducts = (products) => {
+        if(products.length > 0) return true;
+        return false;
+      }
+
+      const getSaleCondition = () => {
+        if(planesPago.cuotas < 2) return true;
+        return false;
+      }
+
+      const invoiceContainCAE = (invoice) => {
+        if(invoice.cae) return true;
+        return false;
+      }
     },
 
-    processAndSaveNoFiscal() {
+    saveNoFiscalNote() {
       /* Constants */
       const mediosPago = this.receiptDialogData.mediosPago;
       const planesPago = this.receiptDialogData.planPago;

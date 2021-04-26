@@ -282,14 +282,14 @@ import GenericService from '../../services/GenericService';
           const first = new Date(firstTimestamp - (firstTimestamp % 900000))
           const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
           const second = new Date(first.getTime() + secondTimestamp)
-
-          notes.push({
-            name: this.names[this.rnd(0, this.names.length - 1)],
-            startEvent: first,
-            endEvent: second,
-            color: this.colors[this.rnd(0, this.colors.length - 1)],
-            timed: !allDay,
-          })
+          console.log(second)
+          // notes.push({
+          //   name: this.names[this.rnd(0, this.names.length - 1)],
+          //   startEvent: first,
+          //   endEvent: second,
+          //   color: this.colors[this.rnd(0, this.colors.length - 1)],
+          //   timed: !allDay,
+          // })
         }
 
         this.notes = notes
