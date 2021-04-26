@@ -87,6 +87,30 @@
           @click:date="viewDay"
           @change="updateRange"
         ></v-calendar>
+        <v-dialog v-model="dialog">
+          <v-card>
+            <v-container>
+              <v-form @submit.prevent="addEvent()"> 
+                <v-text-field type="text" label="Agregar Nombre" v-model="name">
+                <v-text-field type="text" label="Agregar Nombre" v-model="object.name">
+                </v-text-field>
+                <v-text-field type="text" label="Agregar Detalle" v-model="details">
+                <v-text-field type="text" label="Agregar Detalle" v-model="object.details">
+                </v-text-field>
+                <v-text-field type="Date" label="Inicio del evento" v-model="start">
+                <v-text-field type="Date" label="Inicio del evento" v-model="object.startEvent" @change="formatDate()">
+                </v-text-field>
+                <v-text-field type="color" label="Color del evento" v-model="color">
+                <v-text-field type="Date" label="Finalizacion del evento" v-model="object.endEvent">
+                </v-text-field>
+                <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false">Agregar</v-btn>
+                <v-text-field type="color" label="Color del evento" v-model="object.color">
+                </v-text-field>
+                <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false" @click="save">Agregar</v-btn>
+              </v-form>
+            </v-container>
+          </v-card>
+        </v-dialog>
         <v-menu
           v-model="selectedOpen"
           :close-on-content-click="false"
@@ -136,6 +160,26 @@
 import GenericService from "../../services/GenericService";
   export default {
     data: () => ({
+      notes:[],
+      filterParams:{
+      name:"",
+      details:"",
+      endEvent:"",
+      startEvent:"",
+      page: 1,
+      size: 10,
+      totalPages: 0
+      },
+      loaded:false,
+      tenant: "",
+      service: "notes",
+      token: localStorage.getItem("token"),
+      object:{
+        name:"",
+        details:"",
+        endEvent:"",
+        startEvent:""
+      },
       today: '',
       type: 'month',
       typeToLabel: {
@@ -153,17 +197,18 @@ import GenericService from "../../services/GenericService";
       color:'',
       dialog:false, 
       currentlyEditing:null,
-      colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
-      names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
+      colors: [],
+      names: [],
     }),
     mounted () {
       this.$refs.calendar.checkChange()
+      this.getEvents()
     },
     methods: {
-      async getEvents(){},
-        viewDay ({ date }) {
-        this.focus = date
-        this.type = 'day'
+      
+      viewDay ({ date }) {
+      this.focus = date
+      this.type = 'day'
       },
       getEventColor (event) {
         return event.color
@@ -224,6 +269,42 @@ import GenericService from "../../services/GenericService";
       rnd (a, b) {
         return Math.floor((b - a + 1) * Math.random()) + a
       },
+
+      getEvent() {
+        GenericService(this.tenant,this.service,this.token)
+        .filter(this.filterParams)
+        .then((data)=>{
+          this.notes = data.data.content;
+      
+        })
+      },
+
+      saveEvent(){
+       this.loaded = false;
+       GenericService(this.tenant,this.service,this.token)
+       .save(this.object)
+       .then(()=>{
+         this.getEvents();
+       });
+            
+
+          
+      },
     },
-  }
+       
+      addEvent(){
+        this.loaded = false;
+        GenericService(this.tenant,this.service,this.token)
+        .saveAll(this.object)
+        .then(()=>{
+          
+
+           })
+        },
+    }.catch((error) => {
+          if (error.response.status == 500) {
+            this.errorStatus = true;
+            this.loaded = true;
+          }
+        });  
 </script>
