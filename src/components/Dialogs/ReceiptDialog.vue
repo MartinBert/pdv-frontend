@@ -22,6 +22,7 @@
                   :return-object="true"
                   placeholder="Seleccione un cliente"
                   required
+                  style="width: 100%;"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="6">
@@ -34,6 +35,7 @@
                   :return-object="true"
                   placeholder="Seleccione un tipo de comprobante"
                   required
+                  style="width: 100%;"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="6">
@@ -46,17 +48,19 @@
                   :return-object="true"
                   placeholder="Seleccione un medio de pago"
                   required
+                  style="width: 100%;"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="6">
                 <v-autocomplete
-                  required
                   class="button-ventas plan-pago"
                   v-model="dialogObject.planPago"
                   :items="databaseItems.planes"
                   item-text="nombre"
                   :return-object="true"
                   placeholder="Seleccione un plan de pago"
+                  required
+                  style="width: 100%;"
                 ></v-autocomplete>
               </v-col>
               <v-col></v-col>
@@ -66,6 +70,7 @@
                   type="number"
                   v-model="dialogObject.totalVenta"
                   required
+                  style="width: 100%;"
                 ></v-text-field>
               </v-col>
               <v-col></v-col>
