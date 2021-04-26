@@ -16,6 +16,13 @@
               </span>
               <span v-if="!defaultDeposit"> No definido </span>
             </h3>
+            <v-btn
+              v-if="loguedUser.perfil === 1"
+              color="primary"
+              class="ml-5"
+              @click="testCert()"
+              >TEST CERTIFICADO</v-btn
+            >
           </div>
         </v-col>
         <v-col class="text-right">
@@ -1243,6 +1250,20 @@ export default {
       this.listennerOfListChange = 999999999;
       this.$store.commit("productos/resetStates");
     },
+
+    /******************************************************************************************************/
+    /* FUNCITON FOR TEST AFIP CERT -----------------------------------------------------------------------*/
+    /******************************************************************************************************/
+    testCert(){
+      const cuit = '23280601659';
+      const idFiscal = '16';
+      const codigoDocumento = '001';
+      axios
+        .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuit}/${idFiscal}/${codigoDocumento}`)
+        .then(data => {
+          console.log(data);
+        })
+    }
   },
 };
 </script>
