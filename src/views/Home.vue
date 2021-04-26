@@ -34,7 +34,6 @@ export default {
     opciones:['rojo','azul','amarillo'],
     tenant: "",
     token: localStorage.getItem("token"),
-    loguedUser: JSON.parse(localStorage.getItem('userData')),
     loaded: true,
     filterParams: {
       blackReceiptFilter: 999999999,
@@ -83,7 +82,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.sucursalId = this.loguedUser.sucursal.id
+    this.filterParams.sucursalId = JSON.parse(localStorage.getItem('userData')).sucursal.id
     this.GetFechas([formatWithSlash(getCurrentDate())]);
     this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
   },
