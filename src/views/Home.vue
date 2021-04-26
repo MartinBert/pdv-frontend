@@ -82,14 +82,26 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.sucursalId = JSON.parse(localStorage.getItem('userData')).sucursal.id
-    this.GetFechas([formatWithSlash(getCurrentDate())]);
-    this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
+    this.getSucursalId()
+    .then(()=>{
+      this.GetFechas([formatWithSlash(getCurrentDate())]);
+      this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
+    })
   },
 
   methods: {
-    getDaySaleAmonth() {
+
+    async getSucursalId(){
       this.loaded = false;
+      setTimeout(()=>{
+        const sucursal = JSON.parse(localStorage.getItem('userData')).sucursal;
+        if(sucursal){
+          this.filterParams.sucursalId = sucursal.id;
+        }
+      }, 500)
+    },
+
+    getDaySaleAmonth() {
       GenericService('pdv', "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
