@@ -122,7 +122,7 @@
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon>
-                <v-icon>mdi-heart</v-icon>
+                <v-icon @click="deleteEvent(selectedEvent.id)">mdi-delete</v-icon>
               </v-btn>
               <v-btn icon>
                 <v-icon>mdi-dots-vertical</v-icon>
@@ -186,7 +186,6 @@ export default {
     this.$refs.calendar.checkChange();
     this.tenant = this.$route.params.tenant;
     this.getEvent();
-    this.printEvent();
   },
   methods: {
     
@@ -197,14 +196,15 @@ export default {
           this.notes = data.data.content;
           console.log(this.notes);
           this.notes.forEach((notes) => {
-            const { name, details, endEvent, startEvent } = notes;
+            const { name, details, endEvent, startEvent,id } = notes;
             console.log(details);
 
             this.events.push({
+              id: id,
               name: name,
               start: startEvent,
               end: endEvent,
-              color: "#FF5733",
+              color: "#1976D2",
             });
           });
         });
@@ -224,6 +224,21 @@ export default {
             this.loaded = true;
           }
         });
+    },
+
+    deleteEvent(id){
+
+      console.log(id);
+
+      GenericService(this.tenant,this.service,this.token)
+      .delete(id)
+      .then(()=>{
+       
+       this.getEvent()
+       this.selectedOpen=false;
+        
+
+      })
     },
 
     viewDay({ date }) {
@@ -246,6 +261,7 @@ export default {
       const open = () => {
         this.selectedEvent = event;
         this.selectedElement = nativeEvent.target;
+        console.log(this.selectedEvent);
         setTimeout(() => {
           this.selectedOpen = true;
         }, 10);
