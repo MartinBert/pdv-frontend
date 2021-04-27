@@ -2,57 +2,30 @@
   <v-row class="fill-height">
     <v-col>
       <v-sheet height="64">
-        <v-toolbar
-          flat
-        >
+        <v-toolbar flat>
           <v-btn color="primary" dark class="mr-4" @click="dialog = true">
             Agregar
           </v-btn>
-          <v-btn
-            outlined
-            class="mr-4"
-            color="grey darken-2"
-            @click="setToday"
-          >
+          <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">
             Hoy
           </v-btn>
-          <v-btn
-            fab
-            text
-            small
-            color="grey darken-2"
-            @click="prev"
-          >
+          <v-btn fab text small color="grey darken-2" @click="prev">
             <v-icon small>
               mdi-chevron-left
             </v-icon>
           </v-btn>
-           <v-toolbar-title v-if="$refs.calendar">
+          <v-toolbar-title v-if="$refs.calendar">
             {{ $refs.calendar.title }}
           </v-toolbar-title>
-          <v-btn
-            fab
-            text
-            small
-            color="grey darken-2"
-            @click="next"
-          >
+          <v-btn fab text small color="grey darken-2" @click="next">
             <v-icon small>
               mdi-chevron-right
             </v-icon>
           </v-btn>
           <v-spacer></v-spacer>
-          <v-menu
-            bottom
-            right
-          >
+          <v-menu bottom right>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                outlined
-                color="grey darken-2"
-                v-bind="attrs"
-                v-on="on"
-              >
+              <v-btn outlined color="grey darken-2" v-bind="attrs" v-on="on">
                 <span>{{ typeToLabel[type] }}</span>
                 <v-icon right>
                   mdi-menu-down
@@ -81,36 +54,55 @@
           locale="es"
           ref="calendar"
           v-model="focus"
+          @click:event="showEvent"
+          @click:more="viewDay"
+          @click:date="viewDay"
           color="primary"
           :events="events"
           :event-color="getEventColor"
           :type="type"
-          @click:event="showEvent"
-          @click:more="viewDay"
-          @click:date="viewDay"
-          @change="updateRange"
         ></v-calendar>
         <v-dialog v-model="dialog">
           <v-card>
             <v-container>
               <v-form @submit.prevent="saveEvent()">
-                <v-text-field 
-                  type="text" label="Agregar Nombre" v-model="object.name">
+                <v-text-field
+                  type="text"
+                  label="Agregar Nombre"
+                  v-model="object.name"
+                >
                 </v-text-field>
-                <v-text-field 
-                  type="text" label="Agregar un Detalle" v-model="object.details">
+                <v-text-field
+                  type="text"
+                  label="Agregar un Detalle"
+                  v-model="object.details"
+                >
                 </v-text-field>
-                <v-text-field 
-                  type="date" label="Inicio del evento" v-model="object.startEvent">
+                <v-text-field
+                  type="date"
+                  label="Inicio del evento"
+                  v-model="object.startEvent"
+                >
                 </v-text-field>
-                <v-text-field 
-                  type="date" label="Fin del evento" v-model="object.endEvent">
+                <v-text-field
+                  type="date"
+                  label="Fin del evento"
+                  v-model="object.endEvent"
+                >
                 </v-text-field>
-                <v-text-field 
-                  type="color" label="Color del evento" v-model="object.color">
+                <v-text-field
+                  type="color"
+                  label="Color del evento"
+                  v-model="object.color"
+                >
                 </v-text-field>
-                <v-btn type="submit" color="primary" class="mr-4" 
-                @click.stop="dialog = false">Agregar</v-btn>
+                <v-btn
+                  type="submit"
+                  color="primary"
+                  class="mr-4"
+                  @click.stop="dialog = false"
+                  >Agregar</v-btn
+                >
               </v-form>
             </v-container>
           </v-card>
@@ -122,15 +114,8 @@
           :activator="selectedElement"
           offset-x
         >
-          <v-card
-            color="grey lighten-4"
-            min-width="350px"
-            flat
-          >
-            <v-toolbar
-              :color="selectedEvent.color"
-              dark
-            >
+          <v-card color="grey lighten-4" min-width="350px" flat>
+            <v-toolbar :color="selectedEvent.color" dark>
               <v-btn icon>
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
@@ -147,11 +132,7 @@
               <span v-html="selectedEvent.details"></span>
             </v-card-text>
             <v-card-actions>
-              <v-btn
-                text
-                color="secondary"
-                @click="selectedOpen = false"
-              >
+              <v-btn text color="secondary" @click="selectedOpen = false">
                 Cancel
               </v-btn>
             </v-card-actions>
@@ -162,12 +143,12 @@
   </v-row>
 </template>
 <script>
-import GenericService from '../../services/GenericService';
-  export default {
-    data: () => ({
-      focus: '',
-      notes: [],
-      filterParams: {
+import GenericService from "../../services/GenericService";
+export default {
+  data: () => ({
+    focus: "",
+    notes: [],
+    filterParams: {
       name: "",
       details: "",
       endEvent: "",
@@ -176,56 +157,68 @@ import GenericService from '../../services/GenericService';
       size: 1000,
       totalPages: 1000,
     },
-      type: 'month',
-      typeToLabel: {
-        month: 'Mes',
-        week: 'Semana',
-        day: 'Dia',
-        '4day': '4 Days',
-      },
-      object: {
+    type: "month",
+    typeToLabel: {
+      month: "Mes",
+      week: "Semana",
+      day: "Dia",
+      "4day": "4 Days",
+    },
+    object: {
       name: "",
       details: "",
       endEvent: "",
       startEvent: "",
-      color: "#1976D2",
-      },
-      tenant: "",
-      service: "notes",
-      token: localStorage.getItem("token"),
-      selectedEvent: {},
-      selectedElement: null,
-      selectedOpen: false,
-      events: [],
-      colors: [],
-      names: [],
-      dialog: false
-    }),
-    mounted () {
-      this.$refs.calendar.checkChange()
-      this.tenant = this.$route.params.tenant;
-      this.getEvent();
+      color: ["#FF5733","#1976D2","#33FFA5"],
     },
-    methods: {
-
-      getEvent() {
+    tenant: "",
+    service: "notes",
+    token: localStorage.getItem("token"),
+    selectedEvent: {},
+    selectedElement: null,
+    selectedOpen: false,
+    events: [],
+    colors: [],
+    names: [],
+    dialog: false,
+  }),
+  mounted() {
+    this.$refs.calendar.checkChange();
+    this.tenant = this.$route.params.tenant;
+    this.getEvent();
+    this.printEvent();
+  },
+  methods: {
+    
+    getEvent() {
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.notes = data.data.content;
           console.log(this.notes);
+          this.notes.forEach((notes) => {
+            const { name, details, endEvent, startEvent } = notes;
+            console.log(details);
+
+            this.events.push({
+              name: name,
+              start: startEvent,
+              end: endEvent,
+              color: "#FF5733",
+            });
+          });
         });
     },
+
     saveEvent() {
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
           this.getEvent();
-          
         })
         .catch((error) => {
-          console.error(error)
+          console.error(error);
           if (error.response.status == 500) {
             this.errorStatus = true;
             this.loaded = true;
@@ -233,70 +226,42 @@ import GenericService from '../../services/GenericService';
         });
     },
 
-    viewDay ({ date }) {
-        this.focus = date
-        this.type = 'day'
-      },
-    getEventColor (event) {
-        return event.color
-      },
-    setToday () {
-        this.focus = ''
-      },
-    prev () {
-        this.$refs.calendar.prev()
-      },
-    next () {
-        this.$refs.calendar.next()
-      },
-    showEvent ({ nativeEvent, event }) {
-        const open = () => {
-          this.selectedEvent = event
-          this.selectedElement = nativeEvent.target
-          setTimeout(() => {
-            this.selectedOpen = true
-          }, 10)
-        }
-
-        if (this.selectedOpen) {
-          this.selectedOpen = false
-          setTimeout(open, 10)
-        } else {
-          open()
-        }
-
-        nativeEvent.stopPropagation()
-      },
-    updateRange ({ startEvent, endEvent }) {
-        this.object={}
-        const notes = []
-
-        const min = new Date(`${startEvent.object}T00:00:00`)
-        const max = new Date(`${endEvent.object}T23:59:59`)
-        const days = (max.getTime() - min.getTime()) / 86400000
-        const eventCount = this.rnd(days, days + 20)
-
-        for (let i = 0; i < eventCount; i++) {
-          const allDay = this.rnd(0, 3) === 0
-          const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-          const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-          const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-          const second = new Date(first.getTime() + secondTimestamp)
-          console.log(second)
-          // notes.push({
-          //   name: this.names[this.rnd(0, this.names.length - 1)],
-          //   startEvent: first,
-          //   endEvent: second,
-          //   color: this.colors[this.rnd(0, this.colors.length - 1)],
-          //   timed: !allDay,
-          // })
-        }
-
-        this.notes = notes
-      },
-    rnd (a, b) {
-        return Math.floor((b - a + 1) * Math.random()) + a
-      },
+    viewDay({ date }) {
+      this.focus = date;
+      this.type = "day";
     },
-  }
+    getEventColor(event) {
+      return event.color;
+    },
+    setToday() {
+      this.focus = "";
+    },
+    prev() {
+      this.$refs.calendar.prev();
+    },
+    next() {
+      this.$refs.calendar.next();
+    },
+    showEvent({ nativeEvent, event }) {
+      const open = () => {
+        this.selectedEvent = event;
+        this.selectedElement = nativeEvent.target;
+        setTimeout(() => {
+          this.selectedOpen = true;
+        }, 10);
+      };
+
+      if (this.selectedOpen) {
+        this.selectedOpen = false;
+        setTimeout(open, 10);
+      } else {
+        open();
+      }
+
+      nativeEvent.stopPropagation();
+    },
+    
+  
+  },
+};
 </script>
