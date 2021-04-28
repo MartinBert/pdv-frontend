@@ -62,52 +62,56 @@
           :event-color="getEventColor"
           :type="type"
         ></v-calendar>
-        <v-dialog v-model="dialog">
-          <v-card>
-            <v-container>
-              <v-form @submit.prevent="saveEvent()">
-                <v-text-field
-                  type="text"
-                  label="Agregar Nombre"
-                  v-model="object.name"
-                >
-                </v-text-field>
-                <v-text-field
-                  type="text"
-                  label="Agregar un Detalle"
-                  v-model="object.details"
-                >
-                </v-text-field>
-                <v-text-field
-                  type="date"
-                  label="Inicio del evento"
-                  v-model="object.startEvent"
-                >
-                </v-text-field>
-                <v-text-field
-                  type="date"
-                  label="Fin del evento"
-                  v-model="object.endEvent"
-                >
-                </v-text-field>
-                <v-text-field
-                  type="color"
-                  label="Color del evento"
-                  v-model="object.color"
-                >
-                </v-text-field>
-                <v-btn
-                  type="submit"
-                  color="primary"
-                  class="mr-4"
-                  @click.stop="dialog = false"
-                  >Agregar</v-btn
-                >
-              </v-form>
-            </v-container>
-          </v-card>
-        </v-dialog>
-
+        <v-layout row justify-center>
+          <v-dialog v-model="dialog" max-width="500">
+            <v-card>
+              <v-container>
+                <v-flex>
+                  <v-form @submit.prevent="saveEvent()">
+                    <v-text-field
+                      type="text"
+                      label="Agregar Nombre"
+                      v-model="object.name"
+                      
+                    >
+                    </v-text-field>
+                    <v-text-field
+                      type="text"
+                      label="Agregar un Detalle"
+                      v-model="object.details"
+                    >
+                    </v-text-field>
+                    <v-text-field
+                      type="date"
+                      label="Inicio del evento"
+                      v-model="object.startEvent"
+                    >
+                    </v-text-field>
+                    <v-text-field
+                      type="date"
+                      label="Fin del evento"
+                      v-model="object.endEvent"
+                    >
+                    </v-text-field>
+                    <v-text-field
+                      type="color"
+                      label="Color del evento"
+                      v-model="object.color"
+                    >
+                    </v-text-field>
+                    <v-btn
+                      type="submit"
+                      color="primary"
+                      class="mr-4"
+                      @click.stop="dialog = false"
+                      >Agregar</v-btn
+                    >
+                  </v-form>
+                </v-flex>
+              </v-container>
+            </v-card>
+          </v-dialog>
+        </v-layout>
         <v-menu
           v-model="selectedOpen"
           :close-on-content-click="false"
@@ -118,11 +122,14 @@
             <v-toolbar :color="selectedEvent.color" dark>
               <v-btn icon>
                 <v-icon>mdi-pencil</v-icon>
+                
               </v-btn>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon>
-                <v-icon @click="deleteEvent(selectedEvent.id)">mdi-delete</v-icon>
+                <v-icon @click="deleteEvent(selectedEvent.id)"
+                  >mdi-delete</v-icon
+                >
               </v-btn>
               <v-btn icon>
                 <v-icon>mdi-dots-vertical</v-icon>
@@ -144,8 +151,10 @@
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+
 export default {
   data: () => ({
+    loaded: false,
     focus: "",
     notes: [],
     filterParams: {
@@ -169,7 +178,7 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
-      color: ["#FF5733","#1976D2","#33FFA5"],
+      color: ["#FF5733", "#1976D2", "#33FFA5"],
     },
     tenant: "",
     service: "notes",
@@ -182,13 +191,13 @@ export default {
     names: [],
     dialog: false,
   }),
+  components: {},
   mounted() {
     this.$refs.calendar.checkChange();
     this.tenant = this.$route.params.tenant;
     this.getEvent();
   },
   methods: {
-    
     getEvent() {
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
@@ -196,7 +205,7 @@ export default {
           this.notes = data.data.content;
           console.log(this.notes);
           this.notes.forEach((notes) => {
-            const { name, details, endEvent, startEvent,id } = notes;
+            const { name, details, endEvent, startEvent, id } = notes;
             console.log(details);
 
             this.events.push({
@@ -226,19 +235,15 @@ export default {
         });
     },
 
-    deleteEvent(id){
-
+    deleteEvent(id) {
       console.log(id);
 
-      GenericService(this.tenant,this.service,this.token)
-      .delete(id)
-      .then(()=>{
-       
-       this.getEvent()
-       this.selectedOpen=false;
-        
-
-      })
+      GenericService(this.tenant, this.service, this.token)
+        .delete(id)
+        .then(() => {
+          this.getEvent();
+          this.selectedOpen = false;
+        });
     },
 
     viewDay({ date }) {
@@ -276,8 +281,6 @@ export default {
 
       nativeEvent.stopPropagation();
     },
-    
-  
   },
 };
 </script>
