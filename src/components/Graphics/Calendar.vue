@@ -133,15 +133,15 @@
               </v-btn>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
-              <v-btn icon>
-                <v-icon>mdi-heart</v-icon>
-              </v-btn>
-              <v-btn icon>
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
             </v-toolbar>
             <v-card-text>
-              <span v-html="selectedEvent.details"></span>
+              <v-form v-if="currentlyEditing !== selectedEvent.id">
+                {{selectedEvent.id}} - {{selectedEvent.details}}
+              </v-form>
+              <v-form v-else>
+                <v-text-field v-model="selectedEvent.name" type="text" label="name"></v-text-field>
+                <v-text-field v-model="selectedEvent.details" type="text" label="details"></v-text-field>
+              </v-form>
             </v-card-text>
             <v-card-actions>
               <v-btn
@@ -151,6 +151,12 @@
               >
                 Cancel
               </v-btn>
+              <v-btn text v-if="currentlyEditing !== selectedEvent.id"
+              @click.prevent="editEvent(selectEvent.id)"
+              >
+              Editar
+              </v-btn>
+              <v-btn text v-else @click.prevent="UpdateEvent(selectEvent)">Guardar Cambios</v-btn>
             </v-card-actions>
           </v-card>
         </v-menu>
@@ -292,6 +298,9 @@ import GenericService from "../../services/GenericService";
 
           
       },
+      updateEvent(){
+        console.log("Actualizamo")
+      }
     },
        
       addEvent(){
