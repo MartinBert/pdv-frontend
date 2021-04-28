@@ -87,30 +87,32 @@
           @click:date="viewDay"
           @change="updateRange"
         ></v-calendar>
-        <v-dialog v-model="dialog">
-          <v-card>
-            <v-container>
-              <v-form @submit.prevent="addEvent()"> 
-                <v-text-field type="text" label="Agregar Nombre" v-model="name">
-                <v-text-field type="text" label="Agregar Nombre" v-model="object.name">
-                </v-text-field>
-                <v-text-field type="text" label="Agregar Detalle" v-model="details">
-                <v-text-field type="text" label="Agregar Detalle" v-model="object.details">
-                </v-text-field>
-                <v-text-field type="Date" label="Inicio del evento" v-model="start">
-                <v-text-field type="Date" label="Inicio del evento" v-model="object.startEvent" @change="formatDate()">
-                </v-text-field>
-                <v-text-field type="color" label="Color del evento" v-model="color">
-                <v-text-field type="Date" label="Finalizacion del evento" v-model="object.endEvent">
-                </v-text-field>
-                <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false">Agregar</v-btn>
-                <v-text-field type="color" label="Color del evento" v-model="object.color">
-                </v-text-field>
-                <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false" @click="save">Agregar</v-btn>
-              </v-form>
-            </v-container>
-          </v-card>
-        </v-dialog>
+        <v-layout row justify-center>
+          <v-dialog v-model="dialog" persistent max-width="600px">
+            <v-card>
+              <v-container>
+                <v-form @submit.prevent="addEvent()"> 
+                  <v-text-field type="text" label="Agregar Nombre" v-model="name">
+                  <v-text-field type="text" label="Agregar Nombre" v-model="object.name">
+                  </v-text-field>
+                  <v-text-field type="text" label="Agregar Detalle" v-model="details">
+                  <v-text-field type="text" label="Agregar Detalle" v-model="object.details">
+                  </v-text-field>
+                  <v-text-field type="Date" label="Inicio del evento" v-model="start">
+                  <v-text-field type="Date" label="Inicio del evento" v-model="object.startEvent" @change="formatDate()">
+                  </v-text-field>
+                  <v-text-field type="color" label="Color del evento" v-model="color">
+                  <v-text-field type="Date" label="Finalizacion del evento" v-model="object.endEvent">
+                  </v-text-field>
+                  <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false">Agregar</v-btn>
+                  <v-text-field type="color" label="Color del evento" v-model="object.color">
+                  </v-text-field>
+                  <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false" @click="save">Agregar</v-btn>
+                </v-form>
+              </v-container>
+            </v-card>
+          </v-dialog>
+        </v-layout>
         <v-menu
           v-model="selectedOpen"
           :close-on-content-click="false"
