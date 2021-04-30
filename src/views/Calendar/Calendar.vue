@@ -67,30 +67,34 @@
             <v-card>
               <v-container>
                 <v-flex>
-                  <v-form @submit.prevent="saveEvent()">
+                  <v-form @submit.prevent="saveEvent()" :lazy-validation="false" v-model="valid">
                     <v-text-field
                       type="text"
                       label="Agregar Nombre"
                       v-model="object.name"
-                      
+                      :rules="nameRules"
+                     
                     >
                     </v-text-field>
                     <v-text-field
                       type="text"
                       label="Agregar un Detalle"
                       v-model="object.details"
+                      :rules="detailsRules"
                     >
                     </v-text-field>
                     <v-text-field
                       type="date"
                       label="Inicio del evento"
                       v-model="object.startEvent"
+                      :rules="startRules"
                     >
                     </v-text-field>
                     <v-text-field
                       type="date"
                       label="Fin del evento"
                       v-model="object.endEvent"
+                      :roles="endRules"
                     >
                     </v-text-field>
                     <v-text-field
@@ -104,6 +108,7 @@
                       color="primary"
                       class="mr-4"
                       @click.stop="dialog = false"
+                      :disabled="!valid"
                       >Agregar</v-btn
                     >
                   </v-form>
@@ -154,8 +159,27 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     loaded: false,
+    valid:true,
+    errors: [],
     focus: "",
     notes: [],
+    nameRules: [
+        v => !!v || 'Nombre es requerido',
+        v => v.length <= 20 || 'El nombre debe tener menos de 20 caracteres',
+      ],
+      details:'',
+      detailsRules:[
+        v => !!v || 'Detalle es requerido',
+        v => v.length <= 20 || 'El nombre debe tener menos de 20 caracteres',
+      ],
+      startEvent: '',
+      startRules: [
+        v => !!v || 'Fecha de comienzo del evento es requerido'
+      ],
+      endEvent:'',
+      endRules:[
+        v => !!v || 'Fecha de finalizacion es requerida'
+      ],
     filterParams: {
       name: "",
       details: "",
@@ -191,9 +215,6 @@ export default {
     dialog: false,
     currentlyEvent:null
   }),
-  components: {
-    
-  },
   mounted() {
     this.$refs.calendar.checkChange();
     this.tenant = this.$route.params.tenant;
@@ -201,6 +222,7 @@ export default {
   },
   methods: {
     getEvent() {
+      
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -208,7 +230,6 @@ export default {
           console.log(this.notes);
           this.notes.forEach((notes) => {
             const { name, details, endEvent, startEvent, id } = notes;
-              
               this.events.push({
               id: id,
               name: name,
@@ -221,7 +242,7 @@ export default {
         });
     },
 
-    saveEvent() {
+    saveEvent(){
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
@@ -235,6 +256,9 @@ export default {
             this.loaded = true;
           }
         });
+
+        location.reload();
+        
     },
 
     deleteEvent(id) {
@@ -245,6 +269,8 @@ export default {
           this.getEvent();
           this.selectedOpen = false;
         });
+
+        location.reload();
     },
 
     editEvent(ev){
@@ -259,7 +285,6 @@ export default {
     this.dialog = true;
     window.location.reload;
     },
-
     viewDay({ date }) {
       this.focus = date;
       this.type = "day";

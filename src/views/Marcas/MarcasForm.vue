@@ -2,7 +2,8 @@
   <v-card min-width="100%">
     <Error :errorStatus="errorStatus"/>
     <div v-if="loaded">
-      <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
+      <v-form ref="form" 
+       class="mt-5">
         <v-row class="ma-1">
             <v-col class="col-6"> 
               <v-text-field 
