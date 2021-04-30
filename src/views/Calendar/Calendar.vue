@@ -120,9 +120,9 @@
         >
           <v-card color="grey lighten-4" min-width="350px" flat>
             <v-toolbar :color="selectedEvent.color" dark>
-              <v-btn icon>
+              <v-btn icon @click="UpdateObj(selectedEvent)">
                 <v-icon>mdi-pencil</v-icon>
-                
+
               </v-btn>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
@@ -151,7 +151,6 @@
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-
 export default {
   data: () => ({
     loaded: false,
@@ -190,8 +189,11 @@ export default {
     colors: [],
     names: [],
     dialog: false,
+    currentlyEvent:null
   }),
-  components: {},
+  components: {
+    
+  },
   mounted() {
     this.$refs.calendar.checkChange();
     this.tenant = this.$route.params.tenant;
@@ -206,11 +208,11 @@ export default {
           console.log(this.notes);
           this.notes.forEach((notes) => {
             const { name, details, endEvent, startEvent, id } = notes;
-            console.log(details);
-
-            this.events.push({
+              
+              this.events.push({
               id: id,
               name: name,
+              details:details,
               start: startEvent,
               end: endEvent,
               color: "#1976D2",
@@ -236,14 +238,26 @@ export default {
     },
 
     deleteEvent(id) {
-      console.log(id);
-
-      GenericService(this.tenant, this.service, this.token)
+      this.loaded = true;
+        GenericService(this.tenant, this.service, this.token)
         .delete(id)
         .then(() => {
           this.getEvent();
           this.selectedOpen = false;
         });
+    },
+
+    editEvent(ev){
+      this.currentlyEvent = ev.id;
+      console.log(this.currentlyEvent);
+    },
+
+    UpdateObj(events){
+  
+    console.log(events);
+    this.object= events;
+    this.dialog = true;
+    window.location.reload;
     },
 
     viewDay({ date }) {
