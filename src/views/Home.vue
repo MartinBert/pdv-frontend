@@ -13,13 +13,7 @@
        <v-col>
         <Spinner v-if="!loaded" />
        </v-col>
-       <v-col md="3" sm="12" class="ml-md-auto">
-         <v-select
-          :items="opciones"
-          label="Seleciona un grafico"
-        ></v-select>
-         <button type="button" @click="notify">Show notification</button>
-      </v-col>
+       <v-btn color="success" @click="genericReports">Generar Reportes</v-btn>
     </v-row>
   </v-container>
 </template>
@@ -29,8 +23,10 @@ import LineChartComponent from "../components/Graphics/LineChartComponent";
 import DataPicker from "../components/Graphics/DataPicker";
 import { formatDateWithoutSlash, formatDate, getCurrentDate, formatWithSlash } from "../helpers/dateHelper";
 import GenericService from "../services/GenericService";
+import jsPdf from "jspdf";
 export default {
   data: () => ({
+    jsPdf:"",
     opciones:['rojo','azul','amarillo'],
     tenant: "",
     token: localStorage.getItem("token"),
@@ -118,14 +114,14 @@ export default {
         });
     },
 
-     notify () {
-      // https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification#Parameters
-      this.$notification.show('Hello World', {
-        body: 'This is an example!'
-      }, {})
+    genericReports(){
+      const doc = new jsPdf();
+      let imgData = LineChartComponent;
+      doc.text("Reporte de Cantidad de ventas por dia", 50,10)
+      doc.text("Fecha",10,10)
+      doc.addImage(imgData,'JPEG',10,40,180,180)
+      doc.save("a4.pdf")
     },
-    
-
 
     checkIfDateIsEmitted(fechas){
       this.getDaySaleQuantities(fechas)

@@ -9,6 +9,7 @@ import VueBarcodeScanner from 'vue-barcode-scanner';
 import store from './store/index';
 import { errorAlert, infoAlert, infoAlert2, questionAlert, successAlert, successAlert2 } from './helpers/alerts';
 import VueNativeNotification from 'vue-native-notification'
+import { jsPDF } from "jspdf";
 
 Vue.prototype.$errorAlert = errorAlert;
 Vue.prototype.$infoAlert = infoAlert;
@@ -18,6 +19,13 @@ Vue.prototype.$successAlert = successAlert;
 Vue.prototype.$successAlert2 = successAlert2;
 
 Vue.config.productionTip = false
+
+
+// Default export is a4 paper, portrait, using millimeters for units
+const doc = new jsPDF();
+
+doc.text("Hello world!", 10, 10);
+doc.save("a4.pdf");
 
 
  
