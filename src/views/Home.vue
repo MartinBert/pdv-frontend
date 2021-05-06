@@ -5,10 +5,10 @@
         <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded" :charData="charData" id="reporteHTML"/>
+        <LineChartComponent v-if="loaded" :charData="charData" id="reporteHTML1"/>
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded"  :charData="charData2"/>
+        <LineChartComponent v-if="loaded"  :charData="charData2" id="reporteHTML2"/>
       </v-col>
        <v-col>
         <Spinner v-if="!loaded" />

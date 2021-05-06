@@ -9,7 +9,6 @@ import VueBarcodeScanner from 'vue-barcode-scanner';
 import store from './store/index';
 import { errorAlert, infoAlert, infoAlert2, questionAlert, successAlert, successAlert2 } from './helpers/alerts';
     
-
 Vue.prototype.$errorAlert = errorAlert;
 Vue.prototype.$infoAlert = infoAlert;
 Vue.prototype.$infoAlert2 = infoAlert2;
@@ -18,12 +17,6 @@ Vue.prototype.$successAlert = successAlert;
 Vue.prototype.$successAlert2 = successAlert2;
 
 Vue.config.productionTip = false
-
-
-
-
-
-
 
 Vue.use(Vuex);
 Vue.use(colors);
