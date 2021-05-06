@@ -8,7 +8,7 @@ import Vuex from 'vuex';
 import VueBarcodeScanner from 'vue-barcode-scanner';
 import store from './store/index';
 import { errorAlert, infoAlert, infoAlert2, questionAlert, successAlert, successAlert2 } from './helpers/alerts';
-import VueNativeNotification from 'vue-native-notification'
+import VueNativeNotification from 'vue-native-notification'    
 
 Vue.prototype.$errorAlert = errorAlert;
 Vue.prototype.$infoAlert = infoAlert;

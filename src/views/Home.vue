@@ -5,7 +5,7 @@
         <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded" :charData="charData"/>
+        <LineChartComponent v-if="loaded" :charData="charData" id="reporteHTML"/>
       </v-col>
       <v-col md="4" sm="12">
         <LineChartComponent v-if="loaded"  :charData="charData2"/>
