@@ -115,11 +115,8 @@ export default {
     },
 
     genericReports(){
-      const doc = new jsPdf();
-      let imgData = LineChartComponent;
-      doc.text("Reporte de Cantidad de ventas por dia", 50,10)
-      doc.text("Fecha",10,10)
-      doc.addImage(imgData,'JPEG',10,40,180,180)
+      const doc = new jsPdf('p', 'pt', 'A4');
+      doc.text("Reportes", 200, 50)
       doc.save("a4.pdf")
     },
 
