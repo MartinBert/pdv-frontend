@@ -8,12 +8,7 @@ import Vuex from 'vuex';
 import VueBarcodeScanner from 'vue-barcode-scanner';
 import store from './store/index';
 import { errorAlert, infoAlert, infoAlert2, questionAlert, successAlert, successAlert2 } from './helpers/alerts';
-<<<<<<< HEAD
     
-=======
-
-import { jsPDF } from "jspdf";
->>>>>>> 48dab2cdb2f46afa386d2c70cbf5f53b12621152
 
 Vue.prototype.$errorAlert = errorAlert;
 Vue.prototype.$infoAlert = infoAlert;
@@ -28,12 +23,7 @@ Vue.config.productionTip = false
 
 
 
- 
-Vue.use(VueNativeNotification, {
-  // Automatic permission request before
-  // showing notification (default: true)
-  requestOnNotify: true
-})
+
 
 Vue.use(Vuex);
 Vue.use(colors);
