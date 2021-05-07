@@ -106,6 +106,7 @@ export default {
       this.GetFechas([formatWithSlash(getCurrentDate())]);
       this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
     })
+    this.$toaster.success('Your toaster success message.')
 
   },
 
@@ -195,7 +196,6 @@ export default {
         });
        
     },
-
    async getDaySaleQuantities(fechas) {
       const fechasRecibidas = fechas;
       this.loaded = false;

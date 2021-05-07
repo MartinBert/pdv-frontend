@@ -92,17 +92,17 @@
             <v-card>
               <v-container>
                 <v-form @submit.prevent="addEvent()"> 
-                  <v-text-field type="text" label="Agregar Nombre" v-model="name">
-                  <v-text-field type="text" label="Agregar Nombre" v-model="object.name">
+                  <v-text-field type="Time" label="Agregar Nombre" v-model="object.hourStart">
                   </v-text-field>
-                  <v-text-field type="text" label="Agregar Detalle" v-model="details">
                   <v-text-field type="text" label="Agregar Detalle" v-model="object.details">
                   </v-text-field>
-                  <v-text-field type="Date" label="Inicio del evento" v-model="start">
                   <v-text-field type="Date" label="Inicio del evento" v-model="object.startEvent" @change="formatDate()">
                   </v-text-field>
-                  <v-text-field type="color" label="Color del evento" v-model="color">
+                  <v-text-field type="Time" label="Hora de inicio" v-model="object.hourStart">
+                  </v-text-field>
                   <v-text-field type="Date" label="Finalizacion del evento" v-model="object.endEvent">
+                  </v-text-field>
+                  <v-text-field type="Time" label="Hora de finalizacion" v-model="object.hourEnd">
                   </v-text-field>
                   <v-btn type="submit" color="primary" class="mr-4" @click.stop="dialog = false">Agregar</v-btn>
                   <v-text-field type="color" label="Color del evento" v-model="object.color">
@@ -174,6 +174,8 @@ import GenericService from "../../services/GenericService";
       details:"",
       endEvent:"",
       startEvent:"",
+      hourStart:"",
+      hourEnd:"",
       page: 1,
       size: 10,
       totalPages: 0
@@ -186,7 +188,9 @@ import GenericService from "../../services/GenericService";
         name:"",
         details:"",
         endEvent:"",
-        startEvent:""
+        startEvent:"",
+        hourStart:"",
+        hourEnd:""
       },
       today: '',
       type: 'month',
@@ -229,6 +233,15 @@ import GenericService from "../../services/GenericService";
       },
       next () {
         this.$refs.calendar.next()
+      },
+      showNotification(notes){
+       let hoy = new Date()
+      notes.forEach(notes => {
+         const{endEvent,endHour} = notes
+         if(endEvent == hoy.toLocaleDateString && endHour == hoy.getHours){
+           this.$toaster.success('Your toaster success message.')
+         }
+       });
       },
       showEvent ({ nativeEvent, event }) {
         const open = () => {
