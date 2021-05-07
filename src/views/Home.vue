@@ -5,7 +5,7 @@
         <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded" :charData="charData" id="reporteHTML1"/>
+        <LineChartComponent v-if="loaded" :charData="charData" ref="contentHtml"/>
       </v-col>
       <v-col md="4" sm="12">
         <LineChartComponent v-if="loaded"  :charData="charData2" id="reporteHTML2"/>
@@ -15,6 +15,27 @@
        </v-col>
        <v-btn color="success" @click="genericReports">Generar Reportes</v-btn>
     </v-row>
+    <div>
+     <vue-html2pdf
+        :show-layout="false"
+        :float-layout="true"
+        :enable-download="true"
+        :preview-modal="false"
+        :paginate-elements-by-height="1400"
+        filename="Reportes"
+        :pdf-quality="1"
+        :manual-pagination="false"
+        pdf-format="a4"
+        pdf-orientation="landscape"
+        pdf-content-width="300px"
+        ref="html2Pdf"
+    >
+        <section slot="pdf-content">
+             <LineChartComponent v-if="loaded" :charData="charData" ref="contentHtml"/>
+             <LineChartComponent v-if="loaded" :charData="charData2"/>
+        </section>
+    </vue-html2pdf>
+   </div>
   </v-container>
 </template>
 <script >
@@ -24,6 +45,7 @@ import DataPicker from "../components/Graphics/DataPicker";
 import { formatDateWithoutSlash, formatDate, getCurrentDate, formatWithSlash } from "../helpers/dateHelper";
 import GenericService from "../services/GenericService";
 import jsPdf from "jspdf";
+import VueHtml2pdf from 'vue-html2pdf'
 export default {
   data: () => ({
     jsPdf:"",
@@ -72,7 +94,8 @@ export default {
   components: {
     LineChartComponent,
     DataPicker,
-    Spinner
+    Spinner,
+    VueHtml2pdf
   },
 
 
@@ -83,6 +106,7 @@ export default {
       this.GetFechas([formatWithSlash(getCurrentDate())]);
       this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
     })
+
   },
 
   methods: {
@@ -118,6 +142,7 @@ export default {
       const doc = new jsPdf('p', 'pt', 'A4');
       doc.text("Reportes", 200, 50)
       doc.save("a4.pdf")
+      this.$refs.html2Pdf.generatePdf()
     },
 
     checkIfDateIsEmitted(fechas){
