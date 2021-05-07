@@ -91,6 +91,13 @@
                     >
                     </v-text-field>
                     <v-text-field
+                      type="Time"
+                      label="Hora de inicio"
+                      v-model="object.Starthour"
+                      :rules="startRules"
+                    >
+                    </v-text-field>
+                    <v-text-field
                       type="date"
                       label="Fin del evento"
                       v-model="object.endEvent"
@@ -185,6 +192,8 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
+      Starthour:"",
+      Endhour:"",
       page: 1,
       size: 1000,
       totalPages: 1000,
@@ -279,8 +288,12 @@ export default {
     },
     showNotification(events){
      let hoy = new Date()
-     
-     
+     events.forEach(events => {
+       const{Endevent,Endhour} = events;
+       if(Endevent == hoy.toLocaleDateString && Endhour == hoy.getHours){
+         this.$toaster.success('Your toaster success message.')
+       }
+     });
 
     },
     UpdateObj(events){
