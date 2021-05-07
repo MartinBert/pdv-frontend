@@ -1,4 +1,37 @@
-
+<template>
+  <v-row class="fill-height">
+    <v-col>
+      <v-sheet height="64">
+        <v-toolbar flat>
+          <v-btn color="primary" dark class="mr-4" @click="dialog = true">
+            Agregar
+          </v-btn>
+          <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">
+            Hoy
+          </v-btn>
+          <v-btn fab text small color="grey darken-2" @click="prev">
+            <v-icon small>
+              mdi-chevron-left
+            </v-icon>
+          </v-btn>
+          <v-toolbar-title v-if="$refs.calendar">
+            {{ $refs.calendar.title }}
+          </v-toolbar-title>
+          <v-btn fab text small color="grey darken-2" @click="next">
+            <v-icon small>
+              mdi-chevron-right
+            </v-icon>
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-menu bottom right>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn outlined color="grey darken-2" v-bind="attrs" v-on="on">
+                <span>{{ typeToLabel[type] }}</span>
+                <v-icon right>
+                  mdi-menu-down
+                </v-icon>
+              </v-btn>
+            </template>
             <v-list>
               <v-list-item @click="type = 'day'">
                 <v-list-item-title>Dia</v-list-item-title>
@@ -224,7 +257,7 @@ export default {
           }
         });
 
-      
+       
         
     },
 
@@ -244,9 +277,13 @@ export default {
       this.currentlyEvent = ev.id;
       console.log(this.currentlyEvent);
     },
+    showNotification(events){
+     let hoy = new Date()
+     
+     
 
+    },
     UpdateObj(events){
-  
     console.log(events);
     this.object= events;
     this.dialog = true;
