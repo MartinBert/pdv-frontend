@@ -105,6 +105,13 @@
                     >
                     </v-text-field>
                     <v-text-field
+                      type="Time"
+                      label="Hora finalizacion"
+                      v-model="object.Endhour"
+                      :roles="endRules"
+                    >
+                    </v-text-field>
+                    <v-text-field
                       type="color"
                       label="Color del evento"
                       v-model="object.color"
