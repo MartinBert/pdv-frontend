@@ -100,11 +100,13 @@ export default {
 
 
   mounted() {
-    this.tenant = this.$route.params.tenant;
     this.getSucursalId()
     .then(()=>{
-      this.GetFechas([formatWithSlash(getCurrentDate())]);
-      this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
+      this.getTenant()
+      .then(()=>{
+        this.GetFechas([formatWithSlash(getCurrentDate())]);
+        this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
+      })
     })
     this.$toaster.success('Your toaster success message.')
 
@@ -147,11 +149,8 @@ export default {
     },
 
     checkIfDateIsEmitted(fechas){
-      this.getTenant()
-      then(()=>{
-        this.getDaySaleQuantities(fechas)
-        this.GetFechas(fechas)
-      })
+      this.getDaySaleQuantities(fechas)
+      this.GetFechas(fechas)
     },
 
     async GetFechas(fechas) {
