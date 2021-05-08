@@ -54,7 +54,7 @@ export default {
     token: localStorage.getItem("token"),
     loaded: true,
     filterParams: {
-      blackReceiptFilter: 999999999,
+      blackReceiptFilter: "",
       sucursalId: "",
       fechaEmision: "",
       comprobanteCerrado: "",
