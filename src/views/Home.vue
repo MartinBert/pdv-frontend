@@ -147,8 +147,11 @@ export default {
     },
 
     checkIfDateIsEmitted(fechas){
-      this.getDaySaleQuantities(fechas)
-      this.GetFechas(fechas)
+      this.getTenant()
+      then(()=>{
+        this.getDaySaleQuantities(fechas)
+        this.GetFechas(fechas)
+      })
     },
 
     async GetFechas(fechas) {
@@ -196,6 +199,7 @@ export default {
         });
        
     },
+
    async getDaySaleQuantities(fechas) {
       const fechasRecibidas = fechas;
       this.loaded = false;
@@ -226,22 +230,24 @@ export default {
           kays.forEach((element) => {
             dateSales[element] = dateSales[element].length;
           });
-
           this.charData.labels = [];
           this.charData.datasets[0].data = [];
-
           kays.forEach((element) => {
             dateSales[kays];
             this.charData.labels.push(element);
             this.charData.datasets[0].data.push(Number(dateSales[element]));
           });
-
           this.$store.commit('eventual/addEventual', this.charData);
-
           this.detected++ 
-
           this.loaded = true;
         });
+    },
+
+    async getTenant(){
+      await setTimeout(()=>{
+        this.tenant = this.$route.params.tenant;
+      }, 500)
+      if(!this.tenant) getTenant();
     },
 
     sortResults(a, b) {
