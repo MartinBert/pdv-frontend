@@ -123,7 +123,7 @@ export default {
     },
 
     getDaySaleAmonth() {
-      GenericService('pdv', "ventas", this.token)
+      GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
