@@ -246,7 +246,7 @@ export default {
       await setTimeout(()=>{
         this.tenant = this.$route.params.tenant;
       }, 500)
-      if(!this.tenant) getTenant();
+      if(!this.tenant) this.getTenant();
     },
 
     sortResults(a, b) {
