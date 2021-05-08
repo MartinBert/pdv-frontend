@@ -154,7 +154,7 @@ export default {
     async GetFechas(fechas) {
       let fechasRecibidas = fechas; 
       this.loaded = false;
-      GenericService('pdv', "ventas", this.token)
+      GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
@@ -199,7 +199,7 @@ export default {
    async getDaySaleQuantities(fechas) {
       const fechasRecibidas = fechas;
       this.loaded = false;
-      GenericService('pdv', "ventas", this.token)
+      GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
