@@ -152,6 +152,7 @@ export default {
       this.tenant = this.$route.params.tenant;
       this.getDaySaleQuantities(fechas);
       this.getFechas(fechas);
+      this.loadReady();
     },
 
     getFechas(fechas) {
