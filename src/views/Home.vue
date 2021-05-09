@@ -101,7 +101,6 @@ export default {
 
 
   mounted() {
-    this.tenant = this.$route.params.tenant;
     this.getSucursalId()
     .then(()=>{
       this.GetFechas([formatWithSlash(getCurrentDate())]);
@@ -112,6 +111,7 @@ export default {
   methods: {
 
     async getSucursalId(){
+      this.tenant = this.$route.params.tenant;
       this.loaded = false;
       await setTimeout(()=>{
         const sucursal = JSON.parse(localStorage.getItem('userData')).sucursal;
@@ -146,7 +146,7 @@ export default {
     },
 
     checkIfDateIsEmitted(fechas){
-      if(!this.tenant) return null;
+      this.tenant = this.$route.params.tenant;
       this.getDaySaleQuantities(fechas)
       this.GetFechas(fechas)
     },
