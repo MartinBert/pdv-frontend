@@ -55,7 +55,7 @@ export default {
     token: localStorage.getItem("token"),
     loaded: true,
     filterParams: {
-      blackReceiptFilter: "999999999",
+      blackReceiptFilter: "",
       sucursalId: "",
       fechaEmision: "",
       comprobanteCerrado: "",
@@ -186,7 +186,6 @@ export default {
             this.charData2.labels.push(element);
             this.charData2.datasets[0].data.push(Number(dateSales[element]));
           });
-
            this.loaded = true;
         });
        
