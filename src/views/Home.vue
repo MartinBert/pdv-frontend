@@ -70,7 +70,7 @@ export default {
       numeroComprobante: "",
       totalVenta: "",
       page: 1,
-      size: 10,
+      size: 100000,
       totalPages: 0,
     },
     detected: 0,
