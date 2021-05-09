@@ -8,14 +8,14 @@
         <LineChartComponent v-if="loaded" :charData="charData" ref="contentHtml"/>
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded"  :charData="charData2" id="reporteHTML2"/>
+        <LineChartComponent v-if="loaded"  :charData="charData2" id="reporteHTML2" ref="contentHtml"/>
       </v-col>
        <v-col>
         <Spinner v-if="!loaded" />
        </v-col>
        <!-- <v-btn color="success" @click="genericReports">Generar Reportes</v-btn> -->
     </v-row>
-    <div>
+    <!-- <div>
      <vue-html2pdf
         :show-layout="false"
         :float-layout="true"
@@ -35,7 +35,7 @@
              <LineChartComponent v-if="loaded" :charData="charData2"/>
         </section>
     </vue-html2pdf>
-   </div>
+   </div> -->
   </v-container>
 </template>
 <script >
@@ -45,7 +45,6 @@ import DataPicker from "../components/Graphics/DataPicker";
 import { formatDateWithoutSlash, formatDate } from "../helpers/dateHelper";
 import GenericService from "../services/GenericService";
 import jsPdf from "jspdf";
-import VueHtml2pdf from 'vue-html2pdf'
 export default {
   data: () => ({
     jsPdf:"",
@@ -95,8 +94,7 @@ export default {
   components: {
     LineChartComponent,
     DataPicker,
-    Spinner,
-    VueHtml2pdf
+    Spinner
   },
 
 
@@ -144,6 +142,7 @@ export default {
       this.tenant = this.$route.params.tenant;
       this.getDaySaleQuantities(fechas)
       this.GetFechas(fechas)
+      this.$refs.contentHtml.$forceUpdate()
     },
 
     GetFechas(fechas) {
