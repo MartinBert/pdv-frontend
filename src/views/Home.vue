@@ -13,7 +13,7 @@
        <v-col>
         <Spinner v-if="!loaded" />
        </v-col>
-       <v-btn color="success" @click="genericReports">Generar Reportes</v-btn>
+       <!-- <v-btn color="success" @click="genericReports">Generar Reportes</v-btn> -->
     </v-row>
     <div>
      <vue-html2pdf
@@ -51,6 +51,7 @@ export default {
     jsPdf:"",
     opciones:['rojo','azul','amarillo'],
     tenant: "",
+    service: "ventas",
     token: localStorage.getItem("token"),
     loaded: true,
     filterParams: {
@@ -100,23 +101,19 @@ export default {
 
 
   mounted() {
+    this.tenant = this.$route.params.tenant;
     this.getSucursalId()
     .then(()=>{
-      this.getTenant()
-      .then(()=>{
-        this.GetFechas([formatWithSlash(getCurrentDate())]);
-        this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
-      })
+      this.GetFechas([formatWithSlash(getCurrentDate())]);
+      this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
     })
-    this.$toaster.success('Your toaster success message.')
-
   },
 
   methods: {
 
     async getSucursalId(){
       this.loaded = false;
-      setTimeout(()=>{
+      await setTimeout(()=>{
         const sucursal = JSON.parse(localStorage.getItem('userData')).sucursal;
         if(sucursal){
           this.filterParams.sucursalId = sucursal.id;
@@ -125,7 +122,7 @@ export default {
     },
 
     getDaySaleAmonth() {
-      GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
@@ -149,14 +146,15 @@ export default {
     },
 
     checkIfDateIsEmitted(fechas){
+      if(!this.tenant) return null;
       this.getDaySaleQuantities(fechas)
       this.GetFechas(fechas)
     },
 
-    async GetFechas(fechas) {
+    GetFechas(fechas) {
       let fechasRecibidas = fechas; 
       this.loaded = false;
-      GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
@@ -199,10 +197,10 @@ export default {
        
     },
 
-   async getDaySaleQuantities(fechas) {
+    getDaySaleQuantities(fechas) {
       const fechasRecibidas = fechas;
       this.loaded = false;
-      GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
@@ -240,13 +238,6 @@ export default {
           this.detected++ 
           this.loaded = true;
         });
-    },
-
-    async getTenant(){
-      await setTimeout(()=>{
-        this.tenant = this.$route.params.tenant;
-      }, 500)
-      if(!this.tenant) this.getTenant();
     },
 
     sortResults(a, b) {

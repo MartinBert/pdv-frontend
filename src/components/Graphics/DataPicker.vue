@@ -15,7 +15,6 @@ export default {
   methods: {
     emitFormatDate() {
       this.$emit('emitDate', this.fechas);
-      
     }
   },
 };
