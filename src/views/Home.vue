@@ -132,7 +132,12 @@ export default {
             this.charData.datasets[0].data.push(Number(venta.totalVenta));
           });
           this.charData.datasets[0].data.sort(this.sortResults);
+        })
+        .then(()=>{
           this.loadReady();
+        })
+        .catch(err => {
+          console.error(err);
         });
     },
 
@@ -190,7 +195,12 @@ export default {
             this.charData2.labels.push(element);
             this.charData2.datasets[0].data.push(Number(dateSales[element]));
           });
+        })
+        .then(()=>{
           this.loadReady();
+        })
+        .catch(err => {
+          console.error(err);
         });
     },
 
@@ -232,7 +242,12 @@ export default {
           });
           this.$store.commit("eventual/addEventual", this.charData);
           this.detected++;
+        })
+        .then(()=>{
           this.loadReady();
+        })
+        .catch(err => {
+          console.error(err);
         });
     },
 
