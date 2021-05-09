@@ -42,7 +42,7 @@
 import Spinner from "../components/Graphics/Spinner";
 import LineChartComponent from "../components/Graphics/LineChartComponent";
 import DataPicker from "../components/Graphics/DataPicker";
-import { formatDateWithoutSlash, formatDate, getCurrentDate, formatWithSlash } from "../helpers/dateHelper";
+import { formatDateWithoutSlash, formatDate } from "../helpers/dateHelper";
 import GenericService from "../services/GenericService";
 import jsPdf from "jspdf";
 import VueHtml2pdf from 'vue-html2pdf'
@@ -55,7 +55,7 @@ export default {
     token: localStorage.getItem("token"),
     loaded: true,
     filterParams: {
-      blackReceiptFilter: "",
+      blackReceiptFilter: "999999999",
       sucursalId: "",
       fechaEmision: "",
       comprobanteCerrado: "",
@@ -102,18 +102,13 @@ export default {
 
   mounted() {
     this.getSucursalId()
-    .then(()=>{
-      this.GetFechas([formatWithSlash(getCurrentDate())]);
-      this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
-    })
   },
 
   methods: {
 
-    async getSucursalId(){
+    getSucursalId(){
       this.tenant = this.$route.params.tenant;
-      this.loaded = false;
-      await setTimeout(()=>{
+      setTimeout(()=>{
         const sucursal = JSON.parse(localStorage.getItem('userData')).sucursal;
         if(sucursal){
           this.filterParams.sucursalId = sucursal.id;
