@@ -244,7 +244,7 @@ export default {
     loadReady() {
       setTimeout(() => {
         this.loaded = true;
-      }, 300);
+      }, 1000);
     },
 
     getFilteredDates(fechasRecibidas) {
