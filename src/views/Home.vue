@@ -127,7 +127,9 @@ export default {
             this.charData.datasets[0].data.push(Number(venta.totalVenta));
           });
           this.charData.datasets[0].data.sort(this.sortResults);
-          this.loaded = true;
+          setTimeout(()=>{
+            this.loaded = true;
+          }, 200)
         });
     },
 
@@ -141,11 +143,10 @@ export default {
     checkIfDateIsEmitted(fechas){
       this.tenant = this.$route.params.tenant;
       this.getDaySaleQuantities(fechas)
-      this.GetFechas(fechas)
-      this.$refs.contentHtml.$forceUpdate()
+      this.getFechas(fechas)
     },
 
-    GetFechas(fechas) {
+    getFechas(fechas) {
       let fechasRecibidas = fechas; 
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
@@ -185,7 +186,9 @@ export default {
             this.charData2.labels.push(element);
             this.charData2.datasets[0].data.push(Number(dateSales[element]));
           });
-           this.loaded = true;
+           setTimeout(()=>{
+            this.loaded = true;
+          }, 200)
         });
        
     },
@@ -229,7 +232,9 @@ export default {
           });
           this.$store.commit('eventual/addEventual', this.charData);
           this.detected++ 
-          this.loaded = true;
+          setTimeout(()=>{
+            this.loaded = true;
+          }, 200)
         });
     },
 
