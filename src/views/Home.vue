@@ -2,18 +2,27 @@
   <v-container class="home-content">
     <v-row>
       <v-col md="4" sm="12">
-        <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
+        <DataPicker v-on:emitDate="checkIfDateIsEmitted" />
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded" :charData="charData" ref="contentHtml"/>
+        <LineChartComponent
+          v-if="loaded"
+          :charData="charData"
+          ref="contentHtml"
+        />
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded"  :charData="charData2" id="reporteHTML2" ref="contentHtml"/>
+        <LineChartComponent
+          v-if="loaded"
+          :charData="charData2"
+          id="reporteHTML2"
+          ref="contentHtml"
+        />
       </v-col>
-       <v-col>
+      <v-col>
         <Spinner v-if="!loaded" />
-       </v-col>
-       <!-- <v-btn color="success" @click="genericReports">Generar Reportes</v-btn> -->
+      </v-col>
+      <!-- <v-btn color="success" @click="genericReports">Generar Reportes</v-btn> -->
     </v-row>
     <!-- <div>
      <vue-html2pdf
@@ -47,14 +56,14 @@ import GenericService from "../services/GenericService";
 import jsPdf from "jspdf";
 export default {
   data: () => ({
-    jsPdf:"",
-    opciones:['rojo','azul','amarillo'],
+    jsPdf: "",
+    opciones: ["rojo", "azul", "amarillo"],
     tenant: "",
     service: "ventas",
     token: localStorage.getItem("token"),
     loaded: true,
     filterParams: {
-      blackReceiptFilter: "",
+      blackReceiptFilter: "999999999",
       sucursalId: "",
       fechaEmision: "",
       comprobanteCerrado: "",
@@ -64,8 +73,7 @@ export default {
       size: 10,
       totalPages: 0,
     },
-    detected:0,
-
+    detected: 0,
     daySaleQuantities: [],
     ventas: [],
     charData: {
@@ -78,7 +86,7 @@ export default {
         },
       ],
     },
-      charData2: {
+    charData2: {
       labels: [],
       datasets: [
         {
@@ -88,30 +96,27 @@ export default {
         },
       ],
     },
-  
   }),
 
   components: {
     LineChartComponent,
     DataPicker,
-    Spinner
+    Spinner,
   },
 
-
   mounted() {
-    this.getSucursalId()
+    this.getSucursalId();
   },
 
   methods: {
-
-    getSucursalId(){
+    getSucursalId() {
       this.tenant = this.$route.params.tenant;
-      setTimeout(()=>{
-        const sucursal = JSON.parse(localStorage.getItem('userData')).sucursal;
-        if(sucursal){
+      setTimeout(() => {
+        const sucursal = JSON.parse(localStorage.getItem("userData")).sucursal;
+        if (sucursal) {
           this.filterParams.sucursalId = sucursal.id;
         }
-      }, 500)
+      }, 500);
     },
 
     getDaySaleAmonth() {
@@ -127,27 +132,25 @@ export default {
             this.charData.datasets[0].data.push(Number(venta.totalVenta));
           });
           this.charData.datasets[0].data.sort(this.sortResults);
-          setTimeout(()=>{
-            this.loaded = true;
-          }, 200)
+          this.loadReady();
         });
     },
 
-    genericReports(){
-      const doc = new jsPdf('p', 'pt', 'A4');
-      doc.text("Reportes", 200, 50)
-      doc.save("a4.pdf")
-      this.$refs.html2Pdf.generatePdf()
+    genericReports() {
+      const doc = new jsPdf("p", "pt", "A4");
+      doc.text("Reportes", 200, 50);
+      doc.save("a4.pdf");
+      this.$refs.html2Pdf.generatePdf();
     },
 
-    checkIfDateIsEmitted(fechas){
+    checkIfDateIsEmitted(fechas) {
       this.tenant = this.$route.params.tenant;
-      this.getDaySaleQuantities(fechas)
-      this.getFechas(fechas)
+      this.getDaySaleQuantities(fechas);
+      this.getFechas(fechas);
     },
 
     getFechas(fechas) {
-      let fechasRecibidas = fechas; 
+      let fechasRecibidas = fechas;
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
@@ -174,23 +177,21 @@ export default {
           const kays = Object.keys(dateSales);
           kays.forEach((element) => {
             const ventasDeLlavedeObj = dateSales[element];
-            const total = ventasDeLlavedeObj.reduce((acc,el)=> acc + el.totalVenta, 0)
-            dateSales[element] = total
+            const total = ventasDeLlavedeObj.reduce(
+              (acc, el) => acc + el.totalVenta,
+              0
+            );
+            dateSales[element] = total;
           });
-
           this.charData2.labels = [];
           this.charData2.datasets[0].data = [];
-
           kays.forEach((element) => {
             dateSales[kays];
             this.charData2.labels.push(element);
             this.charData2.datasets[0].data.push(Number(dateSales[element]));
           });
-           setTimeout(()=>{
-            this.loaded = true;
-          }, 200)
+          this.loadReady();
         });
-       
     },
 
     getDaySaleQuantities(fechas) {
@@ -201,7 +202,6 @@ export default {
         .then((data) => {
           this.ventas = data.data.content;
           const filteredSales = this.getFilteredDates(fechasRecibidas);
- 
           let fechas = [];
           for (let index = 0; index < filteredSales.length; index++) {
             const element = filteredSales[index];
@@ -230,11 +230,9 @@ export default {
             this.charData.labels.push(element);
             this.charData.datasets[0].data.push(Number(dateSales[element]));
           });
-          this.$store.commit('eventual/addEventual', this.charData);
-          this.detected++ 
-          setTimeout(()=>{
-            this.loaded = true;
-          }, 200)
+          this.$store.commit("eventual/addEventual", this.charData);
+          this.detected++;
+          this.loadReady();
         });
     },
 
@@ -243,11 +241,17 @@ export default {
       return -1;
     },
 
+    loadReady() {
+      setTimeout(() => {
+        this.loaded = true;
+      }, 300);
+    },
+
     getFilteredDates(fechasRecibidas) {
       let fechas = fechasRecibidas.map((el) => {
         return formatDate(formatDateWithoutSlash(el));
       });
-      
+
       let selectVentas = [];
       this.ventas.forEach((venta) => {
         fechas.forEach((fecha) => {
@@ -262,8 +266,8 @@ export default {
 };
 </script>
 <style>
- .v-text-field{
+.v-text-field {
   width: 300px;
-  margin-bottom: .5em
+  margin-bottom: 0.5em;
 }
 </style>
