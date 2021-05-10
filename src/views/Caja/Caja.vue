@@ -77,9 +77,9 @@ export default {
     },
 
     async closure(type){
-      const clientIp = this.loguedUser.puntoVenta.ipLocal;
+      // const clientIp = this.loguedUser.puntoVenta.ipLocal;
       axios
-        .post(`http://${clientIp}/${type}_closure`)
+        .post(`http://200.117.153.115/${type}_closure`)
         .then(() => {
           this.$successAlert(`Cierre ${type} realizado`);
           this.loaded = true;
