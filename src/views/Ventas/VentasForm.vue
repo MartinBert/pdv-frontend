@@ -700,10 +700,10 @@ export default {
     },
 
     sendTicketData(jsonToFiscalController, ticketRoute) {
-      const clientIp = this.loguedUser.puntoVenta.ipLocal;
+      // const clientIp = this.loguedUser.puntoVenta.ipLocal;
       axios
         .post(
-          `http://${clientIp}/${ticketRoute}`,
+          `http://${this.clientIp}/${ticketRoute}`,
           jsonToFiscalController
         )
         .then(() => {

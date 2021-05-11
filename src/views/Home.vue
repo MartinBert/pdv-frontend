@@ -2,70 +2,81 @@
   <v-container class="home-content">
     <v-row>
       <v-col md="4" sm="12">
-        <DataPicker v-on:emitDate="checkIfDateIsEmitted"/>
+        <DataPicker v-on:emitDate="checkIfDateIsEmitted" />
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded" :charData="charData" ref="contentHtml"/>
+        <LineChartComponent
+          v-if="loaded"
+          :charData="charData"
+          ref="contentHtml"
+        />
       </v-col>
       <v-col md="4" sm="12">
-        <LineChartComponent v-if="loaded"  :charData="charData2" id="reporteHTML2"/>
+        <LineChartComponent
+          v-if="loaded"
+          :charData="charData2"
+          id="reporteHTML2"
+          ref="contentHtml"
+        />
       </v-col>
-       <v-col>
+      <v-col>
         <Spinner v-if="!loaded" />
-       </v-col>
-       <v-btn color="success" @click="genericReports">Generar Reportes</v-btn>
+      </v-col>
+      <v-btn color="success" @click="genericReports">Generar Reportes</v-btn>
     </v-row>
-    <div>
-     <vue-html2pdf
-        :show-layout="false"
-        :float-layout="true"
-        :enable-download="true"
-        :preview-modal="false"
-        :paginate-elements-by-height="1400"
-        filename="Reportes"
-        :pdf-quality="1"
-        :manual-pagination="false"
-        pdf-format="a4"
-        pdf-orientation="landscape"
-        pdf-content-width="300px"
-        ref="html2Pdf"
+    <vue-html2pdf
+      :show-layout="false"
+      :float-layout="true"
+      :enable-download="true"
+      :preview-modal="false"
+      :paginate-elements-by-height="1400"
+      filename="Reportes"
+      :pdf-quality="1"
+      :manual-pagination="false"
+      pdf-format="a4"
+      pdf-orientation="landscape"
+      pdf-content-width="300px"
+      ref="html2Pdf"
     >
-        <section slot="pdf-content">
-             <LineChartComponent v-if="loaded" :charData="charData" ref="contentHtml"/>
-             <LineChartComponent v-if="loaded" :charData="charData2"/>
-        </section>
+      <section slot="pdf-content">
+        <LineChartComponent
+          v-if="loaded"
+          :charData="charData"
+          ref="contentHtml"
+        />
+        <LineChartComponent v-if="loaded" :charData="charData2" />
+      </section>
     </vue-html2pdf>
-   </div>
   </v-container>
 </template>
-<script >
+<script>
 import Spinner from "../components/Graphics/Spinner";
 import LineChartComponent from "../components/Graphics/LineChartComponent";
 import DataPicker from "../components/Graphics/DataPicker";
-import { formatDateWithoutSlash, formatDate, getCurrentDate, formatWithSlash } from "../helpers/dateHelper";
+import { formatDateWithoutSlash, formatDate } from "../helpers/dateHelper";
 import GenericService from "../services/GenericService";
 import jsPdf from "jspdf";
-import VueHtml2pdf from 'vue-html2pdf'
+import VueHtml2pdf from 'vue-html2pdf';
 export default {
   data: () => ({
-    jsPdf:"",
-    opciones:['rojo','azul','amarillo'],
+    jsPdf: "",
+    opciones: ["rojo", "azul", "amarillo"],
     tenant: "",
+    service: "ventas",
     token: localStorage.getItem("token"),
     loaded: true,
     filterParams: {
-      blackReceiptFilter: 999999999,
+      blackReceiptFilter: "999999999",
       sucursalId: "",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
       totalVenta: "",
       page: 1,
-      size: 100000,
+      size: 100,
       totalPages: 0,
     },
-    detected:0,
-
+    detected: 0,
     daySaleQuantities: [],
     ventas: [],
     charData: {
@@ -78,7 +89,7 @@ export default {
         },
       ],
     },
-      charData2: {
+    charData2: {
       labels: [],
       datasets: [
         {
@@ -88,42 +99,32 @@ export default {
         },
       ],
     },
-  
   }),
 
   components: {
     LineChartComponent,
     DataPicker,
     Spinner,
-    VueHtml2pdf
+    VueHtml2pdf,
   },
-
 
   mounted() {
-    this.tenant = this.$route.params.tenant;
-    this.getSucursalId()
-    .then(()=>{
-      this.GetFechas([formatWithSlash(getCurrentDate())]);
-      this.getDaySaleQuantities([formatWithSlash(getCurrentDate())]);
-    })
+    this.getSucursalId();
     this.$toaster.success('Your toaster success message.')
-
   },
-
   methods: {
-
-    async getSucursalId(){
-      this.loaded = false;
-      setTimeout(()=>{
-        const sucursal = JSON.parse(localStorage.getItem('userData')).sucursal;
-        if(sucursal){
+    getSucursalId() {
+      this.tenant = this.$route.params.tenant;
+      setTimeout(() => {
+        const sucursal = JSON.parse(localStorage.getItem("userData")).sucursal;
+        if (sucursal) {
           this.filterParams.sucursalId = sucursal.id;
         }
-      }, 500)
+      }, 500);
     },
 
     getDaySaleAmonth() {
-      GenericService('pdv', "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
@@ -135,26 +136,33 @@ export default {
             this.charData.datasets[0].data.push(Number(venta.totalVenta));
           });
           this.charData.datasets[0].data.sort(this.sortResults);
-          this.loaded = true;
+        })
+        .then(() => {
+          this.loadReady();
+        })
+        .catch((err) => {
+          console.error(err);
         });
     },
 
-    genericReports(){
-      const doc = new jsPdf('p', 'pt', 'A4');
-      doc.text("Reportes", 200, 50)
-      doc.save("a4.pdf")
-      this.$refs.html2Pdf.generatePdf()
+    genericReports() {
+      const doc = new jsPdf("p", "pt", "A4");
+      doc.text("Reportes", 200, 50);
+      doc.save("a4.pdf");
+      this.$refs.html2Pdf.generatePdf();
     },
 
-    checkIfDateIsEmitted(fechas){
-      this.getDaySaleQuantities(fechas)
-      this.GetFechas(fechas)
+    checkIfDateIsEmitted(fechas) {
+      this.tenant = this.$route.params.tenant;
+      this.getDaySaleQuantities(fechas);
+      this.getFechas(fechas);
+      this.loadReady();
     },
 
-    async GetFechas(fechas) {
-      let fechasRecibidas = fechas; 
+    getFechas(fechas) {
+      let fechasRecibidas = fechas;
       this.loaded = false;
-      GenericService('pdv', "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
@@ -179,32 +187,36 @@ export default {
           const kays = Object.keys(dateSales);
           kays.forEach((element) => {
             const ventasDeLlavedeObj = dateSales[element];
-            const total = ventasDeLlavedeObj.reduce((acc,el)=> acc + el.totalVenta, 0)
-            dateSales[element] = total
+            const total = ventasDeLlavedeObj.reduce(
+              (acc, el) => acc + el.totalVenta,
+              0
+            );
+            dateSales[element] = total;
           });
-
           this.charData2.labels = [];
           this.charData2.datasets[0].data = [];
-
           kays.forEach((element) => {
             dateSales[kays];
             this.charData2.labels.push(element);
             this.charData2.datasets[0].data.push(Number(dateSales[element]));
           });
-
-           this.loaded = true;
+        })
+        .then(() => {
+          this.loadReady();
+        })
+        .catch((err) => {
+          console.error(err);
         });
-       
     },
-   async getDaySaleQuantities(fechas) {
+
+    getDaySaleQuantities(fechas) {
       const fechasRecibidas = fechas;
       this.loaded = false;
-      GenericService('pdv', "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
           const filteredSales = this.getFilteredDates(fechasRecibidas);
- 
           let fechas = [];
           for (let index = 0; index < filteredSales.length; index++) {
             const element = filteredSales[index];
@@ -226,21 +238,21 @@ export default {
           kays.forEach((element) => {
             dateSales[element] = dateSales[element].length;
           });
-
           this.charData.labels = [];
           this.charData.datasets[0].data = [];
-
           kays.forEach((element) => {
             dateSales[kays];
             this.charData.labels.push(element);
             this.charData.datasets[0].data.push(Number(dateSales[element]));
           });
-
-          this.$store.commit('eventual/addEventual', this.charData);
-
-          this.detected++ 
-
-          this.loaded = true;
+          this.$store.commit("eventual/addEventual", this.charData);
+          this.detected++;
+        })
+        .then(() => {
+          this.loadReady();
+        })
+        .catch((err) => {
+          console.error(err);
         });
     },
 
@@ -249,11 +261,17 @@ export default {
       return -1;
     },
 
+    loadReady() {
+      setTimeout(() => {
+        this.loaded = true;
+      }, 1000);
+    },
+
     getFilteredDates(fechasRecibidas) {
       let fechas = fechasRecibidas.map((el) => {
         return formatDate(formatDateWithoutSlash(el));
       });
-      
+
       let selectVentas = [];
       this.ventas.forEach((venta) => {
         fechas.forEach((fecha) => {
@@ -268,8 +286,8 @@ export default {
 };
 </script>
 <style>
- .v-text-field{
+.v-text-field {
   width: 300px;
-  margin-bottom: .5em
+  margin-bottom: 0.5em;
 }
 </style>

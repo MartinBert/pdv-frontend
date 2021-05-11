@@ -94,10 +94,9 @@
                     >
                     </v-text-field>
                     <v-text-field
-                      type="Time"
+                      type="datetime-local"
                       label="Hora de inicio"
-                      v-model="object.Starthour"
-                      :rules="startRules"
+                      v-model="object.starthour"     
                     >
                     </v-text-field>
                     <v-text-field
@@ -108,10 +107,9 @@
                     >
                     </v-text-field>
                     <v-text-field
-                      type="Time"
+                      type="time"
                       label="Hora finalizacion"
-                      v-model="object.Endhour"
-                      :roles="endRules"
+                      v-model="object.endhour"
                     >
                     </v-text-field>
                     <v-text-field
@@ -197,8 +195,13 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
+<<<<<<< HEAD:src/components/Graphics/Calendar.vue
       Starthour: "",
       Endhour: "",
+=======
+      starthour:"",
+      endhour:"",
+>>>>>>> dbc07b18b46f7395b9e17e66871767a5eadcafe9:src/components/Graphics/Calendario.vue
       page: 1,
       size: 1000,
       totalPages: 1000,
@@ -215,6 +218,8 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
+      starthour:"",
+      endhour:"",
       color: ["#FF5733", "#1976D2", "#33FFA5"],
     },
     tenant: "",
@@ -242,14 +247,21 @@ export default {
           this.notes = data.data.content;
           console.log(this.notes);
           this.notes.forEach((notes) => {
+<<<<<<< HEAD:src/components/Graphics/Calendar.vue
             const { name, details, endEvent, startEvent, id } = notes;
             this.events.push({
+=======
+            const { name, details, endEvent, startEvent, id,endhour,starthour } = notes;
+              this.events.push({
+>>>>>>> dbc07b18b46f7395b9e17e66871767a5eadcafe9:src/components/Graphics/Calendario.vue
               id: id,
               name: name,
               details: details,
               start: startEvent,
               end: endEvent,
               color: "#1976D2",
+              starthour:starthour,
+              endhour:endhour,
             });
           });
         });
@@ -287,6 +299,7 @@ export default {
       this.currentlyEvent = ev.id;
       console.log(this.currentlyEvent);
     },
+<<<<<<< HEAD:src/components/Graphics/Calendar.vue
     showNotification(events) {
       let hoy = new Date();
       events.forEach((events) => {
@@ -295,6 +308,16 @@ export default {
           this.$toaster.success("Your toaster success message.");
         }
       });
+=======
+    showNotification(events){
+     let hoy = new Date()
+     events.forEach(events => {
+       const{Endevent,Endhour} = events;
+       if(Endevent == hoy.toLocaleDateString && Endhour == hoy.getHours){
+         
+       }
+     });
+>>>>>>> dbc07b18b46f7395b9e17e66871767a5eadcafe9:src/components/Graphics/Calendario.vue
     },
     UpdateObj(events) {
       console.log(events);
@@ -334,7 +357,6 @@ export default {
       } else {
         open();
       }
-
       nativeEvent.stopPropagation();
     },
   },

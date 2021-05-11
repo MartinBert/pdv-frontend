@@ -90,10 +90,24 @@
                       :rules="startRules"
                     >
                     </v-text-field>
+                     <v-text-field
+                      type="Time"
+                      label="Inicio del evento"
+                      v-model="object.startEvent"
+                      :rules="startRules"
+                    >
+                    </v-text-field>
                     <v-text-field
                       type="date"
                       label="Fin del evento"
                       v-model="object.endEvent"
+                      :roles="endRules"
+                    >
+                    </v-text-field>
+                     <v-text-field
+                      type="Time"
+                      label="Fin del evento"
+                      v-model="object.Endhour"
                       :roles="endRules"
                     >
                     </v-text-field>
@@ -185,6 +199,8 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
+      endHour:"",
+      startHour:"",
       page: 1,
       size: 1000,
       totalPages: 1000,
@@ -201,6 +217,8 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
+      endhour:"",
+      starthour:"",
       color: ["#FF5733", "#1976D2", "#33FFA5"],
     },
     tenant: "",

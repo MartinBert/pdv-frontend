@@ -4,8 +4,8 @@
       <v-row>
         <v-col>
           <v-btn class="primary" @click="newObject()" raised>REALIZAR ARQUEO</v-btn>
-          <v-btn class="primary ml-1" @click="closure('z')" raised>REALIZAR CIERRE Z CONTROLADOR FISCAL</v-btn>
-          <v-btn class="primary ml-1" @click="closure('x')" raised>REALIZAR CIERRE X CONTROLADOR FISCAL</v-btn>
+          <v-btn class="primary ml-1" @click="closure('z')" raised :disabled="((clientIp) ? false : true)">REALIZAR CIERRE Z CONTROLADOR FISCAL</v-btn>
+          <v-btn class="primary ml-1" @click="closure('x')" raised :disabled="((clientIp) ? false : true)">REALIZAR CIERRE X CONTROLADOR FISCAL</v-btn>
         </v-col>
       </v-row>
     </v-form>
@@ -46,7 +46,8 @@ export default {
     service: "caja",
     token: localStorage.getItem("token"),
     dialogDeleteObject: false,
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    clientIp: ""
   }),
 
   components:{
@@ -62,6 +63,7 @@ export default {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects()
+    this.getClientIpForFiscalController();
   },
 
   methods: {
@@ -76,10 +78,16 @@ export default {
         });
     },
 
+    getClientIpForFiscalController() {
+      axios.get("https://api.ipify.org?format=json").then((data) => {
+        this.clientIp = data.data.ip;
+      });
+    },
+
     async closure(type){
-      // const clientPublicIp = await this.getClientPublicIp();
+      // const clientIp = this.loguedUser.puntoVenta.ipLocal;
       axios
-        .post(`http://192.168.1.100/${type}_closure`)
+        .post(`http://${this.clientIp}/${type}_closure`)
         .then(() => {
           this.$successAlert(`Cierre ${type} realizado`);
           this.loaded = true;

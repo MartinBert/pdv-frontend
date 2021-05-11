@@ -76,7 +76,7 @@ export default {
           axios.get(`${process.env.VUE_APP_SERVER}/${this.$route.params.tenant}/api/usuarios/getLogued`,
           { headers: { Authorization: "Bearer " + localStorage.getItem('token') }})
           .then(data => {
-            if(data.data.perfil.id >= 2){
+            if(data.data.perfil.id > 1){
               const userData = {
                 "id": data.data.id,
                 "nombre": data.data.nombre,
