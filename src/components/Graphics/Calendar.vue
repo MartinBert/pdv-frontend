@@ -73,7 +73,6 @@
                       label="Agregar Nombre"
                       v-model="object.name"
                       :rules="nameRules"
-                     
                     >
                     </v-text-field>
                     <v-text-field
@@ -93,7 +92,7 @@
                     <v-text-field
                       type="Time"
                       label="Hora de inicio"
-                      v-model="object.Starthour"
+                      v-model="object.starthour"
                       :rules="startRules"
                     >
                     </v-text-field>
@@ -107,7 +106,7 @@
                     <v-text-field
                       type="Time"
                       label="Hora finalizacion"
-                      v-model="object.Endhour"
+                      v-model="object.endhour"
                       :roles="endRules"
                     >
                     </v-text-field>
@@ -199,8 +198,8 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
-      Starthour:"",
-      Endhour:"",
+      starthour:"",
+      endhour:"",
       page: 1,
       size: 1000,
       totalPages: 1000,
@@ -217,6 +216,8 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
+      Starthour:"",
+      Endhour:"",
       color: ["#FF5733", "#1976D2", "#33FFA5"],
     },
     tenant: "",
@@ -238,14 +239,13 @@ export default {
   },
   methods: {
     getEvent() {
-      
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.notes = data.data.content;
           console.log(this.notes);
           this.notes.forEach((notes) => {
-            const { name, details, endEvent, startEvent, id } = notes;
+            const { name, details, endEvent, startEvent, id,endhour,starthour } = notes;
               this.events.push({
               id: id,
               name: name,
@@ -253,6 +253,8 @@ export default {
               start: startEvent,
               end: endEvent,
               color: "#1976D2",
+              starthour:starthour,
+              endhour:endhour,
             });
           });
         });
@@ -272,9 +274,6 @@ export default {
             this.loaded = true;
           }
         });
-
-       
-        
     },
 
     deleteEvent(id) {
@@ -301,7 +300,6 @@ export default {
          this.$toaster.success('Your toaster success message.')
        }
      });
-
     },
     UpdateObj(events){
     console.log(events);
@@ -341,7 +339,6 @@ export default {
       } else {
         open();
       }
-
       nativeEvent.stopPropagation();
     },
   },
