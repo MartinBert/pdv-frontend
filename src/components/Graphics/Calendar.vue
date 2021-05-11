@@ -90,10 +90,9 @@
                     >
                     </v-text-field>
                     <v-text-field
-                      type="Time"
+                      type="datetime-local"
                       label="Hora de inicio"
-                      v-model="object.starthour"
-                      :rules="startRules"
+                      v-model="object.starthour"     
                     >
                     </v-text-field>
                     <v-text-field
@@ -104,10 +103,9 @@
                     >
                     </v-text-field>
                     <v-text-field
-                      type="Time"
+                      type="time"
                       label="Hora finalizacion"
                       v-model="object.endhour"
-                      :roles="endRules"
                     >
                     </v-text-field>
                     <v-text-field
