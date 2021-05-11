@@ -351,14 +351,14 @@ export default {
       },
       {
       name: "calendar",
-      title: "Calendario",
+      title: "Calendar",
       visible: false,
       icon: "/../images/icons/calendar.svg",
       childs: [
           {
             path: "/calendar",
             name: "calendar",
-            title: "Calendario",
+            title: "Calendar",
             visible: false
           },
         ]

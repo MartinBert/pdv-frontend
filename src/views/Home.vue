@@ -112,7 +112,6 @@ export default {
     this.getSucursalId();
     this.$toaster.success('Your toaster success message.')
   },
-
   methods: {
     getSucursalId() {
       this.tenant = this.$route.params.tenant;
