@@ -67,13 +67,16 @@
             <v-card>
               <v-container>
                 <v-flex>
-                  <v-form @submit.prevent="saveEvent()" :lazy-validation="false" v-model="valid">
+                  <v-form
+                    @submit.prevent="saveEvent()"
+                    :lazy-validation="false"
+                    v-model="valid"
+                  >
                     <v-text-field
                       type="text"
                       label="Agregar Nombre"
                       v-model="object.name"
                       :rules="nameRules"
-                     
                     >
                     </v-text-field>
                     <v-text-field
@@ -141,7 +144,6 @@
             <v-toolbar :color="selectedEvent.color" dark>
               <v-btn icon @click="UpdateObj(selectedEvent)">
                 <v-icon>mdi-pencil</v-icon>
-
               </v-btn>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
@@ -173,34 +175,30 @@ import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
     loaded: false,
-    valid:true,
+    valid: true,
     errors: [],
     focus: "",
     notes: [],
     nameRules: [
-        v => !!v || 'Nombre es requerido',
-        v => v.length <= 20 || 'El nombre debe tener menos de 20 caracteres',
-      ],
-      details:'',
-      detailsRules:[
-        v => !!v || 'Detalle es requerido',
-        v => v.length <= 20 || 'El nombre debe tener menos de 20 caracteres',
-      ],
-      startEvent: '',
-      startRules: [
-        v => !!v || 'Fecha de comienzo del evento es requerido'
-      ],
-      endEvent:'',
-      endRules:[
-        v => !!v || 'Fecha de finalizacion es requerida'
-      ],
+      (v) => !!v || "Nombre es requerido",
+      (v) => v.length <= 20 || "El nombre debe tener menos de 20 caracteres",
+    ],
+    details: "",
+    detailsRules: [
+      (v) => !!v || "Detalle es requerido",
+      (v) => v.length <= 20 || "El nombre debe tener menos de 20 caracteres",
+    ],
+    startEvent: "",
+    startRules: [(v) => !!v || "Fecha de comienzo del evento es requerido"],
+    endEvent: "",
+    endRules: [(v) => !!v || "Fecha de finalizacion es requerida"],
     filterParams: {
       name: "",
       details: "",
       endEvent: "",
       startEvent: "",
-      Starthour:"",
-      Endhour:"",
+      Starthour: "",
+      Endhour: "",
       page: 1,
       size: 1000,
       totalPages: 1000,
@@ -229,7 +227,7 @@ export default {
     colors: [],
     names: [],
     dialog: false,
-    currentlyEvent:null
+    currentlyEvent: null,
   }),
   mounted() {
     this.$refs.calendar.checkChange();
@@ -238,7 +236,6 @@ export default {
   },
   methods: {
     getEvent() {
-      
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -246,10 +243,10 @@ export default {
           console.log(this.notes);
           this.notes.forEach((notes) => {
             const { name, details, endEvent, startEvent, id } = notes;
-              this.events.push({
+            this.events.push({
               id: id,
               name: name,
-              details:details,
+              details: details,
               start: startEvent,
               end: endEvent,
               color: "#1976D2",
@@ -258,7 +255,7 @@ export default {
         });
     },
 
-    saveEvent(){
+    saveEvent() {
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
@@ -272,42 +269,38 @@ export default {
             this.loaded = true;
           }
         });
-
-       
-        
     },
 
     deleteEvent(id) {
       this.loaded = true;
-        GenericService(this.tenant, this.service, this.token)
+      GenericService(this.tenant, this.service, this.token)
         .delete(id)
         .then(() => {
           this.getEvent();
           this.selectedOpen = false;
         });
 
-        location.reload();
+      location.reload();
     },
 
-    editEvent(ev){
+    editEvent(ev) {
       this.currentlyEvent = ev.id;
       console.log(this.currentlyEvent);
     },
-    showNotification(events){
-     let hoy = new Date()
-     events.forEach(events => {
-       const{Endevent,Endhour} = events;
-       if(Endevent == hoy.toLocaleDateString && Endhour == hoy.getHours){
-         this.$toaster.success('Your toaster success message.')
-       }
-     });
-
+    showNotification(events) {
+      let hoy = new Date();
+      events.forEach((events) => {
+        const { Endevent, Endhour } = events;
+        if (Endevent == hoy.toLocaleDateString && Endhour == hoy.getHours) {
+          this.$toaster.success("Your toaster success message.");
+        }
+      });
     },
-    UpdateObj(events){
-    console.log(events);
-    this.object= events;
-    this.dialog = true;
-    window.location.reload;
+    UpdateObj(events) {
+      console.log(events);
+      this.object = events;
+      this.dialog = true;
+      window.location.reload;
     },
     viewDay({ date }) {
       this.focus = date;
