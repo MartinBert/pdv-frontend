@@ -56,7 +56,7 @@ import DataPicker from "../components/Graphics/DataPicker";
 import { formatDateWithoutSlash, formatDate } from "../helpers/dateHelper";
 import GenericService from "../services/GenericService";
 import jsPdf from "jspdf";
-import VueHtml2pdf from 'vue-html2pdf'
+import VueHtml2pdf from 'vue-html2pdf';
 export default {
   data: () => ({
     jsPdf: "",
@@ -105,11 +105,12 @@ export default {
     LineChartComponent,
     DataPicker,
     Spinner,
-    VueHtml2pdf
+    VueHtml2pdf,
   },
 
   mounted() {
     this.getSucursalId();
+    this.$toaster.success('Your toaster success message.')
   },
 
   methods: {

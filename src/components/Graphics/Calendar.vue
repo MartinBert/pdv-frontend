@@ -216,8 +216,8 @@ export default {
       details: "",
       endEvent: "",
       startEvent: "",
-      Starthour:"",
-      Endhour:"",
+      starthour:"",
+      endhour:"",
       color: ["#FF5733", "#1976D2", "#33FFA5"],
     },
     tenant: "",
@@ -297,7 +297,7 @@ export default {
      events.forEach(events => {
        const{Endevent,Endhour} = events;
        if(Endevent == hoy.toLocaleDateString && Endhour == hoy.getHours){
-         this.$toaster.success('Your toaster success message.')
+         
        }
      });
     },
