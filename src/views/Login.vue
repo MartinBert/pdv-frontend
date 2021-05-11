@@ -85,7 +85,6 @@ export default {
                 "puntoVenta": data.data.puntoVenta,
                 "empresa": data.data.empresa
               }
-              console.log(userData);
               localStorage.setItem("userData", JSON.stringify(userData));            
             }else{
               const userData = {
