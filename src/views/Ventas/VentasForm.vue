@@ -703,7 +703,7 @@ export default {
       // const clientIp = this.loguedUser.puntoVenta.ipLocal;
       axios
         .post(
-          `http://200.117.153.115/${ticketRoute}`,
+          `http://${this.clientIp}/${ticketRoute}`,
           jsonToFiscalController
         )
         .then(() => {
