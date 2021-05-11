@@ -22,38 +22,41 @@
       <v-col>
         <Spinner v-if="!loaded" />
       </v-col>
-      <!-- <v-btn color="success" @click="genericReports">Generar Reportes</v-btn> -->
+      <v-btn color="success" @click="genericReports">Generar Reportes</v-btn>
     </v-row>
-    <!-- <div>
-     <vue-html2pdf
-        :show-layout="false"
-        :float-layout="true"
-        :enable-download="true"
-        :preview-modal="false"
-        :paginate-elements-by-height="1400"
-        filename="Reportes"
-        :pdf-quality="1"
-        :manual-pagination="false"
-        pdf-format="a4"
-        pdf-orientation="landscape"
-        pdf-content-width="300px"
-        ref="html2Pdf"
+    <vue-html2pdf
+      :show-layout="false"
+      :float-layout="true"
+      :enable-download="true"
+      :preview-modal="false"
+      :paginate-elements-by-height="1400"
+      filename="Reportes"
+      :pdf-quality="1"
+      :manual-pagination="false"
+      pdf-format="a4"
+      pdf-orientation="landscape"
+      pdf-content-width="300px"
+      ref="html2Pdf"
     >
-        <section slot="pdf-content">
-             <LineChartComponent v-if="loaded" :charData="charData" ref="contentHtml"/>
-             <LineChartComponent v-if="loaded" :charData="charData2"/>
-        </section>
+      <section slot="pdf-content">
+        <LineChartComponent
+          v-if="loaded"
+          :charData="charData"
+          ref="contentHtml"
+        />
+        <LineChartComponent v-if="loaded" :charData="charData2" />
+      </section>
     </vue-html2pdf>
-   </div> -->
   </v-container>
 </template>
-<script >
+<script>
 import Spinner from "../components/Graphics/Spinner";
 import LineChartComponent from "../components/Graphics/LineChartComponent";
 import DataPicker from "../components/Graphics/DataPicker";
 import { formatDateWithoutSlash, formatDate } from "../helpers/dateHelper";
 import GenericService from "../services/GenericService";
 import jsPdf from "jspdf";
+import VueHtml2pdf from 'vue-html2pdf'
 export default {
   data: () => ({
     jsPdf: "",
@@ -102,6 +105,7 @@ export default {
     LineChartComponent,
     DataPicker,
     Spinner,
+    VueHtml2pdf
   },
 
   mounted() {
@@ -133,10 +137,10 @@ export default {
           });
           this.charData.datasets[0].data.sort(this.sortResults);
         })
-        .then(()=>{
+        .then(() => {
           this.loadReady();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     },
@@ -197,10 +201,10 @@ export default {
             this.charData2.datasets[0].data.push(Number(dateSales[element]));
           });
         })
-        .then(()=>{
+        .then(() => {
           this.loadReady();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     },
@@ -244,10 +248,10 @@ export default {
           this.$store.commit("eventual/addEventual", this.charData);
           this.detected++;
         })
-        .then(()=>{
+        .then(() => {
           this.loadReady();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     },
