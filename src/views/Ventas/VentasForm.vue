@@ -141,8 +141,8 @@
                         <th class="text-left">Producto</th>
                         <th class="text-left">Codigo de barras</th>
                         <th class="text-left">Cantidad de unidades</th>
-                        <th class="text-left">Precion unitario</th>
-                        <th class="text-left">Precion total</th>
+                        <th class="text-left">Precio unitario</th>
+                        <th class="text-left">Precio total</th>
                         <th></th>
                       </tr>
                     </thead>
