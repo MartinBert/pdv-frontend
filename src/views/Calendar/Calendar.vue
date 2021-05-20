@@ -291,6 +291,16 @@ export default {
         location.reload();
     },
 
+     showNotification(events){
+     let hoy = new Date()
+     events.forEach(events => {
+       const{Endevent,Endhour} = events;
+       if(Endevent == hoy.toLocaleDateString && Endhour == hoy.getHours){
+         this.$toaster.success('Your toaster success message.')
+       }
+     });
+    },
+
     editEvent(ev){
       this.currentlyEvent = ev.id;
       console.log(this.currentlyEvent);
