@@ -110,7 +110,7 @@ export default {
 
   mounted() {
     this.getSucursalId();
-    this.$toaster.success('Your toaster success message.')
+    // this.$toaster.success('Your toaster success message.')
   },
   methods: {
     getSucursalId() {
