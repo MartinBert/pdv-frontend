@@ -37,7 +37,7 @@
     </v-navigation-drawer>
     <v-app-bar app color="primary" dark clipped-left fixed>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-spacer />
+      <v-spacer></v-spacer>
         <form @submit.prevent="changeUserData()" v-if="logued" class="d-flex mt-5">
           <v-autocomplete
             :items="sucursales"
