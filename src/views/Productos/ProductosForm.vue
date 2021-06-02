@@ -1,6 +1,6 @@
 <template>
   <v-card min-width="100%">
-    <Error :errorStatus="errorStatus"/>
+    <Error :errorStatus="errorStatus" />
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
         <v-row class="ma-1">
@@ -35,7 +35,9 @@
               @keypress.enter="checkBarCode(filterParams, object.codigoBarra)"
               :rules="[(v) => !!v || 'Campo requerido...']"
             ></v-text-field>
-            <v-btn class="primary mt-3" @click="generateBarCode()">Generar</v-btn>
+            <v-btn class="primary mt-3" @click="generateBarCode()"
+              >Generar</v-btn
+            >
           </v-col>
         </v-row>
         <v-row class="ma-1">
@@ -106,7 +108,7 @@
         <v-row class="ml-1">
           <v-col cols="3">
             <v-autocomplete
-            label="Iva compras"
+              label="Iva compras"
               :items="ivasCompra"
               item-text="nombre"
               v-model="object.ivaComprasObject"
@@ -116,7 +118,7 @@
           </v-col>
           <v-col cols="3">
             <v-autocomplete
-            label="Iva ventas"
+              label="Iva ventas"
               :items="ivasVenta"
               item-text="nombre"
               v-model="object.ivaVentasObject"
@@ -126,17 +128,13 @@
           </v-col>
           <v-col>
             <v-container class="d-flex justify-end">
-              <v-radio-group v-model="object.editable" row label="¿Precio editable en ventas?">
-                <v-radio
-                  label="Si"
-                  :value="true"
-                  color="primary"
-                ></v-radio>
-                <v-radio
-                  label="No"
-                  :value="false"
-                  color="primary"
-                ></v-radio>
+              <v-radio-group
+                v-model="object.editable"
+                row
+                label="¿Precio editable en ventas?"
+              >
+                <v-radio label="Si" :value="true" color="primary"></v-radio>
+                <v-radio label="No" :value="false" color="primary"></v-radio>
               </v-radio-group>
             </v-container>
           </v-col>
@@ -240,7 +238,7 @@
         </div>
       </v-form>
     </div>
-    <Spinner v-if="!loaded"/>
+    <Spinner v-if="!loaded" />
   </v-card>
 </template>
 <script>
@@ -253,8 +251,8 @@ import {
   generateBarCode,
 } from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
-import Spinner from '../../components/Graphics/Spinner';
-import Error from '../../components/Error';
+import Spinner from "../../components/Graphics/Spinner";
+import Error from "../../components/Error";
 export default {
   data: () => ({
     atributosNumericos: [],
@@ -269,10 +267,10 @@ export default {
     object: {
       estado: 1,
       ganancia: 0,
-      codigoBarra: '',
+      codigoBarra: "",
       ivaComprasObject: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
-      editable: false
+      editable: false,
     },
     filterParams: {
       productoName: "",
@@ -285,7 +283,7 @@ export default {
       productoEstado: "",
       page: 1,
       size: 1,
-      totalPages: 0
+      totalPages: 0,
     },
     cantidad: [],
     loaded: false,
@@ -295,9 +293,9 @@ export default {
     errorStatus: false,
   }),
 
-  components:{
+  components: {
     Spinner,
-    Error
+    Error,
   },
 
   mounted() {
@@ -344,20 +342,20 @@ export default {
                 this.rubros = data.data.content;
                 break;
               case "ivas":
-                this.ivasCompra = data.data.content.filter(el => el.tipo);
-                this.ivasVenta = data.data.content.filter(el => !el.tipo);
+                this.ivasCompra = data.data.content.filter((el) => el.tipo);
+                this.ivasVenta = data.data.content.filter((el) => !el.tipo);
                 break;
               case "propiedades":
                 this.propiedades = data.data.content;
                 break;
               default:
-                data.data.content.filter(el => {
-                  if(el.valor === undefined || el.valor === null){
+                data.data.content.filter((el) => {
+                  if (el.valor === undefined || el.valor === null) {
                     this.atributosNumericos.push(el);
-                    }else{
+                  } else {
                     this.atributosDeTexto.push(el);
                   }
-                })
+                });
                 break;
             }
           });
@@ -404,27 +402,29 @@ export default {
       );
     },
 
-    generateBarCode(){
+    generateBarCode() {
       this.object.codigoBarra = generateBarCode();
     },
 
-    checkBarCode(filterParams, barcode){
+    checkBarCode(filterParams, barcode) {
       filterParams.productoCodigoBarras = barcode;
       GenericService(this.tenant, this.service, this.token)
-      .filter(filterParams)
-      .then(data => {
-        if(this.isEmpty(data.data.content)) return;
-        this.$errorAlert("El código de barras que ha introducido ya existe en otro producto: " + data.data.content[0].nombre)
-        .then(data => {
-          if(data.dismiss){
-            this.object.codigoBarra = "";
-          }
-        })
-      })
+        .filter(filterParams)
+        .then((data) => {
+          if (this.isEmpty(data.data.content)) return;
+          this.$errorAlert(
+            "El código de barras que ha introducido ya existe en otro producto: " +
+              data.data.content[0].nombre
+          ).then((data) => {
+            if (data.dismiss) {
+              this.object.codigoBarra = "";
+            }
+          });
+        });
     },
 
-    isEmpty(array){
-      if(array.length === 0) return true;
+    isEmpty(array) {
+      if (array.length === 0) return true;
       return false;
     },
 

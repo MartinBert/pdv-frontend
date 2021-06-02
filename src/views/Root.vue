@@ -121,6 +121,19 @@ export default {
             title: "Lista",
             visible: false
           },
+           {
+            path: "/ventas/presupuesto", 
+            name: "presupuesto",
+            title: "Presupuesto",
+            visible: false
+          },
+          {
+            path: "/ventas/cierrez",
+            name: "cierrez",
+            title: "Cierrez",
+            visible: false
+          },
+
           {
             path: "/devoluciones",
             name: "devoluciones",

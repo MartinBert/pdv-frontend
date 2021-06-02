@@ -59,6 +59,10 @@ import IvasForm from "../views/Ivas/IvasForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
 import Mensajes from "../views/Mensajes/Mensajes.vue";
 import Calendar from "../views/Calendar/Calendar.vue";
+import PresupuestoForm from "../views/Presupuesto/PresupuestoForm.vue";
+import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
+import Cierrez from "../views/Cierrez/Cierrez.vue";
+import CierrezForm from "../views/Cierrez/CierrezForm.vue";
 
 Vue.use(VueRouter)
 
@@ -260,6 +264,30 @@ const routes = [
                 path: 'ventas',
                 name: 'ventasForm',
                 component: VentasForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'ventas/presupuesto',
+                name: 'presupuesto',
+                component: PresupuestoForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'presupuesto',
+                name: 'presupuestoForm',
+                component: Presupuesto,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'ventas/cierrez',
+                name: 'cierrez',
+                component: Cierrez,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'cierrez',
+                name: 'cierrezForm',
+                component: CierrezForm,
                 meta: { requiresAuth: true }
             },
             {

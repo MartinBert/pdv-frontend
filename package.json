@@ -10,6 +10,7 @@
   "dependencies": {
     "@mdi/js": "^5.1.45",
     "@vue/cli-service-global": "^4.5.7",
+    "@vue/composition-api": "^1.0.0-rc.10",
     "axios": "^0.19.2",
     "chart.js": "^2.9.4",
     "chartjs": "^0.3.24",

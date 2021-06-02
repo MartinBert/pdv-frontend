@@ -1,5 +1,16 @@
 <template>
   <v-container>
+    <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab to="/ventas/ventas/list">
+        Comprobantes Emitidos
+      </v-tab>
+      <v-tab to="/ventas/presupuesto">
+        Presupuesto
+      </v-tab>
+      <v-tab to ="/ventas/cierrez">
+        Cierre Z 
+      </v-tab>
+    </v-tabs>
     <v-form class="mb-3">
       <v-row>
         <v-col>
@@ -104,7 +115,7 @@ export default {
     Pagination,
     Spinner,
     VentasTable,
-    VentaDetails
+    VentaDetails,
   },
 
   mounted() {
@@ -117,18 +128,18 @@ export default {
   },
 
   methods: {
-      filterObjects(page) {
-        if(page) this.filterParams.page = page;
-        GenericService(this.tenant, "ventas", this.token)
-          .filter(this.filterParams)
-          .then((data) => {
-            this.ventas = data.data.content;
-            this.filterParams.totalPages = data.data.totalPages;
-            if(this.filterParams.totalPages < this.filterParams.page){
-              this.filterParams.page = 1;
-            }
-            this.loaded = true;
-          });
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, "ventas", this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.ventas = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
     },
 
     seeDetails(objects) {
@@ -182,3 +193,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.v-form {
+  padding: 10px;
+}
+</style>

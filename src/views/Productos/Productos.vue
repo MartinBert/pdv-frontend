@@ -1,24 +1,28 @@
 <template>
   <v-container>
-    <v-form class="mb-3">
+     <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised to="productos/form/:id">
+        Lista
+      </v-tab>
+      <v-tab class="primary ml-1" @click="newObject()" raised to="productos/form/:id">
+        Nuevo
+      </v-tab>
+      <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
+        Generar Etiquetas
+      </v-tab>
+      <v-tab class="primary ml-2" @click="goPricesManagerView()">
+        Modificar Precios
+      </v-tab>
+    </v-tabs>
+    <v-form class="mb-3"  v-on:click="show = !show">
       <v-row>
-        <v-col cols="12" v-if="perfil < 3">
-          <v-btn class="primary ml-1" @click="view = 'listOfProducts'" raised
-            >LISTA</v-btn
-          >
-          <v-btn class="primary ml-1" @click="newObject()" raised>NUEVO</v-btn>
-          <v-btn class="primary ml-1" @click="view = 'labelPrinting'"
-            >GENERAR ETIQUETAS</v-btn
-          >
-          <v-btn class="primary ml-1" @click="goPricesManagerView()"
-            >MODIFICAR PRECIOS</v-btn
-          >
-          <v-btn class="primary ml-1" @click="getReport()" raised
+        <v-col cols="8" v-if="perfil < 3">
+          <v-btn class="primary ml-2" @click="getReport()" raised
             >REPORTE</v-btn
           >
           <v-btn
             v-if="loaded"
-            class="primary ml-1"
+            class="primary ml-2"
             @click="exportGeneralExcel()"
             raised
             >EXPORTAR EXCEL</v-btn
@@ -34,7 +38,7 @@
           -->
           <v-btn
             v-if="perfil === 1"
-            class="primary ml-1"
+            class="primary ml-2"
             @click="correctPriceInList()"
             raised
             >Corregir lista de precios</v-btn
@@ -68,10 +72,9 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col class="mt-2 ml-3" v-if="view == 'labelPrinting'">
+        <v-col class="mt-4 ml-3" v-if="view == 'labelPrinting'">
           <h2>Seleccion de productos</h2>
         </v-col>
-        <v-col></v-col>
         <v-col cols="2">
           <v-text-field
             v-model="filterParams.productoName"
@@ -223,6 +226,7 @@ import { exportExcel } from "../../helpers/exportFileHelper";
 import XLSX from "xlsx";
 export default {
   data: () => ({
+    show:true,
     icon: "mdi-check-circle",
     view: "listOfProducts",
     perfil: "",
