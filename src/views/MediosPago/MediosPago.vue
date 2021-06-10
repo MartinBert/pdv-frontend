@@ -34,8 +34,10 @@
       v-on:editItem="edit"
       v-on:deleteItem="deleteItem"
       v-on:seeDetails="seeDetails"
-      v-on:add="add"
-      v-on:uncheck="uncheck"
+      v-on:addZClosure="add"
+      v-on:addCloseBox="add"
+      v-on:uncheckCloseBox="uncheck"
+      v-on:uncheckZClosure="uncheck"
       v-if="loaded"
     />
     <Pagination
@@ -148,9 +150,13 @@ export default {
       this.$store.commit('details/addObjectsToDetail', objects);
     },
 
-    add(object){
+    add(object, changeType){
       this.loaded = false;
-      object.sumaEnCierreDeCaja = true;
+      if(changeType === 'addCloseBox'){
+        object.sumaEnCierreDeCaja = true;
+      }else{
+        object.aplicaCierreZ = true;
+      }
       GenericService(this.tenant, this.service, this.token)
       .save(object)
       .then(()=>{
@@ -161,9 +167,13 @@ export default {
       })
     },
 
-    uncheck(object){
+    uncheck(object, changeType){
       this.loaded = false;
-      object.sumaEnCierreDeCaja = false;
+      if(changeType === 'uncheckCloseBox'){
+        object.sumaEnCierreDeCaja = false;
+      }else{
+        object.aplicaCierreZ = false;
+      }
       GenericService(this.tenant, this.service, this.token)
       .save(object)
       .then(()=>{

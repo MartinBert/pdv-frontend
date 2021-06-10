@@ -1,16 +1,6 @@
 <template>
   <v-container>
-    <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab to="/ventas/ventas/list">
-        Comprobantes Emitidos
-      </v-tab>
-      <v-tab to="/ventas/presupuesto">
-        Presupuesto
-      </v-tab>
-      <v-tab to ="/ventas/cierrez">
-        Cierre Z 
-      </v-tab>
-    </v-tabs>
+    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent"/>
     <v-form class="mb-3">
       <v-row>
         <v-col>
@@ -66,14 +56,14 @@
       :items="ventas"
       v-on:print="print"
       v-on:seeDetails="seeDetails"
-      v-if="loaded"
+      v-if="loaded && activeTab === 1"
     />
     <Pagination
       :page="filterParams.page"
       :totalPages="filterParams.totalPages"
       :totalVisible="7"
       v-on:changePage="filterObjects"
-      v-if="loaded"
+      v-if="loaded && activeTab === 1"
     />
     <Spinner v-if="!loaded" />
     <VentaDetails />
@@ -86,6 +76,7 @@ import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
+import TabBar from "../../components/Graphics/TabBar";
 import VentasTable from "../../components/Tables/VentasTable";
 import VentaDetails from "../../components/Details/VentaDetails";
 export default {
@@ -104,6 +95,12 @@ export default {
       size: 10,
       totalPages: 0,
     },
+    tabs: [
+      {id: 1, route: '', title: 'Comprobantes Emitidos'},
+      {id: 2, route: '', title: 'Presupuesto'},
+      {id: 3, route: '', title: 'Cierre Z'}
+    ],
+    activeTab: 1,
     loaded: false,
     tenant: "",
     service: "comprobantesFiscales",
@@ -116,11 +113,15 @@ export default {
     Spinner,
     VentasTable,
     VentaDetails,
+    TabBar
   },
 
   mounted() {
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
+    this.tabs[0].route = `/${this.tenant}/ventas/list`
+    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`
+    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
@@ -165,6 +166,10 @@ export default {
 
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
+    },
+
+    setActiveTabComponent(id){
+      this.activeTab = id;
     },
 
     containValue(value) {

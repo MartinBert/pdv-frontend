@@ -269,13 +269,13 @@ const routes = [
             {
                 path: 'ventas/presupuesto',
                 name: 'presupuesto',
-                component: PresupuestoForm,
+                component: Presupuesto,
                 meta: { requiresAuth: true }
             },
             {
                 path: 'presupuesto',
                 name: 'presupuestoForm',
-                component: Presupuesto,
+                component: PresupuestoForm,
                 meta: { requiresAuth: true }
             },
             {

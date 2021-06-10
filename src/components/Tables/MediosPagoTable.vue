@@ -6,6 +6,7 @@
           <th>Nombre</th>
           <th>Planes asociados</th>
           <th>Suma en arqueo de caja</th>
+          <th>Aplica en cierre Z</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -21,13 +22,25 @@
           <td>
             <Add
               :object="item"
-              v-on:add="add"
+              v-on:add="addCloseBox"
               v-if="!item.sumaEnCierreDeCaja"
             />
             <Checked
               :object="item"
-              v-on:uncheck="uncheck"
+              v-on:uncheck="uncheckCloseBox"
               v-if="item.sumaEnCierreDeCaja"
+            />
+          </td>
+          <td>
+            <Add
+              :object="item"
+              v-on:add="addZClosure"
+              v-if="!item.aplicaCierreZ"
+            />
+            <Checked
+              :object="item"
+              v-on:uncheck="uncheckZClosure"
+              v-if="item.aplicaCierreZ"
             />
           </td>
           <td>
@@ -60,18 +73,30 @@ export default {
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },
+
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
     },
-    add(object) {
-      this.$emit("add", object);
+
+    addCloseBox(object) {
+      this.$emit('addCloseBox', object, 'addCloseBox');
     },
-    uncheck(object) {
-      this.$emit("uncheck", object);
+
+    uncheckCloseBox(object) {
+      this.$emit('uncheckCloseBox', object, 'uncheckCloseBox');
     },
+
+    addZClosure(object) {
+      this.$emit('addZClosure', object, 'addZClosure');
+    },
+
+    uncheckZClosure(object) {
+      this.$emit('uncheckZClosure', object, 'uncheckZClosure');
+    },
+
     seeDetails(objects) {
-      this.$emit("seeDetails", objects);
-    },
+      this.$emit('seeDetails', objects);
+    }
   },
 };
 </script>

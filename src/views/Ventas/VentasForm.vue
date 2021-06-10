@@ -1255,8 +1255,8 @@ export default {
     /* FUNCITON FOR TEST AFIP CERT -----------------------------------------------------------------------*/
     /******************************************************************************************************/
     testCert(){
-      const cuit = '23280601659';
-      const idFiscal = '16';
+      const cuit = '27149046785';
+      const idFiscal = '5';
       const codigoDocumento = '001';
       axios
         .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuit}/${idFiscal}/${codigoDocumento}`)
