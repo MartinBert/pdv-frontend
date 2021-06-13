@@ -1,21 +1,12 @@
 <template>
   <v-container>
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent"/>
-    <v-form class="mb-3">
+    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" v-if="loaded"/>
+    <v-form class="mb-3" v-if="loaded">
       <v-row>
         <v-col cols="1">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          <v-btn class="primary" @click="generateZClosure()" raised>Realizar cierre z</v-btn>
         </v-col>
-        <v-col cols="3">
-          <v-file-input
-          v-model="file" 
-          class="mt-0"
-          placeholder="Importar marcas"
-          accept=".xlsx, xls"
-          @change="importDocuments($event)"
-          ></v-file-input>
-        </v-col>
-        <v-col cols="5"></v-col>
+        <v-col></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterParams.marcaName"
@@ -30,8 +21,8 @@
         </v-col>
       </v-row>
     </v-form>
-    <MarcasTable
-      :items="marcas"
+    <CierrezTable
+      :items="cierres"
       v-on:editItem="edit"
       v-on:deleteItem="deleteItem"
       v-if="loaded"
@@ -52,21 +43,32 @@
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import MarcasTable from '../../components/Tables/MarcasTable'
+import VentasService from "../../services/VentasService";
+import CierrezTable from '../../components/Tables/CierrezTable'
 import Pagination from '../../components/Pagination';
 import Spinner from '../../components/Graphics/Spinner';
 import TabBar from '../../components/Graphics/TabBar';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
-import XLSX from 'xlsx';
+import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
+import { questionAlert } from '../../helpers/alerts';
+import { roundTwoDecimals } from '../../helpers/mathHelper';
 export default {
   data: () => ({
-    marcas: [],
+    cierres: [],
+    comprobantes: [],
     file: null,
     filterParams: {
-      marcaName: "",
+      sucursalId: '',
+      date: '',
       page: 1,
       size: 10,
       totalPages: 0
+    },
+    invoiceFilterParams: {
+      sucursalId: '',
+      fechaEmision: '',
+      page: 1,
+      size: 100000,
     },
     tabs: [
       {id: 1, route: '', title: 'Comprobantes Emitidos'},
@@ -76,14 +78,14 @@ export default {
     activeTab: 3,
     loaded: false,
     tenant: "",
-    service: "marcas",
+    service: "cierres_z",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData"))
   }),
 
   components:{
-    MarcasTable,
+    CierrezTable,
     Pagination,
     Spinner,
     DeleteDialog,
@@ -95,6 +97,10 @@ export default {
     this.tabs[0].route = `/${this.tenant}/ventas/list`
     this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`
     this.tabs[2].route = `/${this.tenant}/ventas/cierrez`
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      this.invoiceFilterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
     this.filterObjects();
   },
   methods: {
@@ -103,14 +109,44 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.marcas = data.data.content;
+          this.cierres = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
     
-    newObject() {
-      this.$router.push({ name: "marcasForm", params: { id: 0 } });
+    generateZClosure() {
+      this.loaded = false;
+      this.invoiceFilterParams.fechaEmision = formatDate(getCurrentDate());
+      VentasService(this.tenant, "ventas", this.token)
+        .getUniqueDateSales(this.invoiceFilterParams)
+        .then((data) => {
+          this.comprobantes = data.data.content;
+          this.closeOrCancelZ();
+        });
+    },
+
+    closeOrCancelZ(){
+      questionAlert("Este proceso realizará el cierre z diario", "Desea continuar")
+      .then(result => {
+        this.comprobantes.forEach(comprobante => {
+          comprobante.cerradoEnCierreZ = true;
+        })
+        const total = this.comprobantes.reduce((acc, el) => acc + roundTwoDecimals(parseFloat(el.totalVenta)), 0)
+        if(result.isConfirmed){
+          const cierreZ = {
+            sucursal: this.loguedUser.sucursal.id,
+            comprobantesFiscales: this.comprobantes,
+            total,
+            fecha: new Date()
+          }
+          console.log(cierreZ);
+          this.loaded = true;
+        }else{
+          this.comprobantes = []
+          this.loaded = true;
+        }
+      })
     },
 
     edit(id) {
@@ -136,63 +172,6 @@ export default {
         .catch(()=>{
           this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
         })
-    },
-
-    importDocuments(event) {
-      this.file = event;
-      var excel = [];
-      var reader = new FileReader();
-      reader.onload = e => {
-        var data = e.target.result;
-        var workbook = XLSX.read(data, { type: "binary" });
-
-        var sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function(y) {
-          var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-          if (exceljson.length > 0) {
-            for (var i = 0; i < exceljson.length; i++) {
-              excel.push(exceljson[i]);
-            }
-          }
-        });
-        var doc = this.validateImport(excel);
-        if (doc.status) {
-          GenericService(this.tenant, this.service, this.token)
-            .saveAll(doc.data)
-            .then(() => {
-              this.filterObjects();
-              this.loaderStatus = true;
-              window.setTimeout(()=>{
-                this.loader = false
-                this.loaderStatus=false;
-              }, 2000);              
-            });
-        }
-      };
-      reader.readAsBinaryString(this.file);
-    },
-
-    validateImport(marcas) {
-      this.loader = true;
-      var importacion = {
-        status: true,
-        data: [],
-        message: ""
-      };
-      marcas.forEach((element, index) => {
-        if (
-          element.nombre 
-        ) {
-          var obj = {
-            nombre: element.nombre,
-          };
-          importacion.data.push(obj);
-        } else {
-          importacion.status = false;
-          importacion.message = "Faltan datos en el renglón " + (index + 2);
-        }
-      });
-      return importacion;
     },
 
     setActiveTabComponent(id){

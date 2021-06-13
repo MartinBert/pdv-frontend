@@ -62,7 +62,6 @@ import Calendar from "../views/Calendar/Calendar.vue";
 import PresupuestoForm from "../views/Presupuesto/PresupuestoForm.vue";
 import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
 import Cierrez from "../views/Cierrez/Cierrez.vue";
-import CierrezForm from "../views/Cierrez/CierrezForm.vue";
 
 Vue.use(VueRouter)
 
@@ -282,12 +281,6 @@ const routes = [
                 path: 'ventas/cierrez',
                 name: 'cierrez',
                 component: Cierrez,
-                meta: { requiresAuth: true }
-            },
-            {
-                path: 'cierrez',
-                name: 'cierrezForm',
-                component: CierrezForm,
                 meta: { requiresAuth: true }
             },
             {

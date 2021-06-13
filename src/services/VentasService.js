@@ -57,6 +57,13 @@ export default (tenant,service,token) =>{
                 infoAlert2(`Estos productos no se encuentran en el depósito principal: ${productsOnSecondaryDeposits}... Sus unidades se descontaron de otros depósitos`);
                 }
             }
-        }
+        },
+
+        getUniqueDateSales: function (object) {
+            let data = axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getUniqueDateSales`, object, {
+                headers: { Authorization: "Bearer " + token }
+            })
+            return data;
+        },
     }
 }
