@@ -309,9 +309,10 @@ export default {
       totalPages: 0,
     },
     tabs: [
-      { id: 1, route: "", title: "Comprobantes Emitidos" },
-      { id: 2, route: "", title: "Presupuesto" },
-      { id: 3, route: "", title: "Cierre Z" },
+      { id: 1, route: "", title: "Lista" },
+      { id: 2, route: "", title: "Nuevo" },
+      { id: 3, route: "", title: "Generar Etiquetas" },
+      { id: 4, route: "", title: "Modificar Precios" },
     ],
     cantidad: [],
     loaded: false,
@@ -337,9 +338,10 @@ export default {
     this.getOtherModels(0, 100000);
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
-    this.tabs[0].route = `/${this.tenant}/ventas/list`;
-    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`;
-    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`;
+    this.tabs[0].route = `/${this.tenant}/productos`;
+    this.tabs[1].route = `/${this.tenant}/productos/form/:id`;
+    this.tabs[2].route = `/${this.tenant}/productos`;
+    this.tabs[3].route = `/${this.tenant}/precios`;
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
