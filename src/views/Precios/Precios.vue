@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <v-card min-width="100%" v-if="loaded">
+      <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
       <v-card-title>
         <div class="text-center" style="width: 100%">Alterar precios</div>
       </v-card-title>
@@ -14,15 +15,12 @@
           item-value="id"
           placeholder="Seleccione un concepto de filtrado"
         />
-        <v-radio-group v-model="salePriceModification" label="Aplicar modificación">
-          <v-radio
-            label="Sobre el precio de costo"
-            :value="false"
-          ></v-radio>
-          <v-radio
-            label="Sobre el precio de venta"
-            :value="true"
-          ></v-radio>
+        <v-radio-group
+          v-model="salePriceModification"
+          label="Aplicar modificación"
+        >
+          <v-radio label="Sobre el precio de costo" :value="false"></v-radio>
+          <v-radio label="Sobre el precio de venta" :value="true"></v-radio>
         </v-radio-group>
         <v-select
           filled
@@ -93,7 +91,7 @@
         </div>
       </v-card-text>
     </v-card>
-    <Spinner v-if="!loaded"/>
+    <Spinner v-if="!loaded" />
   </v-container>
 </template>
 <script>
@@ -106,7 +104,8 @@ import {
   sumarNumeros,
 } from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
-import Spinner from '../../components/Graphics/Spinner';
+import Spinner from "../../components/Graphics/Spinner";
+import TabBar from "../../components/Graphics/TabBar.vue";
 export default {
   data: () => ({
     loaded: false,
@@ -117,17 +116,24 @@ export default {
     alterationType: null,
     object: {
       percent: 0,
-      amount: 0
+      amount: 0,
     },
     alterationFilters: [
-      {id: 1, text: "Aplicar modificación de precios a todos los productos"},
-      {id: 2, text: "Aplicar modificación de precios por marcas"},
-      {id: 3, text: "Aplicar modificación de precios por rubros"},
-      {id: 4, text: "Aplicar modificación de precios por distribuidores"},
-      {id: 5, text: "Aplicar modificación de precios por código de producto"},
+      { id: 1, text: "Aplicar modificación de precios a todos los productos" },
+      { id: 2, text: "Aplicar modificación de precios por marcas" },
+      { id: 3, text: "Aplicar modificación de precios por rubros" },
+      { id: 4, text: "Aplicar modificación de precios por distribuidores" },
+      { id: 5, text: "Aplicar modificación de precios por código de producto" },
     ],
-    alterationFilter:{
-      id: 1, text: "Aplicar modificación de precios a todos los productos"
+    tabs: [
+      { id: 1, route: "", title: "Lista" },
+      { id: 2, route: "", title: "Nuevo" },
+      { id: 3, route: "", title: "Generar Etiquetas" },
+      { id: 4, route: "", title: "Modificar Precios" },
+    ],
+    alterationFilter: {
+      id: 1,
+      text: "Aplicar modificación de precios a todos los productos",
     },
     distribuidores: [],
     selectedDistribuidores: [],
@@ -150,28 +156,39 @@ export default {
       productoTercerAtributoName: "",
       productoEstado: "",
       page: 1,
-      size: 100000
+      size: 100000,
     },
     filterParamsMarcas: {
       marcaName: "",
       page: 1,
-      size: 100000
+      size: 100000,
     },
     filterParamsRubros: {
       rubroName: "",
       page: 1,
-      size: 100000
+      size: 100000,
     },
     token: localStorage.getItem("token"),
   }),
 
-  components:{
-    Spinner
+  components: {
+    Spinner,
+    TabBar,
   },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.getObjects();
+    this.$store.commit("eventual/resetStates");
+    this.tenant = this.$route.params.tenant;
+    this.tabs[0].route = `/${this.tenant}/productos`;
+    this.tabs[1].route = `/${this.tenant}/productos/form/:id`;
+    this.tabs[2].route = `/${this.tenant}/productos`;
+    this.tabs[3].route = `/${this.tenant}/precios`;
+    if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterObjects();
   },
 
   methods: {
@@ -191,7 +208,7 @@ export default {
         .then((data) => {
           this.rubros = data.data.content;
         });
-        this.loaded = true;
+      this.loaded = true;
     },
 
     updatePrices() {
@@ -200,7 +217,9 @@ export default {
       } else if (this.object.amount && this.object.amount !== 0) {
         this.applyModification("amount");
       } else {
-        this.$errorAlert("Debe indicar un valor porcentual o fijo distinto a cero");
+        this.$errorAlert(
+          "Debe indicar un valor porcentual o fijo distinto a cero"
+        );
       }
     },
 
@@ -213,194 +232,198 @@ export default {
           this.loaded = false;
           switch (this.alterationFilter) {
             case 2:
-                this.applyModificationForTradeMark(modificationType);
+              this.applyModificationForTradeMark(modificationType);
               break;
             case 3:
-                this.applyModificationForLines(modificationType);
+              this.applyModificationForLines(modificationType);
               break;
             case 4:
-                this.applyModificationForDistribuitors(modificationType);
+              this.applyModificationForDistribuitors(modificationType);
               break;
             case 5:
-                this.applyModificationForProductCode(modificationType);
+              this.applyModificationForProductCode(modificationType);
               break;
             default:
-                this.applyModificationToAllProducts(modificationType);
+              this.applyModificationToAllProducts(modificationType);
               break;
           }
         }
       });
     },
 
-    applyModificationForTradeMark(modificationType){
-      if(this.selectedMarcas.length === 0) return this.$errorAlert("No ha seleccionado ninguna marca");
+    applyModificationForTradeMark(modificationType) {
+      if (this.selectedMarcas.length === 0)
+        return this.$errorAlert("No ha seleccionado ninguna marca");
       GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then((data) => {
-        this.products = data.data.content;
-        const filteredProductsWithTradeMark = this.filterProducts()
-        const alterProducts = filteredProductsWithTradeMark.map((el) => {
-          if(this.salePriceModification === true){
-            el = this.processModificationSalePrice(el, modificationType);
-          }else{
-            el = this.processModificationCostPrice(el, modificationType);
-          }
-          return el;
-        });
-        GenericService(this.tenant, this.service, this.token)
-          .saveAll(alterProducts)
-          .then(() => {
-            this.$successAlert("Procesado con éxito");
-            this.back();
+        .filter(this.filterParams)
+        .then((data) => {
+          this.products = data.data.content;
+          const filteredProductsWithTradeMark = this.filterProducts();
+          const alterProducts = filteredProductsWithTradeMark.map((el) => {
+            if (this.salePriceModification === true) {
+              el = this.processModificationSalePrice(el, modificationType);
+            } else {
+              el = this.processModificationCostPrice(el, modificationType);
+            }
+            return el;
           });
-      });
-    },
-    
-    applyModificationForLines(modificationType){
-      if(this.selectedRubros.length === 0) return this.$errorAlert("No ha seleccionado ningún rubro");
-      GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then((data) => {
-        this.products = data.data.content;
-        const filteredProductsWithLines = this.filterProducts()
-        const alterProducts = filteredProductsWithLines.map((el) => {
-          if(this.salePriceModification === true){
-            el = this.processModificationSalePrice(el, modificationType);
-          }else{
-            el = this.processModificationCostPrice(el, modificationType);
-          }
-          return el;
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(alterProducts)
+            .then(() => {
+              this.$successAlert("Procesado con éxito");
+              this.back();
+            });
         });
-        GenericService(this.tenant, this.service, this.token)
-          .saveAll(alterProducts)
-          .then(() => {
-            this.$successAlert("Procesado con éxito");
-            this.back();
-          });
-      });
     },
 
-    applyModificationForDistribuitors(modificationType){
-      if(this.selectedDistribuidores.length === 0) return this.$errorAlert("No ha seleccionado ningún distribuidor");
+    applyModificationForLines(modificationType) {
+      if (this.selectedRubros.length === 0)
+        return this.$errorAlert("No ha seleccionado ningún rubro");
       GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then((data) => {
-        this.products = data.data.content;
-        const filteredProductsWithDistribuitors = this.filterProducts()
-        const alterProducts = filteredProductsWithDistribuitors.map((el) => {
-          if(this.salePriceModification === true){
-            el = this.processModificationSalePrice(el, modificationType);
-          }else{
-            el = this.processModificationCostPrice(el, modificationType);
-          }
-          return el;
-        });
-        GenericService(this.tenant, this.service, this.token)
-          .saveAll(alterProducts)
-          .then(() => {
-            this.$successAlert("Procesado con éxito");
-            this.back();
+        .filter(this.filterParams)
+        .then((data) => {
+          this.products = data.data.content;
+          const filteredProductsWithLines = this.filterProducts();
+          const alterProducts = filteredProductsWithLines.map((el) => {
+            if (this.salePriceModification === true) {
+              el = this.processModificationSalePrice(el, modificationType);
+            } else {
+              el = this.processModificationCostPrice(el, modificationType);
+            }
+            return el;
           });
-      });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(alterProducts)
+            .then(() => {
+              this.$successAlert("Procesado con éxito");
+              this.back();
+            });
+        });
     },
 
-    applyModificationForProductCode(modificationType){
-      if(this.codigoDeProducto.length === 0) return this.$errorAlert("No ha escrito ningún código de producto");
+    applyModificationForDistribuitors(modificationType) {
+      if (this.selectedDistribuidores.length === 0)
+        return this.$errorAlert("No ha seleccionado ningún distribuidor");
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.products = data.data.content;
+          const filteredProductsWithDistribuitors = this.filterProducts();
+          const alterProducts = filteredProductsWithDistribuitors.map((el) => {
+            if (this.salePriceModification === true) {
+              el = this.processModificationSalePrice(el, modificationType);
+            } else {
+              el = this.processModificationCostPrice(el, modificationType);
+            }
+            return el;
+          });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(alterProducts)
+            .then(() => {
+              this.$successAlert("Procesado con éxito");
+              this.back();
+            });
+        });
+    },
+
+    applyModificationForProductCode(modificationType) {
+      if (this.codigoDeProducto.length === 0)
+        return this.$errorAlert("No ha escrito ningún código de producto");
       this.filterParams.productoCodigo = this.codigoDeProducto;
       GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then((data) => {
-        this.products = data.data.content;
-        const alterProducts = this.products.map((el) => {
-          if(this.salePriceModification === true){
-            el = this.processModificationSalePrice(el, modificationType);
-          }else{
-            el = this.processModificationCostPrice(el, modificationType);
-          }
-          return el;
-        });
-        GenericService(this.tenant, this.service, this.token)
-          .saveAll(alterProducts)
-          .then(() => {
-            this.$successAlert("Procesado con éxito");
-            this.back();
+        .filter(this.filterParams)
+        .then((data) => {
+          this.products = data.data.content;
+          const alterProducts = this.products.map((el) => {
+            if (this.salePriceModification === true) {
+              el = this.processModificationSalePrice(el, modificationType);
+            } else {
+              el = this.processModificationCostPrice(el, modificationType);
+            }
+            return el;
           });
-      });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(alterProducts)
+            .then(() => {
+              this.$successAlert("Procesado con éxito");
+              this.back();
+            });
+        });
     },
 
-    applyModificationToAllProducts(modificationType){
+    applyModificationToAllProducts(modificationType) {
       GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then((data) => {
-        this.products = data.data.content;
-        const alterProducts = this.products.map((el) => {
-          if(this.salePriceModification === true){
-            el = this.processModificationSalePrice(el, modificationType);
-          }else{
-            el = this.processModificationCostPrice(el, modificationType);
-          }
-          return el;
-        });
-        GenericService(this.tenant, this.service, this.token)
-          .saveAll(alterProducts)
-          .then(() => {
-            this.$successAlert("Procesado con éxito");
-            this.back();
+        .filter(this.filterParams)
+        .then((data) => {
+          this.products = data.data.content;
+          const alterProducts = this.products.map((el) => {
+            if (this.salePriceModification === true) {
+              el = this.processModificationSalePrice(el, modificationType);
+            } else {
+              el = this.processModificationCostPrice(el, modificationType);
+            }
+            return el;
           });
-      });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(alterProducts)
+            .then(() => {
+              this.$successAlert("Procesado con éxito");
+              this.back();
+            });
+        });
     },
 
-    filterProducts(){
+    filterProducts() {
       let result;
       switch (this.alterationFilter) {
         case 2:
-            result = this.filterWithTradeMark()
+          result = this.filterWithTradeMark();
           break;
         case 3:
-            result = this.filterWithLines()
+          result = this.filterWithLines();
           break;
         default:
-            result = this.filterWithDistribuitors()
+          result = this.filterWithDistribuitors();
           break;
       }
       return result;
     },
 
-    filterWithTradeMark(){
+    filterWithTradeMark() {
       let filteredProducts = [];
-      this.products.forEach(product => {
-        this.selectedMarcas.forEach(tradeMark => {
-          if(product.marca.id === tradeMark.id){
+      this.products.forEach((product) => {
+        this.selectedMarcas.forEach((tradeMark) => {
+          if (product.marca.id === tradeMark.id) {
             filteredProducts.push(product);
           }
-        })
-      })
+        });
+      });
       return filteredProducts;
     },
 
-    filterWithLines(){
+    filterWithLines() {
       let filteredProducts = [];
-      this.products.forEach(product => {
-        this.selectedRubros.forEach(line => {
-          if(product.rubro.id === line.id){
+      this.products.forEach((product) => {
+        this.selectedRubros.forEach((line) => {
+          if (product.rubro.id === line.id) {
             filteredProducts.push(product);
           }
-        })
-      })
+        });
+      });
       return filteredProducts;
     },
 
-    filterWithDistribuitors(){
+    filterWithDistribuitors() {
       let filteredProducts = [];
-      this.products.forEach(product => {
-        this.selectedDistribuidores.forEach(distribuitor => {
-          product.distribuidores.forEach(productDistribuitor => {
-            if(productDistribuitor.id === distribuitor.id){
+      this.products.forEach((product) => {
+        this.selectedDistribuidores.forEach((distribuitor) => {
+          product.distribuidores.forEach((productDistribuitor) => {
+            if (productDistribuitor.id === distribuitor.id) {
               filteredProducts.push(product);
             }
-          })
-        })
-      })
+          });
+        });
+      });
       return filteredProducts;
     },
 
@@ -440,7 +463,7 @@ export default {
       return product;
     },
 
-    processModificationSalePrice(product, type){
+    processModificationSalePrice(product, type) {
       if (type === "percent") {
         product.precioTotal = calculateAmountPlusPercentaje(
           product.precioTotal,
