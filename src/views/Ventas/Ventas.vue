@@ -2,7 +2,7 @@
   <v-container>
     <TabBar :tabs="tabs" :activeTab="setActiveTabComponent"/>
     <v-form class="mb-3">
-      <v-row>
+      <v-row class="mb-4">
         <v-col>
           <v-btn class="primary" @click="seeReports()" raised
             >Reporte de Ventas</v-btn
@@ -98,7 +98,8 @@ export default {
     tabs: [
       {id: 1, route: '', title: 'Comprobantes Emitidos'},
       {id: 2, route: '', title: 'Presupuesto'},
-      {id: 3, route: '', title: 'Cierre Z'}
+      {id: 3, route: '', title: 'Cierre Z'},
+      {id:3, route: '', title :''}
     ],
     activeTab: 1,
     loaded: false,

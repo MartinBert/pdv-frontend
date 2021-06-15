@@ -129,15 +129,8 @@ export default {
           },
           {
             path: "/ventas/cierrez",
-            name: "cierrez",
-            title: "Cierrez",
-            visible: false
-          },
-
-          {
-            path: "/devoluciones",
-            name: "devoluciones",
-            title: "Devoluciones y cambios",
+            name: "Cierrez",
+            title: "Cierre z",
             visible: false
           },
           {

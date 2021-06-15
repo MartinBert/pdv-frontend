@@ -1,7 +1,7 @@
 <template>
   <v-container>
      <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised to="productos/form/:id">
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised to="productos">
         Lista
       </v-tab>
       <v-tab class="primary ml-1" @click="newObject()" raised to="productos/form/:id">
