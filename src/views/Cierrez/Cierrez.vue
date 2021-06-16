@@ -23,7 +23,8 @@
     </v-form>
     <CierrezTable
       :items="cierres"
-      v-on:editItem="edit"
+      v-on:seeDetails="seeDetails"
+      v-on:print="print"
       v-on:deleteItem="deleteItem"
       v-if="loaded"
     />
@@ -39,16 +40,25 @@
       :status="deleteDialogStatus"
       v-on:deleteConfirmation="deleteConfirmation"
     />
+    <CierrezDetails />
+    <PrintSelectionDialog 
+      :status="printDialogStatus" 
+      v-on:close="closePrintSelectionDialog" 
+      v-on:printSpecification="printSpecification"
+    />
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+import ReportsService from "../../services/ReportsService";
 import VentasService from "../../services/VentasService";
 import CierrezTable from '../../components/Tables/CierrezTable'
 import Pagination from '../../components/Pagination';
 import Spinner from '../../components/Graphics/Spinner';
 import TabBar from '../../components/Graphics/TabBar';
 import DeleteDialog from '../../components/Dialogs/DeleteDialog';
+import PrintSelectionDialog from '../../components/Dialogs/PrintSelectionDialog';
+import CierrezDetails from '../../components/Details/CierrezDetails.vue';
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 import { questionAlert } from '../../helpers/alerts';
 import { roundTwoDecimals } from '../../helpers/mathHelper';
@@ -76,6 +86,8 @@ export default {
       {id: 3, route: '', title: 'Cierre Z'}
     ],
     activeTab: 3,
+    objectToPrint: null,
+    printDialogStatus: false,
     loaded: false,
     tenant: "",
     service: "cierres_z",
@@ -89,6 +101,8 @@ export default {
     Pagination,
     Spinner,
     DeleteDialog,
+    CierrezDetails,
+    PrintSelectionDialog,
     TabBar
   },
 
@@ -135,12 +149,18 @@ export default {
         const total = this.comprobantes.reduce((acc, el) => acc + roundTwoDecimals(parseFloat(el.totalVenta)), 0)
         if(result.isConfirmed){
           const cierreZ = {
-            sucursal: this.loguedUser.sucursal.id,
+            sucursal: this.loguedUser.sucursal,
             comprobantesFiscales: this.comprobantes,
             total,
+            cantidadVentas: parseInt(this.comprobantes.length),
             fecha: new Date()
           }
           console.log(cierreZ);
+          GenericService(this.tenant, this.service, this.token)
+          .save(cierreZ)
+          .then(()=>{
+            this.filterObjects();
+          })
           this.loaded = true;
         }else{
           this.comprobantes = []
@@ -149,8 +169,30 @@ export default {
       })
     },
 
-    edit(id) {
-      this.$router.push({ name: "marcasForm", params: { id: id } });
+    seeDetails(comprobantes) {
+      this.$store.commit('details/mutateDialog');
+      this.$store.commit('details/addObjectsToDetail', comprobantes);
+    },
+
+    print(object){
+      this.objectToPrint = object;
+      this.printDialogStatus = true;
+    },
+
+    printSpecification(specification){
+      return this.printZClosure(specification);
+    },
+
+    printZClosure(specification){
+      ReportsService(this.tenant, "cierres_z", this.token)
+        .printZClosure(this.objectToPrint, specification)
+        .then((res) => {
+          let file = new Blob([res["data"]], {
+            type: "application/pdf",
+          });
+          let fileURL = URL.createObjectURL(file);
+          window.open(fileURL, "_blank");
+        });
     },
 
     deleteItem(id) {
@@ -176,6 +218,10 @@ export default {
 
     setActiveTabComponent(id){
       this.activeTab = id;
+    },
+
+    closePrintSelectionDialog(){
+      this.printDialogStatus = false;
     }
   }
 };
