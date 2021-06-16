@@ -14,6 +14,8 @@
         Modificar Precios
       </v-tab>
     </v-tabs>
+    <br>
+   <v-card>
     <v-form class="mb-3" v-on:click="show = !show">
       <v-row>
         <v-col cols="10" v-if="perfil < 3">
@@ -56,117 +58,120 @@
           @change="onChange($event)"
         ></v-file-input>
       </v-col>
+         <v-row>
+          <v-col v-if="view == 'listOfProducts' && perfil < 3">
+            <v-select
+              :items="estados"
+              v-model="estadoSelecionado"
+              item-text="text"
+              :return-object="true"
+              outlined
+              dense
+              @input="filterObjects()"
+            ></v-select>
+          </v-col>
+        </v-row>
+     
+        <v-row>
+          <v-col class="mt-4 ml-3" v-if="view == 'labelPrinting'">
+            <h2>Seleccion de productos</h2>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productoName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Nombre de producto"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productoCodigo"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Codigo de producto"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productoCodigoBarras"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Codigo de barras"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productoMarcaName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Marca"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productoPrimerAtributoName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Atributo"
+              append-icon="mdi-magnify"
+            />
+          </v-col>
+          <v-col></v-col>
+        </v-row>
 
-      <v-row>
-        <v-col v-if="view == 'listOfProducts' && perfil < 3">
-          <v-select
-            :items="estados"
-            v-model="estadoSelecionado"
-            item-text="text"
-            :return-object="true"
-            outlined
-            dense
-            @input="filterObjects()"
-          ></v-select>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col class="mt-4 ml-3" v-if="view == 'labelPrinting'">
-          <h2>Seleccion de productos</h2>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Nombre de producto"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoCodigo"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Codigo de producto"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoCodigoBarras"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Codigo de barras"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoMarcaName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Marca"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoPrimerAtributoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Atributo"
-            append-icon="mdi-magnify"
-          />
-        </v-col>
-        <v-col></v-col>
-      </v-row>
     </v-form>
-    <ProductosTable
-      :items="productos"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-on:add="reactivationOfProduct"
-      v-if="loaded && view === 'listOfProducts'"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded && view === 'listOfProducts'"
-    />
-    <LabelPrinting
-      v-if="view === 'labelPrinting'"
-      :productos="productos"
-      :page="filterParams.page"
-      :totalVisible="filterParams.size"
-      :totalPages="filterParams.totalPages"
-      :tenant="tenant"
-      :token="token"
-      v-on:changePage="changePage"
-      v-on:checkProduct="checkProductInList"
-    />
-    <Spinner v-if="!loaded" />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
+  
+        <ProductosTable
+          :items="productos"
+          v-on:editItem="edit"
+          v-on:deleteItem="deleteItem"
+          v-on:add="reactivationOfProduct"
+          v-if="loaded && view === 'listOfProducts'"
+        />
+        <Pagination
+          :page="filterParams.page"
+          :totalPages="filterParams.totalPages"
+          :totalVisible="7"
+          v-on:changePage="filterObjects"
+          v-if="loaded && view === 'listOfProducts'"
+        />
+        <LabelPrinting
+          v-if="view === 'labelPrinting'"
+          :productos="productos"
+          :page="filterParams.page"
+          :totalVisible="filterParams.size"
+          :totalPages="filterParams.totalPages"
+          :tenant="tenant"
+          :token="token"
+          v-on:changePage="changePage"
+          v-on:checkProduct="checkProductInList"
+        />
+        <Spinner v-if="!loaded" />
+        <DeleteDialog
+          :status="deleteDialogStatus"
+          v-on:deleteConfirmation="deleteConfirmation"
+        />
+   </v-card>      
     <template>
       <v-dialog
         v-model="loader"
@@ -878,3 +883,9 @@ export default {
   },
 };
 </script>
+<style>
+v-tabs{
+  margin-bottom: 10px;
+}
+
+</style>
