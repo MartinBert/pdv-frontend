@@ -36,8 +36,11 @@ export default {
     Delete
   },
   methods: {
-    editItem(itemId) {
-      this.$emit("editItem", itemId);
+    seeDetails(object) {
+      this.$emit("seeDetails", object);
+    },
+    print(object) {
+      this.$emit("print", object);
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
