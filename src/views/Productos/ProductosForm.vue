@@ -1,266 +1,277 @@
 <template>
-  <v-card class="card" min-width="100%">
-    <Error :errorStatus="errorStatus" />
-    <div class="container">
-      <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
-    </div>
-    <div v-if="loaded" class="grey lighten-5">
-      <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-3">
-        <v-container>
-          <v-row>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                class="mr-2"
-                type="text"
-                v-model="object.nombre"
-                :counter="50"
-                label="Nombre"
-                required
-                :rules="[(v) => !!v || 'Campo requerido...']"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                class="mr-2"
-                type="text"
-                v-model="object.codigoProducto"
-                :counter="50"
-                label="Código de producto"
-                required
-                :rules="[(v) => !!v || 'Campo requerido...']"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="4" class="d-flex" sm="4">
-              <v-text-field
-                class="mr-2"
-                type="text"
-                v-model="object.codigoBarra"
-                :counter="50"
-                label="Código de barras"
-                required
-                @keypress.enter="checkBarCode(filterParams, object.codigoBarra)"
-                :rules="[(v) => !!v || 'Campo requerido...']"
-              ></v-text-field>
-              <v-btn class="primary mt-3" @click="generateBarCode()"
-                >Generar</v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-container>
-        <v-container>
-          <v-row class="sm-3">
-            <v-col cols="8">
-              <v-autocomplete
-                :items="distribuidores"
-                v-model="object.distribuidores"
-                multiple
-                item-text="razonSocial"
-                label="Distribuidores"
-                :return-object="true"
-                :rules="[(v) => !!v || 'Campo requerido...']"
-              ></v-autocomplete>
-            </v-col>
-          </v-row>
-        </v-container>
-        <v-container>
-          <v-row class="sm-3">
-            <v-col>
-              <v-autocomplete
-                :items="marcas"
-                v-model="object.marca"
-                item-text="nombre"
-                :return-object="true"
-                label="Marca"
-                :rules="[(v) => !!v || 'Campo requerido...']"
-              ></v-autocomplete>
-            </v-col>
-            <v-col>
-              <v-autocomplete
-                :items="rubros"
-                v-model="object.rubro"
-                item-text="nombre"
-                :return-object="true"
-                label="Rubro"
-                :rules="[(v) => !!v || 'Campo requerido...']"
-              ></v-autocomplete>
-            </v-col>
-            <v-col>
-              <v-autocomplete
-                multiple
-                :items="propiedades"
-                v-model="object.propiedades"
-                item-text="nombre"
-                label="Propiedades"
-                :return-object="true"
-              ></v-autocomplete>
-            </v-col>
-            <v-col cols="4">
-              <v-autocomplete
-                multiple
-                :items="atributosDeTexto"
-                v-model="object.atributos"
-                item-text="valor"
-                label="Atributos de tipo texto"
-                :return-object="true"
-              ></v-autocomplete>
-            </v-col>
-            <v-col>
-              <v-autocomplete
-                multiple
-                :items="atributosNumericos"
-                v-model="object.atributos"
-                item-text="valorNumerico"
-                label="Atributos numéricos"
-                :return-object="true"
-              ></v-autocomplete>
-            </v-col>
-          </v-row>
-        </v-container>
-        <v-container>
-          <v-row class="sm-2">
-            <v-col cols="4" sm="4">
-              <v-autocomplete
-                label="Iva compras"
-                :items="ivasCompra"
-                item-text="nombre"
-                v-model="object.ivaComprasObject"
-                :return-object="true"
-                v-on:input="calculations()"
-              />
-            </v-col>
-            <v-col cols="4" sm="4">
-              <v-autocomplete
-                label="Iva ventas"
-                :items="ivasVenta"
-                item-text="nombre"
-                v-model="object.ivaVentasObject"
-                :return-object="true"
-                v-on:input="calculations()"
-              />
-            </v-col>
-            <v-col cols="4" sm="4">
-              <v-container>
-                <v-radio-group
-                  v-model="object.editable"
-                  row
-                  label="¿Precio editable en ventas?"
+  <v-container>
+    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
+    <v-card class="card" min-width="100%">
+      <Error :errorStatus="errorStatus" />
+      <div v-if="loaded" class="grey lighten-5">
+        <v-form
+          ref="form"
+          v-model="valid"
+          :lazy-validation="false"
+          class="mt-3"
+        >
+          <v-container>
+            <v-row>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  class="mr-2"
+                  type="text"
+                  v-model="object.nombre"
+                  :counter="50"
+                  label="Nombre"
+                  required
+                  :rules="[(v) => !!v || 'Campo requerido...']"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  class="mr-2"
+                  type="text"
+                  v-model="object.codigoProducto"
+                  :counter="50"
+                  label="Código de producto"
+                  required
+                  :rules="[(v) => !!v || 'Campo requerido...']"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4" class="d-flex" sm="4">
+                <v-text-field
+                  class="mr-2"
+                  type="text"
+                  v-model="object.codigoBarra"
+                  :counter="50"
+                  label="Código de barras"
+                  required
+                  @keypress.enter="
+                    checkBarCode(filterParams, object.codigoBarra)
+                  "
+                  :rules="[(v) => !!v || 'Campo requerido...']"
+                ></v-text-field>
+                <v-btn class="primary mt-3" @click="generateBarCode()"
+                  >Generar</v-btn
                 >
-                  <v-radio label="Si" :value="true" color="primary"></v-radio>
-                  <v-radio label="No" :value="false" color="primary"></v-radio>
-                </v-radio-group>
-              </v-container>
-            </v-col>
-          </v-row>
-        </v-container>
-        <v-container>
-          <v-row class="sm-3">
-            <v-col cols="3" sm="4">
-              <v-text-field
-                type="number"
-                v-model="object.costoBruto"
-                :counter="10"
-                label="Costo bruto"
-                required
-                class="mr-3"
-                v-on:input="calculations()"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                type="number"
-                v-model="object.precioCosto"
-                :counter="10"
-                label="Precio de costo"
-                required
-                class="mr-3"
-                disabled
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                type="number"
-                v-model="object.costoNeto"
-                :counter="10"
-                label="Costo neto"
-                required
-                class="mr-3"
-                disabled
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                type="number"
-                v-model="object.ivaCompra"
-                :counter="10"
-                label="Iva compras"
-                required
-                class="mr-3"
-                disabled
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                type="number"
-                v-model="object.ganancia"
-                :counter="10"
-                label="Ganancia"
-                required
-                class="mr-3"
-                v-on:input="calculations()"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                type="number"
-                v-model="object.precioSinIva"
-                :counter="10"
-                label="Precio sin IVA"
-                required
-                class="mr-3"
-                disabled
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                type="number"
-                v-model="object.ivaVenta"
-                :counter="10"
-                label="Iva ventas"
-                required
-                class="mr-3"
-                disabled
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3" sm="4">
-              <v-text-field
-                type="number"
-                v-model="object.precioTotal"
-                :counter="10"
-                label="Precio total"
-                required
-                @input="gainCalculations()"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-container>
-        <v-container>
-          <div class="ma-1">
-            <v-col class="col-6">
-              <v-btn
-                class="mr-4"
-                color="primary"
-                @click="save"
-                :disabled="!valid"
-                >Guardar</v-btn
-              >
-              <v-btn color="default" @click="back()">Cancelar</v-btn>
-            </v-col>
-          </div>
-        </v-container>
-      </v-form>
-    </div>
-    <Spinner v-if="!loaded" />
-  </v-card>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-container>
+            <v-row class="sm-3">
+              <v-col cols="8">
+                <v-autocomplete
+                  :items="distribuidores"
+                  v-model="object.distribuidores"
+                  multiple
+                  item-text="razonSocial"
+                  label="Distribuidores"
+                  :return-object="true"
+                  :rules="[(v) => !!v || 'Campo requerido...']"
+                ></v-autocomplete>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-container>
+            <v-row class="sm-3">
+              <v-col>
+                <v-autocomplete
+                  :items="marcas"
+                  v-model="object.marca"
+                  item-text="nombre"
+                  :return-object="true"
+                  label="Marca"
+                  :rules="[(v) => !!v || 'Campo requerido...']"
+                ></v-autocomplete>
+              </v-col>
+              <v-col>
+                <v-autocomplete
+                  :items="rubros"
+                  v-model="object.rubro"
+                  item-text="nombre"
+                  :return-object="true"
+                  label="Rubro"
+                  :rules="[(v) => !!v || 'Campo requerido...']"
+                ></v-autocomplete>
+              </v-col>
+              <v-col>
+                <v-autocomplete
+                  multiple
+                  :items="propiedades"
+                  v-model="object.propiedades"
+                  item-text="nombre"
+                  label="Propiedades"
+                  :return-object="true"
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="4">
+                <v-autocomplete
+                  multiple
+                  :items="atributosDeTexto"
+                  v-model="object.atributos"
+                  item-text="valor"
+                  label="Atributos de tipo texto"
+                  :return-object="true"
+                ></v-autocomplete>
+              </v-col>
+              <v-col>
+                <v-autocomplete
+                  multiple
+                  :items="atributosNumericos"
+                  v-model="object.atributos"
+                  item-text="valorNumerico"
+                  label="Atributos numéricos"
+                  :return-object="true"
+                ></v-autocomplete>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-container>
+            <v-row class="sm-2">
+              <v-col cols="4" sm="4">
+                <v-autocomplete
+                  label="Iva compras"
+                  :items="ivasCompra"
+                  item-text="nombre"
+                  v-model="object.ivaComprasObject"
+                  :return-object="true"
+                  v-on:input="calculations()"
+                />
+              </v-col>
+              <v-col cols="4" sm="4">
+                <v-autocomplete
+                  label="Iva ventas"
+                  :items="ivasVenta"
+                  item-text="nombre"
+                  v-model="object.ivaVentasObject"
+                  :return-object="true"
+                  v-on:input="calculations()"
+                />
+              </v-col>
+              <v-col cols="4" sm="4">
+                <v-container>
+                  <v-radio-group
+                    v-model="object.editable"
+                    row
+                    label="¿Precio editable en ventas?"
+                  >
+                    <v-radio label="Si" :value="true" color="primary"></v-radio>
+                    <v-radio
+                      label="No"
+                      :value="false"
+                      color="primary"
+                    ></v-radio>
+                  </v-radio-group>
+                </v-container>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-container>
+            <v-row class="sm-3">
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  type="number"
+                  v-model="object.costoBruto"
+                  :counter="10"
+                  label="Costo bruto"
+                  required
+                  class="mr-3"
+                  v-on:input="calculations()"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  type="number"
+                  v-model="object.precioCosto"
+                  :counter="10"
+                  label="Precio de costo"
+                  required
+                  class="mr-3"
+                  disabled
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  type="number"
+                  v-model="object.costoNeto"
+                  :counter="10"
+                  label="Costo neto"
+                  required
+                  class="mr-3"
+                  disabled
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  type="number"
+                  v-model="object.ivaCompra"
+                  :counter="10"
+                  label="Iva compras"
+                  required
+                  class="mr-3"
+                  disabled
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  type="number"
+                  v-model="object.ganancia"
+                  :counter="10"
+                  label="Ganancia"
+                  required
+                  class="mr-3"
+                  v-on:input="calculations()"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  type="number"
+                  v-model="object.precioSinIva"
+                  :counter="10"
+                  label="Precio sin IVA"
+                  required
+                  class="mr-3"
+                  disabled
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  type="number"
+                  v-model="object.ivaVenta"
+                  :counter="10"
+                  label="Iva ventas"
+                  required
+                  class="mr-3"
+                  disabled
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" sm="4">
+                <v-text-field
+                  type="number"
+                  v-model="object.precioTotal"
+                  :counter="10"
+                  label="Precio total"
+                  required
+                  @input="gainCalculations()"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-container>
+            <div class="ma-1">
+              <v-col class="col-6">
+                <v-btn
+                  class="mr-4"
+                  color="primary"
+                  @click="save"
+                  :disabled="!valid"
+                  >Guardar</v-btn
+                >
+                <v-btn color="default" @click="back()">Cancelar</v-btn>
+              </v-col>
+            </div>
+          </v-container>
+        </v-form>
+      </div>
+      <Spinner v-if="!loaded" />
+    </v-card>
+  </v-container>
 </template>
 <script>
 import {

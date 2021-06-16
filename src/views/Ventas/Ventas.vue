@@ -98,8 +98,7 @@ export default {
     tabs: [
       {id: 1, route: '', title: 'Comprobantes Emitidos'},
       {id: 2, route: '', title: 'Presupuesto'},
-      {id: 3, route: '', title: 'Cierre Z'},
-      {id:3, route: '', title :''}
+      {id: 3, route: '', title: 'Cierre Z'}
     ],
     activeTab: 1,
     loaded: false,

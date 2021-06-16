@@ -130,7 +130,7 @@ export default {
           {
             path: "/ventas/cierrez",
             name: "Cierrez",
-            title: "Cierre z",
+            title: "Cierrez",
             visible: false
           },
           {

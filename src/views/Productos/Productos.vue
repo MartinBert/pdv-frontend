@@ -1,10 +1,10 @@
 <template>
   <v-container>
-     <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised to="productos">
+    <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'">
         Lista
       </v-tab>
-      <v-tab class="primary ml-1" @click="newObject()" raised to="productos/form/:id">
+      <v-tab class="primary ml-1" @click="newObject()">
         Nuevo
       </v-tab>
       <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
@@ -14,9 +14,9 @@
         Modificar Precios
       </v-tab>
     </v-tabs>
-    <v-form class="mb-3"  v-on:click="show = !show">
+    <v-form class="mb-3" v-on:click="show = !show">
       <v-row>
-        <v-col cols="8" v-if="perfil < 3">
+        <v-col cols="10" v-if="perfil < 3">
           <v-btn class="primary ml-2" @click="getReport()" raised
             >REPORTE</v-btn
           >
@@ -43,22 +43,21 @@
             raised
             >Corregir lista de precios</v-btn
           >
-
-
         </v-col>
       </v-row>
+      <v-col cols="6"></v-col>
+      <v-col v-if="perfil < 3 && view == 'listOfProducts'">
+        <v-file-input
+          class="mt-3"
+          dense
+          v-model="file"
+          placeholder="Importar"
+          accept=".xlsx, xls"
+          @change="onChange($event)"
+        ></v-file-input>
+      </v-col>
+
       <v-row>
-        <v-col cols="6"></v-col>
-        <v-col v-if="perfil < 3 && view == 'listOfProducts'">
-          <v-file-input
-            class="mt-3"
-            dense
-            v-model="file"
-            placeholder="Importar"
-            accept=".xlsx, xls"
-            @change="onChange($event)"
-          ></v-file-input>
-        </v-col>
         <v-col v-if="view == 'listOfProducts' && perfil < 3">
           <v-select
             :items="estados"
@@ -214,19 +213,20 @@ import Spinner from "../../components/Graphics/Spinner";
 import Pagination from "../../components/Pagination";
 import ProductosTable from "../../components/Tables/ProductosTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+
 import {
   generateBarCode,
   roundTwoDecimals,
   decimalPercent,
   calculateImportWithoutIvaPercent,
   restarNumeros,
-  calculateAmountPlusPercentaje
+  calculateAmountPlusPercentaje,
 } from "../../helpers/mathHelper";
 import { exportExcel } from "../../helpers/exportFileHelper";
 import XLSX from "xlsx";
 export default {
   data: () => ({
-    show:true,
+    show: true,
     icon: "mdi-check-circle",
     view: "listOfProducts",
     perfil: "",
@@ -246,6 +246,12 @@ export default {
     estados: [
       { id: 1, text: "Activos" },
       { id: 2, text: "Inactivos" },
+    ],
+    tabs: [
+      { id: 1, route: "", title: "Lista" },
+      { id: 2, route: "", title: "Nuevo" },
+      { id: 3, route: "", title: "Generar Etiquetas" },
+      { id: 4, route: "", title: "Modificar Precios" },
     ],
     estadoSelecionado: { id: 1, text: "Activos" },
     filterParams: {
@@ -286,6 +292,14 @@ export default {
     this.filterObjects();
     this.getOtherModels(0, 100000);
     this.perfil = this.loguedUser.perfil;
+    this.tabs[0].route = `/${this.tenant}/productos`;
+    this.tabs[1].route = `/${this.tenant}/productos/form/:id`;
+    this.tabs[2].route = `/${this.tenant}/productos`;
+    this.tabs[3].route = `/${this.tenant}/precios`;
+    if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterObjects();
   },
 
   methods: {
@@ -296,8 +310,8 @@ export default {
       } else {
         this.filterParams.productoEstado = 0;
       }
-      if(this.loguedUser.perfil > 1){
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      if (this.loguedUser.perfil > 1) {
+        this.filterParams.sucursalId = this.loguedUser.sucursal.id;
       }
       GenericService(this.tenant, "productos", this.token)
         .filter(this.filterParams)
@@ -438,7 +452,7 @@ export default {
         let workbook = XLSX.read(data, { type: "binary" });
 
         let sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function (y) {
+        sheet_name_list.forEach(function(y) {
           let exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
           if (exceljson.length > 0) {
             for (let i = 0; i < exceljson.length; i++) {
@@ -511,17 +525,30 @@ export default {
                 (1 + decimalPercent(ivaVent))
             ),
             costoNeto: roundTwoDecimals(
-              element.precioTotal / (1 + decimalPercent(ivaVent)) / (1 + ganancia) / (1 + decimalPercent(ivaComp))
+              element.precioTotal /
+                (1 + decimalPercent(ivaVent)) /
+                (1 + ganancia) /
+                (1 + decimalPercent(ivaComp))
             ),
             ivaCompra: roundTwoDecimals(
-              (element.precioTotal /
+              element.precioTotal /
                 (1 + ganancia) /
-                (1 + decimalPercent(ivaVent))) -
-                element.precioTotal / (1 + decimalPercent(ivaVent)) / (1 + ganancia) / (1 + decimalPercent(ivaComp))
+                (1 + decimalPercent(ivaVent)) -
+                element.precioTotal /
+                  (1 + decimalPercent(ivaVent)) /
+                  (1 + ganancia) /
+                  (1 + decimalPercent(ivaComp))
             ),
             ganancia: element.ganancia,
-            precioSinIva: roundTwoDecimals(element.precioTotal / (1 + decimalPercent(ivaVent))),
-            ivaVenta: roundTwoDecimals(element.precioTotal - roundTwoDecimals(element.precioTotal / (1 + decimalPercent(ivaVent)))),
+            precioSinIva: roundTwoDecimals(
+              element.precioTotal / (1 + decimalPercent(ivaVent))
+            ),
+            ivaVenta: roundTwoDecimals(
+              element.precioTotal -
+                roundTwoDecimals(
+                  element.precioTotal / (1 + decimalPercent(ivaVent))
+                )
+            ),
             precioTotal: element.precioTotal,
             estado: 1,
           };
@@ -802,28 +829,28 @@ export default {
     /******************************************************************************************************/
     /* ALL FUNCTIONS TO APPLY CORRECTIONS TO THE PRICE LIST ----------------------------------------------*/
     /******************************************************************************************************/
-    correctPriceInList(){
+    correctPriceInList() {
       this.loaded = false;
       this.filterParams.page = 1;
       this.filterParams.size = 1000000;
       GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then(data => {
-        const products = data.data.content;
-        let correctedProducts = products.map(el => {
-          el = this.calculations(el);
-          return el;
-        })
-        GenericService(this.tenant, this.service, this.token)
-        .saveAll(correctedProducts)
-        .then(()=>{
-          this.$successAlert("Precios corregidos")
-          this.loaded = true;
-        })
-        .catch(err => {
-          console.error(err);
-        })
-      })
+        .filter(this.filterParams)
+        .then((data) => {
+          const products = data.data.content;
+          let correctedProducts = products.map((el) => {
+            el = this.calculations(el);
+            return el;
+          });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(correctedProducts)
+            .then(() => {
+              this.$successAlert("Precios corregidos");
+              this.loaded = true;
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
     },
 
     calculations(object) {
@@ -832,10 +859,7 @@ export default {
         object.ivaComprasObject.porcentaje
       );
       object.precioCosto = object.costoNeto;
-      object.ivaCompra = restarNumeros([
-        object.costoBruto,
-        object.costoNeto,
-      ]);
+      object.ivaCompra = restarNumeros([object.costoBruto, object.costoNeto]);
       object.precioSinIva = calculateAmountPlusPercentaje(
         object.costoBruto,
         object.ganancia
@@ -846,7 +870,7 @@ export default {
       );
       object.ivaVenta = restarNumeros([
         object.precioTotal,
-        object.precioSinIva
+        object.precioSinIva,
       ]);
 
       return object;

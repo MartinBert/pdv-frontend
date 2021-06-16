@@ -1,7 +1,7 @@
 <template>
   <v-container>
+    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
     <v-card min-width="100%" v-if="loaded">
-      <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
       <v-card-title>
         <div class="text-center" style="width: 100%">Alterar precios</div>
       </v-card-title>
@@ -91,7 +91,7 @@
         </div>
       </v-card-text>
     </v-card>
-    <Spinner v-if="!loaded" />
+  
   </v-container>
 </template>
 <script>
@@ -104,7 +104,6 @@ import {
   sumarNumeros,
 } from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
-import Spinner from "../../components/Graphics/Spinner";
 import TabBar from "../../components/Graphics/TabBar.vue";
 export default {
   data: () => ({
@@ -172,8 +171,7 @@ export default {
   }),
 
   components: {
-    Spinner,
-    TabBar,
+    TabBar
   },
 
   mounted() {
