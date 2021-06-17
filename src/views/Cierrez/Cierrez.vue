@@ -1,10 +1,12 @@
 <template>
   <v-container>
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" v-if="loaded"/>
+    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" v-if="loaded" />
     <v-form class="mb-3" v-if="loaded">
       <v-row>
         <v-col cols="1">
-          <v-btn class="primary" @click="generateZClosure()" raised>Realizar cierre z</v-btn>
+          <v-btn class="primary" @click="generateZClosure()" raised
+            >Realizar cierre z</v-btn
+          >
         </v-col>
         <v-col></v-col>
         <v-col cols="3">
@@ -35,15 +37,15 @@
       v-on:changePage="filterObjects"
       v-if="loaded"
     />
-    <Spinner v-if="!loaded"/>
+    <Spinner v-if="!loaded" />
     <DeleteDialog
       :status="deleteDialogStatus"
       v-on:deleteConfirmation="deleteConfirmation"
     />
     <CierrezDetails />
-    <PrintSelectionDialog 
-      :status="printDialogStatus" 
-      v-on:close="closePrintSelectionDialog" 
+    <PrintSelectionDialog
+      :status="printDialogStatus"
+      v-on:close="closePrintSelectionDialog"
       v-on:printSpecification="printSpecification"
     />
   </v-container>
@@ -52,38 +54,42 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import VentasService from "../../services/VentasService";
-import CierrezTable from '../../components/Tables/CierrezTable'
-import Pagination from '../../components/Pagination';
-import Spinner from '../../components/Graphics/Spinner';
-import TabBar from '../../components/Graphics/TabBar';
-import DeleteDialog from '../../components/Dialogs/DeleteDialog';
-import PrintSelectionDialog from '../../components/Dialogs/PrintSelectionDialog';
-import CierrezDetails from '../../components/Details/CierrezDetails.vue';
-import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
-import { questionAlert } from '../../helpers/alerts';
-import { roundTwoDecimals } from '../../helpers/mathHelper';
+import CierrezTable from "../../components/Tables/CierrezTable";
+import Pagination from "../../components/Pagination";
+import Spinner from "../../components/Graphics/Spinner";
+import TabBar from "../../components/Graphics/TabBar";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+import PrintSelectionDialog from "../../components/Dialogs/PrintSelectionDialog";
+import CierrezDetails from "../../components/Details/CierrezDetails.vue";
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
+import { questionAlert } from "../../helpers/alerts";
+import {
+  roundTwoDecimals,
+  calculatePercentReductionInAmount,
+  sumarNumeros,
+} from "../../helpers/mathHelper";
 export default {
   data: () => ({
     cierres: [],
     comprobantes: [],
     file: null,
     filterParams: {
-      sucursalId: '',
-      date: '',
+      sucursalId: "",
+      date: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     invoiceFilterParams: {
-      sucursalId: '',
-      fechaEmision: '',
+      sucursalId: "",
+      fechaEmision: "",
       page: 1,
       size: 100000,
     },
     tabs: [
-      {id: 1, route: '', title: 'Comprobantes Emitidos'},
-      {id: 2, route: '', title: 'Presupuesto'},
-      {id: 3, route: '', title: 'Cierre Z'}
+      { id: 1, route: "", title: "Comprobantes Emitidos" },
+      { id: 2, route: "", title: "Presupuesto" },
+      { id: 3, route: "", title: "Cierre Z" },
     ],
     activeTab: 3,
     objectToPrint: null,
@@ -93,33 +99,33 @@ export default {
     service: "cierres_z",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
-  components:{
+  components: {
     CierrezTable,
     Pagination,
     Spinner,
     DeleteDialog,
     CierrezDetails,
     PrintSelectionDialog,
-    TabBar
+    TabBar,
   },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.tabs[0].route = `/${this.tenant}/ventas/list`
-    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`
-    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`
-    if(this.loguedUser.perfil > 1){
+    this.tabs[0].route = `/${this.tenant}/ventas/list`;
+    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`;
+    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`;
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
       this.invoiceFilterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects();
   },
   methods: {
-    filterObjects(page){
-      if(page) this.filterParams.page = page;
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -128,7 +134,7 @@ export default {
           this.loaded = true;
         });
     },
-    
+
     generateZClosure() {
       this.loaded = false;
       this.invoiceFilterParams.fechaEmision = formatDate(getCurrentDate());
@@ -140,19 +146,161 @@ export default {
         });
     },
 
-    closeOrCancelZ(){
-      questionAlert("Este proceso realizará el cierre z diario", "Desea continuar")
-      .then(result => {
-        this.comprobantes.forEach(comprobante => {
+    closeOrCancelZ() {
+      questionAlert(
+        "Este proceso realizará el cierre z diario",
+        "Desea continuar"
+      ).then((result) => {
+        this.comprobantes.forEach((comprobante) => {
           comprobante.cerradoEnCierreZ = true;
+        });
+        const total = this.comprobantes.reduce(
+          (acc, el) => acc + roundTwoDecimals(parseFloat(el.totalVenta)),
+          0
+        );
+        let iva21 = 0;
+        let iva10 = 0;
+        let iva27 = 0;
+        let mediosPagoDetalle = []
+        this.comprobantes.forEach((comprobante) => {
+          const totalIva21 = comprobante.productoDescription.reduce(
+            (acc, producto) => {
+              if (producto.saleIvaPercent == 21) {
+                if (
+                  producto.discountPercent > 0 &&
+                  producto.surchargePercent > 0
+                ) {
+                  const salePriceWithDiscountAndSurcharge = producto.salePrice + producto.surchargeAmount - producto.discountAmount;
+                  acc += salePriceWithDiscountAndSurcharge - calculatePercentReductionInAmount(salePriceWithDiscountAndSurcharge, 21) 
+                } else if (producto.discountPercent > 0) {
+                  const salePriceWithDiscount = producto.salePrice - producto.discountAmount;
+                  acc += salePriceWithDiscount - calculatePercentReductionInAmount(salePriceWithDiscount, 21) 
+                } else if (producto.surchargePercent > 0) {
+                  const salePriceWithSurcharge = producto.salePrice + producto.surchargeAmount;
+                  acc += salePriceWithSurcharge - calculatePercentReductionInAmount(salePriceWithSurcharge, 21) 
+                } else {
+                  acc += producto.saleIvaAmount;
+                }
+              }
+              return acc;
+            },
+            0
+          );
+          const totalIva10 = comprobante.productoDescription.reduce(
+            (acc, producto) => {
+              if (producto.saleIvaPercent == 10.5) {
+                if (
+                  producto.discountPercent > 0 &&
+                  producto.surchargePercent > 0
+                ) {
+                  const salePriceWithDiscountAndSurcharge = producto.salePrice + producto.surchargeAmount - producto.discountAmount;
+                  acc += salePriceWithDiscountAndSurcharge - calculatePercentReductionInAmount(salePriceWithDiscountAndSurcharge, 10.5) 
+                } else if (producto.discountPercent > 0) {
+                  const salePriceWithDiscount = producto.salePrice - producto.discountAmount;
+                  acc += salePriceWithDiscount - calculatePercentReductionInAmount(salePriceWithDiscount, 10.5) 
+                } else if (producto.surchargePercent > 0) {
+                  const salePriceWithSurcharge = producto.salePrice + producto.surchargeAmount;
+                  acc += salePriceWithSurcharge - calculatePercentReductionInAmount(salePriceWithSurcharge, 10.5) 
+                } else {
+                  acc += producto.saleIvaAmount;
+                }
+              }
+              return acc;
+            },
+            0
+          );
+          const totalIva27 = comprobante.productoDescription.reduce(
+            (acc, producto) => {
+              if (producto.saleIvaPercent == 27) {
+                if (
+                  producto.discountPercent > 0 &&
+                  producto.surchargePercent > 0
+                ) {
+                  const salePriceWithDiscountAndSurcharge = producto.salePrice + producto.surchargeAmount - producto.discountAmount;
+                  acc += salePriceWithDiscountAndSurcharge - calculatePercentReductionInAmount(salePriceWithDiscountAndSurcharge, 27) 
+                } else if (producto.discountPercent > 0) {
+                  const salePriceWithDiscount = producto.salePrice - producto.discountAmount;
+                  acc += salePriceWithDiscount - calculatePercentReductionInAmount(salePriceWithDiscount, 27) 
+                } else if (producto.surchargePercent > 0) {
+                  const salePriceWithSurcharge = producto.salePrice + producto.surchargeAmount;
+                  acc += salePriceWithSurcharge - calculatePercentReductionInAmount(salePriceWithSurcharge, 27) 
+                } else {
+                  acc += producto.saleIvaAmount;
+                }
+              }
+              return acc;
+            },
+            0
+          );
+          if(mediosPagoDetalle.length > 0){
+            let previousRegisterPaymenthMethod = [];
+            comprobante.mediosPago.forEach(comprobanteMedio => {
+              mediosPagoDetalle.forEach(medioDetalle => {
+                if(medioDetalle.medioPago.id === comprobanteMedio.id){
+                  previousRegisterPaymenthMethod.push(medioDetalle);
+                }
+              })
+            })
+            if(previousRegisterPaymenthMethod.length > 0){
+              previousRegisterPaymenthMethod.forEach(medioDetalle => {
+                  medioDetalle.total += Number(comprobante.totalVenta);
+                  medioDetalle.importeTotalIva += Number(sumarNumeros([totalIva21, totalIva10, totalIva27]));
+                  medioDetalle.totalIva21 += Number(totalIva21);
+                  medioDetalle.totalIva10 += Number(totalIva10);
+                  medioDetalle.totalIva27 += Number(totalIva27);
+              })
+            }else{
+              comprobante.mediosPago.forEach(comprobanteMedio => {
+                const obj = {
+                  medioPago: comprobanteMedio,
+                  total: Number(comprobante.totalVenta),
+                  importeTotalIva: sumarNumeros([totalIva21, totalIva10, totalIva27]),
+                  totalIva21: Number(totalIva21),
+                  totalIva10: Number(totalIva10),
+                  totalIva27: Number(totalIva27),
+                }
+                mediosPagoDetalle.push(obj);
+              })
+            }
+          }else{
+            comprobante.mediosPago.forEach(comprobanteMedio => {
+              const obj = {
+                medioPago: comprobanteMedio,
+                total: comprobante.totalVenta,
+                importeTotalIva: sumarNumeros([totalIva21, totalIva10, totalIva27]),
+                totalIva21,
+                totalIva10,
+                totalIva27,
+              }
+              mediosPagoDetalle.push(obj);
+            })
+          }
+          return (
+            (iva21 += totalIva21), (iva10 += totalIva10), (iva27 += totalIva27)
+          );
+        });
+
+        const savedMedioDetalles = [];
+        mediosPagoDetalle.forEach(medioPagoDetalle => {
+          GenericService(this.tenant, "mediosPagoDetalle", this.token)
+          .save(medioPagoDetalle)
+          .then(data => {
+            savedMedioDetalles.push(data.data);
+          })
         })
-        const total = this.comprobantes.reduce((acc, el) => acc + roundTwoDecimals(parseFloat(el.totalVenta)), 0)
+
         if(result.isConfirmed){
           const cierreZ = {
             sucursal: this.loguedUser.sucursal,
+            empresa: this.loguedUser.empresa,
             comprobantesFiscales: this.comprobantes,
             total,
             cantidadVentas: parseInt(this.comprobantes.length),
+            detalleMediosPago: savedMedioDetalles,
+            totalSumatoriaIva: sumarNumeros([iva21, iva10, iva27]),
+            totalIva21: iva21,
+            totalIva10: iva10,
+            totalIva27: iva27,
             fecha: new Date()
           }
           console.log(cierreZ);
@@ -166,24 +314,24 @@ export default {
           this.comprobantes = []
           this.loaded = true;
         }
-      })
+      });
     },
 
     seeDetails(comprobantes) {
-      this.$store.commit('details/mutateDialog');
-      this.$store.commit('details/addObjectsToDetail', comprobantes);
+      this.$store.commit("details/mutateDialog");
+      this.$store.commit("details/addObjectsToDetail", comprobantes);
     },
 
-    print(object){
+    print(object) {
       this.objectToPrint = object;
       this.printDialogStatus = true;
     },
 
-    printSpecification(specification){
+    printSpecification(specification) {
       return this.printZClosure(specification);
     },
 
-    printZClosure(specification){
+    printZClosure(specification) {
       ReportsService(this.tenant, "cierres_z", this.token)
         .printZClosure(this.objectToPrint, specification)
         .then((res) => {
@@ -200,8 +348,8 @@ export default {
       this.deleteDialogStatus = true;
     },
 
-    deleteConfirmation(result){
-      return result ? this.deleteObject() : this.deleteDialogStatus = false;
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
 
     deleteObject() {
@@ -211,18 +359,20 @@ export default {
         .then(() => {
           this.filterObjects();
         })
-        .catch(()=>{
-          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
-        })
+        .catch(() => {
+          this.$errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          );
+        });
     },
 
-    setActiveTabComponent(id){
+    setActiveTabComponent(id) {
       this.activeTab = id;
     },
 
-    closePrintSelectionDialog(){
+    closePrintSelectionDialog() {
       this.printDialogStatus = false;
-    }
-  }
+    },
+  },
 };
 </script>
