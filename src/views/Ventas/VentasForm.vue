@@ -300,6 +300,10 @@ export default {
     productsDescription:[],
     depositos: [],
     defaultDeposit: {},
+    descuentoGlobal: 0,
+    recargoGlobal: 0,
+    porcentajeDescuentoGlobal: 0,
+    porcentajeRecargoGlobal: 0,
     tenant: "",
     service: "ventas",
     token: localStorage.getItem("token"),
@@ -513,8 +517,6 @@ export default {
       } else {
         this.products = processPorducts;
       }
-
-      console.log(this.productsDescription);
     },
 
     getComercialDocuments(clientCond, businessCond) {
@@ -605,6 +607,8 @@ export default {
             editable: false,
           };
           this.products.push(obj);
+          this.descuentoGlobal = obj.precioTotal * -1;
+          this.porcentajeDescuentoGlobal = Number(priceModificationPorcent);
         } else {
           if (Math.sign(percent) === -1) {
             percent = percent * -1;
@@ -620,6 +624,8 @@ export default {
             editable: false,
           };
           this.products.push(obj);
+          this.recargoGlobal = obj.precioTotal;
+          this.porcentajeRecargoGlobal = Number(priceModificationPorcent);
         }
       } else {
         this.$errorAlert("No hay productos seleccionados en la venta");
@@ -647,6 +653,8 @@ export default {
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
           editable: false,
         };
+        this.productsDescription.filter(el => el.barCode === this.renglon.codigoBarra)[0].discountPercent = Number(percent) * -1;
+        this.productsDescription.filter(el => el.barCode === this.renglon.codigoBarra)[0].discountAmount = Number(object.precioTotal) * -1;
       } else {
         object = {
           id: this.products.length + 1,
@@ -661,6 +669,8 @@ export default {
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
           editable: false,
         };
+        this.productsDescription.filter(el => el.barCode === this.renglon.codigoBarra)[0].surchargePercent = Number(percent);
+        this.productsDescription.filter(el => el.barCode === this.renglon.codigoBarra)[0].surchargeAmount = Number(object.precioTotal);
       }
       this.products.push(object);
       this.dialogIndividualPercent = false;
@@ -953,6 +963,10 @@ export default {
                     empresa: empresa,
                     cliente: cliente,
                     totalVenta: totalVenta,
+                    totalDescuentoGlobal: this.descuentoGlobal,
+                    totalRecargoGlobal: this.recargoGlobal,
+                    porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+                    porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
                     mediosPago: [mediosPago],
                     planesPago: [planesPago],
                     nombreDocumento: documento.nombre,
