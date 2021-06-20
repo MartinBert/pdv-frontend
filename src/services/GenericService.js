@@ -14,8 +14,8 @@ export default (tenant, service, token) => {
             })
         },
 
-        save: function (body) {
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`, body, {
+        save: async function (body) {
+            return await axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`, body, {
                 headers: { Authorization: "Bearer " + token }
             })
         },

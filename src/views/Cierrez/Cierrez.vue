@@ -7,6 +7,9 @@
           <v-btn class="primary" @click="generateZClosure()" raised
             >Realizar cierre z</v-btn
           >
+          <v-btn class="primary" @click="check()" raised
+            >check</v-btn
+          >
         </v-col>
         <v-col></v-col>
         <v-col cols="3">
@@ -93,6 +96,7 @@ export default {
     ],
     activeTab: 3,
     objectToPrint: null,
+    savedMedioDetalles: [],
     printDialogStatus: false,
     loaded: false,
     tenant: "",
@@ -146,7 +150,7 @@ export default {
         });
     },
 
-    closeOrCancelZ() {
+    async closeOrCancelZ() {
       questionAlert(
         "Este proceso realizará el cierre z diario",
         "Desea continuar"
@@ -279,42 +283,50 @@ export default {
             (iva21 += totalIva21), (iva10 += totalIva10), (iva27 += totalIva27)
           );
         });
+        this.savePaymentMethodDetails(mediosPagoDetalle)
+        setTimeout(()=>{
+          console.log(this.savedMedioDetalles)
+          if(result.isConfirmed){
+            const cierreZ = {
+              sucursal: this.loguedUser.sucursal,
+              empresa: this.loguedUser.empresa,
+              comprobantesFiscales: this.comprobantes,
+              total,
+              cantidadVentas: parseInt(this.comprobantes.length),
+              detalleMediosPago: this.savedMedioDetalles,
+              totalSumatoriaIva: sumarNumeros([iva21, iva10, iva27]),
+              totalIva21: iva21,
+              totalIva10: iva10,
+              totalIva27: iva27,
+              fecha: new Date()
+            }
+            GenericService(this.tenant, this.service, this.token)
+            .save(cierreZ)
+            .then(()=>{
+              this.filterObjects();
+            })
+            this.loaded = true;
+          }else{
+            this.comprobantes = []
+            this.loaded = true;
+          }
+        }, 1000)
+      });
+    },
 
-        const savedMedioDetalles = [];
+    savePaymentMethodDetails(mediosPagoDetalle){
+      try{
         mediosPagoDetalle.forEach(medioPagoDetalle => {
           GenericService(this.tenant, "mediosPagoDetalle", this.token)
           .save(medioPagoDetalle)
           .then(data => {
-            savedMedioDetalles.push(data.data);
+            console.log(data.data);
+            this.savedMedioDetalles.push(data.data);
           })
         })
-
-        if(result.isConfirmed){
-          const cierreZ = {
-            sucursal: this.loguedUser.sucursal,
-            empresa: this.loguedUser.empresa,
-            comprobantesFiscales: this.comprobantes,
-            total,
-            cantidadVentas: parseInt(this.comprobantes.length),
-            detalleMediosPago: savedMedioDetalles,
-            totalSumatoriaIva: sumarNumeros([iva21, iva10, iva27]),
-            totalIva21: iva21,
-            totalIva10: iva10,
-            totalIva27: iva27,
-            fecha: new Date()
-          }
-          console.log(cierreZ);
-          GenericService(this.tenant, this.service, this.token)
-          .save(cierreZ)
-          .then(()=>{
-            this.filterObjects();
-          })
-          this.loaded = true;
-        }else{
-          this.comprobantes = []
-          this.loaded = true;
-        }
-      });
+      }catch(err){
+        console.error(err)
+      }
     },
 
     seeDetails(comprobantes) {
@@ -373,6 +385,10 @@ export default {
     closePrintSelectionDialog() {
       this.printDialogStatus = false;
     },
+
+    check(){
+      console.log(this.cierres);
+    }
   },
 };
 </script>
