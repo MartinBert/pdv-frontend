@@ -51,6 +51,13 @@ export function roundTwoDecimals(number) {
     return Math.round((number) * 100) / 100;
 }
 
+export function transformPositive(number) {
+    if(number <= 0){
+        number = number * -1;
+    }
+    return number;
+}
+
 export function generateFiveDecimalCode() {
     const minm = 10000;
     const maxm = 99999;

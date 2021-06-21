@@ -275,6 +275,10 @@ import {
   decimalPercent,
   generateFiveDecimalCode,
   roundTwoDecimals,
+  transformPositive,
+  calculateAmountMinusPercentaje,
+  calculateAmountPlusPercentaje,
+  sumarNumeros,
 } from "../../helpers/mathHelper";
 import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
@@ -297,7 +301,7 @@ export default {
     productos: [],
     products: [],
     productsDetail: [],
-    productsDescription:[],
+    productsDescription: [],
     depositos: [],
     defaultDeposit: {},
     descuentoGlobal: 0,
@@ -480,7 +484,7 @@ export default {
       this.productsDescription = [];
       data = [...new Set(data)];
       this.productsDetail = data;
-      data.forEach(product => {
+      data.forEach((product) => {
         const objectForProductsDescription = {
           name: product.nombre,
           barCode: product.codigoBarra,
@@ -498,11 +502,11 @@ export default {
           saleIvaPercent: product.ivaVentasObject.porcentaje,
           buyIvaAmount: product.ivaCompra,
           saleIvaAmount: product.ivaVenta,
-          providerData: (product.proveedores) ? product.proveedores : [],
-        }
+          providerData: product.proveedores ? product.proveedores : [],
+        };
         this.productsDescription.push(objectForProductsDescription);
-      })
-      
+      });
+
       let processPorducts = [];
       data.forEach((el) => {
         processPorducts.push(this.processProductsObject(el));
@@ -539,13 +543,13 @@ export default {
     /* ALL FUNCTIONS FOR PROCESS SALE DATA ---------------------------------------------------------------*/
     /******************************************************************************************************/
     updateTotal(id) {
-      this.products.forEach(el => {
-        this.productsDescription.forEach(e => {
-          if(el.codigoBarra == e.barCode){
+      this.products.forEach((el) => {
+        this.productsDescription.forEach((e) => {
+          if (el.codigoBarra == e.barCode) {
             e.quantity = el.cantUnidades;
           }
-        })
-      })
+        });
+      });
       return this.products.reduce((acc, el) => {
         if (el.id == id) {
           el.precioTotal = acc;
@@ -653,8 +657,12 @@ export default {
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
           editable: false,
         };
-        this.productsDescription.filter(el => el.barCode === this.renglon.codigoBarra)[0].discountPercent = Number(percent) * -1;
-        this.productsDescription.filter(el => el.barCode === this.renglon.codigoBarra)[0].discountAmount = Number(object.precioTotal) * -1;
+        this.productsDescription.filter(
+          (el) => el.barCode === this.renglon.codigoBarra
+        )[0].discountPercent = Number(percent) * -1;
+        this.productsDescription.filter(
+          (el) => el.barCode === this.renglon.codigoBarra
+        )[0].discountAmount = Number(object.precioTotal) * -1;
       } else {
         object = {
           id: this.products.length + 1,
@@ -669,8 +677,12 @@ export default {
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
           editable: false,
         };
-        this.productsDescription.filter(el => el.barCode === this.renglon.codigoBarra)[0].surchargePercent = Number(percent);
-        this.productsDescription.filter(el => el.barCode === this.renglon.codigoBarra)[0].surchargeAmount = Number(object.precioTotal);
+        this.productsDescription.filter(
+          (el) => el.barCode === this.renglon.codigoBarra
+        )[0].surchargePercent = Number(percent);
+        this.productsDescription.filter(
+          (el) => el.barCode === this.renglon.codigoBarra
+        )[0].surchargeAmount = Number(object.precioTotal);
       }
       this.products.push(object);
       this.dialogIndividualPercent = false;
@@ -712,10 +724,7 @@ export default {
     sendTicketData(jsonToFiscalController, ticketRoute) {
       // const clientIp = this.loguedUser.puntoVenta.ipLocal;
       axios
-        .post(
-          `http://${this.clientIp}/${ticketRoute}`,
-          jsonToFiscalController
-        )
+        .post(`http://${this.clientIp}/${ticketRoute}`, jsonToFiscalController)
         .then(() => {
           this.$successAlert("Venta realizada");
           this.clear();
@@ -930,6 +939,8 @@ export default {
           /*** Evaluate required sale form data ***/
           if (mediosPago !== undefined) {
             if (products.length > 0) {
+              checkChangesInPrice();
+
               /*** Send invoice to AFIP ***/
               axios
                 .post(
@@ -971,6 +982,9 @@ export default {
                     planesPago: [planesPago],
                     nombreDocumento: documento.nombre,
                   };
+
+                  console.log(comprobante);
+
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1048,6 +1062,37 @@ export default {
             );
           }
         });
+
+      const checkChangesInPrice = () => {
+        productsDescription.forEach((productDescription) => {
+          if (planesPago.porcentaje < 0) {
+            const paymentPlanVariationPercent = transformPositive(
+              planesPago.porcentaje
+            );
+            productDescription.discountAmount =
+              productDescription.discountAmount +
+              (productDescription.salePrice -
+                calculateAmountMinusPercentaje(
+                  productDescription.salePrice,
+                  paymentPlanVariationPercent
+                ));
+            productDescription.discountPercent = sumarNumeros([productDescription.discountPercent, paymentPlanVariationPercent])
+          } else if (planesPago.porcentaje > 0) {
+            const paymentPlanVariationPercent = transformPositive(
+              planesPago.porcentaje
+            );
+            productDescription.surchargeAmount =
+              productDescription.surchargeAmount +
+              (calculateAmountPlusPercentaje(
+                productDescription.salePrice,
+                paymentPlanVariationPercent
+              ) - productDescription.salePrice);
+            productDescription.surchargePercent = sumarNumeros([productDescription.surchargePercent, paymentPlanVariationPercent])
+          }else{
+            console.log("Not price modifications detected");
+          }
+        });
+      };
     },
 
     saveNoFiscal() {
@@ -1070,7 +1115,9 @@ export default {
       let file;
       let fileURL;
       let comprobante;
-      
+
+      checkChangesInPrice()
+
       comprobante = {
         letra: "X",
         numeroCbte: generateFiveDecimalCode(),
@@ -1092,8 +1139,6 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-
-      console.log(comprobante);
 
       /*** Evaluate required sale form data ***/
       if (comprobante.mediosPago[0] !== undefined) {
@@ -1153,6 +1198,37 @@ export default {
           }
         });
       }
+
+      const checkChangesInPrice = () => {
+        productsDescription.forEach((productDescription) => {
+          if (planesPago.porcentaje < 0) {
+            const paymentPlanVariationPercent = transformPositive(
+              planesPago.porcentaje
+            );
+            productDescription.discountAmount =
+              productDescription.discountAmount +
+              (productDescription.salePrice -
+                calculateAmountMinusPercentaje(
+                  productDescription.salePrice,
+                  paymentPlanVariationPercent
+                ));
+            productDescription.discountPercent = sumarNumeros([productDescription.discountPercent, paymentPlanVariationPercent])
+          } else if (planesPago.porcentaje > 0) {
+            const paymentPlanVariationPercent = transformPositive(
+              planesPago.porcentaje
+            );
+            productDescription.surchargeAmount =
+              productDescription.surchargeAmount +
+              (calculateAmountPlusPercentaje(
+                productDescription.salePrice,
+                paymentPlanVariationPercent
+              ) - productDescription.salePrice);
+            productDescription.surchargePercent = sumarNumeros([productDescription.surchargePercent, paymentPlanVariationPercent])
+          }else{
+            console.log("Not price modifications detected");
+          }
+        });
+      };
     },
 
     async applyStockModifications(comprobante) {
@@ -1268,16 +1344,18 @@ export default {
     /******************************************************************************************************/
     /* FUNCITON FOR TEST AFIP CERT -----------------------------------------------------------------------*/
     /******************************************************************************************************/
-    testCert(){
-      const cuit = '27149046785';
-      const idFiscal = '5';
-      const codigoDocumento = '001';
+    testCert() {
+      const cuit = "27149046785";
+      const idFiscal = "5";
+      const codigoDocumento = "001";
       axios
-        .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuit}/${idFiscal}/${codigoDocumento}`)
-        .then(data => {
+        .get(
+          `${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${cuit}/${idFiscal}/${codigoDocumento}`
+        )
+        .then((data) => {
           console.log(data);
-        })
-    }
+        });
+    },
   },
 };
 </script>

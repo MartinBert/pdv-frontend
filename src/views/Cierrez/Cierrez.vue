@@ -7,9 +7,6 @@
           <v-btn class="primary" @click="generateZClosure()" raised
             >Realizar cierre z</v-btn
           >
-          <v-btn class="primary" @click="check()" raised
-            >check</v-btn
-          >
         </v-col>
         <v-col></v-col>
         <v-col cols="3">
@@ -134,6 +131,9 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.cierres = data.data.content;
+          this.cierres.forEach(el => {
+            el.fecha = formatDate(el.fecha);
+          })
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
@@ -192,6 +192,7 @@ export default {
           );
           const totalIva10 = comprobante.productoDescription.reduce(
             (acc, producto) => {
+              console.log(producto);
               if (producto.saleIvaPercent == 10.5) {
                 if (
                   producto.discountPercent > 0 &&
@@ -285,7 +286,6 @@ export default {
         });
         this.savePaymentMethodDetails(mediosPagoDetalle)
         setTimeout(()=>{
-          console.log(this.savedMedioDetalles)
           if(result.isConfirmed){
             const cierreZ = {
               sucursal: this.loguedUser.sucursal,
@@ -320,7 +320,6 @@ export default {
           GenericService(this.tenant, "mediosPagoDetalle", this.token)
           .save(medioPagoDetalle)
           .then(data => {
-            console.log(data.data);
             this.savedMedioDetalles.push(data.data);
           })
         })
@@ -385,10 +384,6 @@ export default {
     closePrintSelectionDialog() {
       this.printDialogStatus = false;
     },
-
-    check(){
-      console.log(this.cierres);
-    }
   },
 };
 </script>

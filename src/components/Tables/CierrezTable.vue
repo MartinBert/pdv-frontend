@@ -5,17 +5,17 @@
         <tr>
           <th>Fecha</th>
           <th>Número de comprobante</th>
-          <th>Acciones</th>
+          <th class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody v-for="item in items" :key="item.id">
         <tr>
           <td>{{ item.fecha }}</td>
           <td>{{ item.id }}</td>
-          <td>
+          <td class="text-center">
             <Detail :objectsArray="item.comprobantesFiscales" v-on:seeDetails="seeDetails" />
-            <Print :object="item" v-on:print="print" />
-            <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
+            <Print :object="item" v-on:print="print" class="ml-1"/>
+            <Delete :itemId="item.id" v-on:deleteItem="deleteItem" class="ml-1"/>
           </td>
         </tr>
       </tbody>
