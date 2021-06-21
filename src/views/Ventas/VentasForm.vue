@@ -1116,7 +1116,37 @@ export default {
       let fileURL;
       let comprobante;
 
-      checkChangesInPrice()
+      const checkChangesInPrice = () => {
+        productsDescription.forEach((productDescription) => {
+          if (planesPago.porcentaje < 0) {
+            const paymentPlanVariationPercent = transformPositive(
+              planesPago.porcentaje
+            );
+            productDescription.discountAmount =
+              productDescription.discountAmount +
+              (productDescription.salePrice -
+                calculateAmountMinusPercentaje(
+                  productDescription.salePrice,
+                  paymentPlanVariationPercent
+                ));
+            productDescription.discountPercent = sumarNumeros([productDescription.discountPercent, paymentPlanVariationPercent])
+          } else if (planesPago.porcentaje > 0) {
+            const paymentPlanVariationPercent = transformPositive(
+              planesPago.porcentaje
+            );
+            productDescription.surchargeAmount =
+              productDescription.surchargeAmount +
+              (calculateAmountPlusPercentaje(
+                productDescription.salePrice,
+                paymentPlanVariationPercent
+              ) - productDescription.salePrice);
+            productDescription.surchargePercent = sumarNumeros([productDescription.surchargePercent, paymentPlanVariationPercent])
+          }else{
+            console.log("Not price modifications detected");
+          }
+        });
+      };
+      checkChangesInPrice();
 
       comprobante = {
         letra: "X",
@@ -1198,37 +1228,6 @@ export default {
           }
         });
       }
-
-      const checkChangesInPrice = () => {
-        productsDescription.forEach((productDescription) => {
-          if (planesPago.porcentaje < 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.discountAmount =
-              productDescription.discountAmount +
-              (productDescription.salePrice -
-                calculateAmountMinusPercentaje(
-                  productDescription.salePrice,
-                  paymentPlanVariationPercent
-                ));
-            productDescription.discountPercent = sumarNumeros([productDescription.discountPercent, paymentPlanVariationPercent])
-          } else if (planesPago.porcentaje > 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.surchargeAmount =
-              productDescription.surchargeAmount +
-              (calculateAmountPlusPercentaje(
-                productDescription.salePrice,
-                paymentPlanVariationPercent
-              ) - productDescription.salePrice);
-            productDescription.surchargePercent = sumarNumeros([productDescription.surchargePercent, paymentPlanVariationPercent])
-          }else{
-            console.log("Not price modifications detected");
-          }
-        });
-      };
     },
 
     async applyStockModifications(comprobante) {

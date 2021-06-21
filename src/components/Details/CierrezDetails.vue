@@ -55,21 +55,29 @@ export default {
     computed: {
         paymentMethods(){
             const invoices = this.$store.state.details.objects;
-            let paymentMethods = invoices.map(el => el.mediosPago);
-            paymentMethods = [...new Set(paymentMethods)][0];
-            paymentMethods.forEach(paymentMethod => {
-                paymentMethod.totalIsUsed = 0;
-                paymentMethod.total = 0;
+            const paymentMethodsInInvoice = invoices.map(el => el.mediosPago[0]);
+            const paymentMethodNames = [...new Set(paymentMethodsInInvoice.map(item => item.nombre))];
+            let paymentMethodDetails = [];
+            paymentMethodNames.forEach(paymentMethodName => {
+                const obj = {
+                  nombre: paymentMethodName,
+                  totalIsUsed: 0,
+                  total: 0
+                }
+                paymentMethodDetails.push(obj);
             })
-            paymentMethods.forEach(paymentMethod => {
+            paymentMethodDetails.forEach(paymentMethod => {
                 invoices.forEach(invoice => {
-                    if(paymentMethod.id === invoice.mediosPago[0].id){
+                    if(paymentMethod.nombre === invoice.mediosPago[0].nombre){
                         paymentMethod.totalIsUsed += 1
-                        paymentMethod.total += roundTwoDecimals(parseFloat(invoice.totalVenta))
+                        paymentMethod.total += parseFloat(invoice.totalVenta)
                     } 
                 })
             });
-            return paymentMethods;
+            paymentMethodDetails.forEach(el => {
+              el.total = roundTwoDecimals(el.total);
+            })
+            return paymentMethodDetails;
         }
     }
 }
