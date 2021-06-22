@@ -1,52 +1,54 @@
 <template>
   <v-container>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col cols="1">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-        </v-col>
-        <v-col cols="3">
-          <v-file-input
-            v-model="file"
-            class="mt-0"
-            placeholder="Importar documentos"
-            accept=".xlsx, xls"
-            @change="importDocuments($event)"
-          ></v-file-input>
-        </v-col>
-        <v-col cols="4"></v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.documentoComercialName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <DocumentosComercialesTable
-      :items="documentosComerciales"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded" />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
+    <v-card>
+      <v-form class="mb-3">
+        <v-row>
+          <v-col cols="1">
+            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          </v-col>
+          <v-col cols="3">
+            <v-file-input
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar documentos"
+              accept=".xlsx, xls"
+              @change="importDocuments($event)"
+            ></v-file-input>
+          </v-col>
+          <v-col cols="4"></v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="filterParams.documentoComercialName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
+      <DocumentosComercialesTable
+        :items="documentosComerciales"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-if="loaded"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -92,7 +94,7 @@ export default {
 
   methods: {
     filterObjects(page) {
-      if(page) this.filterParams.page = page;
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -149,7 +151,7 @@ export default {
         var workbook = XLSX.read(data, { type: "binary" });
 
         var sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function (y) {
+        sheet_name_list.forEach(function(y) {
           var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
           if (exceljson.length > 0) {
             for (var i = 0; i < exceljson.length; i++) {

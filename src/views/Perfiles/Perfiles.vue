@@ -1,44 +1,45 @@
 <template>
   <v-container>
-    <h3>Perfiles</h3>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col cols="6">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-        </v-col>
-        <v-col cols="3"></v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.perfilName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <PerfilesTable
-      :items="perfiles"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded" />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
+    <v-card>
+      <v-form class="mb-3">
+        <v-row>
+          <v-col cols="6">
+            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          </v-col>
+          <v-col cols="3"></v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="filterParams.perfilName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
+      <PerfilesTable
+        :items="perfiles"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-if="loaded"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -56,13 +57,13 @@ export default {
       perfilName: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
     service: "perfiles",
     token: localStorage.getItem("token"),
-    deleteDialogStatus: false
+    deleteDialogStatus: false,
   }),
 
   components: {
@@ -79,15 +80,15 @@ export default {
   },
 
   methods: {
-    filterObjects(page){
-      if(page) this.filterParams.page = page;
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then(data => {
-        this.perfiles = data.data.content;
-        this.filterParams.totalPages = data.data.totalPages;
-        this.loaded = true;
-      })
+        .filter(this.filterParams)
+        .then((data) => {
+          this.perfiles = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
     },
 
     newObject() {
@@ -120,6 +121,6 @@ export default {
           );
         });
     },
-  }
+  },
 };
 </script>

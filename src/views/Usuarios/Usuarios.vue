@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h3>Usuarios</h3>
+    <v-card>
       <v-row>
         <v-col>
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
@@ -58,24 +58,25 @@
           ></v-text-field>
         </v-col>
       </v-row>
-    <UsuariosTable
-      :items="usuarios"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded" />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
+      <UsuariosTable
+        :items="usuarios"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-if="loaded"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -96,7 +97,7 @@ export default {
       usuarioName: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
@@ -116,25 +117,25 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterParams.perfilId = this.loguedUser.perfil;
-    if(this.loguedUser.perfil > 1){
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.empresaId = this.loguedUser.empresa.id;
     }
     this.filterObjects();
   },
 
   methods: {
-    filterObjects(page){
-      if(page) this.filterParams.page = page;
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then(data => {
-        this.usuarios = data.data.content;
-        this.filterParams.totalPages = data.data.totalPages;
-        if(this.filterParams.totalPages < this.filterParams.page){
-          this.filterParams.page = 1;
-        }
-        this.loaded = true;
-      })
+        .filter(this.filterParams)
+        .then((data) => {
+          this.usuarios = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
     },
 
     newObject() {
@@ -166,7 +167,7 @@ export default {
             "El registro se encuentra asociado a otros elementos en el sistema"
           );
         });
-    }
+    },
   },
 };
 </script>
