@@ -1115,7 +1115,6 @@ export default {
       let file;
       let fileURL;
       let comprobante;
-
       const checkChangesInPrice = () => {
         productsDescription.forEach((productDescription) => {
           if (planesPago.porcentaje < 0) {
@@ -1147,7 +1146,6 @@ export default {
         });
       };
       checkChangesInPrice();
-
       comprobante = {
         letra: "X",
         numeroCbte: generateFiveDecimalCode(),
@@ -1169,7 +1167,6 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-
       /*** Evaluate required sale form data ***/
       if (comprobante.mediosPago[0] !== undefined) {
         if (Number(comprobante.totalVenta) !== 0) {

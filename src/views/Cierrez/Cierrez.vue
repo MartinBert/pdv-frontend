@@ -131,9 +131,6 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.cierres = data.data.content;
-          this.cierres.forEach(el => {
-            el.fecha = formatDate(el.fecha);
-          })
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
