@@ -1,73 +1,76 @@
 <template>
   <v-container>
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent"/>
-    <v-form class="mb-3">
-      <v-row class="mb-4">
-        <v-col>
-          <v-btn class="primary" @click="seeReports()" raised
-            >Reporte de Ventas</v-btn
-          >
-        </v-col>
-        <v-spacer></v-spacer>
-        <v-col>
-          <v-text-field
-            type="text"
-            v-model="filterParams.fechaEmision"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            label="Búsqueda por fecha"
-            class="text-left"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            type="number"
-            v-model="filterParams.numeroComprobante"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            label="Búsqueda por número de comprobante"
-            placeholder=" "
-            class="text-left"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            type="number"
-            v-model="filterParams.blackReceiptFilter"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Búsqueda especial"
-            placeholder=" "
-            append-icon="mdi-magnify"
-            @input="filterObjects()"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <VentasTable
-      :items="ventas"
-      v-on:print="print"
-      v-on:seeDetails="seeDetails"
-      v-if="loaded && activeTab === 1"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded && activeTab === 1"
-    />
-    <Spinner v-if="!loaded" />
-    <VentaDetails />
-    <VentasReportsDialog />
+    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
+      <v-card>
+        <v-form class="mb-3">
+          <v-row class="mb-4">
+              <v-col>
+                <v-btn class="primary" @click="seeReports()" raised
+                >Reporte de Ventas</v-btn
+                >
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col>
+                <v-text-field
+                type="text"
+                v-model="filterParams.fechaEmision"
+                v-on:input="filterObjects()"
+                dense
+                outlined
+                rounded
+                label="Búsqueda por fecha"
+                class="text-left"
+                append-icon="mdi-magnify"
+                ></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                type="number"
+                v-model="filterParams.numeroComprobante"
+                v-on:input="filterObjects()"
+                dense
+                outlined
+                rounded
+                label="Búsqueda por número de comprobante"
+                placeholder=" "
+                class="text-left"
+                append-icon="mdi-magnify"
+                ></v-text-field>
+              </v-col>
+            <v-col>
+              <v-text-field
+                type="number"
+                v-model="filterParams.blackReceiptFilter"
+                dense
+                outlined
+                rounded
+                class="text-left"
+                label="Búsqueda especial"
+                placeholder=" "
+                append-icon="mdi-magnify"
+                @input="filterObjects()"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-form>
+    
+          <VentasTable
+            :items="ventas"
+            v-on:print="print"
+            v-on:seeDetails="seeDetails"
+            v-if="loaded && activeTab === 1"
+          />
+          <Pagination
+            :page="filterParams.page"
+            :totalPages="filterParams.totalPages"
+            :totalVisible="7"
+            v-on:changePage="filterObjects"
+            v-if="loaded && activeTab === 1"
+          />
+          <Spinner v-if="!loaded" />
+          <VentaDetails />
+          <VentasReportsDialog />
+      </v-card>   
   </v-container>
 </template>
 <script>
@@ -96,9 +99,9 @@ export default {
       totalPages: 0,
     },
     tabs: [
-      {id: 1, route: '', title: 'Comprobantes Emitidos'},
-      {id: 2, route: '', title: 'Presupuesto'},
-      {id: 3, route: '', title: 'Cierre Z'}
+      { id: 1, route: "", title: "Comprobantes Emitidos" },
+      { id: 2, route: "", title: "Presupuesto" },
+      { id: 3, route: "", title: "Cierre Z" },
     ],
     activeTab: 1,
     loaded: false,
@@ -113,15 +116,15 @@ export default {
     Spinner,
     VentasTable,
     VentaDetails,
-    TabBar
+    TabBar,
   },
 
   mounted() {
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
-    this.tabs[0].route = `/${this.tenant}/ventas/list`
-    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`
-    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`
+    this.tabs[0].route = `/${this.tenant}/ventas/list`;
+    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`;
+    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`;
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
@@ -168,7 +171,7 @@ export default {
       this.$store.commit("eventual/mutateEventualDialog");
     },
 
-    setActiveTabComponent(id){
+    setActiveTabComponent(id) {
       this.activeTab = id;
     },
 

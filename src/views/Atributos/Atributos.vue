@@ -1,61 +1,63 @@
 <template>
   <v-container>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col cols="1">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-        </v-col>
-        <v-col cols="3">
-          <v-file-input
-            v-model="file"
-            class="mt-0"
-            placeholder="Importar atributos de texto"
-            accept=".xlsx, xls"
-            @change="importDocuments($event, 'text')"
-          ></v-file-input>
-        </v-col>
-        <v-col cols="3">
-          <v-file-input
-            v-model="file"
-            class="mt-0"
-            placeholder="Importar atributos numéricos"
-            accept=".xlsx, xls"
-            @change="importDocuments($event, 'number')"
-          ></v-file-input>
-        </v-col>
-        <v-spacer></v-spacer>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.atributoValor"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <AtributosTable
-      :items="atributos"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded" />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
+    <v-card>
+      <v-form class="mb-3">
+        <v-row>
+          <v-col cols="1">
+            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          </v-col>
+          <v-col cols="3">
+            <v-file-input
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar atributos de texto"
+              accept=".xlsx, xls"
+              @change="importDocuments($event, 'text')"
+            ></v-file-input>
+          </v-col>
+          <v-col cols="3">
+            <v-file-input
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar atributos numéricos"
+              accept=".xlsx, xls"
+              @change="importDocuments($event, 'number')"
+            ></v-file-input>
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="3">
+            <v-text-field
+              v-model="filterParams.atributoValor"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
+      <AtributosTable
+        :items="atributos"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-if="loaded"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -97,7 +99,7 @@ export default {
 
   methods: {
     filterObjects(page) {
-      if(page) this.filterParams.page = page;
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {

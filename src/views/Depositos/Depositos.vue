@@ -1,61 +1,62 @@
 <template>
   <v-container>
-    <h3>Depositos</h3>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col cols="9" class="mt-2 d-flex">
-          <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>
-          <v-btn class="primary ml-1" @click="openStockMovementHistoryDialog()"
-            >MOVIMIENTOS DE STOCK</v-btn
-          >
-          <div style="width: 300px">
-            <v-file-input
+    <v-card>
+      <v-form class="mb-3">
+        <v-row>
+          <v-col cols="9" class="mt-2 d-flex">
+            <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>
+            <v-btn
+              class="primary ml-1"
+              @click="openStockMovementHistoryDialog()"
+              >MOVIMIENTOS DE STOCK</v-btn
+            >
+            <div style="width: 300px">
+              <v-file-input
+                dense
+                v-model="file"
+                class="mt-0"
+                placeholder="Importar depósitos"
+                accept=".xlsx, xls"
+                @change="importDocuments($event)"
+              ></v-file-input>
+            </div>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              style="width: 300px"
+              v-model="filterParams.depositoName"
+              v-on:input="filterObjects()"
               dense
-              v-model="file"
-              class="mt-0"
-              placeholder="Importar depósitos"
-              accept=".xlsx, xls"
-              @change="importDocuments($event)"
-            ></v-file-input>
-          </div>
-        </v-col>
-        <v-col cols="3">
-          <v-text-field
-            style="width: 300px"
-            v-model="filterParams.depositoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <DepositosTable
-      :items="depositos"
-      v-on:deleteItem="deleteItem"
-      v-on:editItem="editItem"
-      v-on:selectDefaultDeposit="selectDefaultDeposit"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner 
-      v-if="!loaded"
-    />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
-    <StockHistoryDialog />
+              outlined
+              rounded
+              class="text-left"
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
+      <DepositosTable
+        :items="depositos"
+        v-on:deleteItem="deleteItem"
+        v-on:editItem="editItem"
+        v-on:selectDefaultDeposit="selectDefaultDeposit"
+        v-if="loaded"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+      <StockHistoryDialog />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -76,7 +77,7 @@ export default {
       sucursalId: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
@@ -91,12 +92,12 @@ export default {
     DepositosTable,
     DeleteDialog,
     Spinner,
-    Pagination
+    Pagination,
   },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    if(this.loguedUser.perfil > 1){
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterParams.perfilId = this.loguedUser.perfil;
@@ -105,7 +106,7 @@ export default {
 
   methods: {
     filterObjects(page) {
-      if(page) this.filterParams.page = page;
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -131,8 +132,8 @@ export default {
       this.deleteDialogStatus = true;
     },
 
-    deleteConfirmation(result){
-      return result ? this.deleteObject() : this.deleteDialogStatus = false;
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
 
     deleteObject() {
@@ -143,9 +144,11 @@ export default {
         .then(() => {
           this.filterObjects();
         })
-        .catch(()=>{
-          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
-        })
+        .catch(() => {
+          this.$errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          );
+        });
     },
 
     importDocuments(event) {
@@ -157,7 +160,7 @@ export default {
         var workbook = XLSX.read(data, { type: "binary" });
 
         var sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function (y) {
+        sheet_name_list.forEach(function(y) {
           var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
           if (exceljson.length > 0) {
             for (var i = 0; i < exceljson.length; i++) {
@@ -213,28 +216,35 @@ export default {
         perfilId: this.loguedUser.perfil,
         sucursalId: this.loguedUser.sucursal.id,
         page: 1,
-        size: 100000
-      }
+        size: 100000,
+      };
 
       GenericService(this.tenant, this.service, this.token)
         .filter(filterParams)
         .then((data) => {
           let allDeposits = data.data.content;
-          let allDefaultDeposits = allDeposits.filter(el => el.defaultDeposit === "1");
+          let allDefaultDeposits = allDeposits.filter(
+            (el) => el.defaultDeposit === "1"
+          );
 
           if (allDefaultDeposits.length > 0) {
-            let defaultBranchDeposit = allDefaultDeposits.filter(el => el.sucursales.id === deposit.sucursales.id)[0];
-            
-            if(defaultBranchDeposit){
-              this.modifyDepositStatus(defaultBranchDeposit, 'nullDefaultStatus')
-              this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+            let defaultBranchDeposit = allDefaultDeposits.filter(
+              (el) => el.sucursales.id === deposit.sucursales.id
+            )[0];
+
+            if (defaultBranchDeposit) {
+              this.modifyDepositStatus(
+                defaultBranchDeposit,
+                "nullDefaultStatus"
+              );
+              this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
               this.refreshView();
-            }else{
-              this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+            } else {
+              this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
               this.refreshView();
             }
           } else {
-            this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+            this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
             this.refreshView();
           }
         });
@@ -244,23 +254,21 @@ export default {
       this.$store.commit("stocks/stockHistoryDialogMutation");
     },
 
-    modifyDepositStatus(deposit, statusType){
-      if(statusType === 'nullDefaultStatus'){
+    modifyDepositStatus(deposit, statusType) {
+      if (statusType === "nullDefaultStatus") {
         deposit.defaultDeposit = null;
-        GenericService(this.tenant, this.service, this.token)
-        .save(deposit);
-      }else{
-        deposit.defaultDeposit = '1';
-        GenericService(this.tenant, this.service, this.token)
-        .save(deposit);
+        GenericService(this.tenant, this.service, this.token).save(deposit);
+      } else {
+        deposit.defaultDeposit = "1";
+        GenericService(this.tenant, this.service, this.token).save(deposit);
       }
     },
 
-    refreshView(){
+    refreshView() {
       setTimeout(() => {
-          this.filterObjects();
+        this.filterObjects();
       }, 500);
-    }
+    },
   },
 };
 </script>

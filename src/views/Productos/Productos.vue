@@ -73,9 +73,6 @@
         </v-row>
      
         <v-row>
-          <v-col class="mt-4 ml-3" v-if="view == 'labelPrinting'">
-            <h2>Seleccion de productos</h2>
-          </v-col>
           <v-col cols="2">
             <v-text-field
               v-model="filterParams.productoName"
@@ -135,6 +132,9 @@
               label="Atributo"
               append-icon="mdi-magnify"
             />
+          </v-col>
+           <v-col v-if="view == 'labelPrinting'">
+            <h2>Seleccion de productos</h2>
           </v-col>
           <v-col></v-col>
         </v-row>

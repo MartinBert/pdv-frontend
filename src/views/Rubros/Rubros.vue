@@ -1,61 +1,63 @@
 <template>
   <v-container>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col cols="1">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-        </v-col>
-        <v-col cols="3">
-          <v-file-input
-          v-model="file" 
-          class="mt-0"
-          placeholder="Importar rubros"
-          accept=".xlsx, xls"
-          @change="importDocuments($event)"
-          ></v-file-input>
-        </v-col>
-        <v-col cols="5"></v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.rubroName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <RubrosTable
-      :items="rubros"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded"/>
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
+    <v-card>
+      <v-form class="mb-3">
+        <v-row>
+          <v-col cols="1">
+            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          </v-col>
+          <v-col cols="3">
+            <v-file-input
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar rubros"
+              accept=".xlsx, xls"
+              @change="importDocuments($event)"
+            ></v-file-input>
+          </v-col>
+          <v-col cols="5"></v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="filterParams.rubroName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
+      <RubrosTable
+        :items="rubros"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-if="loaded"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+    </v-card>
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import RubrosTable from '../../components/Tables/RubrosTable'
-import Pagination from '../../components/Pagination';
-import Spinner from '../../components/Graphics/Spinner';
-import DeleteDialog from '../../components/Dialogs/DeleteDialog';
-import XLSX from 'xlsx';
+import RubrosTable from "../../components/Tables/RubrosTable";
+import Pagination from "../../components/Pagination";
+import Spinner from "../../components/Graphics/Spinner";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+import XLSX from "xlsx";
 export default {
   data: () => ({
     rubros: [],
@@ -64,21 +66,21 @@ export default {
       rubroName: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
     service: "rubros",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
-  components:{
+  components: {
     RubrosTable,
     Pagination,
     Spinner,
-    DeleteDialog
+    DeleteDialog,
   },
 
   mounted() {
@@ -87,8 +89,8 @@ export default {
   },
 
   methods: {
-    filterObjects(page){
-      if(page) this.filterParams.page = page;
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -111,8 +113,8 @@ export default {
       this.deleteDialogStatus = true;
     },
 
-    deleteConfirmation(result){
-      return result ? this.deleteObject() : this.deleteDialogStatus = false;
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
 
     deleteObject() {
@@ -122,16 +124,18 @@ export default {
         .then(() => {
           this.filterObjects();
         })
-        .catch(()=>{
-          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
-        })
+        .catch(() => {
+          this.$errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          );
+        });
     },
 
     importDocuments(event) {
       this.file = event;
       var excel = [];
       var reader = new FileReader();
-      reader.onload = e => {
+      reader.onload = (e) => {
         var data = e.target.result;
         var workbook = XLSX.read(data, { type: "binary" });
 
@@ -151,10 +155,10 @@ export default {
             .then(() => {
               this.filterObjects();
               this.loaderStatus = true;
-              window.setTimeout(()=>{
-                this.loader = false
-                this.loaderStatus=false;
-              }, 2000);              
+              window.setTimeout(() => {
+                this.loader = false;
+                this.loaderStatus = false;
+              }, 2000);
             });
         }
       };
@@ -166,12 +170,10 @@ export default {
       var importacion = {
         status: true,
         data: [],
-        message: ""
+        message: "",
       };
       rubros.forEach((element, index) => {
-        if (
-          element.nombre 
-        ) {
+        if (element.nombre) {
           var obj = {
             nombre: element.nombre,
           };
@@ -182,7 +184,7 @@ export default {
         }
       });
       return importacion;
-    }
-  }
+    },
+  },
 };
 </script>

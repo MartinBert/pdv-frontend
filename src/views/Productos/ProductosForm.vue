@@ -350,7 +350,7 @@ export default {
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
     this.tabs[0].route = `/${this.tenant}/productos`;
-    this.tabs[1].route = `/${this.tenant}/productos/form/:id`;
+    this.tabs[1].route = `/${this.tenant}/form/:id`;
     this.tabs[2].route = `/${this.tenant}/productos`;
     this.tabs[3].route = `/${this.tenant}/precios`;
     if (this.loguedUser.perfil > 1) {
