@@ -10,27 +10,27 @@
       <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
         Generar Etiquetas
       </v-tab>
-      <v-tab class="primary ml-2" @click="goPricesManagerView()">
+      <v-tab class="primary ml-1" @click="goPricesManagerView()">
         Modificar Precios
       </v-tab>
     </v-tabs>
-    <br>
-   <v-card>
-    <v-form class="mb-3" v-on:click="show = !show">
-      <v-row>
-        <v-col cols="10" v-if="perfil < 3">
-          <v-btn class="primary ml-2" @click="getReport()" raised
-            >REPORTE</v-btn
-          >
-          <v-btn
-            v-if="loaded"
-            class="primary ml-2"
-            @click="exportGeneralExcel()"
-            raised
-            >EXPORTAR EXCEL</v-btn
-          >
+    <br />
+    <v-card>
+      <v-form class="mb-3" v-on:click="show = !show">
+        <v-row>
+          <v-col cols="10" v-if="perfil < 3">
+            <v-btn class="primary ml-2" @click="getReport()" raised
+              >REPORTE</v-btn
+            >
+            <v-btn
+              v-if="loaded"
+              class="primary ml-2"
+              @click="exportGeneralExcel()"
+              raised
+              >EXPORTAR EXCEL</v-btn
+            >
 
-          <!-- 
+            <!-- 
           Este servicio corrige los precios de la 
           lista, calculando sus valores basados en los 
           porcentajes de iva compra, iva venta, ganancia 
@@ -38,27 +38,27 @@
           cálculos se realizan partiendo del costo bruto
           del artículo y no de de su precio final de venta.
           -->
-          <v-btn
-            v-if="perfil === 1"
-            class="primary ml-2"
-            @click="correctPriceInList()"
-            raised
-            >Corregir lista de precios</v-btn
-          >
-        </v-col>
-      </v-row>
-      <v-col cols="6"></v-col>
-      <v-col v-if="perfil < 3 && view == 'listOfProducts'">
-        <v-file-input
-          class="mt-3"
-          dense
-          v-model="file"
-          placeholder="Importar"
-          accept=".xlsx, xls"
-          @change="onChange($event)"
-        ></v-file-input>
-      </v-col>
-         <v-row>
+            <v-btn
+              v-if="perfil === 1"
+              class="primary ml-2"
+              @click="correctPriceInList()"
+              raised
+              >Corregir lista de precios</v-btn
+            >
+            <v-col cols="8"></v-col>
+            <v-col v-if="perfil < 3 && view == 'listOfProducts'">
+              <v-file-input
+                class="mt-3"
+                dense
+                v-model="file"
+                placeholder="Importar"
+                accept=".xlsx, xls"
+                @change="onChange($event)"
+              ></v-file-input>
+            </v-col>
+          </v-col>
+        </v-row>
+        <v-row>
           <v-col v-if="view == 'listOfProducts' && perfil < 3">
             <v-select
               :items="estados"
@@ -71,7 +71,7 @@
             ></v-select>
           </v-col>
         </v-row>
-     
+
         <v-row>
           <v-col cols="2">
             <v-text-field
@@ -133,45 +133,44 @@
               append-icon="mdi-magnify"
             />
           </v-col>
-           <v-col v-if="view == 'labelPrinting'">
+          <v-col v-if="view == 'labelPrinting'">
             <h2>Seleccion de productos</h2>
           </v-col>
           <v-col></v-col>
         </v-row>
+      </v-form>
 
-    </v-form>
-  
-        <ProductosTable
-          :items="productos"
-          v-on:editItem="edit"
-          v-on:deleteItem="deleteItem"
-          v-on:add="reactivationOfProduct"
-          v-if="loaded && view === 'listOfProducts'"
-        />
-        <Pagination
-          :page="filterParams.page"
-          :totalPages="filterParams.totalPages"
-          :totalVisible="7"
-          v-on:changePage="filterObjects"
-          v-if="loaded && view === 'listOfProducts'"
-        />
-        <LabelPrinting
-          v-if="view === 'labelPrinting'"
-          :productos="productos"
-          :page="filterParams.page"
-          :totalVisible="filterParams.size"
-          :totalPages="filterParams.totalPages"
-          :tenant="tenant"
-          :token="token"
-          v-on:changePage="changePage"
-          v-on:checkProduct="checkProductInList"
-        />
-        <Spinner v-if="!loaded" />
-        <DeleteDialog
-          :status="deleteDialogStatus"
-          v-on:deleteConfirmation="deleteConfirmation"
-        />
-   </v-card>      
+      <ProductosTable
+        :items="productos"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-on:add="reactivationOfProduct"
+        v-if="loaded && view === 'listOfProducts'"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded && view === 'listOfProducts'"
+      />
+      <LabelPrinting
+        v-if="view === 'labelPrinting'"
+        :productos="productos"
+        :page="filterParams.page"
+        :totalVisible="filterParams.size"
+        :totalPages="filterParams.totalPages"
+        :tenant="tenant"
+        :token="token"
+        v-on:changePage="changePage"
+        v-on:checkProduct="checkProductInList"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+    </v-card>
     <template>
       <v-dialog
         v-model="loader"
@@ -884,8 +883,7 @@ export default {
 };
 </script>
 <style>
-v-tabs{
+v-tabs {
   margin-bottom: 10px;
 }
-
 </style>

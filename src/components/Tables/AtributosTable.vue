@@ -1,40 +1,51 @@
 <template>
   <v-container>
-    <v-simple-table style="background-color: transparent">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Texto</th>
-          <th>Valor numérico</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody v-for="item in items" :key="item.id">
-        <tr>
-          <td>{{ item.id }}</td>
-          <td>{{ item.valor }}</td>
-          <td>{{ item.valorNumerico }}</td>
-          <td>
-            <Edit :itemId="item.id" v-on:editItem="editItem" />
-            <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
+    <v-data-table :headers="headers" :items="atributos">
+
+    </v-data-table>
   </v-container>
 </template>
 <script>
-import Edit from "../Buttons/Edit";
-import Delete from "../Buttons/Delete";
+import GenericService from "../../services/GenericService";
 export default {
-  props: {
-    items: Array,
-  },
-  components: {
-    Edit,
-    Delete,
+  data: () => ({
+    atributos: [],
+    headers:[
+      {text:"Id",value:"id"},
+      {text:"Text", value:"valor"},
+      {text:"Valor Numerico", value:"valorNumerico"},
+      {text:"Acciones", value:"acciones" , sortable:false}
+
+      ],
+    filterParams: {
+      atributoValor: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    loaded: false,
+    tenant: "",
+    service: "atributos",
+    token: localStorage.getItem("token"),
+    deleteDialogStatus: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+  }),
+  
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+    this.items();
   },
   methods: {
+    items(page){
+       if (page) this.filterParams.page = page;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.atributos = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
+    },
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },

@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-data-table class="elevation-8" :headers="headers" :items="productos">
+    <v-data-table class="elevation-6" :headers="headers" :items="productos">
     </v-data-table>
   </v-container>
 </template>
@@ -30,6 +30,7 @@ export default {
         { text: "Marca", value: "marca.nombre" },
         { text: "Costo Bruto", value: "costoBruto" },
         { text: "Costo Total", value: "precioTotal" },
+        { text: "Acciones", value: "acciones", sortable: false },
       ],
       filterParams: {
         productoName: "",

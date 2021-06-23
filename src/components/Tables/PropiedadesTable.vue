@@ -1,47 +1,54 @@
 <template>
   <v-container>
-    <v-simple-table style="background-color: transparent">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Atributos</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody v-for="item in items" :key="item.id">
-        <tr>
-          <td>{{ item.id }}</td>
-          <td>{{ item.nombre }}</td>
-          <td>
-            <Detail
-              :objectsArray="item.atributos"
-              v-on:seeDetails="seeDetails"
-            />
-          </td>
-          <td>
-            <Edit :itemId="item.id" v-on:editItem="editItem" />
-            <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
+    <v-data-table :headers="headers" :items="propiedades">
+    </v-data-table>
   </v-container>
 </template>
 <script>
-import Edit from "../Buttons/Edit";
-import Delete from "../Buttons/Delete";
-import Detail from "../Buttons/Detail";
+import GenericService from "../../services/GenericService";
 export default {
-  props: {
-    items: Array,
-  },
+  data:()=>({
+    propiedades: [],
+    filterParams: {
+      propiedadName: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    headers:[
+      {text:"Id", value:"id"},
+      {text:"Nombre",value:"nombre"},
+      {text:"Atributos", value:"atributos[0].valor"},
+      {text:"Acciones", value:"acciones", sorteable:false}
+
+    ],
+    loaded: false,
+    tenant: "",
+    service: "propiedades",
+    token: localStorage.getItem("token"),
+    deleteDialogStatus: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+  }),
   components: {
-    Edit,
-    Delete,
-    Detail,
+
   },
+   mounted() {
+    this.tenant = this.$route.params.tenant;
+    this.filterObjects();
+  },
+
   methods: {
+    
+  filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.propiedades = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
+    },
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },

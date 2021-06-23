@@ -1,72 +1,84 @@
 <template>
   <v-container>
-    <v-simple-table style="background-color: transparent" ref="tab">
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Atributos</th>
-          <th>Marca</th>
-          <th>Codigo de barras</th>
-          <th>Codigo de producto</th>
-          <th>Cantidad</th>
-          <th>Cant. mínima</th>
-          <th>Depósito</th>
-          <th>Acciones</th>
-          <th class="text-center">Migrar a otro depósito</th>
-        </tr>
-      </thead>
-      <tbody v-for="item in items" :key="item.id">
-        <tr>
-          <td>{{ item.producto.nombre }}</td>
-          <td>{{ setAttributesValues(item.producto.atributos) }}</td>
-          <td>{{ item.producto.marca.nombre }}</td>
-          <td>{{ item.producto.codigoBarra }}</td>
-          <td>{{ item.producto.codigoProducto }}</td>
-          <td>{{ item.cantidad }}</td>
-          <td>
-            <span v-if="!item.cantidadMinima"
-              >Sin existencias mínimas asignadas</span
-            >
-            <span v-if="item.cantidadMinima">{{ item.cantidadMinima }}</span>
-          </td>
-          <td>{{ item.deposito.nombre }}</td>
-          <td>
-            <Edit :itemId="item.id" v-on:editItem="editItem" />
-            <Delete
-              :itemId="item.id"
-              v-on:deleteItem="deleteItem"
-              v-if="item.estado != 2"
-            />
-          </td>
-          <td class="text-center">
-            <Checked
-              :object="item"
-              v-on:uncheck="uncheck"
-              v-if="item.selected === true"
-            />
-            <Add :object="item" v-on:add="add" v-else />
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
+    <v-data-table :headers="headers" :items="stock"> </v-data-table>
   </v-container>
 </template>
 <script>
-import Edit from "../Buttons/Edit";
-import Delete from "../Buttons/Delete";
-import Add from "../Buttons/Add";
-import Checked from "../Buttons/Checked";
+import GenericService from "../../services/GenericService";
 export default {
-  props: {
-    items: Array,
-  },
-  components: {
-    Edit,
-    Delete,
-    Add,
-    Checked,
+  data: () => ({
+    stock: [],
+    filterParams: {
+      productoName: "",
+      productoCodigo: "",
+      productoCodigoBarras: "",
+      productoMarcaName: "",
+      productoPrimerAtributoName: "",
+      productoSegundoAtributoName: "",
+      productoTercerAtributoName: "",
+      productoEstado: 0,
+      stockDepositoId: "",
+      sucursalId: "",
+      perfilId: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    depositsFilterParams: {
+      depositoName: "",
+      perfilId: "",
+      sucursalId: "",
+      page: 1,
+      size: 100000,
+    },
+    headers: [
+      {text: "Productos", value: "producto.nombre" },
+      {text:"Atributos", value:"producto.atributos[0].valor"},
+      {text:"Marca", value:"producto.marca.nombre"},
+      {text:"Codigo de Barras", value:"producto.codigoBarra"},
+      {text:"Codigo de producto", value:"producto.codigoProducto"},
+      {text:"Cantidad", value:"cantidad"}
+    
+    ],
+    loaded: false,
+    tenant: "",
+    service: "stock",
+    token: localStorage.getItem("token"),
+    deleteDialogStatus: false,
+    depositos: [],
+    realDeposits: [],
+    typeList: 0,
+    migration: [],
+    destinationDepositForMigrations: {},
+  }),
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+    this.items();
+    this.getOtherModels();
   },
   methods: {
+    items() {
+      GenericService(this.tenant, "stock", this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.stock = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
+    },
+    getOtherModels() {
+      GenericService(this.tenant, "depositos", this.token)
+        .filter(this.depositsFilterParams)
+        .then((data) => {
+          this.depositos = data.data.content;
+          this.depositos.push({
+            id: 0,
+            nombre: "Todos",
+          });
+          this.realDeposits = this.depositos.filter((el) => el.id !== 0);
+        });
+    },
+
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },
