@@ -448,7 +448,7 @@ export default {
             ptoVentaId: ptoVenta.idFiscal,
             receiptCode: documento.codigoDocumento,
             clientCuit: cliente.cuit,
-            numberOfCurrentInvoice: numberOfCurrentInvoice,
+            numberOfReceipt: numberOfCurrentInvoice,
             date: getInternationalDate(),
             products: [detail],
             totalVenta: totalVenta,
