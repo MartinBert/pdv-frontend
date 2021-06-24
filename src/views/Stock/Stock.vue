@@ -1,36 +1,40 @@
 <template>
   <v-container>
+    <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab class="primary" @click="newObject()" raised>
+        Nuevo
+      </v-tab>
+      <v-tab
+        class="primary ml-1"
+        @click="openDialog('minimumStockRestriction')"
+        raised
+      >
+        EXISTENCIAS MÍNIMAS
+      </v-tab>
+      <v-tab class="primary ml-1" @click="openDialog('stockMigration')">
+        Migrar Stock
+      </v-tab>
+      <v-tab class="primary ml-1" @click="openDialog('reports')">
+        Reportes
+      </v-tab>
+      <v-tab
+        class="primary ml-1"
+        @click="modifyAlgorim()"
+        v-if="loguedUser.perfil < 2"
+      >
+        Cambiar marca de algoritmo de stock
+      </v-tab>
+      <v-tab
+        class="primary ml-1"
+        @click="checkStocks()"
+        v-if="loguedUser.perfil < 2"
+      >
+        Check Stock
+      </v-tab>
+    </v-tabs>
+    <br />
     <v-card>
       <v-form>
-        <v-row>
-          <v-col cols="6">
-            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-            <v-btn
-              class="primary ml-1"
-              @click="openDialog('minimumStockRestriction')"
-              raised
-              >EXISTENCIAS MÍNIMAS</v-btn
-            >
-            <v-btn class="primary ml-1" @click="openDialog('stockMigration')"
-              >MIGRAR STOCK</v-btn
-            >
-            <v-btn class="primary ml-1" @click="openDialog('reports')"
-              >Reportes</v-btn
-            >
-            <v-btn
-              class="primary ml-1"
-              @click="modifyAlgorim()"
-              v-if="loguedUser.perfil < 2"
-              >Cambiar marca de algoritmo de stock</v-btn
-            >
-            <v-btn
-              class="primary ml-1"
-              @click="checkStocks()"
-              v-if="loguedUser.perfil < 2"
-              >Check stock</v-btn
-            >
-          </v-col>
-        </v-row>
         <v-row>
           <v-col>
             <v-autocomplete
@@ -125,22 +129,24 @@
         :status="deleteDialogStatus"
         v-on:deleteConfirmation="deleteConfirmation"
       />
-      <v-row>
-        <v-col cols="12">
-          <form @submit.prevent="migrateStockToOtherDeposit()">
-            <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
-            <v-autocomplete
-              :items="realDeposits"
-              item-text="nombre"
-              :return-object="true"
-              label="A depósito"
-              v-model="destinationDepositForMigrations"
-              required
-              style="width: 250px"
-            />
-          </form>
-        </v-col>
-      </v-row>
+      <v-container>
+        <v-row>
+          <v-col cols="12">
+            <form @submit.prevent="migrateStockToOtherDeposit()">
+              <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
+              <v-autocomplete
+                :items="realDeposits"
+                item-text="nombre"
+                :return-object="true"
+                label="A depósito"
+                v-model="destinationDepositForMigrations"
+                required
+                style="width: 250px"
+              />
+            </form>
+          </v-col>
+        </v-row>
+      </v-container>
       <ModifyMinimumStocksDialog
         v-on:stocksRestrictions="applyMassiveStocksRestrictions()"
       />
@@ -157,6 +163,7 @@
   </v-container>
 </template>
 <script>
+//import TabBar from "../../components/Graphics/TabBar.vue";
 import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
 import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
@@ -187,6 +194,14 @@ export default {
       size: 10,
       totalPages: 0,
     },
+    tabs: [
+      { id: 0, route: "", title: "Nuevo" },
+      { id: 1, route: "", title: "ExistenciasMinimas" },
+      { id: 2, route: "", title: "MigrarStock" },
+      { id: 3, route: "", title: "Reportes" },
+      { id: 4, route: "", title: "Algoritmo" },
+      { id: 5, route: "", title: "CheckStock" },
+    ],
     depositsFilterParams: {
       depositoName: "",
       perfilId: "",
@@ -214,9 +229,16 @@ export default {
     Pagination,
     Spinner,
     DeleteDialog,
+    //TabBar
   },
 
   mounted() {
+    this.tabs[0].route = `/${this.tenant}/stock/form/0`;
+    this.tabs[1].route = `/${this.tenant}/form/:id`;
+    this.tabs[2].route = `/${this.tenant}/productos`;
+    this.tabs[3].route = `/${this.tenant}/precios`;
+    this.tabs[4].route = `/${this.tenant}/precios`;
+    this.tabs[5].route = `/${this.tenant}/precios`;
     this.tenant = this.$route.params.tenant;
     this.filterParams.perfilId = this.loguedUser.perfil;
     this.depositsFilterParams.perfilId = this.loguedUser.perfil;

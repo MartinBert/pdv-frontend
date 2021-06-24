@@ -1,52 +1,84 @@
 <template>
   <v-container>
-    <v-simple-table style="background-color: transparent">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Depósito predeterminado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody v-for="item in items" :key="item.id">
-        <tr>
-          <td>{{ item.nombre }}</td>
-          <td>
-            <span v-if="item.defaultDeposit == '1'">
-              <img
-                src="/../../images/icons/success.svg"
-                alt="success"
-                width="30"
-                height="30"
-              />
-            </span>
-            <span v-if="item.defaultDeposit !== '1'">
-              <v-btn class="primary" @click="selectDefaultDeposit(item)"
-                >Elegir predeterminado</v-btn
-              >
-            </span>
-          </td>
-          <td>
-            <Edit :itemId="item.id" v-on:editItem="editItem" />
-            <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
+    <v-data-table :headers="headers" :items="depositos">
+      <v-dialog v-model="dialog" max-width="500px">
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="close">
+            Cancel
+          </v-btn>
+          <v-btn color="blue darken-1" text @click="save">
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-dialog>
+      <template v-slot:[`item.acciones`]="{ item }">
+        <v-icon small class="mr-2" @click="editItem(item)">
+          mdi-pencil
+        </v-icon>
+        <v-icon small @click="deleteItem(item)">
+          mdi-delete
+        </v-icon>
+      </template>
+      <template v-slot:no-data>
+        <v-btn color="primary" @click="initialize">
+          Reset
+        </v-btn>
+      </template>
+    </v-data-table>
   </v-container>
 </template>
 <script>
-import Edit from "../Buttons/Edit";
-import Delete from "../Buttons/Delete";
+import GenericService from "../../services/GenericService";
+
+
 export default {
-  props: {
-    items: Array,
-  },
-  components: {
-    Edit,
-    Delete,
+  data:()=>({
+    depositos: [],
+    file: null,
+    filterParams: {
+      depositoName: "",
+      perfilId: "",
+      sucursalId: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    loaded: false,
+    tenant: "",
+    service: "depositos",
+    token: localStorage.getItem("token"),
+    deleteDialogStatus: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+   headers:[
+     {text:"Nombre", value:"nombre"},
+     {text:"Deposito Determinado", value:"deposito[0].valor"},
+     {text:"Acciones", value:"acciones", sorteable:false}
+   ]
+  }),
+  
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+    if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterParams.perfilId = this.loguedUser.perfil;
+    this.filterObjects();
   },
   methods: {
+     filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.depositos = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },

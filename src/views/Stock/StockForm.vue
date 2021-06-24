@@ -1,5 +1,6 @@
 <template>
   <v-card min-width="100%">
+    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
     <Error :errorStatus="errorStatus"/>
     <div v-if="loaded">
       <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
@@ -220,6 +221,7 @@
   </v-card>
 </template>
 <script>
+import TabBar from "../../components/Graphics/TabBar.vue";
 import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
 import Spinner from '../../components/Graphics/Spinner';
@@ -268,7 +270,8 @@ export default {
 
   components:{
     Spinner,
-    Error
+    Error,
+    TabBar
   },
 
   mounted() {
