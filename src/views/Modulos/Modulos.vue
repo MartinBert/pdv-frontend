@@ -1,42 +1,44 @@
 <template>
-  <v-container>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col cols="6">
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-        </v-col>
-        <v-col cols="3"></v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.moduloName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <ModulosTable
-      :items="modulos"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded" />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
+  <v-container style="min-width: 100%;">
+    <v-card>
+      <v-form class="mb-3">
+        <v-row>
+          <v-col cols="6">
+            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+          </v-col>
+          <v-col cols="3"></v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="filterParams.moduloName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
+      <ModulosTable
+        :items="modulos"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-if="loaded"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -76,7 +78,7 @@ export default {
 
   methods: {
     filterObjects(page) {
-      if(page) this.filterParams.page = page;
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {

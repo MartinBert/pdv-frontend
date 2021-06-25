@@ -1,8 +1,8 @@
 <template>
-  <v-container>
+  <v-container style="min-width: 100%;">
     <v-card>
       <v-row>
-        <v-col>
+        <v-col style="margin: 2px;">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
         <v-col cols="2">
@@ -44,7 +44,7 @@
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="3">
           <v-text-field
             v-model="filterParams.perfilName"
             v-on:input="filterObjects()"
