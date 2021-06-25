@@ -1,6 +1,20 @@
 <template>
   <v-container>
-    <v-data-table :headers="headers" :items="stock"> </v-data-table>
+    <v-data-table :headers="headers" :items="stock">
+        <template v-slot:[`item.acciones`]="{ item }">
+        <v-icon small class="mr-2" @click="editItem(item)">
+          mdi-pencil
+        </v-icon>
+        <v-icon small @click="deleteItem(item)">
+          mdi-delete
+        </v-icon>
+      </template>
+      <template v-slot:no-data>
+        <v-btn color="primary" @click="initialize">
+          Reset
+        </v-btn>
+      </template>
+    </v-data-table>
   </v-container>
 </template>
 <script>
@@ -37,7 +51,8 @@ export default {
       {text:"Marca", value:"producto.marca.nombre"},
       {text:"Codigo de Barras", value:"producto.codigoBarra"},
       {text:"Codigo de producto", value:"producto.codigoProducto"},
-      {text:"Cantidad", value:"cantidad"}
+      {text:"Cantidad", value:"cantidad"},
+      {text:"Acciones", value:"acciones" , sorteable: false}
     
     ],
     loaded: false,

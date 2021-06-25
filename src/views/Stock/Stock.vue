@@ -129,11 +129,10 @@
         :status="deleteDialogStatus"
         v-on:deleteConfirmation="deleteConfirmation"
       />
-      <v-container>
         <v-row>
           <v-col cols="12">
-            <form @submit.prevent="migrateStockToOtherDeposit()">
-              <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
+            <form @submit.prevent="migrateStockToOtherDeposit()" style="margin: 10px;">
+              <v-btn class="primary" type="submit" >Migrar seleccionados</v-btn>
               <v-autocomplete
                 :items="realDeposits"
                 item-text="nombre"
@@ -146,7 +145,6 @@
             </form>
           </v-col>
         </v-row>
-      </v-container>
       <ModifyMinimumStocksDialog
         v-on:stocksRestrictions="applyMassiveStocksRestrictions()"
       />
