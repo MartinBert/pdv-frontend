@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
+  <v-container style="min-width: 100%;">
+    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent"/>
     <v-card class="card" min-width="100%">
       <Error :errorStatus="errorStatus" />
       <div v-if="loaded" class="grey lighten-5">
