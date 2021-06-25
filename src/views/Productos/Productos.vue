@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="min-width: 100%;">
     <v-tabs fixed-tabs background-color="indigo" dark>
       <v-tab class="primary ml-1" @click="view = 'listOfProducts'">
         Lista

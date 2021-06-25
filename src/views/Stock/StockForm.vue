@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="min-width: 100%;">
     <Error :errorStatus="errorStatus" />
     <v-tabs fixed-tabs background-color="indigo" dark>
       <v-tab class="primary" @click="newObject()" raised>
@@ -270,11 +270,11 @@
       v-on:depositsForMigrationProcess="applyMassiveChangesInDeposits()"
     />
     <StockReportsDialog
-        :loguedUser="loguedUser"
-        :tenant="tenant"
-        :service="service"
-        :token="token"
-      />
+      :loguedUser="loguedUser"
+      :tenant="tenant"
+      :service="service"
+      :token="token"
+    />
   </v-container>
 </template>
 <script>
@@ -339,7 +339,7 @@ export default {
     Error,
     ModifyMinimumStocksDialog,
     DepositMigrationDialog,
-    StockReportsDialog
+    StockReportsDialog,
     //TabBar,
   },
 
