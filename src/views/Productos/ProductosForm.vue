@@ -289,6 +289,7 @@ import TabBar from "../../components/Graphics/TabBar.vue";
 
 export default {
   data: () => ({
+    setActiveTabComponent:null,
     atributosNumericos: [],
     atributosDeTexto: [],
     distribuidores: [],
