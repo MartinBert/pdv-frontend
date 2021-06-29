@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-data-table :items="documentosComerciales" :headers="headers">
+  <v-container style="min-width: 100%;">
+    <v-data-table :items="documentosComerciales" :headers="headers" class="elevation-6">
       <template v-slot:[`item.tipo`]="{ item }">
          <v-alert type="success" dense v-if="item.tipo">Fiscal</v-alert>
             <v-alert

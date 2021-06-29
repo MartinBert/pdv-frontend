@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-data-table :headers="headers" :items="marcas">
+  <v-container style="min-width: 100%;">
+    <v-data-table :headers="headers" :items="marcas" class="elevation-6">
       <v-dialog v-model="dialog" max-width="500px">
         <v-card-text>
           <v-container>

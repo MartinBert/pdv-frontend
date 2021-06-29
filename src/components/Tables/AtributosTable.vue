@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-data-table :headers="headers" :items="atributos">
+  <v-container style="min-width: 100%;">
+    <v-data-table :headers="headers" :items="atributos" class="elevation-6">
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
           mdi-pencil
