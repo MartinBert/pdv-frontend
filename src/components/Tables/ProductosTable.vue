@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="max-width:100%">
     <v-data-table class="elevation-6" :headers="headers" :items="productos">
       <v-dialog v-model="dialog" max-width="500px">
         <v-card-actions>

@@ -1,3 +1,4 @@
+
 <template>
     <v-container class="d-flex" style="min-width: 100%;">
         <v-tabs fixed-tabs background-color="primary" dark v-for="(tab, index) in tabs" :key="index">
@@ -17,6 +18,7 @@
         }
     }
 </script>
+
 
 
 

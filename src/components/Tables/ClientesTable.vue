@@ -1,44 +1,46 @@
 <template>
   <v-container>
-    <v-simple-table style="background-color: transparent">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Razón Social</th>
-          <th>CUIT</th>
-          <th>Detalles</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody v-for="item in items" :key="item.id">
-        <tr>
-          <td>{{ item.nombre }}</td>
-          <td>{{ item.razonSocial }}</td>
-          <td>{{ item.cuit }}</td>
-          <td>
-            <Detail :object="item" v-on:seeDetails="seeDetails" />
-          </td>
-          <td>
-            <Edit :itemId="item.id" v-on:editItem="editItem" />
-            <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
+    <v-data-table>
+
+    </v-data-table>
   </v-container>
 </template>
 <script>
-import Edit from "../Buttons/Edit";
-import Delete from "../Buttons/Delete";
-import Detail from "../Buttons/Detail";
+//import Edit from "../Buttons/Edit";
+//import Delete from "../Buttons/Delete";
+//import Detail from "../Buttons/Detail";
 export default {
-  props: {
-    items: Array,
-  },
+  data: () => ({
+    clientes: [],
+    filterParams: {
+      sucursalId: "",
+      personaSocialReason: "",
+      personaName: "",
+      personaCuit: "",
+      personaDirection: "",
+      personaContactName: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    loaded: false,
+    tenant: "",
+    service: "clientes",
+    token: localStorage.getItem("token"),
+    deleteDialogStatus: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    headers:[
+      {text:"Nombre",value:"nombre"},
+      {text:"Razon Social", value:"razonSocial"},
+      {text:"Cuit", value:"cuit"},
+      {text:"Detalles", value:"detalles"},
+      {text:"", value:""}
+    ]
+  }),
   components: {
-    Edit,
-    Delete,
-    Detail,
+    //Edit,
+    //Delete,
+    //Detail,
   },
   methods: {
     editItem(itemId) {

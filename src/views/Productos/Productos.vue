@@ -1,7 +1,7 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'">
+    <v-tabs fixed-tabs background-color="indigo" dark >
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" >
         Lista
       </v-tab>
       <v-tab class="primary ml-1" @click="newObject()">
@@ -465,7 +465,6 @@ export default {
           }
         });
         let prod = this.validateImport(excel);
-        console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
