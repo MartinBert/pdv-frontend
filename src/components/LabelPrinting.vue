@@ -1,49 +1,30 @@
 <template>
-  <v-container style="background-color: transparent">
+  <v-container style="min-width: 100%">
     <v-row>
       <v-col cols="12">
-        <v-simple-table
+        <v-data-table
           style="background-color: transparent"
           ref="tableOfProducts"
+          :headers="headers"
+          :items="productos"
         >
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Atributos</th>
-                <th>Marca</th>
-                <th>Código de barras</th>
-                <th>Código de producto</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody v-for="producto in productos" :key="producto.id">
-              <tr>
-                <td>{{ producto.nombre }}</td>
-                <td>{{ setAtributesValues(producto.atributos) }}</td>
-                <td>{{ producto.marca.nombre }}</td>
-                <td>{{ producto.codigoBarra }}</td>
-                <td>{{ producto.codigoProducto }}</td>
-                <td>
-                  <a title="Agregar" v-if="!producto.selected"
-                    ><img
-                      src="/../../images/icons/add.svg"
-                      @click="addProductToTagsList(producto)"
-                      width="30"
-                      height="30"
-                  /></a>
-                  <a title="Quitar" v-if="producto.selected"
-                    ><img
-                      src="/../../images/icons/success.svg"
-                      @click="deleteLine(producto)"
-                      width="30"
-                      height="30"
-                  /></a>
-                </td>
-              </tr>
-            </tbody>
+          <template v-slot:[`item.acciones`]="{ item }">
+            <a title="Agregar" v-if="!item.selected"
+              ><img
+                src="/../../images/icons/add.svg"
+                @click="addProductToTagsList(item)"
+                width="30"
+                height="30"
+            /></a>
+            <a title="Quitar" v-if="item.selected"
+              ><img
+                src="/../../images/icons/success.svg"
+                @click="deleteLine(item)"
+                width="30"
+                height="30"
+            /></a>
           </template>
-        </v-simple-table>
+        </v-data-table>
         <Pagination
           :page="page"
           :totalPages="totalPages"
@@ -123,7 +104,7 @@
 <script>
 import ReportsService from "../services/ReportsService";
 import Pagination from "./Pagination";
-
+import GenericService from "../services/GenericService";
 export default {
   name: "LabelPrinting",
   props: {
@@ -135,6 +116,27 @@ export default {
     token: String,
   },
   data: () => ({
+    filterParams: {
+      sucursalId: "",
+      productoName: "",
+      productoCodigo: "",
+      productoCodigoBarras: "",
+      productoMarcaName: "",
+      productoPrimerAtributoName: "",
+      productoSegundoAtributoName: "",
+      productoTercerAtributoName: "",
+      productoEstado: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    loaded: false,
+    idObject: "",
+    service: "productos",
+    dialogStock: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    checkImportStatus: 0,
+    deleteDialogStatus: false,
     labelList: [],
     labelFormats: {
       labelWithoutPrice: "label_image_not_selected",
@@ -142,11 +144,49 @@ export default {
       labelWithPrice: "label_image_not_selected",
       labelOnlyBarCode: "label_image_not_selected",
     },
+    headers: [
+      { text: "Nombre", value: "nombre" },
+      { text: "Atributos", value: "atributos[0].valor" },
+      { text: "Marca", value: "marca.nombre" },
+      { text: "Codigo de Barra", value: "codigoBarra" },
+      { text: "Codigo de Producto", value: "codigoProducto" },
+      { text: "Acciones", value: "acciones" },
+    ],
+    headers1: [
+      { text: "Nombre" },
+      { text: "Atributos" },
+      { text: "Marca" },
+      { text: "Codigo de Barra" },
+      { text: "Codigo de Producto" },
+      { text: "Cantidad", value: "cantidad" },
+    ],
   }),
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+    this.filterObjects();
+  },
   components: {
     Pagination,
   },
   methods: {
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      if (this.estadoSelecionado.id > 1) {
+        this.filterParams.productoEstado = 2;
+      } else {
+        this.filterParams.productoEstado = 0;
+      }
+      if (this.loguedUser.perfil > 1) {
+        this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      }
+      GenericService(this.tenant, "productos", this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.productos = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
+    },
     changePage(page) {
       this.$emit("changePage", page);
     },
