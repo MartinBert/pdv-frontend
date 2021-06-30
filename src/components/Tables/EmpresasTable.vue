@@ -1,44 +1,74 @@
 <template>
-  <v-container>
-    <v-simple-table style="background-color: transparent">
-      <thead>
-        <tr>
-          <th>Razón Social</th>
-          <th>CUIT</th>
-          <th>Detalles</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody v-for="item in items" :key="item.id">
-        <tr>
-          <td>{{ item.razonSocial }}</td>
-          <td>{{ item.cuit }}</td>
-          <td>
-            <Detail :object="item" v-on:seeDetails="seeDetails" />
-          </td>
-          <td>
-            <Edit :itemId="item.id" v-on:editItem="editItem" />
-            <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
+  <v-container style="min-width: 100%;">
+    <v-data-table :headers="headers" :items="empresas" class="elevation-6">
+      <template v-slot:[`item.detalles`]="{ item }">
+        <Detail :object="item" v-on:seeDetails="seeDetails" />
+      </template>
+      <template v-slot:[`item.acciones`]="{ item }">
+        <Edit :itemId="item.id" v-on:editItem="editItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
+      </template>
+    </v-data-table>
   </v-container>
 </template>
 <script>
+import GenericService from "../../services/GenericService";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
 import Detail from "../Buttons/Detail";
 export default {
-  props: {
-    items: Array,
-  },
+  data: () => ({
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    empresas: [],
+    filterParams: {
+      perfilId: "",
+      empresaId: "",
+      empresaName: "",
+      empresaCuit: "",
+      empresaSocialReason: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    loaded: false,
+    tenant: "",
+    service: "empresas",
+    token: localStorage.getItem("token"),
+    deleteDialogStatus: false,
+    headers: [
+      { text: "Razon Social", value: "razonSocial" },
+      { text: "CUIT", value: "cuit" },
+      { text: "Detalles", value: "detalles", sortable: false },
+      { text: "Acciones", value: "acciones", sortable: false },
+    ],
+  }),
   components: {
     Edit,
     Delete,
     Detail,
   },
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+    this.filterParams.perfilId = this.loguedUser.perfil;
+    if (this.loguedUser.perfil > 1) {
+      this.filterParams.empresaId = this.loguedUser.empresa.id;
+    }
+    this.filterObjects();
+  },
   methods: {
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.empresas = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },

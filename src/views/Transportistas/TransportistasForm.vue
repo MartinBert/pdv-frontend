@@ -1,125 +1,142 @@
 <template>
-  <v-card min-width="100%">
-    <Error :errorStatus="errorStatus"/>
-    <div v-if="loaded">
-      <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
-        <v-row class="ma-1">
-          <v-col>
-            <v-select
-              type="text"
-              :items="tipopersona"
-              item-text="text"
-              item-value="id"
-              v-model="object.tipoPersona"
-              :counter="50"
-              label="Tipo de persona"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-select>
-          </v-col>
-          <v-col>
-            <v-select
-              type="text"
-              :items="condicioniva"
-              item-text="nombre"
-              item-value="id"
-              v-model="object.condicionIva"
-              :counter="50"
-              :return-object="true"
-              label="Condición frente al IVA"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-select>
-          </v-col>
-          <v-col>
-            <v-text-field
-              type="text"
-              v-model="object.razonSocial"
-              :counter="50"
-              label="Razón social"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field type="text" 
-            v-model="object.nombre" 
-            :counter="50" 
-            label="Nombre" 
-            required
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              type="number"
-              v-model="object.cuit"
-              :counter="50"
-              label="CUIT o DNI"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row class="ma-3">
-          <v-col>
-            <v-text-field type="text" 
-            v-model="object.direccion" 
-            :counter="50" 
-            label="Dirección"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field type="text" 
-            v-model="object.email" 
-            :counter="50" 
-            label="Email"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field type="text" 
-            v-model="object.telefono" 
-            :counter="50" 
-            label="Teléfono"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              type="text"
-              v-model="object.telefonoAlternativo"
-              :counter="50"
-              label="Teléfono alternativo"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              type="text"
-              v-model="object.nombreContacto"
-              :counter="50"
-              label="Nombre de contacto"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <div class="ma-1">
-          <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
-            <v-btn color="default" @click="back()">Cancelar</v-btn>
-          </v-col>
-        </div>
-      </v-form>
-    </div>
-    <Spinner v-if="!loaded"/>
-  </v-card>
+  <v-container style="min-width: 100% ;">
+    <v-card min-width="100%">
+      <Error :errorStatus="errorStatus" />
+      <div v-if="loaded">
+        <v-form
+          ref="form"
+          v-model="valid"
+          :lazy-validation="false"
+          class="mt-5"
+        >
+          <v-row class="ma-1">
+            <v-col>
+              <v-select
+                type="text"
+                :items="tipopersona"
+                item-text="text"
+                item-value="id"
+                v-model="object.tipoPersona"
+                :counter="50"
+                label="Tipo de persona"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-select>
+            </v-col>
+            <v-col>
+              <v-select
+                type="text"
+                :items="condicioniva"
+                item-text="nombre"
+                item-value="id"
+                v-model="object.condicionIva"
+                :counter="50"
+                :return-object="true"
+                label="Condición frente al IVA"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-select>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.razonSocial"
+                :counter="50"
+                label="Razón social"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.nombre"
+                :counter="50"
+                label="Nombre"
+                required
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="number"
+                v-model="object.cuit"
+                :counter="50"
+                label="CUIT o DNI"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row class="ma-3">
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.direccion"
+                :counter="50"
+                label="Dirección"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.email"
+                :counter="50"
+                label="Email"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.telefono"
+                :counter="50"
+                label="Teléfono"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.telefonoAlternativo"
+                :counter="50"
+                label="Teléfono alternativo"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.nombreContacto"
+                :counter="50"
+                label="Nombre de contacto"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <div class="ma-1">
+            <v-col class="col-6">
+              <v-btn
+                class="mr-4"
+                color="primary"
+                @click="save"
+                :disabled="!valid"
+                >Guardar</v-btn
+              >
+              <v-btn color="default" @click="back()">Cancelar</v-btn>
+            </v-col>
+          </div>
+        </v-form>
+      </div>
+      <Spinner v-if="!loaded" />
+    </v-card>
+  </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import Spinner from '../../components/Graphics/Spinner';
-import Error from '../../components/Error';
+import Spinner from "../../components/Graphics/Spinner";
+import Error from "../../components/Error";
 export default {
   data: () => ({
     valid: true,
     tipopersona: [
       { id: 1, text: "Física" },
-      { id: 2, text: "Jurídica" }
+      { id: 2, text: "Jurídica" },
     ],
     condicioniva: [],
     object: {},
@@ -128,12 +145,12 @@ export default {
     service: "transportistas",
     token: localStorage.getItem("token"),
     errorStatus: false,
-    loguedUser: JSON.parse(localStorage.getItem("userData"))
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
 
-  components:{
+  components: {
     Spinner,
-    Error
+    Error,
   },
 
   mounted() {
@@ -150,16 +167,16 @@ export default {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
-        .then(data => {
+        .then((data) => {
           this.object = data.data;
           this.loaded = true;
         });
     },
 
-    getCondicionesIva(){
+    getCondicionesIva() {
       GenericService(this.tenant, "condicionesFiscales", this.token)
         .getAll()
-        .then(data => {
+        .then((data) => {
           this.condicioniva = data.data.content;
         });
     },
@@ -173,7 +190,7 @@ export default {
         .then(() => {
           this.$router.push({ name: "transportistas" });
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status == 500) {
             this.errorStatus = true;
             this.loaded = true;
@@ -183,7 +200,7 @@ export default {
 
     back() {
       this.$router.push({ name: "transportistas" });
-    }
-  }
+    },
+  },
 };
 </script>

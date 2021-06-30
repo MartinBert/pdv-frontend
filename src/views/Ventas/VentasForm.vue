@@ -47,7 +47,7 @@
       </v-row>
       <br>
       <div class="horizontalSeparator"></div>
-      <v-card>
+      <v-card style="min-width: 100%">
         <v-row>
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
@@ -239,8 +239,8 @@
       v-on:resetListStatus="resetListOfDialog"
       :refreshListStatus="listennerOfListChange"
     />
-    <v-dialog v-model="dialogIndividualPercent" width="500">
-      <v-card>
+    <v-dialog v-model="dialogIndividualPercent" width="600">
+      <v-card min-width: 100%>
         <v-card-title class="headline grey lighten-2">
           Modificar precio a renglón
         </v-card-title>

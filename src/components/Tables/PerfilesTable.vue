@@ -7,8 +7,8 @@
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import Edit from "../Buttons/Edit";
-import Delete from "../Buttons/Delete";
+//import Edit from "../Buttons/Edit";
+//import Delete from "../Buttons/Delete";
 export default {
   data: () => ({
     perfiles: [],
@@ -27,8 +27,8 @@ export default {
     deleteDialogStatus: false,
   }),
   components: {
-    Edit,
-    Delete,
+    //Edit,
+    //Delete,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;

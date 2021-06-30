@@ -1,7 +1,7 @@
 <template>
   <v-container style="min-width: 100%;">
     <v-card>
-      <v-form class="mb-3">
+      <v-form class="mb-6">
         <v-row>
           <v-col>
             <v-btn
@@ -12,7 +12,7 @@
               >Nuevo</v-btn
             >
           </v-col>
-          <v-col cols="2">
+          <v-col cols="3">
             <v-text-field
               v-model="filterParams.sucursalSocialReason"
               v-on:input="filterObjects()"
@@ -23,7 +23,7 @@
               append-icon="mdi-magnify"
             ></v-text-field>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="3">
             <v-text-field
               v-model="filterParams.sucursalName"
               v-on:input="filterObjects()"
@@ -34,7 +34,7 @@
               append-icon="mdi-magnify"
             ></v-text-field>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="3">
             <v-text-field
               v-model="filterParams.sucursalDirection"
               v-on:input="filterObjects()"
