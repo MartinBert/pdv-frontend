@@ -66,6 +66,16 @@
             <v-col>
               <v-text-field
                 type="text"
+                v-model="object.region"
+                :counter="50"
+                label="Localidad"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
                 v-model="object.direccion"
                 :counter="50"
                 label="Dirección"
