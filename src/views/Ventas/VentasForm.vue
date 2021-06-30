@@ -962,7 +962,7 @@ export default {
                   // Create receipt
                   comprobante = {
                     letra: documento.letra,
-                    numeroCbte: numberOfReceipt,
+                    numeroCbte: addZerosInString("04", ptoVenta.idFiscal) + '-' + addZerosInString("08", numberOfReceipt),
                     fechaEmision: formatDate(getCurrentDate()),
                     fechaVto: formatDate(dateOfCaeExpiration),
                     condicionVenta: condVenta,
