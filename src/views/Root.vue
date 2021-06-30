@@ -94,6 +94,7 @@ export default {
     source: String
   },
   data: () => ({
+    mini:true,
     user: null,
     logued: false,
     tenant: "",

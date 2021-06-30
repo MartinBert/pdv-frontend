@@ -1,52 +1,53 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-card>
-      <v-col cols="12" v-if="loaded">
-        <v-row class="mb-1">
-          <v-col cols="6">
-            <div class="d-flex text-left">
-              <v-btn
-                color="primary"
-                @click="$store.commit('productos/dialogProductosMutation')"
-                >BUSCAR PRODUCTOS</v-btn
-              >
-              <h3 class="mt-2 ml-2">
-                Depósito predeterminado:
-                <span v-if="defaultDeposit">
-                  {{ defaultDeposit.nombre }}
-                </span>
-                <span v-if="!defaultDeposit"> No definido </span>
-              </h3>
-              <v-btn
-                v-if="loguedUser.perfil === 1"
-                color="primary"
-                class="ml-5"
-                @click="testCert()"
-                >TEST CERTIFICADO</v-btn
-              >
-            </div>
-          </v-col>
-          <v-col class="text-right">
-            <select class="select-ventas-import" v-model="modificator">
-              <option value="">Modificar importe total</option>
-              <option value="descuento">Descuento</option>
-              <option value="recargo">Recargo</option>
-            </select>
-          </v-col>
-          <v-col cols="3" v-if="modificator">
-            <input
-              class="totalInput"
-              v-model="priceModificationPorcent"
-              type="number"
-            />
+    <v-col cols="12" v-if="loaded">
+      <v-row class="mb-1">
+        <v-col cols="6">
+          <div class="d-flex text-left">
             <v-btn
-              class="success ml-3"
-              @click="applyModification(modificator, priceModificationPorcent)"
-              >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
+              color="primary"
+              @click="$store.commit('productos/dialogProductosMutation')"
+              >BUSCAR PRODUCTOS</v-btn
             >
-          </v-col>
-        </v-row>
-        <div class="horizontalSeparator"></div>
+            <h3 class="mt-2 ml-2">
+              Depósito predeterminado:
+              <span v-if="defaultDeposit">
+                {{ defaultDeposit.nombre }}
+              </span>
+              <span v-if="!defaultDeposit"> No definido </span>
+            </h3>
+            <v-btn
+              v-if="loguedUser.perfil === 1"
+              color="primary"
+              class="ml-5"
+              @click="testCert()"
+              >TEST CERTIFICADO</v-btn
+            >
+          </div>
+        </v-col>
+        <v-col class="text-right" cols="5">
+          <select class="select-ventas-import" v-model="modificator">
+            <option value="">Modificar importe total</option>
+            <option value="descuento">Descuento</option>
+            <option value="recargo">Recargo</option>
+          </select>
+        </v-col>
+        <v-col cols="3" v-if="modificator">
+          <input
+            class="totalInput"
+            v-model="priceModificationPorcent"
+            type="number"
+          />
+          <v-btn
+            class="success ml-3"
+            @click="applyModification(modificator, priceModificationPorcent)"
+            >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
+          >
+        </v-col>
+      </v-row>
+      <br>
+      <div class="horizontalSeparator"></div>
+      <v-card>
         <v-row>
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
@@ -208,7 +209,7 @@
               <v-col cols="1">
                 <div class="verticalSeparator"></div>
               </v-col>
-              <v-col cols="11">
+              <v-col cols="10">
                 <Calculator class="mt-2" />
                 <div style="text-align: center; padding: 1em 0">
                   <h3>
@@ -231,31 +232,31 @@
             </v-row>
           </v-col>
         </v-row>
-      </v-col>
-      <ProductDialog
-        v-on:productList="addProduct"
-        v-on:resetListStatus="resetListOfDialog"
-        :refreshListStatus="listennerOfListChange"
-      />
-      <v-dialog v-model="dialogIndividualPercent" width="500">
-        <v-card>
-          <v-card-title class="headline grey lighten-2">
-            Modificar precio a renglón
-          </v-card-title>
-          <v-container class="text-center">
-            <v-text-field
-              placeholder="Porcentaje"
-              type="number"
-              v-model="individualPercent"
-            ></v-text-field>
-            <v-btn class="success ml-3" @click="applyToLine(individualPercent)"
-              >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
-            >
-          </v-container>
-        </v-card>
-      </v-dialog>
-      <Spinner v-if="!loaded" />
-    </v-card>
+      </v-card>
+    </v-col>
+    <ProductDialog
+      v-on:productList="addProduct"
+      v-on:resetListStatus="resetListOfDialog"
+      :refreshListStatus="listennerOfListChange"
+    />
+    <v-dialog v-model="dialogIndividualPercent" width="500">
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          Modificar precio a renglón
+        </v-card-title>
+        <v-container class="text-center">
+          <v-text-field
+            placeholder="Porcentaje"
+            type="number"
+            v-model="individualPercent"
+          ></v-text-field>
+          <v-btn class="success ml-3" @click="applyToLine(individualPercent)"
+            >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
+          >
+        </v-container>
+      </v-card>
+    </v-dialog>
+    <Spinner v-if="!loaded" />
   </v-container>
 </template>
 <script>
