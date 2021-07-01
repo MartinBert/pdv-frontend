@@ -1,7 +1,21 @@
 <template>
   <v-container style="min-width: 100%;">
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
-    <v-card min-width="100%" v-if="loaded">
+    <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'">
+        Lista
+      </v-tab>
+      <v-tab class="primary ml-1" @click="newObject()">
+        Nuevo
+      </v-tab>
+      <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
+        Generar Etiquetas
+      </v-tab>
+      <v-tab class="primary ml-1" @click="goPricesManagerView()">
+        Modificar Precios
+      </v-tab>
+    </v-tabs>
+    <br />
+    <v-card min-width="90%" v-if="loaded">
       <v-card-title>
         <div class="text-center" style="width: 100%">Alterar precios</div>
       </v-card-title>
@@ -91,7 +105,6 @@
         </div>
       </v-card-text>
     </v-card>
-  
   </v-container>
 </template>
 <script>
@@ -104,7 +117,7 @@ import {
   sumarNumeros,
 } from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
-import TabBar from "../../components/Graphics/TabBar.vue";
+//import TabBar from "../../components/Graphics/TabBar.vue";
 export default {
   data: () => ({
     loaded: false,
@@ -170,9 +183,7 @@ export default {
     token: localStorage.getItem("token"),
   }),
 
-  components: {
-    TabBar
-  },
+  components: {},
 
   mounted() {
     this.tenant = this.$route.params.tenant;

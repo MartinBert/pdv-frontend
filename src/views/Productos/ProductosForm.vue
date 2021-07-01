@@ -1,6 +1,13 @@
 <template>
   <v-container style="min-width: 100%;">
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent"/>
+    <v-tabs fixed-tabs background-color="indigo" dark >
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'">Lista</v-tab>
+      <v-tab class="primary ml-1">Nuevo</v-tab>
+      <v-tab class="primary ml-1">Generar Etiquetas</v-tab>
+      <v-tab class="primary ml-1">Modificar Precios</v-tab>
+
+    </v-tabs>
+    <br>
     <v-card class="card" min-width="100%">
       <Error :errorStatus="errorStatus" />
       <div v-if="loaded" class="grey lighten-5">
@@ -285,12 +292,13 @@ import {
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
 import Error from "../../components/Error";
-import TabBar from "../../components/Graphics/TabBar.vue";
+//import TabBar from "../../components/Graphics/TabBar.vue";
 
 export default {
   data: () => ({
-    setActiveTabComponent:null,
-    activeTab:null,
+    view: "listOfProducts",
+    setActiveTabComponent: null,
+    activeTab: null,
     atributosNumericos: [],
     atributosDeTexto: [],
     distribuidores: [],
@@ -338,7 +346,7 @@ export default {
   components: {
     Spinner,
     Error,
-    TabBar,
+    //TabBar,
   },
 
   mounted() {
@@ -351,14 +359,13 @@ export default {
     this.getOtherModels(0, 100000);
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
+    if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
     this.tabs[0].route = `/${this.tenant}/productos`;
     this.tabs[1].route = `/${this.tenant}/form/:id`;
     this.tabs[2].route = `/${this.tenant}/productos`;
     this.tabs[3].route = `/${this.tenant}/precios`;
-    if (this.loguedUser.perfil > 1) {
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
-    this.filterObjects();
   },
 
   methods: {
@@ -415,6 +422,14 @@ export default {
       });
     },
 
+    newObject() {
+      this.$router.push({ name: "productosForm", params: { id: 0 } });
+    },
+
+    goPricesManagerView() {
+      this.$router.push({ name: "productos" });
+    },
+
     calculations() {
       this.object.costoNeto = calculateImportWithoutIvaPercent(
         this.object.costoBruto,
@@ -438,7 +453,6 @@ export default {
         this.object.precioSinIva,
       ]);
     },
-
     gainCalculations() {
       this.object.ganancia = roundTwoDecimals(
         calculatePercentReductionInAmount(

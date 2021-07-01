@@ -17,8 +17,8 @@
     <br />
     <v-card>
       <v-form class="mb-3" v-on:click="show = !show">
-        <v-row>
-          <v-col cols="10" v-if="perfil < 3">
+        <v-row class="m-5">
+          <v-col cols="6" v-if="perfil < 3">
             <v-btn class="primary ml-2" @click="getReport()" raised
               >REPORTE</v-btn
             >
@@ -45,10 +45,10 @@
               raised
               >Corregir lista de precios</v-btn
             >
-            <v-col cols="8"></v-col>
-            <v-col v-if="perfil < 3 && view == 'listOfProducts'">
+          </v-col>
+          <v-col cols="3" v-if="perfil < 3 && view == 'listOfProducts'">
               <v-file-input
-                class="mt-3"
+                class="mt-2"
                 dense
                 v-model="file"
                 placeholder="Importar"
@@ -56,10 +56,7 @@
                 @change="onChange($event)"
               ></v-file-input>
             </v-col>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col v-if="view == 'listOfProducts' && perfil < 3">
+            <v-col cols="3" v-if="view == 'listOfProducts' && perfil < 3">
             <v-select
               :items="estados"
               v-model="estadoSelecionado"
@@ -71,8 +68,9 @@
             ></v-select>
           </v-col>
         </v-row>
-
-        <v-row>
+        <v-row style="justify-content: center;"
+         class="mt-1"
+        >
           <v-col cols="2">
             <v-text-field
               v-model="filterParams.productoName"
@@ -136,7 +134,6 @@
           <v-col v-if="view == 'labelPrinting'">
             <h2>Seleccion de productos</h2>
           </v-col>
-          <v-col></v-col>
         </v-row>
       </v-form>
 
@@ -884,5 +881,8 @@ export default {
 <style>
 v-tabs {
   margin-bottom: 10px;
+}
+.filtros{
+  margin-right: 20px;
 }
 </style>

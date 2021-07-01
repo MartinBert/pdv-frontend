@@ -33,7 +33,7 @@ export default {
       { text: "Nombre", value: "nombre" },
       { text: "Cantidad de coutas", value: "coutas" },
       { text: "Porcentaje de recargo", value: "porcentaje" },
-      { text: "Accciones", value: "accciones", sortable: false}
+      { text: "Accciones", value: "acciones", sortable: false}
     ],
   }),
   components: {
