@@ -1,28 +1,35 @@
 <template>
   <v-container style="min-width: 100%;">
     <v-card>
-      <v-form class="mb-3">
+      <v-form class="mb-0">
         <v-row>
           <v-col cols="1">
             <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
           </v-col>
-          <v-col cols="3">
-            <v-file-input
-              v-model="file"
-              class="mt-0"
-              placeholder="Importar atributos de texto"
-              accept=".xlsx, xls"
-              @change="importDocuments($event, 'text')"
-            ></v-file-input>
+          <v-col cols="2">
+            <div style="width: 300px">
+              <v-file-input
+                dense
+                v-model="file"
+                class="mt-0"
+                placeholder="Importar depósitos"
+                accept=".xlsx, xls"
+                @change="importDocuments($event)"
+              ></v-file-input>
+            </div>
           </v-col>
-          <v-col cols="3">
-            <v-file-input
-              v-model="file"
-              class="mt-0"
-              placeholder="Importar atributos numéricos"
-              accept=".xlsx, xls"
-              @change="importDocuments($event, 'number')"
-            ></v-file-input>
+          <v-spacer></v-spacer>
+          <v-col cols="2">
+            <div style="width: 300px">
+              <v-file-input
+                dense
+                v-model="file"
+                class="mt-0"
+                placeholder="Importar depósitos"
+                accept=".xlsx, xls"
+                @change="importDocuments($event)"
+              ></v-file-input>
+            </div>
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="3">

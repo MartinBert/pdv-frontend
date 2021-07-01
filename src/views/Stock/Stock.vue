@@ -34,7 +34,7 @@
     </v-tabs>
     <br />
     <v-card>
-      <v-form>
+      <v-form style="justify-content: center;">
         <v-row>
           <v-col>
             <v-autocomplete
@@ -106,6 +106,25 @@
               append-icon="mdi-magnify"
             ></v-text-field>
           </v-col>
+          <v-col>
+            <v-autocomplete
+              :items="realDeposits"
+              item-text="nombre"
+              :return-object="true"
+              label="A depósito"
+              v-model="destinationDepositForMigrations"
+              required
+              style="width: 250px"
+            />
+          </v-col>
+          <v-col>
+          <form
+            @submit.prevent="migrateStockToOtherDeposit()"
+            style="margin: 10px;"
+          >
+            <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
+          </form>
+        </v-col>
         </v-row>
       </v-form>
       <StocksTable
@@ -129,22 +148,6 @@
         :status="deleteDialogStatus"
         v-on:deleteConfirmation="deleteConfirmation"
       />
-        <v-row>
-          <v-col cols="12">
-            <form @submit.prevent="migrateStockToOtherDeposit()" style="margin: 10px;">
-              <v-btn class="primary" type="submit" >Migrar seleccionados</v-btn>
-              <v-autocomplete
-                :items="realDeposits"
-                item-text="nombre"
-                :return-object="true"
-                label="A depósito"
-                v-model="destinationDepositForMigrations"
-                required
-                style="width: 250px"
-              />
-            </form>
-          </v-col>
-        </v-row>
       <ModifyMinimumStocksDialog
         v-on:stocksRestrictions="applyMassiveStocksRestrictions()"
       />

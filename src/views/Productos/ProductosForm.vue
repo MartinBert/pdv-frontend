@@ -2,7 +2,7 @@
   <v-container style="min-width: 100%;">
     <v-tabs fixed-tabs background-color="indigo" dark >
       <v-tab class="primary ml-1" @click="view = 'listOfProducts'">Lista</v-tab>
-      <v-tab class="primary ml-1">Nuevo</v-tab>
+      <v-tab class="primary ml-1" >Nuevo</v-tab>
       <v-tab class="primary ml-1">Generar Etiquetas</v-tab>
       <v-tab class="primary ml-1">Modificar Precios</v-tab>
 
@@ -15,7 +15,7 @@
           ref="form"
           v-model="valid"
           :lazy-validation="false"
-          class="mt-3"
+          class="mt-0"
         >
           <v-container>
             <v-row>

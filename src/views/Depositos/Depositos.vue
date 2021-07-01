@@ -1,7 +1,7 @@
 <template>
   <v-container style="min-width: 100%;">
     <v-card>
-      <v-form class="mb-3">
+      <v-form class="mb-0">
         <v-row>
           <v-col cols="9" class="mt-2 d-flex">
             <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>

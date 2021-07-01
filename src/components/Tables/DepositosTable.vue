@@ -1,17 +1,6 @@
 <template>
   <v-container style="min-width: 100%">
     <v-data-table :headers="headers" :items="depositos" class="elevation-6">
-      <v-dialog v-model="dialog" max-width="500px">
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close">
-            Cancel
-          </v-btn>
-          <v-btn color="blue darken-1" text @click="save">
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-dialog>
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
           mdi-pencil
@@ -20,20 +9,30 @@
           mdi-delete
         </v-icon>
       </template>
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">
-          Reset
-        </v-btn>
+      <template v-slot:[`item.cantidad`]="{ item }">
+        <span v-if="!item.cantidadMinima"
+          >Sin existencias mínimas asignadas</span
+        >
+        <span v-if="item.cantidadMinima">{{ item.cantidadMinima }}</span>
+      </template>
+      <template v-slot:[`item.deposito`]="{ item }">
+        <Checked
+          :object="item"
+          v-on:uncheck="uncheck"
+          v-if="item.selected === true"
+        />
+        <Add :object="item" v-on:add="add" v-else />
       </template>
     </v-data-table>
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-
+import Add from "../Buttons/Add";
+import Checked from "../Buttons/Checked";
 
 export default {
-  data:()=>({
+  data: () => ({
     depositos: [],
     file: null,
     filterParams: {
@@ -50,13 +49,19 @@ export default {
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-   headers:[
-     {text:"Nombre", value:"nombre"},
-     {text:"Deposito Determinado", value:"deposito[0].valor"},
-     {text:"Acciones", value:"acciones", sorteable:false}
-   ]
+    headers: [
+      { text: "Nombre", value: "nombre" },
+      { text: "Deposito Determinado", value: "deposito[0].valor" },
+      { text: "Migrar", value: "deposito", sortable: false },
+      { text: "Cantidad", value: "cantidad"},
+      { text: "Acciones", value: "acciones", sortable: false },
+    ],
   }),
-  
+  components: {
+    Add,
+    Checked,
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     if (this.loguedUser.perfil > 1) {
@@ -66,7 +71,7 @@ export default {
     this.filterObjects();
   },
   methods: {
-     filterObjects(page) {
+    filterObjects(page) {
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
@@ -78,6 +83,12 @@ export default {
           }
           this.loaded = true;
         });
+    },
+    add(object) {
+      this.$emit("add", object);
+    },
+    uncheck(object) {
+      this.$emit("uncheck", object);
     },
     editItem(itemId) {
       this.$emit("editItem", itemId);

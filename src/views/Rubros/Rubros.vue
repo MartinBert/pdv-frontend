@@ -6,14 +6,17 @@
           <v-col cols="1">
             <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
           </v-col>
-          <v-col cols="3">
-            <v-file-input
-              v-model="file"
-              class="mt-0"
-              placeholder="Importar rubros"
-              accept=".xlsx, xls"
-              @change="importDocuments($event)"
-            ></v-file-input>
+          <v-col cols="2">
+            <div style="width: 300px">
+              <v-file-input
+                dense
+                v-model="file"
+                class="mt-0"
+                placeholder="Importar depósitos"
+                accept=".xlsx, xls"
+                @change="importDocuments($event)"
+              ></v-file-input>
+            </div>
           </v-col>
           <v-col cols="5"></v-col>
           <v-col cols="3">
