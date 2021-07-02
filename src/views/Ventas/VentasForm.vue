@@ -1,5 +1,5 @@
 <template>
-  <v-container style="min-width: 100%;">
+  <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
       <v-row class="mb-1">
         <v-col cols="6">
@@ -45,7 +45,7 @@
           >
         </v-col>
       </v-row>
-      <br>
+      <br />
       <div class="horizontalSeparator"></div>
       <v-card style="min-width: 100%">
         <v-row>
@@ -281,6 +281,7 @@ import {
   transformPositive,
   calculateAmountMinusPercentaje,
   calculateAmountPlusPercentaje,
+  calculatePercentReductionInAmount,
   sumarNumeros,
 } from "../../helpers/mathHelper";
 import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
@@ -921,6 +922,10 @@ export default {
       let file;
       let fileURL;
       let invoice;
+      let planPercentDiscount;
+      let planPercentSurcharge;
+      let planAmountDiscount = 0;
+      let planAmountSurcharge = 0;
       /*** Get last invoice emmited number ***/
       axios
         .get(
@@ -959,10 +964,174 @@ export default {
                     addZerosInString("04", ptoVenta.idFiscal) +
                     cae +
                     formatDateWithoutSlash(dateOfCaeExpiration);
+
+                  productsDescription.forEach((product) => {
+                    if (!product.surchargeAmount) {
+                      product.surchargeAmount = 0;
+                      product.surchargePercent = 0;
+                    }
+                    if (!product.discountAmount) {
+                      product.discountAmount = 0;
+                      product.discountPercent = 0;
+                    }
+                  });
+
+                  if (planesPago.porcentaje > 0) {
+                    planPercentDiscount = 0;
+                    planPercentSurcharge = planesPago.porcentaje;
+                    const totalSumOfProductPrices = productsDescription.reduce(
+                      (acc, product) => acc + product.salePrice,
+                      0
+                    );
+                    planAmountSurcharge =
+                      calculateAmountPlusPercentaje(
+                        totalSumOfProductPrices,
+                        planPercentSurcharge
+                      ) - totalSumOfProductPrices;
+                  } else {
+                    planPercentDiscount = transformPositive(
+                      planesPago.porcentaje
+                    );
+                    planPercentSurcharge = 0;
+                    const totalSumOfProductPrices = productsDescription.reduce(
+                      (acc, product) => acc + product.salePrice,
+                      0
+                    );
+                    planAmountDiscount =
+                      totalSumOfProductPrices -
+                      calculateAmountMinusPercentaje(
+                        totalSumOfProductPrices,
+                        planPercentDiscount
+                      );
+                  }
+
+                  const productsWithIva21 = productsDescription.filter(
+                    (el) => el.saleIvaPercent === 21
+                  );
+                  const productsWithIva10 = productsDescription.filter(
+                    (el) => el.saleIvaPercent === 10.5
+                  );
+                  const productsWithIva27 = productsDescription.filter(
+                    (el) => el.saleIvaPercent === 27
+                  );
+
+                  const amountOfIva21 = productsWithIva21.reduce(
+                    (acc, product) => {
+                      const salePriceWithPlanDiscountAndSurcharge =
+                        calculateAmountPlusPercentaje(
+                          product.salePrice,
+                          planPercentSurcharge
+                        ) -
+                        (product.salePrice -
+                        calculateAmountMinusPercentaje(
+                          product.salePrice,
+                          planPercentDiscount
+                        ));
+                      const salePriceWithLineDiscountAndSurcharge =
+                        salePriceWithPlanDiscountAndSurcharge +
+                        product.surchargeAmount -
+                        product.discountAmount;
+                      const salePriceWithDiscountAndSurcharge =
+                        calculateAmountMinusPercentaje(
+                          salePriceWithLineDiscountAndSurcharge,
+                          this.porcentajeRecargoGlobal
+                        ) -
+                        (salePriceWithLineDiscountAndSurcharge -
+                          calculateAmountMinusPercentaje(
+                            salePriceWithLineDiscountAndSurcharge,
+                            this.porcentajeDescuentoGlobal
+                          ));
+                      console.log(salePriceWithDiscountAndSurcharge);
+                      acc +=
+                        salePriceWithDiscountAndSurcharge -
+                        calculatePercentReductionInAmount(
+                          salePriceWithDiscountAndSurcharge,
+                          21
+                        );
+                      return roundTwoDecimals(acc);
+                    },
+                    0
+                  );
+                  const amountOfIva10 = productsWithIva10.reduce(
+                    (acc, product) => {
+                      const salePriceWithPlanDiscountAndSurcharge =
+                        calculateAmountPlusPercentaje(
+                          product.salePrice,
+                          planPercentSurcharge
+                        ) -
+                        (product.salePrice -
+                        calculateAmountMinusPercentaje(
+                          product.salePrice,
+                          planPercentDiscount
+                        ));
+                      const salePriceWithLineDiscountAndSurcharge =
+                        salePriceWithPlanDiscountAndSurcharge +
+                        product.surchargeAmount -
+                        product.discountAmount;
+                      const salePriceWithDiscountAndSurcharge =
+                        calculateAmountMinusPercentaje(
+                          salePriceWithLineDiscountAndSurcharge,
+                          this.porcentajeRecargoGlobal
+                        ) -
+                        (salePriceWithLineDiscountAndSurcharge -
+                          calculateAmountMinusPercentaje(
+                            salePriceWithLineDiscountAndSurcharge,
+                            this.porcentajeDescuentoGlobal
+                          ));
+                      acc +=
+                        salePriceWithDiscountAndSurcharge -
+                        calculatePercentReductionInAmount(
+                          salePriceWithDiscountAndSurcharge,
+                          10.5
+                        );
+                      return roundTwoDecimals(acc);
+                    },
+                    0
+                  );
+                  const amountOfIva27 = productsWithIva27.reduce(
+                    (acc, product) => {
+                      const salePriceWithPlanDiscountAndSurcharge =
+                        calculateAmountPlusPercentaje(
+                          product.salePrice,
+                          planPercentSurcharge
+                        ) -
+                        (product.salePrice -
+                        calculateAmountMinusPercentaje(
+                          product.salePrice,
+                          planPercentDiscount
+                        ));
+                      const salePriceWithLineDiscountAndSurcharge =
+                        salePriceWithPlanDiscountAndSurcharge +
+                        product.surchargeAmount -
+                        product.discountAmount;
+                      const salePriceWithDiscountAndSurcharge =
+                        calculateAmountMinusPercentaje(
+                          salePriceWithLineDiscountAndSurcharge,
+                          this.porcentajeRecargoGlobal
+                        ) -
+                        (salePriceWithLineDiscountAndSurcharge -
+                          calculateAmountMinusPercentaje(
+                            salePriceWithLineDiscountAndSurcharge,
+                            this.porcentajeDescuentoGlobal
+                          ));
+                      acc +=
+                        salePriceWithDiscountAndSurcharge -
+                        calculatePercentReductionInAmount(
+                          salePriceWithDiscountAndSurcharge,
+                          27
+                        );
+                      return roundTwoDecimals(acc);
+                    },
+                    0
+                  );
+
                   // Create receipt
                   comprobante = {
                     letra: documento.letra,
-                    numeroCbte: addZerosInString("04", ptoVenta.idFiscal) + '-' + addZerosInString("08", numberOfReceipt),
+                    numeroCbte:
+                      addZerosInString("04", ptoVenta.idFiscal) +
+                      "-" +
+                      addZerosInString("08", numberOfReceipt),
                     fechaEmision: formatDate(getCurrentDate()),
                     fechaVto: formatDate(dateOfCaeExpiration),
                     condicionVenta: condVenta,
@@ -981,6 +1150,13 @@ export default {
                     totalRecargoGlobal: this.recargoGlobal,
                     porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
                     porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                    totalIva21: amountOfIva21,
+                    totalIva10: amountOfIva10,
+                    totalIva27: amountOfIva27,
+                    porcentajeRecargoPlan: planPercentSurcharge,
+                    porcentajeDescuentoPlan: planPercentDiscount,
+                    totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+                    totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
                     mediosPago: [mediosPago],
                     planesPago: [planesPago],
                     nombreDocumento: documento.nombre,
@@ -1125,6 +1301,10 @@ export default {
       let file;
       let fileURL;
       let comprobante;
+      let planPercentDiscount;
+      let planPercentSurcharge;
+      let planAmountDiscount = 0;
+      let planAmountSurcharge = 0;
       const checkChangesInPrice = () => {
         productsDescription.forEach((productDescription) => {
           if (planesPago.porcentaje < 0) {
@@ -1163,6 +1343,167 @@ export default {
         });
       };
       checkChangesInPrice();
+
+      productsDescription.forEach((product) => {
+        if (!product.surchargeAmount) {
+          product.surchargeAmount = 0;
+          product.surchargePercent = 0;
+        }
+        if (!product.discountAmount) {
+          product.discountAmount = 0;
+          product.discountPercent = 0;
+        }
+      });
+
+      if (planesPago.porcentaje > 0) {
+        planPercentDiscount = 0;
+        planPercentSurcharge = planesPago.porcentaje;
+        const totalSumOfProductPrices = productsDescription.reduce(
+          (acc, product) => acc + product.salePrice,
+          0
+        );
+        planAmountSurcharge =
+          calculateAmountPlusPercentaje(
+            totalSumOfProductPrices,
+            planPercentSurcharge
+          ) - totalSumOfProductPrices;
+      } else {
+        planPercentDiscount = transformPositive(
+          planesPago.porcentaje
+        );
+        planPercentSurcharge = 0;
+        const totalSumOfProductPrices = productsDescription.reduce(
+          (acc, product) => acc + product.salePrice,
+          0
+        );
+        planAmountDiscount =
+          totalSumOfProductPrices -
+          calculateAmountMinusPercentaje(
+            totalSumOfProductPrices,
+            planPercentDiscount
+          );
+      }
+
+      const productsWithIva21 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 21
+      );
+      const productsWithIva10 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 10.5
+      );
+      const productsWithIva27 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 27
+      );
+
+      const amountOfIva21 = productsWithIva21.reduce(
+        (acc, product) => {
+          const salePriceWithPlanDiscountAndSurcharge =
+            calculateAmountPlusPercentaje(
+              product.salePrice,
+              planPercentSurcharge
+            ) -
+            (product.salePrice -
+            calculateAmountMinusPercentaje(
+              product.salePrice,
+              planPercentDiscount
+            ));
+          const salePriceWithLineDiscountAndSurcharge =
+            salePriceWithPlanDiscountAndSurcharge +
+            product.surchargeAmount -
+            product.discountAmount;
+          const salePriceWithDiscountAndSurcharge =
+            calculateAmountMinusPercentaje(
+              salePriceWithLineDiscountAndSurcharge,
+              this.porcentajeRecargoGlobal
+            ) -
+            (salePriceWithLineDiscountAndSurcharge -
+              calculateAmountMinusPercentaje(
+                salePriceWithLineDiscountAndSurcharge,
+                this.porcentajeDescuentoGlobal
+              ));
+          console.log(salePriceWithDiscountAndSurcharge);
+          acc +=
+            salePriceWithDiscountAndSurcharge -
+            calculatePercentReductionInAmount(
+              salePriceWithDiscountAndSurcharge,
+              21
+            );
+          return roundTwoDecimals(acc);
+        },
+        0
+      );
+      const amountOfIva10 = productsWithIva10.reduce(
+        (acc, product) => {
+          const salePriceWithPlanDiscountAndSurcharge =
+            calculateAmountPlusPercentaje(
+              product.salePrice,
+              planPercentSurcharge
+            ) -
+            (product.salePrice -
+            calculateAmountMinusPercentaje(
+              product.salePrice,
+              planPercentDiscount
+            ));
+          const salePriceWithLineDiscountAndSurcharge =
+            salePriceWithPlanDiscountAndSurcharge +
+            product.surchargeAmount -
+            product.discountAmount;
+          const salePriceWithDiscountAndSurcharge =
+            calculateAmountMinusPercentaje(
+              salePriceWithLineDiscountAndSurcharge,
+              this.porcentajeRecargoGlobal
+            ) -
+            (salePriceWithLineDiscountAndSurcharge -
+              calculateAmountMinusPercentaje(
+                salePriceWithLineDiscountAndSurcharge,
+                this.porcentajeDescuentoGlobal
+              ));
+          acc +=
+            salePriceWithDiscountAndSurcharge -
+            calculatePercentReductionInAmount(
+              salePriceWithDiscountAndSurcharge,
+              10.5
+            );
+          return roundTwoDecimals(acc);
+        },
+        0
+      );
+      const amountOfIva27 = productsWithIva27.reduce(
+        (acc, product) => {
+          const salePriceWithPlanDiscountAndSurcharge =
+            calculateAmountPlusPercentaje(
+              product.salePrice,
+              planPercentSurcharge
+            ) -
+            (product.salePrice -
+            calculateAmountMinusPercentaje(
+              product.salePrice,
+              planPercentDiscount
+            ));
+          const salePriceWithLineDiscountAndSurcharge =
+            salePriceWithPlanDiscountAndSurcharge +
+            product.surchargeAmount -
+            product.discountAmount;
+          const salePriceWithDiscountAndSurcharge =
+            calculateAmountMinusPercentaje(
+              salePriceWithLineDiscountAndSurcharge,
+              this.porcentajeRecargoGlobal
+            ) -
+            (salePriceWithLineDiscountAndSurcharge -
+              calculateAmountMinusPercentaje(
+                salePriceWithLineDiscountAndSurcharge,
+                this.porcentajeDescuentoGlobal
+              ));
+          acc +=
+            salePriceWithDiscountAndSurcharge -
+            calculatePercentReductionInAmount(
+              salePriceWithDiscountAndSurcharge,
+              27
+            );
+          return roundTwoDecimals(acc);
+        },
+        0
+      );
+
       comprobante = {
         letra: "X",
         numeroCbte: generateFiveDecimalCode(),
@@ -1180,6 +1521,17 @@ export default {
         empresa: empresa,
         cliente: cliente,
         totalVenta: totalVenta,
+        totalDescuentoGlobal: this.descuentoGlobal,
+        totalRecargoGlobal: this.recargoGlobal,
+        porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+        porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+        totalIva21: amountOfIva21,
+        totalIva10: amountOfIva10,
+        totalIva27: amountOfIva27,
+        porcentajeRecargoPlan: planPercentSurcharge,
+        porcentajeDescuentoPlan: planPercentDiscount,
+        totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+        totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
         mediosPago: [mediosPago],
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,

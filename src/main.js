@@ -10,7 +10,6 @@ import store from './store/index';
 import { errorAlert, infoAlert, infoAlert2, questionAlert, successAlert, successAlert2 } from './helpers/alerts';
 import Toaster from 'v-toaster';
 import 'v-toaster/dist/v-toaster.css'
-import animate from 'animate.css';
     
 Vue.prototype.$errorAlert = errorAlert;
 Vue.prototype.$infoAlert = infoAlert;
@@ -30,6 +29,5 @@ new Vue({
   store,
   router,
   vuetify,
-  animate,
   render: h => h(App),
 }).$mount('#app')
