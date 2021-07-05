@@ -1,13 +1,18 @@
 <template>
-  <v-container style="min-width: 100%;">
-    <v-tabs fixed-tabs background-color="indigo" dark >
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'">Lista</v-tab>
-      <v-tab class="primary ml-1" >Nuevo</v-tab>
-      <v-tab class="primary ml-1">Generar Etiquetas</v-tab>
-      <v-tab class="primary ml-1">Modificar Precios</v-tab>
-
+  <v-container style="min-width: 99%;
+  margin-left:2px;
+  ">
+    <v-tabs fixed-tabs background-color="indigo" dark v-model="activeTab">
+        <v-tab
+            v-for="item in tabs"
+            :key="item.id"
+            :to="item.route"
+            @click="setTabs($event)"
+          >
+            {{ item.title }}
+        </v-tab>
     </v-tabs>
-    <br>
+    <br />
     <v-card class="card" min-width="100%">
       <Error :errorStatus="errorStatus" />
       <div v-if="loaded" class="grey lighten-5">
@@ -297,8 +302,6 @@ import Error from "../../components/Error";
 export default {
   data: () => ({
     view: "listOfProducts",
-    setActiveTabComponent: null,
-    activeTab: null,
     atributosNumericos: [],
     atributosDeTexto: [],
     distribuidores: [],
@@ -316,6 +319,13 @@ export default {
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
       editable: false,
     },
+    tabs: [
+      { id:1, title:"Lista", route:"/pdv2/productos"},
+      { id:2, title:"Nuevo", route:"/pdv2/productos/form/0"},
+      { id:3, title:"Generar Etiqueta", route:"/pdv2/productos"},
+      { id:4, title:"Modificar precios", route:"/pdv2/precios"}
+    ],
+    activeTab: 2,
     filterParams: {
       productoName: "",
       productoCodigo: "",
@@ -329,12 +339,6 @@ export default {
       size: 1,
       totalPages: 0,
     },
-    tabs: [
-      { id: 0, route: "", title: "Lista" },
-      { id: 1, route: "", title: "Nuevo" },
-      { id: 2, route: "", title: "Generar Etiquetas" },
-      { id: 3, route: "", title: "Modificar Precios" },
-    ],
     cantidad: [],
     loaded: false,
     tenant: "",
@@ -359,13 +363,9 @@ export default {
     this.getOtherModels(0, 100000);
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
-    if (this.loguedUser.perfil > 1) {
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
-    this.tabs[0].route = `/${this.tenant}/productos`;
-    this.tabs[1].route = `/${this.tenant}/form/:id`;
-    this.tabs[2].route = `/${this.tenant}/productos`;
-    this.tabs[3].route = `/${this.tenant}/precios`;
+    //if (this.loguedUser.perfil > 1) {
+      //this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    //}
   },
 
   methods: {
@@ -428,6 +428,10 @@ export default {
 
     goPricesManagerView() {
       this.$router.push({ name: "productos" });
+    },
+    setTabs(tab){
+      //this.activeTab = tab
+      console.log(tab);
     },
 
     calculations() {

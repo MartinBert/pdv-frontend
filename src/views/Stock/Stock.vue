@@ -1,5 +1,8 @@
 <template>
-  <v-container style="min-width: 100%;">
+  <v-container
+    style="min-width: 98%;
+  margin-left:2px;"
+  >
     <v-tabs fixed-tabs background-color="indigo" dark>
       <v-tab class="primary" @click="newObject()" raised>
         Nuevo
@@ -118,13 +121,13 @@
             />
           </v-col>
           <v-col>
-          <form
-            @submit.prevent="migrateStockToOtherDeposit()"
-            style="margin: 10px;"
-          >
-            <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
-          </form>
-        </v-col>
+            <form
+              @submit.prevent="migrateStockToOtherDeposit()"
+              style="margin: 10px;"
+            >
+              <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
+            </form>
+          </v-col>
         </v-row>
       </v-form>
       <StocksTable

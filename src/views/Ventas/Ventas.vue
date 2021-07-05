@@ -1,7 +1,7 @@
 <template>
   <v-container style="min-width: 100%;">
     <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
-      <v-card>
+      <v-card min-width="100%">
         <v-form class="mb-3">
           <v-row class="mb-4">
               <v-col>

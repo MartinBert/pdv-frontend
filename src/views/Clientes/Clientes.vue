@@ -1,7 +1,11 @@
 <template>
-  <v-container style="min-width: 100%;">
+  <v-container
+    style="min-width: 98%;
+  margin-left:2px;
+  "
+  >
     <v-card>
-      <v-form class="mb-3">
+      <v-form class="mb-0">
         <v-row>
           <v-col>
             <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>

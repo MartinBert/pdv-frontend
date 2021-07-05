@@ -1,14 +1,17 @@
 <template>
-  <v-container>
-    <v-data-table>
-      
+  <v-container style="min-width: 100%;" class="elevation-6">
+    <v-data-table :headers="headers" :items="perfiles">
+      <template v-slot:[`item.acciones`]="{ item }">
+        <Edit :itemId="item.id" v-on:editItem="editItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
+      </template>
     </v-data-table>
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-//import Edit from "../Buttons/Edit";
-//import Delete from "../Buttons/Delete";
+import Edit from "../Buttons/Edit";
+import Delete from "../Buttons/Delete";
 export default {
   data: () => ({
     perfiles: [],
@@ -25,10 +28,17 @@ export default {
     service: "perfiles",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
+    headers: [
+      { text: "Nombre", value: "nombre" },
+      { text: "Usuario", value: "usuario" },
+      { text: "Perfil", value: "perfil.nombre" },
+      { text: "Empresa", value: "empresa.alias" },
+      { text: "Acciones", value: "acciones" },
+    ],
   }),
   components: {
-    //Edit,
-    //Delete,
+    Edit,
+    Delete,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;

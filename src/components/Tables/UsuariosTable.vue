@@ -1,6 +1,6 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-data-table :headers="headers" :items="usuarios">
+    <v-data-table :headers="headers" :items="usuarios" class="elevation-6">
       <template v-slot:[`item.empresa`]="{ item }">
         <span v-if="item.empresa == null">Todas</span>
         <span v-if="item.empresa != null">{{ item.empresa.alias }}</span>

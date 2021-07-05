@@ -1,22 +1,23 @@
 <template>
-  <v-container style="min-width: 100%;">
-    <v-tabs fixed-tabs background-color="indigo" dark >
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" >
-        Lista
-      </v-tab>
-      <v-tab class="primary ml-1" @click="newObject()">
-        Nuevo
-      </v-tab>
-      <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
-        Generar Etiquetas
-      </v-tab>
-      <v-tab class="primary ml-1" @click="goPricesManagerView()">
-        Modificar Precios
+  <v-container
+    class="container"
+    style="min-width: 98%;
+    margin-left:2px;
+  "
+  >
+    <v-tabs fixed-tabs background-color="indigo" dark v-model="activeTab">
+      <v-tab
+        v-for="item in tabs"
+        :key="item.id"
+        :to="item.route"
+        @click="activeTab = item.id"
+      >
+        {{ item.title }}
       </v-tab>
     </v-tabs>
     <br />
     <v-card>
-      <v-form class="mb-3" v-on:click="show = !show">
+      <v-form class="mb-0" v-on:click="show = !show">
         <v-row class="m-5">
           <v-col cols="6" v-if="perfil < 3">
             <v-btn class="primary ml-2" @click="getReport()" raised
@@ -47,16 +48,16 @@
             >
           </v-col>
           <v-col cols="3" v-if="perfil < 3 && view == 'listOfProducts'">
-              <v-file-input
-                class="mt-2"
-                dense
-                v-model="file"
-                placeholder="Importar"
-                accept=".xlsx, xls"
-                @change="onChange($event)"
-              ></v-file-input>
-            </v-col>
-            <v-col cols="3" v-if="view == 'listOfProducts' && perfil < 3">
+            <v-file-input
+              class="mt-2"
+              dense
+              v-model="file"
+              placeholder="Importar"
+              accept=".xlsx, xls"
+              @change="onChange($event)"
+            ></v-file-input>
+          </v-col>
+          <v-col cols="3" v-if="view == 'listOfProducts' && perfil < 3">
             <v-select
               :items="estados"
               v-model="estadoSelecionado"
@@ -68,9 +69,7 @@
             ></v-select>
           </v-col>
         </v-row>
-        <v-row style="justify-content: center;"
-         class="mt-1"
-        >
+        <v-row style="justify-content: center;" class="mt-1">
           <v-col cols="2">
             <v-text-field
               v-model="filterParams.productoName"
@@ -248,12 +247,6 @@ export default {
       { id: 1, text: "Activos" },
       { id: 2, text: "Inactivos" },
     ],
-    tabs: [
-      { id: 1, route: "", title: "Lista" },
-      { id: 2, route: "", title: "Nuevo" },
-      { id: 3, route: "", title: "Generar Etiquetas" },
-      { id: 4, route: "", title: "Modificar Precios" },
-    ],
     estadoSelecionado: { id: 1, text: "Activos" },
     filterParams: {
       sucursalId: "",
@@ -269,6 +262,13 @@ export default {
       size: 10,
       totalPages: 0,
     },
+    tabs: [
+      { id: 0, title: "Lista", route: "/pdv2/productos" },
+      { id: 1, title: "Nuevo", route: "/pdv2/productos/form/0" },
+      { id: 2, title: "Generar Etiqueta", route: "/pdv2/productos" },
+      { id: 3, title: "Modificar precios", route: "/pdv2/precios" },
+    ],
+    activeTab: 1,
     loaded: false,
     tenant: "",
     idObject: "",
@@ -293,10 +293,6 @@ export default {
     this.filterObjects();
     this.getOtherModels(0, 100000);
     this.perfil = this.loguedUser.perfil;
-    this.tabs[0].route = `/${this.tenant}/productos`;
-    this.tabs[1].route = `/${this.tenant}/productos/form/:id`;
-    this.tabs[2].route = `/${this.tenant}/productos`;
-    this.tabs[3].route = `/${this.tenant}/precios`;
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
@@ -882,7 +878,7 @@ export default {
 v-tabs {
   margin-bottom: 10px;
 }
-.filtros{
+.filtros {
   margin-right: 20px;
 }
 </style>
