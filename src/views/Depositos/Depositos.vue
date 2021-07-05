@@ -1,7 +1,6 @@
 <template>
-  <v-container style="min-width: 98%;
-  margin-left:12px;
-  margin-right:12px;
+  <v-container style="min-width: 99%;
+  margin-left:25px;
   ">
     <v-card>
       <v-form class="mb-0">

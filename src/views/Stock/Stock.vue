@@ -1,8 +1,7 @@
 <template>
   <v-container
-    style="min-width: 98%;
-  margin-left:12px;
-  margin-right:12px;"
+    style="min-width: 99%;
+  margin-left:25px;"
   >
     <v-tabs fixed-tabs background-color="indigo" dark>
       <v-tab class="primary" @click="newObject()" raised>
