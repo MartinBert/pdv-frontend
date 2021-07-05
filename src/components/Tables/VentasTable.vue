@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="min-width: 98%;">
     <v-row>
       <v-col>
         <h2>Lista de comprobantes emitidos</h2>
