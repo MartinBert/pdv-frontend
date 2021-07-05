@@ -1,5 +1,6 @@
 <template>
-  <v-container style="min-width: 100%;">
+  <v-container style="min-width: 99%;
+   margin-left:15px;  ">
     <v-card min-width="100%">
       <Error :errorStatus="errorStatus" />
       <div v-if="loaded">
