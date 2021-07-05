@@ -1,7 +1,5 @@
 <template>
-  <v-container style="min-width: 99%;
-  margin-left:25px;
-  ">
+  <v-container class="container">
     <v-card>
       <v-form class="mb-0">
         <v-row>
@@ -192,3 +190,11 @@ export default {
   },
 };
 </script>
+<style>
+.container{
+  min-width: 97%;
+  margin-left: 2%;
+
+
+}
+</style>

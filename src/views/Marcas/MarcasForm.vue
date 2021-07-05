@@ -1,8 +1,8 @@
 <template>
   <v-container style="min-width: 99%;
-  margin-left:25px;
+  margin-left:1px;
   ">
-    <v-card min-width="100%">
+    <v-card>
       <Error :errorStatus="errorStatus" />
       <div v-if="loaded">
         <v-form ref="form" class="mt-5">
