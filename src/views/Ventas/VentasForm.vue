@@ -1041,7 +1041,6 @@ export default {
                             salePriceWithLineDiscountAndSurcharge,
                             this.porcentajeDescuentoGlobal
                           ));
-                      console.log(salePriceWithDiscountAndSurcharge);
                       acc +=
                         salePriceWithDiscountAndSurcharge -
                         calculatePercentReductionInAmount(
@@ -1125,6 +1124,12 @@ export default {
                     0
                   );
 
+                  const totalIvas = amountOfIva21 + amountOfIva10 + amountOfIva27;
+                  const totalDiscounts = this.descuentoGlobal + planAmountDiscount;
+                  const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
+                  const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
+                  const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
+
                   // Create receipt
                   comprobante = {
                     letra: documento.letra,
@@ -1146,6 +1151,7 @@ export default {
                     empresa: empresa,
                     cliente: cliente,
                     totalVenta: totalVenta,
+                    subTotal: subTotal,
                     totalDescuentoGlobal: this.descuentoGlobal,
                     totalRecargoGlobal: this.recargoGlobal,
                     porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
@@ -1161,8 +1167,6 @@ export default {
                     planesPago: [planesPago],
                     nombreDocumento: documento.nombre,
                   };
-
-                  console.log(comprobante);
 
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
@@ -1420,7 +1424,6 @@ export default {
                 salePriceWithLineDiscountAndSurcharge,
                 this.porcentajeDescuentoGlobal
               ));
-          console.log(salePriceWithDiscountAndSurcharge);
           acc +=
             salePriceWithDiscountAndSurcharge -
             calculatePercentReductionInAmount(
@@ -1504,6 +1507,12 @@ export default {
         0
       );
 
+      const totalIvas = amountOfIva21 + amountOfIva10 + amountOfIva27;
+      const totalDiscounts = this.descuentoGlobal + planAmountDiscount;
+      const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
+      const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
+      const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
+
       comprobante = {
         letra: "X",
         numeroCbte: generateFiveDecimalCode(),
@@ -1521,6 +1530,7 @@ export default {
         empresa: empresa,
         cliente: cliente,
         totalVenta: totalVenta,
+        subTotal: subTotal,
         totalDescuentoGlobal: this.descuentoGlobal,
         totalRecargoGlobal: this.recargoGlobal,
         porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
