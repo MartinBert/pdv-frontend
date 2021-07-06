@@ -30,6 +30,7 @@ export default {
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     ventas: [],
+    token: localStorage.getItem('token'),
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
