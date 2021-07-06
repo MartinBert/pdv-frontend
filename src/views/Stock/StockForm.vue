@@ -1,6 +1,6 @@
 <template>
   <v-container style="min-width: 98%;
-  margin-left:2px;
+  margin-right:40px;
   ">
     <Error :errorStatus="errorStatus" />
     <v-tabs fixed-tabs background-color="indigo" dark>

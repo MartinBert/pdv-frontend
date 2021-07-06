@@ -1,7 +1,8 @@
 <template>
   <v-container
-    style="min-width: 99%;
-  margin-left:25px;"
+ style="min-width: 98%;
+  margin-right:40px;
+  "
   >
     <Error :errorStatus="errorStatus" />
     <v-card min-width="100%" v-if="loaded">
