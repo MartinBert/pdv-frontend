@@ -77,6 +77,16 @@
                 :rules="[(v) => !!v || 'Campo requerido...']"
               ></v-text-field>
             </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.logo"
+                :counter="50"
+                label="URL de logo"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-text-field>
+            </v-col>
           </v-row>
           <div class="ma-1">
             <v-col class="col-6">
