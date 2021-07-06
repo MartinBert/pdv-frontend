@@ -172,6 +172,14 @@
                 label="Razón social"
               ></v-text-field>
             </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
+                v-model="object.logo"
+                :counter="50"
+                label="URL de logo"
+              ></v-text-field>
+            </v-col>
           </v-row>
           <div class="ma-1">
             <v-col class="col-6">
@@ -283,13 +291,15 @@ export default {
         !this.object.cuit ||
         !this.object.fechaInicioAct ||
         !this.object.ingBruto ||
-        !this.object.razonSocial
+        !this.object.razonSocial ||
+        !this.object.logo
       ) {
         this.object.condicionIva = this.object.empresa.condicionIva;
         this.object.cuit = this.object.empresa.cuit;
         this.object.fechaInicioAct = this.object.empresa.fechaInicioAct;
         this.object.ingBruto = this.object.empresa.ingBruto;
         this.object.razonSocial = this.object.empresa.razonSocial;
+        this.object.logo = this.object.empresa.logo
       }
       this.$refs.form.validate();
       GenericService(this.tenant, this.service, this.token)
