@@ -1,11 +1,11 @@
 <template>
   <v-container style="min-width: 98%;">
-    <v-row>
+    <v-row style="justify-content: center;">
       <v-col>
         <h2>Lista de comprobantes emitidos</h2>
       </v-col>
     </v-row>
-    <v-data-table style="background-color: transparent" :headers="headers" :items="ventas">
+    <v-data-table style="background-color: transparent" :headers="headers" :items="ventas" class="elevation-6">
       <template v-slot:[`item.productos`]="{ item }">
         <Detail :objectsArray="item.productos" v-on:seeDetails="seeDetails" />
       </template>
@@ -44,16 +44,16 @@ export default {
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
       { text: "Codigo de barra", value: "barCode" },
-      { text: "Comprobante", value: "nombreDocumento" },
-      { text: "Detalles", value: "productos" },
-      { text: "Medios de pago empleados", value: "mediosPago" },
-      { text: "Planes de pago", value: "planesPago" },
+      { text: "Comprobante", value: "nombreDocumento", sortable:false},
+      { text: "Detalles", value: "productos", sortable:false},
+      { text: "Medios de pago empleados", value: "mediosPago" ,sortable:false},
+      { text: "Planes de pago", value: "planesPago",sortable:false},
       { text: "Precio de venta", value: "totalVenta" },
-      { text: "Acciones", value: "acciones" },
+      { text: "Acciones", value: "acciones", sortable:false},
     ],
   }),
   mounted() {
-    this.$store.commit("eventual/resetStates");
+    this.tenant = this.$route.params.tenant;
     this.filterObjects();
   },
 
