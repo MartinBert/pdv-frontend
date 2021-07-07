@@ -50,6 +50,7 @@ export function checkIfNote(docs) {
 
 export function checkIfInvoice(docs) {
   const arr = [
+    "PR",
     "001",
     "006",
     "011",

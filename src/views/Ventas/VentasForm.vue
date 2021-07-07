@@ -9,6 +9,12 @@
               @click="$store.commit('productos/dialogProductosMutation')"
               >BUSCAR PRODUCTOS</v-btn
             >
+            <v-btn
+              color="primary"
+              class="ml-1"
+              @click="$store.commit('productos/dialogProductosMutation')"
+              >BUSCAR PRESUPUESTO</v-btn
+            >
             <h3 class="mt-2 ml-2">
               Depósito predeterminado:
               <span v-if="defaultDeposit">
@@ -889,7 +895,11 @@ export default {
             this.save();
           }
         } else {
-          this.saveNoFiscal();
+          if(documento.presupuesto === true){
+            this.savePresupuesto();
+          }else{
+            this.saveNoFiscal();
+          }
         }
       } else {
         this.$errorAlert(
@@ -1588,6 +1598,310 @@ export default {
                       this.clear();
                       this.loaded = true;
                     });
+                });
+            });
+        } else {
+          this.$errorAlert("No hay productos seleccionados en la venta").then(
+            (result) => {
+              if (result.isDismissed) {
+                this.loaded = true;
+              }
+            }
+          );
+        }
+      } else {
+        this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
+          if (result.isDismissed) {
+            this.loaded = true;
+          }
+        });
+      }
+    },
+
+    savePresupuesto(){
+      const mediosPago = this.object.mediosPago;
+      const planesPago = this.object.planPago;
+      const totalVenta = this.totalVenta;
+      const cliente = this.object.cliente;
+      const empresa = this.loguedUser.empresa;
+      const documento = this.object.documento;
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
+      const products = this.products;
+      const productsDetail = this.productsDetail;
+      const productsDescription = this.productsDescription;
+      const fecha = this.fecha;
+      const tenant = this.tenant;
+      const token = this.token;
+      const service = this.service;
+      const condVenta = this.checkSaleCondition(planesPago);
+      let file;
+      let fileURL;
+      let comprobante;
+      let planPercentDiscount;
+      let planPercentSurcharge;
+      let planAmountDiscount = 0;
+      let planAmountSurcharge = 0;
+      const checkChangesInPrice = () => {
+        productsDescription.forEach((productDescription) => {
+          if (planesPago.porcentaje < 0) {
+            const paymentPlanVariationPercent = transformPositive(
+              planesPago.porcentaje
+            );
+            productDescription.discountAmount =
+              productDescription.discountAmount +
+              (productDescription.salePrice -
+                calculateAmountMinusPercentaje(
+                  productDescription.salePrice,
+                  paymentPlanVariationPercent
+                ));
+            productDescription.discountPercent = sumarNumeros([
+              productDescription.discountPercent,
+              paymentPlanVariationPercent,
+            ]);
+          } else if (planesPago.porcentaje > 0) {
+            const paymentPlanVariationPercent = transformPositive(
+              planesPago.porcentaje
+            );
+            productDescription.surchargeAmount =
+              productDescription.surchargeAmount +
+              (calculateAmountPlusPercentaje(
+                productDescription.salePrice,
+                paymentPlanVariationPercent
+              ) -
+                productDescription.salePrice);
+            productDescription.surchargePercent = sumarNumeros([
+              productDescription.surchargePercent,
+              paymentPlanVariationPercent,
+            ]);
+          } else {
+            console.log("Not price modifications detected");
+          }
+        });
+      };
+      checkChangesInPrice();
+
+      productsDescription.forEach((product) => {
+        if (!product.surchargeAmount) {
+          product.surchargeAmount = 0;
+          product.surchargePercent = 0;
+        }
+        if (!product.discountAmount) {
+          product.discountAmount = 0;
+          product.discountPercent = 0;
+        }
+      });
+
+      if (planesPago.porcentaje > 0) {
+        planPercentDiscount = 0;
+        planPercentSurcharge = planesPago.porcentaje;
+        const totalSumOfProductPrices = productsDescription.reduce(
+          (acc, product) => acc + product.salePrice,
+          0
+        );
+        planAmountSurcharge =
+          calculateAmountPlusPercentaje(
+            totalSumOfProductPrices,
+            planPercentSurcharge
+          ) - totalSumOfProductPrices;
+      } else {
+        planPercentDiscount = transformPositive(
+          planesPago.porcentaje
+        );
+        planPercentSurcharge = 0;
+        const totalSumOfProductPrices = productsDescription.reduce(
+          (acc, product) => acc + product.salePrice,
+          0
+        );
+        planAmountDiscount =
+          totalSumOfProductPrices -
+          calculateAmountMinusPercentaje(
+            totalSumOfProductPrices,
+            planPercentDiscount
+          );
+      }
+
+      const productsWithIva21 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 21
+      );
+      const productsWithIva10 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 10.5
+      );
+      const productsWithIva27 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 27
+      );
+
+      const amountOfIva21 = productsWithIva21.reduce(
+        (acc, product) => {
+          const salePriceWithPlanDiscountAndSurcharge =
+            calculateAmountPlusPercentaje(
+              product.salePrice,
+              planPercentSurcharge
+            ) -
+            (product.salePrice -
+            calculateAmountMinusPercentaje(
+              product.salePrice,
+              planPercentDiscount
+            ));
+          const salePriceWithLineDiscountAndSurcharge =
+            salePriceWithPlanDiscountAndSurcharge +
+            product.surchargeAmount -
+            product.discountAmount;
+          const salePriceWithDiscountAndSurcharge =
+            calculateAmountMinusPercentaje(
+              salePriceWithLineDiscountAndSurcharge,
+              this.porcentajeRecargoGlobal
+            ) -
+            (salePriceWithLineDiscountAndSurcharge -
+              calculateAmountMinusPercentaje(
+                salePriceWithLineDiscountAndSurcharge,
+                this.porcentajeDescuentoGlobal
+              ));
+          acc +=
+            salePriceWithDiscountAndSurcharge -
+            calculatePercentReductionInAmount(
+              salePriceWithDiscountAndSurcharge,
+              21
+            );
+          return roundTwoDecimals(acc);
+        },
+        0
+      );
+      const amountOfIva10 = productsWithIva10.reduce(
+        (acc, product) => {
+          const salePriceWithPlanDiscountAndSurcharge =
+            calculateAmountPlusPercentaje(
+              product.salePrice,
+              planPercentSurcharge
+            ) -
+            (product.salePrice -
+            calculateAmountMinusPercentaje(
+              product.salePrice,
+              planPercentDiscount
+            ));
+          const salePriceWithLineDiscountAndSurcharge =
+            salePriceWithPlanDiscountAndSurcharge +
+            product.surchargeAmount -
+            product.discountAmount;
+          const salePriceWithDiscountAndSurcharge =
+            calculateAmountMinusPercentaje(
+              salePriceWithLineDiscountAndSurcharge,
+              this.porcentajeRecargoGlobal
+            ) -
+            (salePriceWithLineDiscountAndSurcharge -
+              calculateAmountMinusPercentaje(
+                salePriceWithLineDiscountAndSurcharge,
+                this.porcentajeDescuentoGlobal
+              ));
+          acc +=
+            salePriceWithDiscountAndSurcharge -
+            calculatePercentReductionInAmount(
+              salePriceWithDiscountAndSurcharge,
+              10.5
+            );
+          return roundTwoDecimals(acc);
+        },
+        0
+      );
+      const amountOfIva27 = productsWithIva27.reduce(
+        (acc, product) => {
+          const salePriceWithPlanDiscountAndSurcharge =
+            calculateAmountPlusPercentaje(
+              product.salePrice,
+              planPercentSurcharge
+            ) -
+            (product.salePrice -
+            calculateAmountMinusPercentaje(
+              product.salePrice,
+              planPercentDiscount
+            ));
+          const salePriceWithLineDiscountAndSurcharge =
+            salePriceWithPlanDiscountAndSurcharge +
+            product.surchargeAmount -
+            product.discountAmount;
+          const salePriceWithDiscountAndSurcharge =
+            calculateAmountMinusPercentaje(
+              salePriceWithLineDiscountAndSurcharge,
+              this.porcentajeRecargoGlobal
+            ) -
+            (salePriceWithLineDiscountAndSurcharge -
+              calculateAmountMinusPercentaje(
+                salePriceWithLineDiscountAndSurcharge,
+                this.porcentajeDescuentoGlobal
+              ));
+          acc +=
+            salePriceWithDiscountAndSurcharge -
+            calculatePercentReductionInAmount(
+              salePriceWithDiscountAndSurcharge,
+              27
+            );
+          return roundTwoDecimals(acc);
+        },
+        0
+      );
+
+      const totalIvas = amountOfIva21 + amountOfIva10 + amountOfIva27;
+      const totalDiscounts = this.descuentoGlobal + planAmountDiscount;
+      const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
+      const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
+      const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
+
+      comprobante = {
+        letra: "P",
+        numeroCbte: generateFiveDecimalCode(),
+        fechaEmision: formatDate(fecha),
+        fechaVto: formatDate(fecha),
+        condicionVenta: condVenta,
+        productos: products,
+        productosDetalle: productsDetail,
+        productoDescription: productsDescription,
+        barCode: generateBarCode(),
+        cae: "",
+        logoUrl: this.loguedUser.sucursal.logo,
+        puntoVenta: ptoVenta,
+        sucursal: sucursal,
+        documentoComercial: documento,
+        empresa: empresa,
+        cliente: cliente,
+        totalVenta: totalVenta,
+        subTotal: subTotal,
+        totalDescuentoGlobal: this.descuentoGlobal,
+        totalRecargoGlobal: this.recargoGlobal,
+        porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+        porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+        totalIva21: amountOfIva21,
+        totalIva10: amountOfIva10,
+        totalIva27: amountOfIva27,
+        porcentajeRecargoPlan: planPercentSurcharge,
+        porcentajeDescuentoPlan: planPercentDiscount,
+        totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+        totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+        mediosPago: [mediosPago],
+        planesPago: [planesPago],
+        nombreDocumento: documento.nombre,
+      };
+      /*** Evaluate required sale form data ***/
+      if (comprobante.mediosPago[0] !== undefined) {
+        if (Number(comprobante.totalVenta) !== 0) {
+          /*** Save receipt in database and print ticket ***/
+          GenericService(tenant, "comprobantesFiscales", token)
+            .save(comprobante)
+            .then(() => {
+              ReportsService(tenant, service, token)
+                .onCloseSaleReport(comprobante)
+                .then((res) => {
+                  file = new Blob([res["data"]], {
+                    type: "application/pdf",
+                  });
+                  fileURL = URL.createObjectURL(file);
+                  window.open(fileURL, "_blank");
+                })
+                .then(() => {
+                  this.$successAlert("Presupuesto generado")
+                  .then(()=>{
+                    this.clear();
+                    this.loaded = true;
+                  })
                 });
             });
         } else {
