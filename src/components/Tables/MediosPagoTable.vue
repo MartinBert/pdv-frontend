@@ -1,20 +1,34 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-row>
-      <v-col cols="9"></v-col>
-      <v-col cols="2">
-        <v-text-field
-          v-model="filterParams.medioPagoName"
-          v-on:input="filterObjects()"
-          dense
-          outlined
-          rounded
-          class="text-left"
-          placeholder="Búsqueda"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+    <v-form class="mb-0">
+      <v-row>
+        <v-col cols="1">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="3">
+          <v-file-input
+            v-model="file"
+            class="mt-0"
+            placeholder="Importar medios de pago"
+            accept=".xlsx, xls"
+            @change="onChange($event)"
+          ></v-file-input>
+        </v-col>
+        <v-col cols="6"></v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.medioPagoName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="mediosPago" class="elevation-6">
       <template v-slot:[`item.planPago`]="{ item }">
         <Detail :objectsArray="item.planPago" v-on:seeDetails="seeDetails" />

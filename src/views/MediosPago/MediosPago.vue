@@ -3,22 +3,6 @@
   margin-right:40px;
   ">
     <v-card>
-      <v-form class="mb-0">
-        <v-row>
-          <v-col cols="1">
-            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          </v-col>
-          <v-col cols="3">
-            <v-file-input
-              v-model="file"
-              class="mt-0"
-              placeholder="Importar medios de pago"
-              accept=".xlsx, xls"
-              @change="onChange($event)"
-            ></v-file-input>
-          </v-col>
-        </v-row>
-      </v-form>
       <MediosPagoTable
         :items="mediosPago"
         v-on:editItem="edit"
