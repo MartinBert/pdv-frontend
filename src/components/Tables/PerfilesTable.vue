@@ -53,7 +53,7 @@ export default {
       { text: "Usuario", value: "usuario" },
       { text: "Perfil", value: "perfil.nombre" },
       { text: "Empresa", value: "empresa.alias" },
-      { text: "Acciones", value: "acciones" },
+      { text: "Acciones", value: "acciones", sortable:false},
     ],
   }),
   components: {
