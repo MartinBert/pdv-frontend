@@ -1,13 +1,78 @@
 <template>
   <v-container style="max-width:100%">
+    <v-row style="justify-content: center;" class="mt-1">
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Nombre de producto"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoCodigo"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Codigo de producto"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoCodigoBarras"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Codigo de barras"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoMarcaName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Marca"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoPrimerAtributoName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Atributo"
+          append-icon="mdi-magnify"
+        />
+      </v-col>
+      <v-col v-if="view == 'labelPrinting'">
+        <h2>Seleccion de productos</h2>
+      </v-col>
+    </v-row>
     <v-data-table class="elevation-6" :headers="headers" :items="productos">
       <v-dialog v-model="dialog" max-width="500px">
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close">
-            Cancel 
+          <v-btn color="blue darken-1">
+            Cancel
           </v-btn>
-          <v-btn color="blue darken-1" text @click="save">
+          <v-btn color="blue darken-1">
             Save
           </v-btn>
         </v-card-actions>
@@ -38,14 +103,13 @@ export default {
   data() {
     return {
       editedItem: {
-      nombre: "",
-      codigoBarra:0,
-      codigoProducto:0,
-      atributo:"",
-      costoBruto:0,
-      precioTotal:0,
-
-    },
+        nombre: "",
+        codigoBarra: 0,
+        codigoProducto: 0,
+        atributo: "",
+        costoBruto: 0,
+        precioTotal: 0,
+      },
       components: {
         Edit,
         Delete,
@@ -91,24 +155,19 @@ export default {
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.items();
+    this.filterObjects();
   },
 
   methods: {
-    items() {
+    filterObjects() {
       GenericService(this.tenant, "productos", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.productos = data.data.content;
-          console.log(this.productos);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
-        })
-        .catch((error) => {
-          console.log(error);
         });
     },
-
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },

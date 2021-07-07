@@ -1,11 +1,67 @@
 <template>
   <v-container style="min-width: 98%;">
+    <v-form class="mb-0">
+      <v-row class="mb-0">
+        <v-col>
+          <v-btn class="primary" @click="seeReports()" raised
+            >Reporte de Ventas</v-btn
+          >
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-col>
+          <v-text-field
+            type="text"
+            v-model="filterParams.fechaEmision"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            label="Búsqueda por fecha"
+            class="text-left"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            type="number"
+            v-model="filterParams.numeroComprobante"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            label="Búsqueda por número de comprobante"
+            placeholder=" "
+            class="text-left"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            type="number"
+            v-model="filterParams.blackReceiptFilter"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            label="Búsqueda especial"
+            placeholder=" "
+            append-icon="mdi-magnify"
+            @input="filterObjects()"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-row style="justify-content: center;">
       <v-col>
         <h2>Lista de comprobantes emitidos</h2>
       </v-col>
     </v-row>
-    <v-data-table style="background-color: transparent" :headers="headers" :items="ventas" class="elevation-6">
+    <v-data-table
+      style="background-color: transparent"
+      :headers="headers"
+      :items="ventas"
+      class="elevation-6"
+    >
       <template v-slot:[`item.productos`]="{ item }">
         <Detail :objectsArray="item.productos" v-on:seeDetails="seeDetails" />
       </template>
@@ -30,7 +86,7 @@ export default {
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     ventas: [],
-    token: localStorage.getItem('token'),
+    token: localStorage.getItem("token"),
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
@@ -45,12 +101,16 @@ export default {
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
       { text: "Codigo de barra", value: "barCode" },
-      { text: "Comprobante", value: "nombreDocumento", sortable:false},
-      { text: "Detalles", value: "productos", sortable:false},
-      { text: "Medios de pago empleados", value: "mediosPago" ,sortable:false},
-      { text: "Planes de pago", value: "planesPago",sortable:false},
+      { text: "Comprobante", value: "nombreDocumento", sortable: false },
+      { text: "Detalles", value: "productos", sortable: false },
+      {
+        text: "Medios de pago empleados",
+        value: "mediosPago",
+        sortable: false,
+      },
+      { text: "Planes de pago", value: "planesPago", sortable: false },
       { text: "Precio de venta", value: "totalVenta" },
-      { text: "Acciones", value: "acciones", sortable:false},
+      { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
   mounted() {
@@ -75,6 +135,9 @@ export default {
           }
           this.loaded = true;
         });
+    },
+    seeReports() {
+      this.$store.commit("eventual/mutateEventualDialog");
     },
     seeDetails(objects) {
       this.$emit("seeDetails", objects);

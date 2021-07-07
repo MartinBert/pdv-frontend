@@ -2,12 +2,12 @@
   <v-container style="min-width: 99%;
   margin-left:2px;
   ">
-    <v-tabs fixed-tabs background-color="indigo" dark v-model="activeTab">
+    <v-tabs fixed-tabs background-color="indigo" dark>
         <v-tab
+            :class="(activeTab=== 2) ? 'active_tab':null"
             v-for="item in tabs"
             :key="item.id"
             :to="item.route"
-            @click="setTabs($event)"
           >
             {{ item.title }}
         </v-tab>
@@ -519,6 +519,9 @@ export default {
 };
 </script>
 <style>
+.active_tab{
+ background-color: black;
+}
 .mt-5 {
   align-content: center;
 }

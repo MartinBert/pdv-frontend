@@ -140,6 +140,12 @@ export default {
             title: "Caja",
             visible: false
           },
+          {
+            path:"/libroivaVentas",
+            name:"LibroivaVentas",
+            title:"LibroivaVentas",
+            visible:false
+          }
         ]
       },
       {

@@ -1,5 +1,37 @@
 <template>
   <v-container style="min-width: 100%;">
+    <v-form class="mb-0">
+      <v-row>
+        <v-col cols="2">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="2">
+          <div style="width: 300px">
+            <v-file-input
+              dense
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar depósitos"
+              accept=".xlsx, xls"
+              @change="importDocuments($event)"
+            ></v-file-input>
+          </div>
+        </v-col>
+        <v-col cols=""></v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.marcaName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="marcas" class="elevation-6">
       <v-dialog v-model="dialog" max-width="500px">
         <v-card-text>
@@ -78,26 +110,8 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.filterObjects();
   },
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
-    },
-  },
-  watch: {
-    dialog(val) {
-      val || this.close();
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
-  },
-
-  created() {
-    this.initialize();
-  },
   methods: {
-    filterObjects(page) {
-      if (page) this.filterParams.page = page;
+    filterObjects() {
       GenericService(this.tenant, "marcas", this.token)
         .filter(this.filterParams)
         .then((data) => {

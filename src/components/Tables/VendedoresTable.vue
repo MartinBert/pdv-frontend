@@ -1,6 +1,47 @@
 <template>
-  <v-container>
-    <v-data-table :headers="headers" :items="vendedores">
+  <v-container style="min-width: 100%;">
+    <v-form class="mb-0">
+      <v-row>
+        <v-col>
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="4"></v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.personaSocialReason"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Razón social"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.personaName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Nombre"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.personaCuit"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Cuit"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
+    <v-data-table :headers="headers" :items="vendedores" class="elevation-6">
       <template v-slot:[`item.detalles`]="{ item }">
         <Detail :object="item" v-on:seeDetails="seeDetails" />
       </template>
@@ -41,7 +82,7 @@ export default {
       { text: "Razon Social", value: "razonSocial" },
       { text: "Cuit", value: "cuit" },
       { text: "Detalles", value: "detalles" },
-      { text: "Acciones", value: "acciones", sortable:false},
+      { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
   components: {

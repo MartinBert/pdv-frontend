@@ -1,5 +1,50 @@
 <template>
   <v-container style="min-width: 100%;">
+    <v-form class="mb-0">
+      <v-row>
+        <v-col cols="1">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="2">
+          <div style="width: 300px">
+            <v-file-input
+              dense
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar depósitos"
+              accept=".xlsx, xls"
+              @change="importDocuments($event)"
+            ></v-file-input>
+          </div>
+        </v-col>
+        <v-col cols="2"></v-col>
+        <v-col cols="2">
+          <div style="width: 300px">
+            <v-file-input
+              dense
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar depósitos"
+              accept=".xlsx, xls"
+              @change="importDocuments($event)"
+            ></v-file-input>
+          </div>
+        </v-col>
+        <v-col cols="2"></v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.atributoValor"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="atributos" class="elevation-6">
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
@@ -43,10 +88,10 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.items();
+    this.filterObjects();
   },
   methods: {
-    items(page) {
+    filterObjects(page) {
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)

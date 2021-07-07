@@ -1,5 +1,45 @@
 <template>
   <v-container style="min-width: 100%;">
+    <v-form class="mb-0">
+      <v-row>
+        <v-col>
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.empresaSocialReason"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Razón social"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.empresaName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Nombre de empresa"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.empresaCuit"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="CUIT"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="empresas" class="elevation-6">
       <template v-slot:[`item.detalles`]="{ item }">
         <Detail :object="item" v-on:seeDetails="seeDetails" />

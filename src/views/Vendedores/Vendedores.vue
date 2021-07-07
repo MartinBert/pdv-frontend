@@ -3,46 +3,6 @@
   margin-right:40px;
   ">
     <v-card>
-      <v-form class="mb-3">
-        <v-row>
-          <v-col>
-            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          </v-col>
-          <v-col cols="2">
-            <v-text-field
-              v-model="filterParams.personaSocialReason"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              placeholder="Razón social"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="2">
-            <v-text-field
-              v-model="filterParams.personaName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              placeholder="Nombre"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="2">
-            <v-text-field
-              v-model="filterParams.personaCuit"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              placeholder="Cuit"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
       <VendedoresTable
         :items="vendedores"
         v-on:editItem="edit"

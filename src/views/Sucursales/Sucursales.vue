@@ -3,52 +3,6 @@
   margin-right:40px;
   ">
     <v-card>
-      <v-form class="mb-6">
-        <v-row>
-          <v-col>
-            <v-btn
-              v-if="loguedUser.perfil < 3"
-              class="primary"
-              @click="newObject()"
-              raised
-              >Nuevo</v-btn
-            >
-          </v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="filterParams.sucursalSocialReason"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              placeholder="Razón social"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="filterParams.sucursalName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              placeholder="Nombre"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="filterParams.sucursalDirection"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              placeholder="Dirección"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
       <SucursalesTable
         :items="sucursales"
         v-on:editItem="edit"

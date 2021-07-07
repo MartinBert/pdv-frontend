@@ -2,58 +2,7 @@
   <v-container style="min-width: 100%;">
     <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
       <v-card min-width="100%">
-        <v-form class="mb-3">
-          <v-row class="mb-4">
-              <v-col>
-                <v-btn class="primary" @click="seeReports()" raised
-                >Reporte de Ventas</v-btn
-                >
-              </v-col>
-              <v-spacer></v-spacer>
-              <v-col>
-                <v-text-field
-                type="text"
-                v-model="filterParams.fechaEmision"
-                v-on:input="filterObjects()"
-                dense
-                outlined
-                rounded
-                label="Búsqueda por fecha"
-                class="text-left"
-                append-icon="mdi-magnify"
-                ></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field
-                type="number"
-                v-model="filterParams.numeroComprobante"
-                v-on:input="filterObjects()"
-                dense
-                outlined
-                rounded
-                label="Búsqueda por número de comprobante"
-                placeholder=" "
-                class="text-left"
-                append-icon="mdi-magnify"
-                ></v-text-field>
-              </v-col>
-            <v-col>
-              <v-text-field
-                type="number"
-                v-model="filterParams.blackReceiptFilter"
-                dense
-                outlined
-                rounded
-                class="text-left"
-                label="Búsqueda especial"
-                placeholder=" "
-                append-icon="mdi-magnify"
-                @input="filterObjects()"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-form>
-    
+
           <VentasTable
             :items="ventas"
             v-on:print="print"

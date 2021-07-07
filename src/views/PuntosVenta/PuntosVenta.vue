@@ -3,26 +3,6 @@
   margin-right:40px;
   ">
     <v-card>
-      <v-form class="mb-3">
-        <v-row>
-          <v-col cols="6">
-            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          </v-col>
-          <v-col cols="3"></v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="filterParams.puntoVentaName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              placeholder="Búsqueda"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
       <PuntosVentaTable
         :items="puntosVenta"
         v-on:editItem="edit"

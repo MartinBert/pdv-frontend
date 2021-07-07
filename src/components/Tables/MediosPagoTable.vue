@@ -1,11 +1,30 @@
 <template>
   <v-container style="min-width: 100%;">
+    <v-row>
+      <v-col cols="9"></v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.medioPagoName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          placeholder="Búsqueda"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+    </v-row>
     <v-data-table :headers="headers" :items="mediosPago" class="elevation-6">
       <template v-slot:[`item.planPago`]="{ item }">
         <Detail :objectsArray="item.planPago" v-on:seeDetails="seeDetails" />
       </template>
       <template v-slot:[`item.sumaEnCierreDeCaja`]="{ item }">
-        <Add :object="item" v-on:add="addCloseBox" v-if="!item.sumaEnCierreDeCaja" />
+        <Add
+          :object="item"
+          v-on:add="addCloseBox"
+          v-if="!item.sumaEnCierreDeCaja"
+        />
         <Checked
           :object="item"
           v-on:uncheck="uncheckCloseBox"
@@ -20,7 +39,7 @@
           v-if="item.aplicaCierreZ"
         />
       </template>
-      <template v-slot:[`item.acciones`]="{item}">
+      <template v-slot:[`item.acciones`]="{ item }">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
@@ -54,9 +73,13 @@ export default {
     headers: [
       { text: "Nombre", value: "nombre" },
       { text: "Plan de Pago", value: "planPago", sortable: false },
-      { text: "Suma Arqueo de caja", value: "sumaEnCierreDeCaja", sortable: false },
-      {text:"Aplica en cierre z", value:"aplicaCierreZ", sortable:false},
-      {text:"Acciones", value:"acciones", sortable: false}
+      {
+        text: "Suma Arqueo de caja",
+        value: "sumaEnCierreDeCaja",
+        sortable: false,
+      },
+      { text: "Aplica en cierre z", value: "aplicaCierreZ", sortable: false },
+      { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
   components: {

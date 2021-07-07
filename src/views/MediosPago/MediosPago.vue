@@ -17,19 +17,6 @@
               @change="onChange($event)"
             ></v-file-input>
           </v-col>
-          <v-col cols="5"></v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="filterParams.medioPagoName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              placeholder="Búsqueda"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
         </v-row>
       </v-form>
       <MediosPagoTable

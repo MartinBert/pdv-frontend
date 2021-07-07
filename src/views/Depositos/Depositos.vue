@@ -3,41 +3,6 @@
   margin-right:40px;
   ">
     <v-card>
-      <v-form class="mb-0">
-        <v-row>
-          <v-col cols="9" class="mt-2 d-flex">
-            <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>
-            <v-btn
-              class="primary ml-1"
-              @click="openStockMovementHistoryDialog()"
-              >MOVIMIENTOS DE STOCK</v-btn
-            >
-            <div style="width: 300px">
-              <v-file-input
-                dense
-                v-model="file"
-                class="mt-0"
-                placeholder="Importar depósitos"
-                accept=".xlsx, xls"
-                @change="importDocuments($event)"
-              ></v-file-input>
-            </div>
-          </v-col>
-          <v-col cols="3">
-            <v-text-field
-              style="width: 300px"
-              v-model="filterParams.depositoName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              placeholder="Búsqueda"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
       <DepositosTable
         :items="depositos"
         v-on:deleteItem="deleteItem"

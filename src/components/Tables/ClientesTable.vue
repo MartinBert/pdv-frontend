@@ -1,15 +1,62 @@
 <template>
-  <v-container>
-    <v-data-table :headers="headers" :items="clientes">
-      
+  <v-container style="min-width: 100%;">
+    <v-form class="mb-0">
+      <v-row>
+        <v-col>
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="5"></v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.personaSocialReason"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Razón social"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.personaName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Nombre"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.personaCuit"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Cuit"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
+    <v-data-table :headers="headers" :items="clientes" class="elevation-6">
+      <template v-slot:[`item.detalles`]="{ item }">
+        <Detail :object="item" v-on:seeDetails="seeDetails" />
+      </template>
+      <template v-slot:[`item.acciones`]="{ item }">
+        <Edit :itemId="item.id" v-on:editItem="editItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
+      </template>
     </v-data-table>
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-//import Edit from "../Buttons/Edit";
-//import Delete from "../Buttons/Delete";
-//import Detail from "../Buttons/Detail";
+import Edit from "../Buttons/Edit";
+import Delete from "../Buttons/Delete";
+import Detail from "../Buttons/Detail";
 export default {
   data: () => ({
     clientes: [],
@@ -33,15 +80,16 @@ export default {
     headers: [
       { text: "Nombre", value: "nombre" },
       { text: "Razon Social", value: "razonSocial" },
+      { text: "Localidad", value: "localidad" },
       { text: "Cuit", value: "cuit" },
       { text: "Detalles", value: "detalles" },
       { text: "Acciones", value: "acciones" },
     ],
   }),
   components: {
-    //Edit,
-    //Delete,
-    //Detail,
+    Edit,
+    Delete,
+    Detail,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
