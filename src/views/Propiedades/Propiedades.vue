@@ -3,13 +3,6 @@
   margin-right:40px;
   ">
     <v-card>
-      <v-form class="mb-0">
-        <v-row>
-          <v-col cols="6">
-            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          </v-col>
-        </v-row>
-      </v-form>
       <PropiedadesTable
         :items="propiedades"
         v-on:editItem="edit"

@@ -1,20 +1,25 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-row>
-      <v-col cols="8"></v-col>
-      <v-col cols="2">
-        <v-text-field
-          v-model="filterParams.propiedadName"
-          v-on:input="filterObjects()"
-          dense
-          outlined
-          rounded
-          class="text-left"
-          placeholder="Búsqueda"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+    <v-form class="mb-0">
+      <v-row>
+        <v-col cols="6">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="4"></v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.propiedadName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="propiedades" class="elevation-6">
       <v-dialog v-model="dialog" max-width="500px">
         <v-card-actions>

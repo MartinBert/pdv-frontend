@@ -17,7 +17,7 @@
             ></v-file-input>
           </div>
         </v-col>
-        <v-col cols="2"></v-col>
+        <v-col cols="1"></v-col>
         <v-col cols="2">
           <div style="width: 300px">
             <v-file-input
@@ -30,8 +30,8 @@
             ></v-file-input>
           </div>
         </v-col>
-        <v-col cols="2"></v-col>
-        <v-col cols="3">
+        <v-col cols="3"></v-col>
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.atributoValor"
             v-on:input="filterObjects()"
