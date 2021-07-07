@@ -86,10 +86,6 @@ export default {
         });
     },
 
-    newObject() {
-      this.$router.push({ name: "depositosForm", params: { id: 0 } });
-    },
-
     editItem(id) {
       this.$router.push({ name: "depositosForm", params: { id: id } });
     },
@@ -215,10 +211,6 @@ export default {
             this.refreshView();
           }
         });
-    },
-
-    openStockMovementHistoryDialog() {
-      this.$store.commit("stocks/stockHistoryDialogMutation");
     },
 
     modifyDepositStatus(deposit, statusType) {

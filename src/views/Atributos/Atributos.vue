@@ -72,11 +72,6 @@ export default {
           this.loaded = true;
         });
     },
-
-    newObject() {
-      this.$router.push({ name: "atributosForm", params: { id: 0 } });
-    },
-
     edit(id) {
       this.$router.push({ name: "atributosForm", params: { id: id } });
     },

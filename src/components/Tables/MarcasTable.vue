@@ -131,6 +131,9 @@ export default {
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
     },
+    newObject() {
+      this.$router.push({ name: "marcasForm", params: { id: 0 } });
+    },
 
     close() {
       this.dialog = false;

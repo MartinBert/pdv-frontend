@@ -101,6 +101,10 @@ export default {
           this.loaded = true;
         });
     },
+    newObject() {
+      this.$router.push({ name: "atributosForm", params: { id: 0 } });
+    },
+
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },

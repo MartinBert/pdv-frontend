@@ -1,7 +1,9 @@
 <template>
-  <v-container style="min-width: 98%;
+  <v-container
+    style="min-width: 98%;
   margin-right:40px;
-  ">
+  "
+  >
     <v-card>
       <VendedoresTable
         :items="vendedores"
@@ -81,10 +83,6 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-    },
-
-    newObject() {
-      this.$router.push({ name: "vendedoresForm", params: { id: 0 } });
     },
 
     edit(id) {

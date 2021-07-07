@@ -109,6 +109,9 @@ export default {
           this.loaded = true;
         });
     },
+    newObject() {
+      this.$router.push({ name: "vendedoresForm", params: { id: 0 } });
+    },
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },

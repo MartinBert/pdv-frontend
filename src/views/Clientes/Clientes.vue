@@ -1,12 +1,10 @@
 <template>
   <v-container
-   style="min-width: 98%;
+    style="min-width: 98%;
   margin-right:40px;
   "
-  
   >
     <v-card>
-
       <ClientesTable
         :items="clientes"
         v-on:editItem="edit"
@@ -86,10 +84,6 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-    },
-
-    newObject() {
-      this.$router.push({ name: "clientesForm", params: { id: 0 } });
     },
 
     edit(id) {

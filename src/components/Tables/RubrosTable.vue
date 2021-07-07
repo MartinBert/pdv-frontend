@@ -1,7 +1,7 @@
 <template>
   <v-container style="min-width: 100%;">
     <v-form class="mb-0">
-      <v-row >
+      <v-row>
         <v-col cols="1">
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
@@ -17,7 +17,7 @@
             ></v-file-input>
           </div>
         </v-col>
-         <v-col cols="6"></v-col>
+        <v-col cols="6"></v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterParams.rubroName"
@@ -101,6 +101,9 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+    },
+    newObject() {
+      this.$router.push({ name: "rubrosForm", params: { id: 0 } });
     },
     editItem(itemId) {
       this.$emit("editItem", itemId);

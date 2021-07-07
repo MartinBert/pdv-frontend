@@ -72,11 +72,6 @@ export default {
           this.loaded = true;
         });
     },
-
-    newObject() {
-      this.$router.push({ name: "marcasForm", params: { id: 0 } });
-    },
-
     edit(id) {
       this.$router.push({ name: "marcasForm", params: { id: id } });
     },

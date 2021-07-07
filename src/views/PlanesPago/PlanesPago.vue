@@ -79,11 +79,6 @@ export default {
           this.loaded = true;
         });
     },
-
-    newObject() {
-      this.$router.push({ name: "planesPagoForm", params: { id: 0 } });
-    },
-
     edit(id) {
       this.$router.push({ name: "planesPagoForm", params: { id: id } });
     },

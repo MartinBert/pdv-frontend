@@ -118,6 +118,9 @@ export default {
           this.loaded = true;
         });
     },
+    newObject() {
+      this.$router.push({ name: "depositosForm", params: { id: 0 } });
+    },
     add(object) {
       this.$emit("add", object);
     },
@@ -129,6 +132,9 @@ export default {
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
+    },
+    openStockMovementHistoryDialog() {
+      this.$store.commit("stocks/stockHistoryDialogMutation");
     },
     selectDefaultDeposit(object) {
       this.$emit("selectDefaultDeposit", object);

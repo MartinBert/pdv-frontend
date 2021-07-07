@@ -198,6 +198,29 @@ export default {
     uncheck(object) {
       this.$emit("uncheck", object);
     },
+    migrateStockToOtherDeposit() {
+      if (this.migration.length > 0) {
+        this.loaded = false;
+        this.migration.forEach((el) => {
+          el.deposito = this.destinationDepositForMigrations;
+          el.algorim = el.producto.codigoBarra + el.deposito.id;
+          GenericService(this.tenant, this.service, this.token).update(el);
+        });
+
+        this.saveHistorial(this.migration, "Migración de productos");
+
+        this.migration = [];
+        this.destinationDepositForMigrations = {};
+
+        setTimeout(() => {
+          this.filterObjects(this.typeList);
+        }, 500);
+      } else {
+        this.$errorAlert(
+          "Debe seleccionar al menos 1 producto para migrar su stock de depósito"
+        );
+      }
+    },
     setAttributesValues(atributes) {
       let str = atributes.reduce((acc, element) => {
         if (element.valor) {
