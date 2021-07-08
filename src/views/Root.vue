@@ -142,7 +142,7 @@ export default {
           },
           {
             path:"/libroivaVentas",
-            name:"LibroivaVentas",
+            name:"Libroivaventas",
             title:"LibroivaVentas",
             visible:false
           }
