@@ -12,7 +12,7 @@
             <v-btn
               color="primary"
               class="ml-1"
-              @click="$store.commit('productos/dialogProductosMutation')"
+              @click="$store.commit('receipt/receiptDialogMutation')"
               >BUSCAR PRESUPUESTO</v-btn
             >
             <h3 class="mt-2 ml-2">
@@ -78,6 +78,7 @@
                     </v-col>
                     <v-col cols="6">
                       <v-autocomplete
+                        ref="documents"
                         class="button-ventas comprobante"
                         v-model="object.documento"
                         :items="databaseItems.documentos"
@@ -89,6 +90,7 @@
                     </v-col>
                     <v-col cols="6">
                       <v-autocomplete
+                        ref="paymentMethods"
                         class="button-ventas medio-pago"
                         @change="getPaymentPlans(object.mediosPago)"
                         v-model="object.mediosPago"
@@ -101,6 +103,7 @@
                     </v-col>
                     <v-col cols="6">
                       <v-autocomplete
+                        ref="paymentPlans"
                         class="button-ventas plan-pago"
                         v-model="object.planPago"
                         :items="databaseItems.planes"
@@ -245,6 +248,7 @@
       v-on:resetListStatus="resetListOfDialog"
       :refreshListStatus="listennerOfListChange"
     />
+    <SearchPresupuestoDialog v-on:selectPresupuesto="selectPresupuesto" :resetPresupuestSearch="resetPresupuestSearch"/>
     <v-dialog v-model="dialogIndividualPercent" width="600">
       <v-card min-width: 100%>
         <v-card-title class="headline grey lighten-2">
@@ -271,6 +275,7 @@ import VentasService from "../../services/VentasService";
 import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
+import SearchPresupuestoDialog from "../../components/Dialogs/SearchPresupuestoDialog";
 import {
   formatDate,
   getCurrentDate,
@@ -328,12 +333,14 @@ export default {
     individualPercent: "",
     listennerOfListChange: 0,
     clientIp: "",
+    resetPresupuestSearch: false
   }),
 
   components: {
     Calculator,
     ProductDialog,
     Spinner,
+    SearchPresupuestoDialog
   },
 
   created() {
@@ -545,8 +552,23 @@ export default {
       this.databaseItems.documentos = checkIfInvoice(AllDocuments);
     },
 
-    getPaymentPlans(id) {
-      this.databaseItems.planes = id.planPago;
+    getPaymentPlans(paymentMethod) {
+      console.log(paymentMethod.planPago);
+      this.databaseItems.planes = paymentMethod.planPago;
+    },
+
+    selectPresupuesto(presupuesto) {
+      presupuesto.productos.forEach(el => {
+        el.total = el.precioTotal;
+        el.editable = true;
+      })
+      this.getComercialDocuments(presupuesto.cliente.condicionIva.documentos, this.loguedUser.sucursal.condicionIva.documentos);
+      this.getPaymentPlans(presupuesto.mediosPago[0]);
+      this.object = presupuesto;
+      this.object.mediosPago = presupuesto.mediosPago[0];
+      this.object.planPago = presupuesto.planesPago[0];
+      this.products = presupuesto.productos;
+      console.log(this.object)
     },
 
     /******************************************************************************************************/
@@ -1178,6 +1200,9 @@ export default {
                     planesPago: [planesPago],
                     nombreDocumento: documento.nombre,
                   };
+                  if(this.object.id){
+                    comprobante.id = this.object.id;
+                  }
 
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
@@ -2029,6 +2054,7 @@ export default {
       this.priceModificationPorcent = 0;
       this.individualPercent = "";
       this.listennerOfListChange = 999999999;
+      this.resetPresupuestSearch = true;
       this.$store.commit("productos/resetStates");
     },
 

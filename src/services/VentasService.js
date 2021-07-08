@@ -65,5 +65,12 @@ export default (tenant,service,token) =>{
             })
             return data;
         },
+
+        getPresupuestos(object){
+            let data = axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getPresupuestos`, object, {
+                headers: { Authorization: "Bearer " + token }
+            })
+            return data;
+        }
     }
 }
