@@ -274,7 +274,7 @@ const routes = [
             },
             {
                 path: '/libroivaventas',
-                name: '"Libroivaventas"',
+                name: 'Libroivaventas',
                 component: LibroivaVentas,
                 meta: { requiresAuth: true }
             },
