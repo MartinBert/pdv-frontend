@@ -27,10 +27,11 @@
     <!---
     <v-tabs fixed-tabs background-color="indigo" dark v-model="activeTab">
       <v-tab
+        :class="(item.id === active_tab) ? 'active_tab':null"
+        active-class="black" 
         v-for="item in tabs"
         :key="item.id"
         :to="item.route"
-        @click="activeTab = item.id"
       >
         {{ item.title }}
       </v-tab>
@@ -90,73 +91,7 @@
             ></v-select>
           </v-col>
         </v-row>
-        <v-row style="justify-content: center;" class="mt-1">
-          <v-col cols="2">
-            <v-text-field
-              v-model="filterParams.productoName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              label="Nombre de producto"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="2">
-            <v-text-field
-              v-model="filterParams.productoCodigo"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              label="Codigo de producto"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="2">
-            <v-text-field
-              v-model="filterParams.productoCodigoBarras"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              label="Codigo de barras"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="2">
-            <v-text-field
-              v-model="filterParams.productoMarcaName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              label="Marca"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="2">
-            <v-text-field
-              v-model="filterParams.productoPrimerAtributoName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              label="Atributo"
-              append-icon="mdi-magnify"
-            />
-          </v-col>
-          <v-col v-if="view == 'labelPrinting'">
-            <h2>Seleccion de productos</h2>
-          </v-col>
-        </v-row>
       </v-form>
-
       <ProductosTable
         :items="productos"
         v-on:editItem="edit"
@@ -284,10 +219,10 @@ export default {
       totalPages: 0,
     },
     tabs: [
-      { id: 0, title: "Lista", route: "/pdv2/productos" },
-      { id: 1, title: "Nuevo", route: "/pdv2/productos/form/0" },
-      { id: 2, title: "Generar Etiqueta", route: "/pdv2/productos" },
-      { id: 3, title: "Modificar precios", route: "/pdv2/precios" },
+      { id: 1, title: "Lista", route: "/pdv2/productos" },
+      { id: 2, title: "Nuevo", route: "/pdv2/productos/form/0" },
+      { id: 3, title: "Generar Etiqueta", route: "/pdv2/productos" },
+      { id: 4, title: "Modificar precios", route: "/pdv2/precios" },
     ],
     activeTab: 1,
     loaded: false,
@@ -896,6 +831,9 @@ export default {
 };
 </script>
 <style>
+.active_tab{
+ background-color: black;
+}
 v-tabs {
   margin-bottom: 10px;
 }

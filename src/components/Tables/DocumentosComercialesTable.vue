@@ -1,16 +1,52 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-data-table :items="documentosComerciales" :headers="headers" class="elevation-6">
-      <template v-slot:[`item.tipo`]="{ item }">
-         <v-alert type="success" dense v-if="item.tipo">Fiscal</v-alert>
-            <v-alert
-              color="secondary"
-              icon="mdi-close-circle"
+    <v-form class="mb-3">
+      <v-row>
+        <v-col cols="1">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="2">
+          <div style="width: 300px">
+            <v-file-input
               dense
-              dark
-              v-if="!item.tipo"
-              >No fiscal</v-alert
-            >
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar depósitos"
+              accept=".xlsx, xls"
+              @change="importDocuments($event)"
+            ></v-file-input>
+          </div>
+        </v-col>
+        <v-col cols="6"></v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.documentoComercialName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
+    <v-data-table
+      :items="documentosComerciales"
+      :headers="headers"
+      class="elevation-6"
+    >
+      <template v-slot:[`item.tipo`]="{ item }">
+        <v-alert type="success" dense v-if="item.tipo">Fiscal</v-alert>
+        <v-alert
+          color="secondary"
+          icon="mdi-close-circle"
+          dense
+          dark
+          v-if="!item.tipo"
+          >No fiscal</v-alert
+        >
       </template>
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">

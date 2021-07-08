@@ -1,5 +1,25 @@
 <template>
   <v-container style="min-width: 100%;">
+    <v-form class="mb-0">
+      <v-row>
+        <v-col cols="6">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="4"></v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.propiedadName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="propiedades" class="elevation-6">
       <v-dialog v-model="dialog" max-width="500px">
         <v-card-actions>
@@ -31,9 +51,9 @@
 <script>
 import GenericService from "../../services/GenericService";
 export default {
-  data:()=>({
+  data: () => ({
     propiedades: [],
-     editedItem: {
+    editedItem: {
       nombre: "",
     },
     filterParams: {
@@ -42,12 +62,11 @@ export default {
       size: 10,
       totalPages: 0,
     },
-    headers:[
-      {text:"Id", value:"id"},
-      {text:"Nombre",value:"nombre"},
-      {text:"Atributos", value:"atributos[0].valor"},
-      {text:"Acciones", value:"acciones", sorteable: false}
-
+    headers: [
+      { text: "Id", value: "id" },
+      { text: "Nombre", value: "nombre" },
+      { text: "Atributos", value: "atributos[0].valor" },
+      { text: "Acciones", value: "acciones", sorteable: false },
     ],
     loaded: false,
     tenant: "",
@@ -56,17 +75,14 @@ export default {
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
-  components: {
-
-  },
-   mounted() {
+  components: {},
+  mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects();
   },
 
   methods: {
-    
-  filterObjects(page) {
+    filterObjects(page) {
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
@@ -75,6 +91,9 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+    },
+    newObject() {
+      this.$router.push({ name: "propiedadesForm", params: { id: 0 } });
     },
     editItem(itemId) {
       this.$emit("editItem", itemId);

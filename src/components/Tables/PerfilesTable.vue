@@ -1,5 +1,25 @@
 <template>
   <v-container style="min-width: 100%;" class="elevation-6">
+    <v-form class="mb-0">
+      <v-row>
+        <v-col cols="6">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="3"></v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.perfilName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="perfiles">
       <template v-slot:[`item.acciones`]="{ item }">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
@@ -33,7 +53,7 @@ export default {
       { text: "Usuario", value: "usuario" },
       { text: "Perfil", value: "perfil.nombre" },
       { text: "Empresa", value: "empresa.alias" },
-      { text: "Acciones", value: "acciones" },
+      { text: "Acciones", value: "acciones", sortable:false},
     ],
   }),
   components: {

@@ -3,38 +3,6 @@
    margin-right: 40px;
   ">
     <v-card>
-      <v-form class="mb-3">
-        <v-row>
-          <v-col cols="1">
-            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          </v-col>
-          <v-col cols="2">
-            <div style="width: 300px">
-              <v-file-input
-                dense
-                v-model="file"
-                class="mt-0"
-                placeholder="Importar depósitos"
-                accept=".xlsx, xls"
-                @change="importDocuments($event)"
-              ></v-file-input>
-            </div>
-          </v-col>
-          <v-col cols="5"></v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="filterParams.rubroName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              placeholder="Búsqueda"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
       <RubrosTable
         :items="rubros"
         v-on:editItem="edit"
@@ -104,11 +72,6 @@ export default {
           this.loaded = true;
         });
     },
-
-    newObject() {
-      this.$router.push({ name: "rubrosForm", params: { id: 0 } });
-    },
-
     edit(id) {
       this.$router.push({ name: "rubrosForm", params: { id: id } });
     },

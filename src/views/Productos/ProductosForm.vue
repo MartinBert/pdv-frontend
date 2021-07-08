@@ -22,7 +22,18 @@
       >
         Modificar Precios
       </v-tab>
+  <!-------- 
+    <v-tabs fixed-tabs background-color="indigo" dark>
+        <v-tab
+            :class="(activeTab=== 2) ? 'active_tab':null"
+            v-for="item in tabs"
+            :key="item.id"
+            :to="item.route"
+          >
+            {{ item.title }}
+        </v-tab>
     </v-tabs>
+    --->
     <br />
     <v-card class="card" min-width="100%">
       <Error :errorStatus="errorStatus" />
@@ -553,6 +564,9 @@ export default {
 };
 </script>
 <style>
+.active_tab{
+ background-color: black;
+}
 .mt-5 {
   align-content: center;
 }

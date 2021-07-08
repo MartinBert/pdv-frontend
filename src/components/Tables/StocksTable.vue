@@ -1,7 +1,100 @@
 <template>
   <v-container style="min-width: 100%;">
+    <v-form style="justify-content: center;">
+      <v-row>
+        <v-col>
+          <v-autocomplete
+            :items="depositos"
+            item-text="nombre"
+            item-value="id"
+            label="Depósito"
+            v-model="typeList"
+            @change="filterObjects()"
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            label="Nombre"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoCodigo"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            label="Codigo"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoCodigoBarras"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            label="Codigo de barras"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoMarcaName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            label="Marca"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="filterParams.productoPrimerAtributoName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left mt-2"
+            label="Atributo"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-autocomplete
+            :items="realDeposits"
+            item-text="nombre"
+            :return-object="true"
+            label="A depósito"
+            v-model="destinationDepositForMigrations"
+            required
+            style="width: 250px"
+          />
+        </v-col>
+        <v-col>
+          <form
+            @submit.prevent="migrateStockToOtherDeposit()"
+            style="margin: 10px;"
+          >
+            <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
+          </form>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="stock" class="elevation-6">
-        <template v-slot:[`item.acciones`]="{ item }">
+      <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
           mdi-pencil
         </v-icon>
@@ -46,14 +139,13 @@ export default {
       size: 100000,
     },
     headers: [
-      {text: "Productos", value: "producto.nombre" },
-      {text:"Atributos", value:"producto.atributos[0].valor"},
-      {text:"Marca", value:"producto.marca.nombre"},
-      {text:"Codigo de Barras", value:"producto.codigoBarra"},
-      {text:"Codigo de producto", value:"producto.codigoProducto"},
-      {text:"Cantidad", value:"cantidad"},
-      {text:"Acciones", value:"acciones" , sorteable: false}
-    
+      { text: "Productos", value: "producto.nombre" },
+      { text: "Atributos", value: "producto.atributos[0].valor" },
+      { text: "Marca", value: "producto.marca.nombre" },
+      { text: "Codigo de Barras", value: "producto.codigoBarra" },
+      { text: "Codigo de producto", value: "producto.codigoProducto" },
+      { text: "Cantidad", value: "cantidad" },
+      { text: "Acciones", value: "acciones", sorteable: false },
     ],
     loaded: false,
     tenant: "",
@@ -105,6 +197,29 @@ export default {
     },
     uncheck(object) {
       this.$emit("uncheck", object);
+    },
+    migrateStockToOtherDeposit() {
+      if (this.migration.length > 0) {
+        this.loaded = false;
+        this.migration.forEach((el) => {
+          el.deposito = this.destinationDepositForMigrations;
+          el.algorim = el.producto.codigoBarra + el.deposito.id;
+          GenericService(this.tenant, this.service, this.token).update(el);
+        });
+
+        this.saveHistorial(this.migration, "Migración de productos");
+
+        this.migration = [];
+        this.destinationDepositForMigrations = {};
+
+        setTimeout(() => {
+          this.filterObjects(this.typeList);
+        }, 500);
+      } else {
+        this.$errorAlert(
+          "Debe seleccionar al menos 1 producto para migrar su stock de depósito"
+        );
+      }
     },
     setAttributesValues(atributes) {
       let str = atributes.reduce((acc, element) => {

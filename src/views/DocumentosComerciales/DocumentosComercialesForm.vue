@@ -53,7 +53,7 @@
             </v-col>
           </v-row>
           <v-row class="ma-1">
-            <v-col cols="12" sm="6" md="6">
+            <v-col>
               <v-radio-group
                 label="Tipo de documento"
                 v-model="object.tipo"
@@ -69,10 +69,22 @@
                 ></v-radio>
               </v-radio-group>
             </v-col>
-            <v-col cols="12" sm="6" md="6">
+            <v-col>
               <v-radio-group
                 label="¿Es un ticket?"
                 v-model="object.ticket"
+                column
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              >
+                <v-radio label="Si" color="primary" value="true"></v-radio>
+                <v-radio label="No" color="secondary" value="false"></v-radio>
+              </v-radio-group>
+            </v-col>
+            <v-col>
+              <v-radio-group
+                label="¿Es un presupuesto?"
+                v-model="object.presupuesto"
                 column
                 required
                 :rules="[(v) => !!v || 'Campo requerido...']"

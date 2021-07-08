@@ -1,8 +1,54 @@
 <template>
   <v-container style="min-width: 100%;">
+    <v-form class="mb-6">
+      <v-row>
+        <v-col>
+          <v-btn
+            v-if="loguedUser.perfil < 3"
+            class="primary"
+            @click="newObject()"
+            raised
+            >Nuevo</v-btn
+          >
+        </v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.sucursalSocialReason"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Razón social"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.sucursalName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Nombre"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.sucursalDirection"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            placeholder="Dirección"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="sucursales" class="elevation-6">
       <template v-slot:[`item.detalles`]="{ item }">
-         <Detail :object="item" v-on:seeDetails="seeDetails" />
+        <Detail :object="item" v-on:seeDetails="seeDetails" />
       </template>
       <template v-slot:[`item.acciones`]="{ item }">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
@@ -35,21 +81,21 @@ export default {
     service: "sucursales",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
-    headers:[
-      {text:"Nombre", value:"nombre"},
-      {text:"Telefono", value:"telefono"},
-      {text:"Email", value:"email"},
-      {text:"Direcion", value:"direccion"},
-      {text:"Detalles", value:"detalles",sortable:false},
-      {text:"Acciones", value:"acciones",sortable:false}
-    ]
+    headers: [
+      { text: "Nombre", value: "nombre" },
+      { text: "Telefono", value: "telefono" },
+      { text: "Email", value: "email" },
+      { text: "Direcion", value: "direccion" },
+      { text: "Detalles", value: "detalles", sortable: false },
+      { text: "Acciones", value: "acciones", sortable: false },
+    ],
   }),
   components: {
-   Edit,
-   Delete,
-   Detail,
+    Edit,
+    Delete,
+    Detail,
   },
-   mounted() {
+  mounted() {
     this.tenant = this.$route.params.tenant;
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
@@ -57,7 +103,7 @@ export default {
     this.filterObjects();
   },
   methods: {
-      filterObjects(page) {
+    filterObjects(page) {
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)

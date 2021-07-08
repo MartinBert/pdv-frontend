@@ -38,99 +38,6 @@
     </v-tabs>
     <br />
     <v-card>
-      <v-form style="justify-content: center;">
-        <v-row>
-          <v-col>
-            <v-autocomplete
-              :items="depositos"
-              item-text="nombre"
-              item-value="id"
-              label="Depósito"
-              v-model="typeList"
-              @change="filterObjects()"
-            />
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="filterParams.productoName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left mt-2"
-              label="Nombre"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="filterParams.productoCodigo"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left mt-2"
-              label="Codigo"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="filterParams.productoCodigoBarras"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left mt-2"
-              label="Codigo de barras"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="filterParams.productoMarcaName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left mt-2"
-              label="Marca"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="filterParams.productoPrimerAtributoName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left mt-2"
-              label="Atributo"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-autocomplete
-              :items="realDeposits"
-              item-text="nombre"
-              :return-object="true"
-              label="A depósito"
-              v-model="destinationDepositForMigrations"
-              required
-              style="width: 250px"
-            />
-          </v-col>
-          <v-col>
-            <form
-              @submit.prevent="migrateStockToOtherDeposit()"
-              style="margin: 10px;"
-            >
-              <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
-            </form>
-          </v-col>
-        </v-row>
-      </v-form>
       <StocksTable
         :items="stocks"
         v-on:editItem="edit"
@@ -462,30 +369,6 @@ export default {
       this.migration = this.migration.filter((el) => el.id !== object.id);
       this.stocks.filter((el) => el.id === object.id)[0].selected = false;
       this.$refs.stockTable.$forceUpdate();
-    },
-
-    migrateStockToOtherDeposit() {
-      if (this.migration.length > 0) {
-        this.loaded = false;
-        this.migration.forEach((el) => {
-          el.deposito = this.destinationDepositForMigrations;
-          el.algorim = el.producto.codigoBarra + el.deposito.id;
-          GenericService(this.tenant, this.service, this.token).update(el);
-        });
-
-        this.saveHistorial(this.migration, "Migración de productos");
-
-        this.migration = [];
-        this.destinationDepositForMigrations = {};
-
-        setTimeout(() => {
-          this.filterObjects(this.typeList);
-        }, 500);
-      } else {
-        this.$errorAlert(
-          "Debe seleccionar al menos 1 producto para migrar su stock de depósito"
-        );
-      }
     },
 
     saveHistorial(stocks, str) {

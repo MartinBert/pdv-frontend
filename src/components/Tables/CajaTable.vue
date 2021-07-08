@@ -1,7 +1,7 @@
 <template>
-  <v-container>
-    <v-data-table style="background-color: transparent" :headers="headers" :items="objects">
-      <template v-slot:[`item.acciones`]="{ item }">
+  <v-container style="min-width: 100%;">
+    <v-data-table class="elevation-6" :headers="headers" :items="objects">
+      <template v-slot:[`item.detalles`]="{ item }">
          <Detail :object="item" v-on:seeDetails="seeDetails" />
       </template>
     </v-data-table>
@@ -29,7 +29,7 @@ export default {
     headers:[
       {text:"Fecha", value:"fecha"},
       {text:"Descripcion", value:"descripcion"},
-      {text:"Detalles",value:"detalles"}
+      {text:"Detalles",value:"detalles", sortable:false}
     ]
   }),
   components: {
