@@ -5,7 +5,11 @@
     margin-left:1px;
   "
   >
-    <v-tabs fixed-tabs background-color="indigo" dark>
+    <TabBar
+      :tabs="tabs"
+      :activeTab="activeTab"
+    />
+    <!-- <v-tabs fixed-tabs background-color="indigo" dark>
       <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised>
         Lista
       </v-tab>
@@ -23,7 +27,7 @@
       >
         Modificar Precios
       </v-tab>
-    </v-tabs>
+    </v-tabs> -->
     <!---
     <v-tabs fixed-tabs background-color="indigo" dark v-model="activeTab">
       <v-tab
@@ -169,6 +173,7 @@ import Spinner from "../../components/Graphics/Spinner";
 import Pagination from "../../components/Pagination";
 import ProductosTable from "../../components/Tables/ProductosTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+import TabBar from "../../components/Generics/TabBar";
 
 import {
   generateBarCode,
@@ -219,10 +224,10 @@ export default {
       totalPages: 0,
     },
     tabs: [
-      { id: 1, title: "Lista", route: "/pdv2/productos" },
-      { id: 2, title: "Nuevo", route: "/pdv2/productos/form/0" },
-      { id: 3, title: "Generar Etiqueta", route: "/pdv2/productos" },
-      { id: 4, title: "Modificar precios", route: "/pdv2/precios" },
+      { id: 1, title: "Lista", route: "/servipack/productos", event: null },
+      { id: 2, title: "Nuevo", route: "/servipack/productos/form/0", event: null },
+      { id: 3, title: "Generar Etiqueta", route: "/servipack/productos", event: null },
+      { id: 4, title: "Modificar precios", route: "/servipack/precios", event: null },
     ],
     activeTab: 1,
     loaded: false,
@@ -242,6 +247,7 @@ export default {
     Pagination,
     ProductosTable,
     DeleteDialog,
+    TabBar
   },
 
   mounted() {
@@ -316,10 +322,6 @@ export default {
             }
           });
       });
-    },
-
-    newObject() {
-      this.$router.push({ name: "productosForm", params: { id: 0 } });
     },
 
     edit(id) {
@@ -623,10 +625,6 @@ export default {
           let fileURL = URL.createObjectURL(file);
           window.open(fileURL, "_blank");
         });
-    },
-
-    goPricesManagerView() {
-      this.$router.push({ name: "precios" });
     },
 
     setAtributesValues(atributes) {

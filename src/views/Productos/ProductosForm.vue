@@ -4,7 +4,11 @@
   margin-left:2px;
   "
   >
-    <v-tabs fixed-tabs background-color="indigo" dark>
+    <TabBar
+      :tabs="tabs"
+      :activeTab="activeTab"
+    />
+    <!-- <v-tabs fixed-tabs background-color="indigo" dark>
       <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised>
         Lista
       </v-tab>
@@ -22,7 +26,7 @@
       >
         Modificar Precios
       </v-tab>
-    <v-tabs>
+    <v-tabs> -->
   <!-------- 
     <v-tabs fixed-tabs background-color="indigo" dark>
         <v-tab
@@ -320,7 +324,7 @@ import {
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
 import Error from "../../components/Error";
-//import TabBar from "../../components/Graphics/TabBar.vue";
+import TabBar from "../../components/Generics/TabBar.vue";
 
 export default {
   data: () => ({
@@ -343,10 +347,10 @@ export default {
       editable: false,
     },
     tabs: [
-      { id: 1, title: "Lista", route: "/pdv2/productos" },
-      { id: 2, title: "Nuevo", route: "/pdv2/productos/form/0" },
-      { id: 3, title: "Generar Etiqueta", route: "/pdv2/productos" },
-      { id: 4, title: "Modificar precios", route: "/pdv2/precios" },
+      { id: 1, title: "Lista", route: "/servipack/productos", event: null },
+      { id: 2, title: "Nuevo", route: "/servipack/precios", event: null },
+      { id: 3, title: "Generar Etiqueta", route: "/servipack/productos", event: null },
+      { id: 4, title: "Modificar precios", route: "/servipack/precios", event: null },
     ],
     activeTab: 2,
     filterParams: {
@@ -373,7 +377,7 @@ export default {
   components: {
     Spinner,
     Error,
-    //TabBar,
+    TabBar,
   },
 
   mounted() {

@@ -1,6 +1,10 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-tabs fixed-tabs background-color="indigo" dark>
+    <TabBar
+      :tabs="tabs"
+      :activeTab="activeTab"
+    />
+    <!-- <v-tabs fixed-tabs background-color="indigo" dark>
       <v-tab class="primary ml-1" @click="view = 'listOfProducts'">
         Lista
       </v-tab>
@@ -12,8 +16,8 @@
       </v-tab>
       <v-tab class="primary ml-1" @click="goPricesManagerView()">
         Modificar Precios
-      </v-tab>
-    </v-tabs>
+      </v-tab> 
+    </v-tabs> -->
     <br />
     <v-card min-width="90%" v-if="loaded">
       <v-card-title>
@@ -117,7 +121,7 @@ import {
   sumarNumeros,
 } from "../../helpers/mathHelper";
 import GenericService from "../../services/GenericService";
-//import TabBar from "../../components/Graphics/TabBar.vue";
+import TabBar from "../../components/Generics/TabBar.vue";
 export default {
   data: () => ({
     loaded: false,
@@ -138,11 +142,12 @@ export default {
       { id: 5, text: "Aplicar modificación de precios por código de producto" },
     ],
     tabs: [
-      { id: 1, route: "", title: "Lista" },
-      { id: 2, route: "", title: "Nuevo" },
-      { id: 3, route: "", title: "Generar Etiquetas" },
-      { id: 4, route: "", title: "Modificar Precios" },
+      { id: 1, title: "Lista", route: "/servipack/productos", event: null },
+      { id: 2, title: "Nuevo", route: "/servipack/productos/form/0", event: null },
+      { id: 3, title: "Generar Etiqueta", route: "/servipack/productos", event: null },
+      { id: 4, title: "Modificar precios", route: "/servipack/precios", event: null },
     ],
+    activeTab: 4,
     alterationFilter: {
       id: 1,
       text: "Aplicar modificación de precios a todos los productos",
@@ -183,7 +188,9 @@ export default {
     token: localStorage.getItem("token"),
   }),
 
-  components: {},
+  components: {
+    TabBar,
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
