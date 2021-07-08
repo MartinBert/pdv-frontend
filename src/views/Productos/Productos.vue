@@ -5,11 +5,11 @@
     margin-left:1px;
   "
   >
-    <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised>
+    <v-tabs fixed-tabs background-color="indigo" dark   v-model="tab">
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'">
         Lista
       </v-tab>
-      <v-tab class="primary ml-1" @click="newObject()" raised>
+      <v-tab class="primary ml-1" @click="newObject()">
         Nuevo
       </v-tab>
       <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
@@ -177,6 +177,7 @@ import { exportExcel } from "../../helpers/exportFileHelper";
 import XLSX from "xlsx";
 export default {
   data: () => ({
+    tab:null,
     show: true,
     icon: "mdi-check-circle",
     view: "listOfProducts",

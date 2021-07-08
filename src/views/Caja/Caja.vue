@@ -1,29 +1,6 @@
 <template>
   <v-container style="min-width: 100%;">
     <v-card>
-      <v-form class="mb-3">
-        <v-row>
-          <v-col>
-            <v-btn class="primary" @click="newObject()" raised
-              >REALIZAR ARQUEO</v-btn
-            >
-            <v-btn
-              class="primary ml-1"
-              @click="closure('z')"
-              raised
-              :disabled="clientIp ? false : true"
-              >REALIZAR CIERRE Z CONTROLADOR FISCAL</v-btn
-            >
-            <v-btn
-              class="primary ml-1"
-              @click="closure('x')"
-              raised
-              :disabled="clientIp ? false : true"
-              >REALIZAR CIERRE X CONTROLADOR FISCAL</v-btn
-            >
-          </v-col>
-        </v-row>
-      </v-form>
       <CajaTable :items="objects" v-on:seeDetails="seeDetails" v-if="loaded" />
       <Pagination
         :page="filterParams.page"
