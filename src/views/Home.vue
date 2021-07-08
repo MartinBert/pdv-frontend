@@ -196,7 +196,7 @@ export default {
           this.charData2.labels = [];
           this.charData2.datasets[0].data = [];
           kays.forEach((element) => {
-            dateSales[kays];
+                dateSales[kays];
             this.charData2.labels.push(element);
             this.charData2.datasets[0].data.push(Number(dateSales[element]));
           });

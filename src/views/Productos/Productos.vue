@@ -5,6 +5,26 @@
     margin-left:1px;
   "
   >
+    <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised>
+        Lista
+      </v-tab>
+      <v-tab class="primary ml-1" @click="newObject()" raised>
+        Nuevo
+      </v-tab>
+      <v-tab class="primary ml-1" @click="goPricesManagerView()">
+        Modificar Etiquetas
+      </v-tab>
+      <v-tab
+        v-if="perfil === 1"
+        class="primary ml-1"
+        @click="correctPriceInList()"
+        raised
+      >
+        Modificar Precios
+      </v-tab>
+    </v-tabs>
+    <!---
     <v-tabs fixed-tabs background-color="indigo" dark v-model="activeTab">
       <v-tab
         v-for="item in tabs"
@@ -15,6 +35,7 @@
         {{ item.title }}
       </v-tab>
     </v-tabs>
+    !-->
     <br />
     <v-card>
       <v-form class="mb-0" v-on:click="show = !show">

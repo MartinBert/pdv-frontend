@@ -1,16 +1,27 @@
 <template>
-  <v-container style="min-width: 99%;
+  <v-container
+    style="min-width: 99%;
   margin-left:2px;
-  ">
-    <v-tabs fixed-tabs background-color="indigo" dark v-model="activeTab">
-        <v-tab
-            v-for="item in tabs"
-            :key="item.id"
-            :to="item.route"
-            @click="setTabs($event)"
-          >
-            {{ item.title }}
-        </v-tab>
+  "
+  >
+    <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised>
+        Lista
+      </v-tab>
+      <v-tab class="primary ml-1" @click="newObject()" raised>
+        Nuevo
+      </v-tab>
+      <v-tab class="primary ml-1" @click="goPricesManagerView()">
+        Modificar Etiquetas
+      </v-tab>
+      <v-tab
+        v-if="perfil === 1"
+        class="primary ml-1"
+        @click="correctPriceInList()"
+        raised
+      >
+        Modificar Precios
+      </v-tab>
     </v-tabs>
     <br />
     <v-card class="card" min-width="100%">
@@ -320,10 +331,10 @@ export default {
       editable: false,
     },
     tabs: [
-      { id:1, title:"Lista", route:"/pdv2/productos"},
-      { id:2, title:"Nuevo", route:"/pdv2/productos/form/0"},
-      { id:3, title:"Generar Etiqueta", route:"/pdv2/productos"},
-      { id:4, title:"Modificar precios", route:"/pdv2/precios"}
+      { id: 1, title: "Lista", route: "/pdv2/productos" },
+      { id: 2, title: "Nuevo", route: "/pdv2/productos/form/0" },
+      { id: 3, title: "Generar Etiqueta", route: "/pdv2/productos" },
+      { id: 4, title: "Modificar precios", route: "/pdv2/precios" },
     ],
     activeTab: 2,
     filterParams: {
@@ -364,7 +375,7 @@ export default {
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
     //if (this.loguedUser.perfil > 1) {
-      //this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    //this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     //}
   },
 
@@ -429,7 +440,30 @@ export default {
     goPricesManagerView() {
       this.$router.push({ name: "productos" });
     },
-    setTabs(tab){
+    correctPriceInList() {
+      this.loaded = false;
+      this.filterParams.page = 1;
+      this.filterParams.size = 1000000;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          const products = data.data.content;
+          let correctedProducts = products.map((el) => {
+            el = this.calculations(el);
+            return el;
+          });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(correctedProducts)
+            .then(() => {
+              this.$successAlert("Precios corregidos");
+              this.loaded = true;
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
+    },
+    setTabs(tab) {
       //this.activeTab = tab
       console.log(tab);
     },
