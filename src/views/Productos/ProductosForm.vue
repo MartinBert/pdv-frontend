@@ -22,6 +22,7 @@
       >
         Modificar Precios
       </v-tab>
+    <v-tabs>
   <!-------- 
     <v-tabs fixed-tabs background-color="indigo" dark>
         <v-tab
