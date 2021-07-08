@@ -11,7 +11,7 @@
       <v-tab class="primary ml-1" @click="newObject()">
         Nuevo
       </v-tab>
-      <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
+      <v-tab class="primary ml-1" @click="getProduct()">
         Generar Etiquetas
       </v-tab>
       <v-tab class="primary ml-1" @click="goPricesManagerView()">
@@ -152,6 +152,7 @@ export default {
       id: 1,
       text: "Aplicar modificación de precios a todos los productos",
     },
+    view: "listOfProducts",
     distribuidores: [],
     selectedDistribuidores: [],
     marcas: [],
@@ -196,15 +197,9 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.getObjects();
     this.$store.commit("eventual/resetStates");
-    this.tenant = this.$route.params.tenant;
-    this.tabs[0].route = `/${this.tenant}/productos`;
-    this.tabs[1].route = `/${this.tenant}/productos/form/:id`;
-    this.tabs[2].route = `/${this.tenant}/productos`;
-    this.tabs[3].route = `/${this.tenant}/precios`;
-    if (this.loguedUser.perfil > 1) {
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
-    this.filterObjects();
+    //if (this.loguedUser.perfil > 1) {
+      //this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    //}
   },
 
   methods: {
@@ -225,6 +220,40 @@ export default {
           this.rubros = data.data.content;
         });
       this.loaded = true;
+    },
+
+    newObject() {
+      this.$router.push({ name: "productosForm", params: { id: 0 } });
+    },
+    
+    getProduct() {
+      this.$router.push({ name: "productos", params: { id: 0 } });
+    },
+    goPricesManagerView() {
+      this.$router.push({ name: "precios" });
+    },
+    correctPriceInList() {
+      this.loaded = false;
+      this.filterParams.page = 1;
+      this.filterParams.size = 1000000;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          const products = data.data.content;
+          let correctedProducts = products.map((el) => {
+            el = this.calculations(el);
+            return el;
+          });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(correctedProducts)
+            .then(() => {
+              this.$successAlert("Precios corregidos");
+              this.loaded = true;
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
     },
 
     updatePrices() {

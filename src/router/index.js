@@ -62,7 +62,7 @@ import Calendar from "../views/Calendar/Calendar.vue";
 import PresupuestoForm from "../views/Presupuesto/PresupuestoForm.vue";
 import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
 import Cierrez from "../views/Cierrez/Cierrez.vue";
-import LibroivaVentas from "../views/LibroVentas/LibroivaVentas";
+import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
 
 Vue.use(VueRouter)
 
@@ -156,6 +156,12 @@ const routes = [
                 component: MarcasForm,
                 meta: { requiresAuth: true }
             },
+            {
+                path: 'libroivaventas',
+                name: 'libroivaventas',
+                component: LibroivaVentas,
+                meta: { requiresAuth: true }
+            },
 
             {
                 path: 'calendar',
@@ -163,7 +169,6 @@ const routes = [
                 component: Calendar,
                 meta: { requiresAuth: true }
             },
-
             {
                 path: 'clientes',
                 name: 'clientes',
@@ -270,12 +275,6 @@ const routes = [
                 path: 'ventas/presupuesto',
                 name: 'presupuesto',
                 component: Presupuesto,
-                meta: { requiresAuth: true }
-            },
-            {
-                path: '/libroivaventas',
-                name: 'Libroivaventas',
-                component: LibroivaVentas,
                 meta: { requiresAuth: true }
             },
             {

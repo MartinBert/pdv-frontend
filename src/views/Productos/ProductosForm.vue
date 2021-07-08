@@ -15,15 +15,10 @@
       <v-tab class="primary ml-1" @click="newObject()" raised>
         Nuevo
       </v-tab>
-      <v-tab class="primary ml-1" @click="goPricesManagerView()">
-        Modificar Etiquetas
+      <v-tab class="primary ml-1" @click="Getproduct()">
+        Generar Etiquetas
       </v-tab>
-      <v-tab
-        v-if="perfil === 1"
-        class="primary ml-1"
-        @click="correctPriceInList()"
-        raised
-      >
+      <v-tab class="primary ml-1" @click="goPricesManagerView()">
         Modificar Precios
       </v-tab>
     <v-tabs> -->
@@ -37,8 +32,7 @@
           >
             {{ item.title }}
         </v-tab>
-    </v-tabs>
-    --->
+     --->
     <br />
     <v-card class="card" min-width="100%">
       <Error :errorStatus="errorStatus" />
@@ -453,9 +447,14 @@ export default {
       this.$router.push({ name: "productosForm", params: { id: 0 } });
     },
 
-    goPricesManagerView() {
-      this.$router.push({ name: "productos" });
+    Getproduct() {
+      this.$router.push({ name: "productos", params: { id: 0 } });
     },
+
+    goPricesManagerView() {
+      this.$router.push({ name: "precios" });
+    },
+
     correctPriceInList() {
       this.loaded = false;
       this.filterParams.page = 1;
@@ -569,8 +568,8 @@ export default {
 };
 </script>
 <style>
-.active_tab{
- background-color: black;
+.active_tab {
+  background-color: black;
 }
 .mt-5 {
   align-content: center;

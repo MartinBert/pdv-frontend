@@ -2,7 +2,6 @@
   <v-container style="min-width: 100%;">
     <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
       <v-card min-width="100%">
-
           <VentasTable
             :items="ventas"
             v-on:print="print"
