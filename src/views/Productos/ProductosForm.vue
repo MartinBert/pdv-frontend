@@ -5,24 +5,20 @@
   "
   >
     <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised>
+      <v-tab class="primary ml-1" @click="Getproduct()" raised>
         Lista
       </v-tab>
       <v-tab class="primary ml-1" @click="newObject()" raised>
         Nuevo
       </v-tab>
-      <v-tab class="primary ml-1" @click="goPricesManagerView()">
-        Modificar Etiquetas
+      <v-tab class="primary ml-1" @click="Getproduct()">
+        Generar Etiquetas
       </v-tab>
-      <v-tab
-        v-if="perfil === 1"
-        class="primary ml-1"
-        @click="correctPriceInList()"
-        raised
-      >
+      <v-tab class="primary ml-1" @click="goPricesManagerView()">
         Modificar Precios
       </v-tab>
-  <!-------- 
+    </v-tabs>
+    <!-------- 
     <v-tabs fixed-tabs background-color="indigo" dark>
         <v-tab
             :class="(activeTab=== 2) ? 'active_tab':null"
@@ -32,8 +28,7 @@
           >
             {{ item.title }}
         </v-tab>
-    </v-tabs>
-    --->
+     --->
     <br />
     <v-card class="card" min-width="100%">
       <Error :errorStatus="errorStatus" />
@@ -341,13 +336,6 @@ export default {
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
       editable: false,
     },
-    tabs: [
-      { id: 1, title: "Lista", route: "/pdv2/productos" },
-      { id: 2, title: "Nuevo", route: "/pdv2/productos/form/0" },
-      { id: 3, title: "Generar Etiqueta", route: "/pdv2/productos" },
-      { id: 4, title: "Modificar precios", route: "/pdv2/precios" },
-    ],
-    activeTab: 2,
     filterParams: {
       productoName: "",
       productoCodigo: "",
@@ -448,9 +436,14 @@ export default {
       this.$router.push({ name: "productosForm", params: { id: 0 } });
     },
 
-    goPricesManagerView() {
-      this.$router.push({ name: "productos" });
+    Getproduct() {
+      this.$router.push({ name: "productos", params: { id: 0 } });
     },
+
+    goPricesManagerView() {
+      this.$router.push({ name: "precios" });
+    },
+
     correctPriceInList() {
       this.loaded = false;
       this.filterParams.page = 1;
@@ -564,8 +557,8 @@ export default {
 };
 </script>
 <style>
-.active_tab{
- background-color: black;
+.active_tab {
+  background-color: black;
 }
 .mt-5 {
   align-content: center;

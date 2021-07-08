@@ -12,15 +12,10 @@
       <v-tab class="primary ml-1" @click="newObject()" raised>
         Nuevo
       </v-tab>
-      <v-tab class="primary ml-1" @click="goPricesManagerView()">
-        Modificar Etiquetas
+      <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
+        Generar Etiquetas
       </v-tab>
-      <v-tab
-        v-if="perfil === 1"
-        class="primary ml-1"
-        @click="correctPriceInList()"
-        raised
-      >
+      <v-tab class="primary ml-1" @click="goPricesManagerView()">
         Modificar Precios
       </v-tab>
     </v-tabs>
@@ -831,8 +826,8 @@ export default {
 };
 </script>
 <style>
-.active_tab{
- background-color: black;
+.active_tab {
+  background-color: black;
 }
 v-tabs {
   margin-bottom: 10px;
