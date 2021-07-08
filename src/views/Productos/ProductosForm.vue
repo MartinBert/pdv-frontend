@@ -19,6 +19,7 @@
       </v-tab>
     </v-tabs>
     <!-------- 
+    <v-tabs>
     <v-tabs fixed-tabs background-color="indigo" dark>
         <v-tab
             :class="(activeTab=== 2) ? 'active_tab':null"
