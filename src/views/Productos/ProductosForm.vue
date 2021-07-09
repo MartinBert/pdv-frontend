@@ -341,10 +341,10 @@ export default {
       editable: false,
     },
     tabs: [
-      { id: 1, title: "Lista", route: "/servipack/productos", event: null },
-      { id: 2, title: "Nuevo", route: "/servipack/productos/form/0", event: null },
-      { id: 3, title: "Generar Etiqueta", route: "/servipack/etiquetas", event: null },
-      { id: 4, title: "Modificar precios", route: "/servipack/precios", event: null },
+      { id: 1, title: "Lista", route: '/productos' },
+      { id: 2, title: "Nuevo", route: '/productos/form/0' },
+      { id: 3, title: "Generar Etiqueta", route: '/etiquetas' },
+      { id: 4, title: "Modificar precios", route: '/precios' },
     ],
     activeTab: 2,
     filterParams: {
@@ -363,7 +363,7 @@ export default {
     },
     cantidad: [],
     loaded: false,
-    tenant: "",
+    tenant: '',
     service: "productos",
     token: localStorage.getItem("token"),
     errorStatus: false,

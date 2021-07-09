@@ -180,14 +180,14 @@ export default {
       totalPages: 0,
     },
     tabs: [
-      { id: 1, title: "Lista", route: "/servipack/productos", event: null },
-      { id: 2, title: "Nuevo", route: "/servipack/productos/form/0", event: null },
-      { id: 3, title: "Generar Etiqueta", route: "/servipack/etiquetas", event: null },
-      { id: 4, title: "Modificar precios", route: "/servipack/precios", event: null },
+      { id: 1, title: "Lista", route: '/productos' },
+      { id: 2, title: "Nuevo", route: '/productos/form/0' },
+      { id: 3, title: "Generar Etiqueta", route: '/etiquetas' },
+      { id: 4, title: "Modificar precios", route: '/precios' },
     ],
     activeTab: 1,
     loaded: false,
-    tenant: "",
+    tenant: '',
     idObject: "",
     service: "productos",
     token: localStorage.getItem("token"),
@@ -207,13 +207,13 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects();
     this.getOtherModels(0, 100000);
     this.perfil = this.loguedUser.perfil;
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects();
+    
   },
 
   methods: {
