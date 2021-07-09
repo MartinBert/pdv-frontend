@@ -1,5 +1,6 @@
 <template>
   <v-container style="min-width: 100%">
+    <TabBar :tabs='tabs' :activeTab="activeTab"/>
     <v-row>
       <v-col cols="12">
         <v-data-table
@@ -9,27 +10,15 @@
           :items="productos"
         >
           <template v-slot:[`item.acciones`]="{ item }">
-            <a title="Agregar" v-if="!item.selected"
-              ><img
-                src="/../../images/icons/add.svg"
-                @click="addProductToTagsList(item)"
-                width="30"
-                height="30"
-            /></a>
-            <a title="Quitar" v-if="item.selected"
-              ><img
-                src="/../../images/icons/success.svg"
-                @click="deleteLine(item)"
-                width="30"
-                height="30"
-            /></a>
+            <Add :object="item" v-if="!item.selected" v-on:add="selectItem"/>
+            <Checked :object="item" v-if="item.selected" v-on:uncheck="uncheckItem"/>
           </template>
         </v-data-table>
         <Pagination
-          :page="page"
-          :totalPages="totalPages"
-          :totalVisible="totalVisible"
-          v-on:changePage="changePage"
+          :page="filterParams.page"
+          :totalPages="filterParams.totalPages"
+          :totalVisible="7"
+          v-on:changePage="filterObjects"
         />
       </v-col>
       <v-row>
@@ -79,7 +68,7 @@
                       <a title="Agregar"
                         ><img
                           src="/../../images/icons/delete.svg"
-                          @click="deleteLine(producto)"
+                          @click="uncheckItem(producto)"
                           width="30"
                           height="30"
                       /></a>
@@ -102,20 +91,15 @@
   </v-container>
 </template>
 <script>
-import ReportsService from "../services/ReportsService";
-import Pagination from "./Pagination";
-import GenericService from "../services/GenericService";
+import ReportsService from "../../services/ReportsService";
+import Pagination from "../../components/Pagination";
+import GenericService from "../../services/GenericService";
+import TabBar from "../../components/Generics/TabBar";
+import Add from '../../components/Buttons/Add';
+import Checked from '../../components/Buttons/Checked';
 export default {
-  name: "LabelPrinting",
-  props: {
-    productos: Array,
-    page: Number,
-    totalVisible: Number,
-    totalPages: Number,
-    tenant: String,
-    token: String,
-  },
   data: () => ({
+    productos: [],
     filterParams: {
       sucursalId: "",
       productoName: "",
@@ -130,20 +114,22 @@ export default {
       size: 10,
       totalPages: 0,
     },
+    tabs: [
+      { id: 1, title: "Lista", route: "/servipack/productos" },
+      { id: 2, title: "Nuevo", route: "/servipack/productos/form/0" },
+      { id: 3, title: "Generar Etiqueta", route: "/servipack/etiquetas" },
+      { id: 4, title: "Modificar precios", route: "/servipack/precios" },
+    ],
+    activeTab: 3,
     loaded: false,
     idObject: "",
     service: "productos",
     dialogStock: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
+    token: localStorage.getItem("token"),
     checkImportStatus: 0,
     deleteDialogStatus: false,
     labelList: [],
-    labelFormats: {
-      labelWithoutPrice: "label_image_not_selected",
-      labelWithAttributes: "label_image_not_selected",
-      labelWithPrice: "label_image_not_selected",
-      labelOnlyBarCode: "label_image_not_selected",
-    },
     headers: [
       { text: "Nombre", value: "nombre" },
       { text: "Atributos", value: "atributos[0].valor" },
@@ -161,48 +147,55 @@ export default {
       { text: "Cantidad", value: "cantidad" },
     ],
   }),
+
   mounted() {
     this.tenant = this.$route.params.tenant;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
     this.filterObjects();
   },
+
   components: {
     Pagination,
+    TabBar,
+    Add,
+    Checked
   },
+
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      if (this.estadoSelecionado.id > 1) {
-        this.filterParams.productoEstado = 2;
-      } else {
-        this.filterParams.productoEstado = 0;
-      }
       if (this.loguedUser.perfil > 1) {
         this.filterParams.sucursalId = this.loguedUser.sucursal.id;
       }
       GenericService(this.tenant, "productos", this.token)
         .filter(this.filterParams)
         .then((data) => {
+          const productsOfGlobalStore = this.$store.state.productos.products;
+          data.data.content.forEach(product => {
+            productsOfGlobalStore.forEach(productOfGlobalStore => {
+              if(product.id === productOfGlobalStore.id){
+                product.selected = true;
+              }
+            })
+          })
           this.productos = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
-    changePage(page) {
-      this.$emit("changePage", page);
+
+    selectItem(object){
+      this.$store.commit('productos/addProductsToList', object);
+      this.filterObjects();
     },
-    addProductToTagsList(producto) {
-      this.$store.commit("productos/addProductsToList", producto);
-      this.$emit("checkProduct", producto);
-      this.$refs.tableOfProducts.$forceUpdate();
+    
+    uncheckItem(object){
+      this.$store.commit('productos/removeProductsToList', object.id);
+      this.filterObjects();
     },
-    deleteLine(producto) {
-      this.$store.commit("productos/removeProductsToList", producto.id);
-      this.labelList = this.labelList.filter(
-        (el) => el.codigoBarra !== producto.codigoBarra
-      );
-      this.$emit("checkProduct", producto);
-      this.$refs.tableOfProducts.$forceUpdate();
-    },
+    
     setQuantity(producto, $event) {
       if ($event !== "") {
         if ($event < 0) $event = 0;
@@ -223,6 +216,7 @@ export default {
         return;
       }
     },
+
     printLabels(labelList) {
       ReportsService(this.tenant, "productos", this.token)
         .labels(labelList)
@@ -245,56 +239,6 @@ export default {
       }, "");
 
       return str;
-    },
-    getTypeClass(typeLabelFormat) {
-      const selected = "label_image_selected";
-      const notSelected = "label_image_not_selected";
-
-      switch (typeLabelFormat) {
-        case "labelWithoutPrice":
-          if (this.labelFormats.labelWithoutPrice === selected) {
-            this.labelFormats.labelWithoutPrice = notSelected;
-          } else {
-            this.labelFormats.labelWithAttributes = notSelected;
-            this.labelFormats.labelWithPrice = notSelected;
-            this.labelFormats.labelOnlyBarCode = notSelected;
-            this.labelFormats.labelWithoutPrice = selected;
-          }
-          break;
-
-        case "labelWithAttributes":
-          if (this.labelFormats.labelWithAttributes === selected) {
-            this.labelFormats.labelWithAttributes = notSelected;
-          } else {
-            this.labelFormats.labelWithoutPrice = notSelected;
-            this.labelFormats.labelWithPrice = notSelected;
-            this.labelFormats.labelOnlyBarCode = notSelected;
-            this.labelFormats.labelWithAttributes = selected;
-          }
-          break;
-
-        case "labelWithPrice":
-          if (this.labelFormats.labelWithPrice === selected) {
-            this.labelFormats.labelWithPrice = notSelected;
-          } else {
-            this.labelFormats.labelWithoutPrice = notSelected;
-            this.labelFormats.labelWithAttributes = notSelected;
-            this.labelFormats.labelOnlyBarCode = notSelected;
-            this.labelFormats.labelWithPrice = selected;
-          }
-          break;
-
-        default:
-          if (this.labelFormats.labelOnlyBarCode === selected) {
-            this.labelFormats.labelOnlyBarCode = notSelected;
-          } else {
-            this.labelFormats.labelWithoutPrice = notSelected;
-            this.labelFormats.labelWithAttributes = notSelected;
-            this.labelFormats.labelWithPrice = notSelected;
-            this.labelFormats.labelOnlyBarCode = selected;
-          }
-          break;
-      }
     },
   },
 };

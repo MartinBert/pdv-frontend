@@ -37,7 +37,6 @@ export default (tenant, service, token) => {
             let data = axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filter`, object, {
                 headers: { Authorization: "Bearer " + token }
             })
-            console.log(data)
             return data;
             
         },

@@ -1,6 +1,6 @@
 <template>
     <v-tabs fixed-tabs background-color="indigo" dark>
-        <v-tab v-for="tab in tabs" :key="tab.id" @click="tab.event" :to="tab.route" :class="(tab.id === activeTab) ? 'class_active' : null">
+        <v-tab v-for="tab in tabs" :key="tab.id" :to="tab.route" :class="(tab.id === activeTab) ? 'class_active' : null">
             {{tab.title}}
         </v-tab>
     </v-tabs>

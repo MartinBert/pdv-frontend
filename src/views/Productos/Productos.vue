@@ -9,33 +9,6 @@
       :tabs="tabs"
       :activeTab="activeTab"
     />
-    <!-- <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised>
-        Lista
-      </v-tab>
-      <v-tab class="primary ml-1" @click="newObject()">
-        Nuevo
-      </v-tab>
-      <v-tab class="primary ml-1" @click="view = 'labelPrinting'">
-        Generar Etiquetas
-      </v-tab>
-      <v-tab class="primary ml-1" @click="goPricesManagerView()">
-        Modificar Precios
-      </v-tab>
-    </v-tabs> -->
-    <!---
-    <v-tabs fixed-tabs background-color="indigo" dark v-model="activeTab">
-      <v-tab
-        :class="(item.id === active_tab) ? 'active_tab':null"
-        active-class="black" 
-        v-for="item in tabs"
-        :key="item.id"
-        :to="item.route"
-      >
-        {{ item.title }}
-      </v-tab>
-    </v-tabs>
-    !-->
     <br />
     <v-card>
       <v-form class="mb-0" v-on:click="show = !show">
@@ -68,7 +41,7 @@
               >Corregir lista de precios</v-btn
             >
           </v-col>
-          <v-col cols="3" v-if="perfil < 3 && view == 'listOfProducts'">
+          <v-col cols="3" v-if="perfil < 3">
             <v-file-input
               class="mt-2"
               dense
@@ -78,7 +51,7 @@
               @change="onChange($event)"
             ></v-file-input>
           </v-col>
-          <v-col cols="3" v-if="view == 'listOfProducts' && perfil < 3">
+          <v-col cols="3" v-if="perfil < 3">
             <v-select
               :items="estados"
               v-model="estadoSelecionado"
@@ -96,25 +69,14 @@
         v-on:editItem="edit"
         v-on:deleteItem="deleteItem"
         v-on:add="reactivationOfProduct"
-        v-if="loaded && view === 'listOfProducts'"
+        v-if="loaded"
       />
       <Pagination
         :page="filterParams.page"
         :totalPages="filterParams.totalPages"
         :totalVisible="7"
         v-on:changePage="filterObjects"
-        v-if="loaded && view === 'listOfProducts'"
-      />
-      <LabelPrinting
-        v-if="view === 'labelPrinting'"
-        :productos="productos"
-        :page="filterParams.page"
-        :totalVisible="filterParams.size"
-        :totalPages="filterParams.totalPages"
-        :tenant="tenant"
-        :token="token"
-        v-on:changePage="changePage"
-        v-on:checkProduct="checkProductInList"
+        v-if="loaded"
       />
       <Spinner v-if="!loaded" />
       <DeleteDialog
@@ -163,7 +125,6 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-import LabelPrinting from "../../components/LabelPrinting";
 import Spinner from "../../components/Graphics/Spinner";
 import Pagination from "../../components/Pagination";
 import ProductosTable from "../../components/Tables/ProductosTable";
@@ -185,7 +146,6 @@ export default {
     tab:null,
     show: true,
     icon: "mdi-check-circle",
-    view: "listOfProducts",
     perfil: "",
     loader: false,
     loaderStatus: false,
@@ -222,7 +182,7 @@ export default {
     tabs: [
       { id: 1, title: "Lista", route: "/servipack/productos", event: null },
       { id: 2, title: "Nuevo", route: "/servipack/productos/form/0", event: null },
-      { id: 3, title: "Generar Etiqueta", route: "/servipack/productos", event: null },
+      { id: 3, title: "Generar Etiqueta", route: "/servipack/etiquetas", event: null },
       { id: 4, title: "Modificar precios", route: "/servipack/precios", event: null },
     ],
     activeTab: 1,
@@ -238,7 +198,6 @@ export default {
   }),
 
   components: {
-    LabelPrinting,
     Spinner,
     Pagination,
     ProductosTable,

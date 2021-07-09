@@ -63,6 +63,7 @@ import PresupuestoForm from "../views/Presupuesto/PresupuestoForm.vue";
 import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
 import Cierrez from "../views/Cierrez/Cierrez.vue";
 import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
+import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 
 Vue.use(VueRouter)
 
@@ -257,6 +258,12 @@ const routes = [
                 path: 'precios',
                 name: 'precios',
                 component: Precios,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'etiquetas',
+                name: 'etiquetas',
+                component: GenerarEtiquetas,
                 meta: { requiresAuth: true }
             },
             {

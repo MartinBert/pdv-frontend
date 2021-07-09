@@ -61,29 +61,11 @@
           append-icon="mdi-magnify"
         />
       </v-col>
-      <v-col v-if="view == 'labelPrinting'">
-        <h2>Seleccion de productos</h2>
-      </v-col>
     </v-row>
-    <v-data-table class="elevation-6" :headers="headers" :items="productos">
-      <v-dialog v-model="dialog" max-width="500px">
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1">
-            Cancel
-          </v-btn>
-          <v-btn color="blue darken-1">
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-dialog>
+    <v-data-table class="elevation-6" :headers="headers" :items="productos" style="background-color: transparent">
       <template v-slot:[`item.acciones`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          mdi-pencil
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete
-        </v-icon>
+        <Edit :itemId="item.id" v-on:editItem="editItem"/>
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
       </template>
     </v-data-table>
   </v-container>
@@ -91,25 +73,11 @@
 <script>
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
-import Add from "../Buttons/Add";
 import GenericService from "../../services/GenericService";
 
 export default {
   data() {
     return {
-      editedItem: {
-        nombre: "",
-        codigoBarra: 0,
-        codigoProducto: 0,
-        atributo: "",
-        costoBruto: 0,
-        precioTotal: 0,
-      },
-      components: {
-        Edit,
-        Delete,
-        Add,
-      },
       headers: [
         {
           text: "Nombre",
@@ -139,15 +107,17 @@ export default {
       productos: [],
       loaded: false,
       tenant: "",
-      idObject: "",
       service: "productos",
       token: localStorage.getItem("token"),
-      dialogStock: false,
       loguedUser: JSON.parse(localStorage.getItem("userData")),
-      checkImportStatus: 0,
-      deleteDialogStatus: false,
     };
   },
+
+  components:{
+    Delete,
+    Edit
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects();
@@ -185,5 +155,3 @@ export default {
   },
 };
 </script>
-
-<style></style>
