@@ -1,6 +1,6 @@
 <template>
   <v-container
-    style="min-width: 98%;
+    style="min-width: 99%;
     margin-left:1px;
   "
   >
@@ -9,6 +9,7 @@
       <v-row>
         <v-col cols="12">
           <v-data-table
+            class="elevation-6"
             style="background-color: transparent"
             ref="tableOfProducts"
             :headers="headers"

@@ -1,40 +1,11 @@
 <template>
-  <v-container style="min-width: 98%;
+  <v-container
+    style="min-width: 98%;
   margin-right:40px;
-  ">
+  "
+  >
     <Error :errorStatus="errorStatus" />
-    <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary" @click="newObject()" raised>
-        Nuevo
-      </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="openDialog('minimumStockRestriction')"
-        raised
-      >
-        EXISTENCIAS MÍNIMAS
-      </v-tab>
-      <v-tab class="primary ml-1" @click="openDialog('stockMigration')">
-        Migrar Stock
-      </v-tab>
-      <v-tab class="primary ml-1" @click="openDialog('reports')">
-        Reportes
-      </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="modifyAlgorim()"
-        v-if="loguedUser.perfil < 2"
-      >
-        Cambiar marca de algoritmo de stock
-      </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="checkStocks()"
-        v-if="loguedUser.perfil < 2"
-      >
-        Check Stock
-      </v-tab>
-    </v-tabs>
+    <TabBar :tabs="tabs" :activeTab="activeTab" />
     <v-card>
       <div v-if="loaded">
         <v-form
@@ -280,6 +251,7 @@
   </v-container>
 </template>
 <script>
+import TabBar from "../../components/Generics/TabBar.vue";
 import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
 import DepositMigrationDialog from "../../components/Dialogs/DepositMigrationDialog.vue";
 import StockReportsDialog from "../../components/Dialogs/StockReportsDialog.vue";
@@ -319,12 +291,13 @@ export default {
       totalPages: 0,
     },
     tabs: [
-      { id: 0, route: "", title: "Nuevo" },
-      { id: 1, route: "", title: "" },
-      { id: 2, route: "", title: "" },
-      { id: 1, route: "", title: "" },
-      { id: 2, route: "", title: "" },
+      { id: 1, title: "Lista", route: "/stock" },
+      { id: 2, title: "Nuevo", route: "/stock/form/0" },
+      { id: 3, title: "Existencias minimas" },
+      { id: 4, title: "Migrar Stock" },
+      { id: 5, title: "Reportes" },
     ],
+    activeTab: 2,
     filterDepositsParam: {
       depositoName: "",
       perfilId: "",
@@ -342,7 +315,7 @@ export default {
     ModifyMinimumStocksDialog,
     DepositMigrationDialog,
     StockReportsDialog,
-    //TabBar,
+    TabBar,
   },
 
   mounted() {
@@ -598,6 +571,9 @@ export default {
 
     back() {
       this.$router.push({ name: "stock" });
+    },
+    gotoList() {
+      this.$router.push({ name: "stock", params: { id: 0 } });
     },
     newObject() {
       this.$router.push({ name: "stockForm", params: { id: 0 } });
