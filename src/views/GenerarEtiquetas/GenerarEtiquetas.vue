@@ -1,93 +1,112 @@
 <template>
-  <v-container style="min-width: 100%">
-    <TabBar :tabs='tabs' :activeTab="activeTab"/>
-    <v-row>
-      <v-col cols="12">
-        <v-data-table
-          style="background-color: transparent"
-          ref="tableOfProducts"
-          :headers="headers"
-          :items="productos"
-        >
-          <template v-slot:[`item.acciones`]="{ item }">
-            <Add :object="item" v-if="!item.selected" v-on:add="selectItem"/>
-            <Checked :object="item" v-if="item.selected" v-on:uncheck="uncheckItem"/>
-          </template>
-        </v-data-table>
-        <Pagination
-          :page="filterParams.page"
-          :totalPages="filterParams.totalPages"
-          :totalVisible="7"
-          v-on:changePage="filterObjects"
-        />
-      </v-col>
+  <v-container
+    style="min-width: 98%;
+    margin-left:1px;
+  "
+  >
+    <TabBar :tabs="tabs" :activeTab="activeTab" class="tab" />
+    <v-card min-width="100%">
       <v-row>
-        <v-col>
-          <div class="horizontalSeparator"></div>
+        <v-col cols="12">
+          <v-data-table
+            style="background-color: transparent"
+            ref="tableOfProducts"
+            :headers="headers"
+            :items="productos"
+          >
+            <template v-slot:[`item.acciones`]="{ item }">
+              <Add :object="item" v-if="!item.selected" v-on:add="selectItem" />
+              <Checked
+                :object="item"
+                v-if="item.selected"
+                v-on:uncheck="uncheckItem"
+              />
+            </template>
+          </v-data-table>
+          <Pagination
+            :page="filterParams.page"
+            :totalPages="filterParams.totalPages"
+            :totalVisible="7"
+            v-on:changePage="filterObjects"
+          />
         </v-col>
-      </v-row>
-      <v-col cols="12">
-        <v-row>
+        <v-row style="margin:auto"> 
           <v-col cols="12">
-            <h2>Indique la cantidad de etiquetas a imprimir en cada caso</h2>
-          </v-col>
-          <v-col>
-            <v-simple-table style="background-color: transparent" height="525">
-              <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Atributos</th>
-                    <th>Marca</th>
-                    <th>Código de barras</th>
-                    <th>Código de producto</th>
-                    <th>Cantidad</th>
-                  </tr>
-                </thead>
-                <tbody
-                  v-for="producto in $store.state.productos.products"
-                  :key="producto.id"
-                >
-                  <tr>
-                    <td>{{ producto.nombre }}</td>
-                    <td>{{ setAtributesValues(producto.atributos) }}</td>
-                    <td>{{ producto.marca.nombre }}</td>
-                    <td>{{ producto.codigoBarra }}</td>
-                    <td>{{ producto.codigoProducto }}</td>
-                    <td>
-                      <v-text-field
-                        autocomplete="off"
-                        type="number"
-                        counter="3"
-                        maxlength="3"
-                        id="inputQuantity"
-                        @input="setQuantity(producto, $event)"
-                      />
-                    </td>
-                    <td>
-                      <a title="Agregar"
-                        ><img
-                          src="/../../images/icons/delete.svg"
-                          @click="uncheckItem(producto)"
-                          width="30"
-                          height="30"
-                      /></a>
-                    </td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
+            <div class="horizontalSeparator"></div>
           </v-col>
         </v-row>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col class="text-center">
-        <v-btn class="primary" @click="printLabels(labelList)"
-          >IMPRIMIR ETIQUETAS</v-btn
-        >
-      </v-col>
-    </v-row>
+        <v-col cols="12">
+          <v-row>
+            <v-col cols="12">
+              <h2
+                style="text-align:center;
+               margin-top:0;
+              "
+              >
+                Indique la cantidad de etiquetas a imprimir en cada caso
+              </h2>
+            </v-col>
+            <v-col>
+              <v-simple-table
+                style="background-color: transparent"
+                height="525"
+              >
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Atributos</th>
+                      <th>Marca</th>
+                      <th>Código de barras</th>
+                      <th>Código de producto</th>
+                      <th>Cantidad</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    v-for="producto in $store.state.productos.products"
+                    :key="producto.id"
+                  >
+                    <tr>
+                      <td>{{ producto.nombre }}</td>
+                      <td>{{ setAtributesValues(producto.atributos) }}</td>
+                      <td>{{ producto.marca.nombre }}</td>
+                      <td>{{ producto.codigoBarra }}</td>
+                      <td>{{ producto.codigoProducto }}</td>
+                      <td>
+                        <v-text-field
+                          autocomplete="off"
+                          type="number"
+                          counter="3"
+                          maxlength="3"
+                          id="inputQuantity"
+                          @input="setQuantity(producto, $event)"
+                        />
+                      </td>
+                      <td>
+                        <a title="Agregar"
+                          ><img
+                            src="/../../images/icons/delete.svg"
+                            @click="uncheckItem(producto)"
+                            width="30"
+                            height="30"
+                        /></a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col class="text-center">
+          <v-btn class="primary" @click="printLabels(labelList)"
+            >IMPRIMIR ETIQUETAS</v-btn
+          >
+        </v-col>
+      </v-row>
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -95,8 +114,8 @@ import ReportsService from "../../services/ReportsService";
 import Pagination from "../../components/Pagination";
 import GenericService from "../../services/GenericService";
 import TabBar from "../../components/Generics/TabBar";
-import Add from '../../components/Buttons/Add';
-import Checked from '../../components/Buttons/Checked';
+import Add from "../../components/Buttons/Add";
+import Checked from "../../components/Buttons/Checked";
 export default {
   data: () => ({
     productos: [],
@@ -115,10 +134,10 @@ export default {
       totalPages: 0,
     },
     tabs: [
-      { id: 1, title: "Lista", route: '/productos' },
-      { id: 2, title: "Nuevo", route: '/productos/form/0' },
-      { id: 3, title: "Generar Etiqueta", route: '/etiquetas' },
-      { id: 4, title: "Modificar precios", route: '/precios' },
+      { id: 1, title: "Lista", route: "/productos" },
+      { id: 2, title: "Nuevo", route: "/productos/form/0" },
+      { id: 3, title: "Generar Etiqueta", route: "/etiquetas" },
+      { id: 4, title: "Modificar precios", route: "/precios" },
     ],
     activeTab: 3,
     loaded: false,
@@ -127,7 +146,7 @@ export default {
     dialogStock: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     token: localStorage.getItem("token"),
-    tenant: '',
+    tenant: "",
     checkImportStatus: 0,
     deleteDialogStatus: false,
     labelList: [],
@@ -137,7 +156,7 @@ export default {
       { text: "Marca", value: "marca.nombre" },
       { text: "Codigo de Barra", value: "codigoBarra" },
       { text: "Codigo de Producto", value: "codigoProducto" },
-      { text: "Acciones", value: "acciones" },
+      { text: "Acciones", value: "acciones", sortable: false },
     ],
     headers1: [
       { text: "Nombre" },
@@ -151,7 +170,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    if(this.loguedUser.perfil > 1){
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects();
@@ -161,7 +180,7 @@ export default {
     Pagination,
     TabBar,
     Add,
-    Checked
+    Checked,
   },
 
   methods: {
@@ -174,29 +193,29 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           const productsOfGlobalStore = this.$store.state.productos.products;
-          data.data.content.forEach(product => {
-            productsOfGlobalStore.forEach(productOfGlobalStore => {
-              if(product.id === productOfGlobalStore.id){
+          data.data.content.forEach((product) => {
+            productsOfGlobalStore.forEach((productOfGlobalStore) => {
+              if (product.id === productOfGlobalStore.id) {
                 product.selected = true;
               }
-            })
-          })
+            });
+          });
           this.productos = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
 
-    selectItem(object){
-      this.$store.commit('productos/addProductsToList', object);
+    selectItem(object) {
+      this.$store.commit("productos/addProductsToList", object);
       this.filterObjects();
     },
-    
-    uncheckItem(object){
-      this.$store.commit('productos/removeProductsToList', object.id);
+
+    uncheckItem(object) {
+      this.$store.commit("productos/removeProductsToList", object.id);
       this.filterObjects();
     },
-    
+
     setQuantity(producto, $event) {
       if ($event !== "") {
         if ($event < 0) $event = 0;
@@ -244,3 +263,9 @@ export default {
   },
 };
 </script>
+<style>
+.tab {
+  margin-bottom: 30px;
+}
+
+</style>

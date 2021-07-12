@@ -1,23 +1,11 @@
 <template>
-  <v-container style="min-width: 100%;">
+  <v-container  style="min-width: 98%;
+    margin-left:1px;
+  ">
     <TabBar
       :tabs="tabs"
       :activeTab="activeTab"
     />
-    <!-- <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'">
-        Lista
-      </v-tab>
-      <v-tab class="primary ml-1" @click="newObject()">
-        Nuevo
-      </v-tab>
-      <v-tab class="primary ml-1" @click="getProduct()">
-        Generar Etiquetas
-      </v-tab>
-      <v-tab class="primary ml-1" @click="goPricesManagerView()">
-        Modificar Precios
-      </v-tab> 
-    </v-tabs> -->
     <br />
     <v-card min-width="90%" v-if="loaded">
       <v-card-title>

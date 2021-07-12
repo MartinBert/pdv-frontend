@@ -1,24 +1,28 @@
 <template>
-  <v-container style="min-width: 100%;">
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
-      <v-card min-width="100%">
-          <VentasTable
-            :items="ventas"
-            v-on:print="print"
-            v-on:seeDetails="seeDetails"
-            v-if="loaded && activeTab === 1"
-          />
-          <Pagination
-            :page="filterParams.page"
-            :totalPages="filterParams.totalPages"
-            :totalVisible="7"
-            v-on:changePage="filterObjects"
-            v-if="loaded && activeTab === 1"
-          />
-          <Spinner v-if="!loaded" />
-          <VentaDetails />
-          <VentasReportsDialog />
-      </v-card>   
+  <v-container style="min-width: 98%;">
+    <v-tabs v-model="tab" background-color="primary" dark>
+      <v-tab v-for="item in items" :key="item.tab">
+        {{ item.tab }}
+      </v-tab>
+    </v-tabs>
+    <v-card min-width="100%">
+      <VentasTable
+        :items="ventas"
+        v-on:print="print"
+        v-on:seeDetails="seeDetails"
+        v-if="loaded && activeTab === 1"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded && activeTab === 1"
+      />
+      <Spinner v-if="!loaded" />
+      <VentaDetails />
+      <VentasReportsDialog />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -27,7 +31,7 @@ import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
-import TabBar from "../../components/Graphics/TabBar";
+//import TabBar from "../../components/Graphics/TabBar";
 import VentasTable from "../../components/Tables/VentasTable";
 import VentaDetails from "../../components/Details/VentaDetails";
 export default {
@@ -45,13 +49,8 @@ export default {
       page: 1,
       size: 10,
       totalPages: 0,
+      tab: null,
     },
-    tabs: [
-      { id: 1, route: "", title: "Comprobantes Emitidos" },
-      { id: 2, route: "", title: "Presupuesto" },
-      { id: 3, route: "", title: "Cierre de Ventas Diario" },
-    ],
-    activeTab: 1,
     loaded: false,
     tenant: "",
     service: "comprobantesFiscales",
@@ -64,7 +63,7 @@ export default {
     Spinner,
     VentasTable,
     VentaDetails,
-    TabBar,
+    //TabBar,
   },
 
   mounted() {
