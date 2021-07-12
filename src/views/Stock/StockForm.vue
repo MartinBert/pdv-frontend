@@ -4,8 +4,8 @@
   margin-right:40px;
   "
   >
-    <Error :errorStatus="errorStatus" />
     <TabBar :tabs="tabs" :activeTab="activeTab" />
+    <Error :errorStatus="errorStatus" />
     <v-card>
       <div v-if="loaded">
         <v-form
