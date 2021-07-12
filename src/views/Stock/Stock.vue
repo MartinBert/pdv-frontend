@@ -95,7 +95,7 @@ export default {
     tabs: [
       { id: 1, title: "Lista", route: "/stock" },
       { id: 2, title: "Nuevo", route: "/stock/form/0" },
-      { id: 3, title: "Existencias minimas" },
+      { id: 3, title: "Existencias minimas"},
       { id: 4, title: "Migrar Stock" },
     ],
     activeTab: 1,
