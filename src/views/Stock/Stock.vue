@@ -1,10 +1,23 @@
 <template>
   <v-container
-    style="min-width: 98%;
-  margin-right:40px;
-  "
+   style="min-width: 98%;
+   margin-left:1px;
+   "
   >
-    <TabBar :tabs="tabs" :activeTab="activeTab"/>
+    <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab @click="newObject()" raise>
+        Nuevo
+      </v-tab>
+       <v-tab @click="openDialog('minimumStockRestriction')" raised>
+         Existencias Minimas
+      </v-tab>
+       <v-tab @click="openDialog('stockMigration')">
+         Migrar Stock
+      </v-tab>
+       <v-tab @click="openDialog('reports')">
+         Reportes
+      </v-tab>
+    </v-tabs>
     <br />
     <v-card>
       <StocksTable
@@ -44,7 +57,7 @@
   </v-container>
 </template>
 <script>
-import TabBar from "../../components/Generics/TabBar.vue";
+//import TabBar from "../../components/Generics/TabBar.vue";
 import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
 import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
@@ -108,7 +121,7 @@ export default {
     StocksTable,
     Pagination,
     Spinner,
-    TabBar,
+    //TabBar,
     DeleteDialog,
   },
 

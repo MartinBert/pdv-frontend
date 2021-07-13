@@ -1,11 +1,22 @@
 <template>
   <v-container
     style="min-width: 98%;
-  margin-right:40px;
-  "
+    margin-left:1px;"
   >
-    <TabBar :tabs="tabs" :activeTab="activeTab" />
-    <Error :errorStatus="errorStatus" />
+    <v-tabs fixed-tabs background-color="indigo" dark>
+      <v-tab @click="newObject()" raise>
+        Nuevo
+      </v-tab>
+      <v-tab @click="openDialog('minimumStockRestriction')" raised>
+        Existencias Minimas
+      </v-tab>
+      <v-tab @click="openDialog('stockMigration')">
+        Migrar Stock
+      </v-tab>
+      <v-tab @click="openDialog('reports')">
+        Reportes
+      </v-tab>
+    </v-tabs>
     <v-card>
       <div v-if="loaded">
         <v-form
@@ -15,7 +26,12 @@
           class="mt-5"
         >
           <v-row v-if="urlId == 0" class="ml-5 mr-5">
-            <v-col>
+            <v-col cols="1">
+              <v-btn class="ma-0" outlined fab color="teal" @click="newStock()">
+                <v-icon>mdi-format-list-bulleted-square</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoName"
                 dense
@@ -25,7 +41,7 @@
                 @input="filterProducts()"
               ></v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoCodigo"
                 dense
@@ -35,7 +51,7 @@
                 @input="filterProducts()"
               ></v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoCodigoBarras"
                 dense
@@ -45,7 +61,7 @@
                 @input="filterProducts()"
               ></v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoMarcaName"
                 dense
@@ -55,7 +71,7 @@
                 @input="filterProducts()"
               ></v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoPrimerAtributoName"
                 v-on:input="filterProducts()"
@@ -251,14 +267,14 @@
   </v-container>
 </template>
 <script>
-import TabBar from "../../components/Generics/TabBar.vue";
+//import TabBar from "../../components/Generics/TabBar.vue";
 import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
 import DepositMigrationDialog from "../../components/Dialogs/DepositMigrationDialog.vue";
 import StockReportsDialog from "../../components/Dialogs/StockReportsDialog.vue";
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
-import Error from "../../components/Error";
+//import Error from "../../components/Error";
 export default {
   data: () => ({
     valid: true,
@@ -311,11 +327,11 @@ export default {
 
   components: {
     Spinner,
-    Error,
+    //Error,
     ModifyMinimumStocksDialog,
     DepositMigrationDialog,
     StockReportsDialog,
-    TabBar,
+    //TabBar,
   },
 
   mounted() {
@@ -578,6 +594,9 @@ export default {
     newObject() {
       this.$router.push({ name: "stockForm", params: { id: 0 } });
     },
+     newStock() {
+      this.$router.push({ name: "stock", params: { id: 0 } });
+    },
 
     saveHistorial(stocks, str) {
       const stockHistory = {
@@ -618,3 +637,8 @@ export default {
   },
 };
 </script>
+<style>
+.tab {
+  margin-top: 1px;
+}
+</style>
