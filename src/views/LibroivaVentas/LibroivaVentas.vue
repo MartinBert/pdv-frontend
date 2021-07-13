@@ -5,7 +5,7 @@
   >
     <v-card min-width="100%">
       <v-row style="justify-content: center;">
-        <v-col cols="4">
+        <v-col cols="3">
           <v-menu
             ref="menu1"
             v-model="menu1"
@@ -33,7 +33,7 @@
           </v-menu>
         </v-col>
 
-        <v-col cols="4">
+        <v-col cols="3">
           <v-menu
             v-model="menu2"
             :close-on-content-click="false"
@@ -60,11 +60,29 @@
             ></v-date-picker>
           </v-menu>
         </v-col>
-        <v-col cols="3">
-          <v-checkbox v-model="checkbox">
+        <v-col cols="2">
+          <v-checkbox v-model="checkbox1">
             <template v-slot:label>
               <div>
-                Facturas
+                Facturas A
+              </div>
+            </template>
+          </v-checkbox>
+        </v-col>
+        <v-col cols="2">
+          <v-checkbox v-model="checkbox2">
+            <template v-slot:label>
+              <div>
+                Facturas B
+              </div>
+            </template>
+          </v-checkbox>
+        </v-col>
+        <v-col cols="2">
+          <v-checkbox v-model="checkbox3">
+            <template v-slot:label>
+              <div>
+                Facturas C
               </div>
             </template>
           </v-checkbox>
@@ -73,46 +91,45 @@
       <v-row style="justify-content: center;">
         <v-col cols="2">
           <v-text-field
-          dense
-          outlined
-          rounded
-          label="Fecha"
-          class="text-left"
-          append-icon="mdi-magnify"
-        ></v-text-field>
+            dense
+            outlined
+            rounded
+            label="Nombre Comprobante"
+            class="text-left"
+            append-icon="mdi-magnify"
+          ></v-text-field>
         </v-col>
-         <v-col cols="2">
+        <v-col cols="2">
           <v-text-field
-          dense
-          outlined
-          rounded
-          label="Nombre Comprobante"
-          class="text-left"
-          append-icon="mdi-magnify"
-        ></v-text-field>
+            dense
+            outlined
+            rounded
+            label="Razon Social"
+            class="text-left"
+            append-icon="mdi-magnify"
+          ></v-text-field>
         </v-col>
-         <v-col cols="2">
+        <v-col cols="2">
           <v-text-field
-          dense
-          outlined
-          rounded
-          label="Razon Social"
-          class="text-left"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-        </v-col>
-         <v-col cols="2">
-          <v-text-field
-          dense
-          outlined
-          rounded
-          label="N° Cuit"
-          class="text-left"
-          append-icon="mdi-magnify"
-        ></v-text-field>
+            dense
+            outlined
+            rounded
+            label="N° Cuit"
+            class="text-left"
+            append-icon="mdi-magnify"
+          ></v-text-field>
         </v-col>
       </v-row>
-      <v-data-table :headers="headers" class="elevation-6">
+      <v-row>
+        <v-col>
+          <h2 style="text-align:center;">Libro Iva Ventas</h2>
+        </v-col>
+      </v-row>
+      <v-data-table
+        :headers="headers"
+        class="elevation-6"
+        :items="comprobantesFiscales"
+      >
         <template v-slot:[`item.acciones`]="{}">
           <Print />
         </template>
@@ -121,6 +138,7 @@
   </v-container>
 </template>
 <script>
+import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
     date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
@@ -131,13 +149,40 @@ export default {
         .toISOString()
         .substr(0, 10)
     ),
-    file:null,
+    checkbox1: false,
+    checkbox2:false,
+    checkbox3:false,
+    comprobantesFiscales: [],
+    productos: [],
+    filterParams: {
+      letra: "",
+      condicionVenta: Boolean,
+      numeroCbte: "",
+      fechaEmision: "",
+      fechaVto: "",
+      logoUrl: "",
+      barCode: "",
+      cae: "",
+      totalVenta: Number,
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    tenant: "",
+    idObject: "",
+    service: "comprobantesFiscales",
+    token: localStorage.getItem("token"),
+    dialogStock: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    checkImportStatus: 0,
+    deleteDialogStatus: false,
+    file: null,
     menu1: false,
     menu2: false,
     headers: [
-      { text: "Fecha", value: "" },
-      { text: "Comprobante", value: "" },
-      { text: "Razon Social", value: "" },
+      { text: "Fecha", value: "fechaEmision" },
+      { text: "Comprobante", value: "letra" },
+      { text: "Razon Social", value: "condicionVenta" },
       { text: "Condicion Iva", value: "" },
       { text: "N° Cuit", value: "" },
       { text: "Neto Grabado", value: "" },
@@ -145,11 +190,10 @@ export default {
       { text: "Iva 21%", value: "" },
       { text: "Iva 10,5%", value: "" },
       { text: "Iva 0 %", value: "" },
-      { text: "Total Facturado", value: "" },
+      { text: "Total Facturado", value: "totalVenta" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
-
   computed: {
     computedDateFormatted() {
       return this.formatDate(this.date);
@@ -161,8 +205,26 @@ export default {
       this.dateFormatted = this.formatDate(this.date);
     },
   },
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+    this.filterObjects();
+  },
 
   methods: {
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, "comprobantesFiscales", this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.comprobantesFiscales = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
+
     formatDate(date) {
       if (!date) return null;
 
@@ -180,6 +242,6 @@ export default {
 </script>
 <style>
 .elevation-6 {
-  margin-top: 50px;
+  margin-top: 20px;
 }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <TabBar :tabs="tabs" :activeTab="activeTab"/>
+    
   </v-container>
 </template>
 <script>
