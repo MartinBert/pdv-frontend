@@ -1,10 +1,10 @@
 <template>
-  <v-container style="min-width: 98%;">
-    <v-tabs v-model="tab" background-color="primary" dark>
-      <v-tab v-for="item in items" :key="item.tab">
-        {{ item.tab }}
-      </v-tab>
-    </v-tabs>
+  <v-container
+    style="min-width: 98%;
+    margin-left:1px;
+  "
+  >
+    <TabBar :tabs="tabs" :activeTab="activeTab" />
     <v-card min-width="100%">
       <VentasTable
         :items="ventas"
@@ -31,7 +31,7 @@ import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
-//import TabBar from "../../components/Graphics/TabBar";
+import TabBar from "../../components/Generics/TabBar";
 import VentasTable from "../../components/Tables/VentasTable";
 import VentaDetails from "../../components/Details/VentaDetails";
 export default {
@@ -55,23 +55,25 @@ export default {
     tenant: "",
     service: "comprobantesFiscales",
     token: localStorage.getItem("token"),
+    tabs:[
+      { id: 1, title: "Comprobantes", route: '/ventas/list' },
+      { id: 2, title: "Presupuesto", route: '/presupuesto' },
+      { id: 3, title: "Cierre de ventas Diario", route: '/ventas/cierrez' },
+    ]
   }),
-
+  activeTab:1,
   components: {
     VentasReportsDialog,
     Pagination,
     Spinner,
     VentasTable,
     VentaDetails,
-    //TabBar,
+    TabBar,
   },
 
   mounted() {
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
-    this.tabs[0].route = `/${this.tenant}/ventas/list`;
-    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`;
-    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`;
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }

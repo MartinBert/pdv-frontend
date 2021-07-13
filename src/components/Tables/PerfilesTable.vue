@@ -53,7 +53,7 @@ export default {
       { text: "Usuario", value: "usuario" },
       { text: "Perfil", value: "perfil.nombre" },
       { text: "Empresa", value: "empresa.alias" },
-      { text: "Acciones", value: "acciones", sortable:false},
+      { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
   components: {
@@ -75,6 +75,9 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+    },
+    newObject() {
+      this.$router.push({ name: "perfilesForm", params: { id: 0 } });
     },
     editItem(itemId) {
       this.$emit("editItem", itemId);

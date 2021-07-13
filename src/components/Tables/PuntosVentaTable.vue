@@ -1,25 +1,25 @@
 <template>
   <v-container style="min-width: 100%;">
-     <v-form class="mb-3">
-        <v-row>
-          <v-col cols="6">
-            <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-          </v-col>
-          <v-col cols="3"></v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="filterParams.puntoVentaName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              placeholder="Búsqueda"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
+    <v-form class="mb-3">
+      <v-row>
+        <v-col cols="6">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="3"></v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.puntoVentaName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
     <v-data-table :headers="headers" :items="puntosVenta" class="elevation-6">
       <template v-slot:[`item.acciones`]="{ item }">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
@@ -55,7 +55,7 @@ export default {
       { text: "Nombre", value: "nombre" },
       { text: "ID Fiscal", value: "idFiscal" },
       { text: "IPV4", value: "ipLocal" },
-      { text: "Acciones", value: "acciones", sortable:false},
+      { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
   components: {
@@ -82,6 +82,10 @@ export default {
           }
           this.loaded = true;
         });
+    },
+
+    newObject() {
+      this.$router.push({ name: "puntosVentaForm", params: { id: 0 } });
     },
     editItem(itemId) {
       this.$emit("editItem", itemId);
