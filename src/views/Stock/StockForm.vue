@@ -27,7 +27,7 @@
         >
           <v-row v-if="urlId == 0" class="ml-5 mr-5">
             <v-col cols="1">
-              <v-btn class="ma-0" outlined fab color="teal" @click="newStock()">
+              <v-btn class="ma-0" outlined fab color="black" @click="newStock()">
                 <v-icon>mdi-format-list-bulleted-square</v-icon>
               </v-btn>
             </v-col>
