@@ -1,12 +1,11 @@
 <template>
   <v-container  style="min-width: 98%;
-    margin-left:1px;
+    margin-left:5px;
   ">
     <TabBar
       :tabs="tabs"
       :activeTab="activeTab"
     />
-    <br />
     <v-card min-width="90%" v-if="loaded">
       <v-card-title>
         <div class="text-center" style="width: 100%">Alterar precios</div>

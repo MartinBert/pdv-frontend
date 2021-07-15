@@ -1,39 +1,15 @@
 <template>
   <v-container
     style="min-width: 99%;
-  margin-left:2px;
+  margin-left:5px;
   "
   >
     <TabBar
       :tabs="tabs"
       :activeTab="activeTab"
+      class="tab"
     />
-    <!-- <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary ml-1" @click="view = 'listOfProducts'" raised>
-        Lista
-      </v-tab>
-      <v-tab class="primary ml-1" @click="newObject()" raised>
-        Nuevo
-      </v-tab>
-      <v-tab class="primary ml-1" @click="Getproduct()">
-        Generar Etiquetas
-      </v-tab>
-      <v-tab class="primary ml-1" @click="goPricesManagerView()">
-        Modificar Precios
-      </v-tab>
-    <v-tabs> -->
-  <!-------- 
-    <v-tabs fixed-tabs background-color="indigo" dark>
-        <v-tab
-            :class="(activeTab=== 2) ? 'active_tab':null"
-            v-for="item in tabs"
-            :key="item.id"
-            :to="item.route"
-          >
-            {{ item.title }}
-        </v-tab>
-     --->
-    <br />
+
     <v-card class="card" min-width="100%">
       <Error :errorStatus="errorStatus" />
       <div v-if="loaded" class="grey lighten-5">
@@ -577,5 +553,8 @@ export default {
 }
 .pa-2 {
   margin: 10px;
+}
+.tab{
+  margin-bottom: 15px;
 }
 </style>

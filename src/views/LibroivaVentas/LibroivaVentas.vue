@@ -91,30 +91,35 @@
       <v-row style="justify-content: center;">
         <v-col cols="2">
           <v-text-field
+            v-model="filterParams.letra"
             dense
             outlined
             rounded
             label="Nombre Comprobante"
             class="text-left"
+            @input="filterProof()"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
         <v-col cols="2">
           <v-text-field
+            v-model="filterParams.numeroCbte"
             dense
             outlined
             rounded
-            label="Razon Social"
+            label="Numero Comprobante"
             class="text-left"
             append-icon="mdi-magnify"
+            @input="filterProof()"
           ></v-text-field>
         </v-col>
         <v-col cols="2">
           <v-text-field
+            v-model="filterParams.condicionVenta"
             dense
             outlined
             rounded
-            label="N° Cuit"
+            label="Condicion Venta"
             class="text-left"
             append-icon="mdi-magnify"
           ></v-text-field>
@@ -153,17 +158,20 @@ export default {
     checkbox2:false,
     checkbox3:false,
     comprobantesFiscales: [],
+    object: {
+      comprobante: [],
+    },
     productos: [],
     filterParams: {
       letra: "",
-      condicionVenta: Boolean,
+      condicionVenta: "",
       numeroCbte: "",
       fechaEmision: "",
       fechaVto: "",
       logoUrl: "",
       barCode: "",
       cae: "",
-      totalVenta: Number,
+      totalVenta: "",
       page: 1,
       size: 10,
       totalPages: 0,
@@ -207,20 +215,28 @@ export default {
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects();
+    this.filterProof();
   },
 
   methods: {
-    filterObjects(page) {
-      if (page) this.filterParams.page = page;
+   filterProof(){
       GenericService(this.tenant, "comprobantesFiscales", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.comprobantesFiscales = data.data.content;
+          if (this.object.comprobante.length > 0) {
+            this.object.comprobante.forEach((el) => {
+              data.data.content.forEach((e) => {
+                if (e.id === el.id) {
+                  e.selected = true;
+                }
+              });
+            });
+          }
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
           }
+          this.comprobantesFiscales = data.data.content;
           this.loaded = true;
         });
     },

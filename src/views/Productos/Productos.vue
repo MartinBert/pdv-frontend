@@ -2,14 +2,13 @@
   <v-container
     class="container"
     style="min-width: 98%;
-    margin-left:1px;
+    margin-left:5px;
   "
   >
     <TabBar
       :tabs="tabs"
       :activeTab="activeTab"
     />
-    <br />
     <v-card>
       <v-form class="mb-0" v-on:click="show = !show">
         <v-row class="m-5">
@@ -786,9 +785,6 @@ export default {
 <style>
 .active_tab {
   background-color: black;
-}
-v-tabs {
-  margin-bottom: 10px;
 }
 .filtros {
   margin-right: 20px;

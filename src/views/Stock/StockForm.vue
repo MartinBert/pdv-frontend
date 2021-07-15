@@ -26,10 +26,12 @@
           class="mt-5"
         >
           <v-row v-if="urlId == 0" class="ml-5 mr-5">
-            <v-col cols="1">
-              <v-btn class="ma-0" outlined fab color="black" @click="newStock()">
-                <v-icon>mdi-format-list-bulleted-square</v-icon>
-              </v-btn>
+            <v-col cols="2">
+              <div class="text-center">
+                <v-btn rounded color="primary" dark @click="newStock()">
+                  Lista
+                </v-btn>
+              </div>
             </v-col>
             <v-col cols="2">
               <v-text-field
@@ -594,7 +596,7 @@ export default {
     newObject() {
       this.$router.push({ name: "stockForm", params: { id: 0 } });
     },
-     newStock() {
+    newStock() {
       this.$router.push({ name: "stock", params: { id: 0 } });
     },
 

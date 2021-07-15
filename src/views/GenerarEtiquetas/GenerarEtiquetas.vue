@@ -1,11 +1,12 @@
 <template>
   <v-container
     style="min-width: 99%;
-    margin-left:1px;
+    margin-left:5px;
   "
   >
-    <TabBar :tabs="tabs" :activeTab="activeTab" class="tab" />
+    <TabBar :tabs="tabs" :activeTab="activeTab" style="margin-bottom:26px"/>
     <v-card min-width="100%">
+      <Error :errorStatus="errorStatus" />
       <v-row>
         <v-col cols="12">
           <v-data-table
@@ -31,7 +32,7 @@
             v-on:changePage="filterObjects"
           />
         </v-col>
-        <v-row style="margin:auto"> 
+        <v-row style="margin:auto">
           <v-col cols="12">
             <div class="horizontalSeparator"></div>
           </v-col>
@@ -265,8 +266,4 @@ export default {
 };
 </script>
 <style>
-.tab {
-  margin-bottom: 30px;
-}
-
 </style>
