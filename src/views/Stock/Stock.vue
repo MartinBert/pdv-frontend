@@ -1,39 +1,21 @@
 <template>
   <v-container
-    style="min-width: 98%;
-  margin-right:40px;
-  "
+   style="min-width: 98%;
+   margin-left:1px;
+   "
   >
     <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary" @click="newObject()" raised>
+      <v-tab @click="newObject()" raise>
         Nuevo
       </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="openDialog('minimumStockRestriction')"
-        raised
-      >
-        EXISTENCIAS MÍNIMAS
+       <v-tab @click="openDialog('minimumStockRestriction')" raised>
+         Existencias Minimas
       </v-tab>
-      <v-tab class="primary ml-1" @click="openDialog('stockMigration')">
-        Migrar Stock
+       <v-tab @click="openDialog('stockMigration')">
+         Migrar Stock
       </v-tab>
-      <v-tab class="primary ml-1" @click="openDialog('reports')">
-        Reportes
-      </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="modifyAlgorim()"
-        v-if="loguedUser.perfil < 2"
-      >
-        Cambiar marca de algoritmo de stock
-      </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="checkStocks()"
-        v-if="loguedUser.perfil < 2"
-      >
-        Check Stock
+       <v-tab @click="openDialog('reports')">
+         Reportes
       </v-tab>
     </v-tabs>
     <br />
@@ -75,7 +57,7 @@
   </v-container>
 </template>
 <script>
-//import TabBar from "../../components/Graphics/TabBar.vue";
+//import TabBar from "../../components/Generics/TabBar.vue";
 import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
 import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
@@ -106,14 +88,6 @@ export default {
       size: 10,
       totalPages: 0,
     },
-    tabs: [
-      { id: 0, route: "", title: "Nuevo" },
-      { id: 1, route: "", title: "ExistenciasMinimas" },
-      { id: 2, route: "", title: "MigrarStock" },
-      { id: 3, route: "", title: "Reportes" },
-      { id: 4, route: "", title: "Algoritmo" },
-      { id: 5, route: "", title: "CheckStock" },
-    ],
     depositsFilterParams: {
       depositoName: "",
       perfilId: "",
@@ -131,6 +105,13 @@ export default {
     typeList: 0,
     migration: [],
     destinationDepositForMigrations: {},
+    tabs: [
+      { id: 1, title: "Lista", route: "/stock" },
+      { id: 2, title: "Nuevo", route: "/stock/form/0" },
+      { id: 3, title: "Existencias minimas"},
+      { id: 4, title: "Migrar Stock" },
+    ],
+    activeTab: 1,
   }),
 
   components: {
@@ -140,17 +121,11 @@ export default {
     StocksTable,
     Pagination,
     Spinner,
+    //TabBar,
     DeleteDialog,
-    //TabBar
   },
 
   mounted() {
-    this.tabs[0].route = `/${this.tenant}/stock/form/0`;
-    this.tabs[1].route = `/${this.tenant}/form/:id`;
-    this.tabs[2].route = `/${this.tenant}/productos`;
-    this.tabs[3].route = `/${this.tenant}/precios`;
-    this.tabs[4].route = `/${this.tenant}/precios`;
-    this.tabs[5].route = `/${this.tenant}/precios`;
     this.tenant = this.$route.params.tenant;
     this.filterParams.perfilId = this.loguedUser.perfil;
     this.depositsFilterParams.perfilId = this.loguedUser.perfil;
@@ -228,6 +203,9 @@ export default {
           });
           this.realDeposits = this.depositos.filter((el) => el.id !== 0);
         });
+    },
+    gotoList() {
+      this.$router.push({ name: "stock", params: { id: 0 } });
     },
 
     newObject() {

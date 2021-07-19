@@ -1,38 +1,20 @@
 <template>
-  <v-container style="min-width: 98%;
-  margin-right:40px;
-  ">
-    <Error :errorStatus="errorStatus" />
+  <v-container
+    style="min-width: 98%;
+    margin-left:1px;"
+  >
     <v-tabs fixed-tabs background-color="indigo" dark>
-      <v-tab class="primary" @click="newObject()" raised>
+      <v-tab @click="newObject()" raise>
         Nuevo
       </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="openDialog('minimumStockRestriction')"
-        raised
-      >
-        EXISTENCIAS MÍNIMAS
+      <v-tab @click="openDialog('minimumStockRestriction')" raised>
+        Existencias Minimas
       </v-tab>
-      <v-tab class="primary ml-1" @click="openDialog('stockMigration')">
+      <v-tab @click="openDialog('stockMigration')">
         Migrar Stock
       </v-tab>
-      <v-tab class="primary ml-1" @click="openDialog('reports')">
+      <v-tab @click="openDialog('reports')">
         Reportes
-      </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="modifyAlgorim()"
-        v-if="loguedUser.perfil < 2"
-      >
-        Cambiar marca de algoritmo de stock
-      </v-tab>
-      <v-tab
-        class="primary ml-1"
-        @click="checkStocks()"
-        v-if="loguedUser.perfil < 2"
-      >
-        Check Stock
       </v-tab>
     </v-tabs>
     <v-card>
@@ -44,7 +26,14 @@
           class="mt-5"
         >
           <v-row v-if="urlId == 0" class="ml-5 mr-5">
-            <v-col>
+            <v-col cols="2">
+              <div class="text-center">
+                <v-btn rounded color="primary" dark @click="newStock()">
+                  Lista
+                </v-btn>
+              </div>
+            </v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoName"
                 dense
@@ -54,7 +43,7 @@
                 @input="filterProducts()"
               ></v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoCodigo"
                 dense
@@ -64,7 +53,7 @@
                 @input="filterProducts()"
               ></v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoCodigoBarras"
                 dense
@@ -74,7 +63,7 @@
                 @input="filterProducts()"
               ></v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoMarcaName"
                 dense
@@ -84,7 +73,7 @@
                 @input="filterProducts()"
               ></v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="filterParams.productoPrimerAtributoName"
                 v-on:input="filterProducts()"
@@ -280,13 +269,14 @@
   </v-container>
 </template>
 <script>
+//import TabBar from "../../components/Generics/TabBar.vue";
 import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
 import DepositMigrationDialog from "../../components/Dialogs/DepositMigrationDialog.vue";
 import StockReportsDialog from "../../components/Dialogs/StockReportsDialog.vue";
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
-import Error from "../../components/Error";
+//import Error from "../../components/Error";
 export default {
   data: () => ({
     valid: true,
@@ -319,12 +309,13 @@ export default {
       totalPages: 0,
     },
     tabs: [
-      { id: 0, route: "", title: "Nuevo" },
-      { id: 1, route: "", title: "" },
-      { id: 2, route: "", title: "" },
-      { id: 1, route: "", title: "" },
-      { id: 2, route: "", title: "" },
+      { id: 1, title: "Lista", route: "/stock" },
+      { id: 2, title: "Nuevo", route: "/stock/form/0" },
+      { id: 3, title: "Existencias minimas" },
+      { id: 4, title: "Migrar Stock" },
+      { id: 5, title: "Reportes" },
     ],
+    activeTab: 2,
     filterDepositsParam: {
       depositoName: "",
       perfilId: "",
@@ -338,7 +329,7 @@ export default {
 
   components: {
     Spinner,
-    Error,
+    //Error,
     ModifyMinimumStocksDialog,
     DepositMigrationDialog,
     StockReportsDialog,
@@ -599,8 +590,14 @@ export default {
     back() {
       this.$router.push({ name: "stock" });
     },
+    gotoList() {
+      this.$router.push({ name: "stock", params: { id: 0 } });
+    },
     newObject() {
       this.$router.push({ name: "stockForm", params: { id: 0 } });
+    },
+    newStock() {
+      this.$router.push({ name: "stock", params: { id: 0 } });
     },
 
     saveHistorial(stocks, str) {
@@ -642,3 +639,8 @@ export default {
   },
 };
 </script>
+<style>
+.tab {
+  margin-top: 1px;
+}
+</style>

@@ -382,7 +382,7 @@ export default {
         name: "libroivaventas",
         title: "LibroIvaVentas",
         visible: false,
-        icon: "/../images/icons/calendar.svg",
+        icon: "/../images/icons/libro.svg",
         childs: [
           {
             path: "/libroivaventas",

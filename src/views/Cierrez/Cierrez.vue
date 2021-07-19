@@ -1,7 +1,7 @@
 
 <template>
   <v-container>
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" v-if="loaded" />
+    <TabBar :tabs="tabs" :activeTab="activeTab"/>
     <v-form class="mb-3" v-if="loaded">
       <v-row>
         <v-col cols="1">
@@ -88,9 +88,9 @@ export default {
       size: 100000,
     },
     tabs: [
-      { id: 1, route: "", title: "Comprobantes Emitidos" },
-      { id: 2, route: "", title: "Presupuesto" },
-      { id: 3, route: "", title: "Cierre Z" },
+      { id: 1, title: "Comprobantes Emitidos", route:'/ventas/list'},
+      { id: 2, title: "Presupuesto", route:'/ventas/comprobantes'},
+      { id: 3, title: "Cierre Z", route:'/ventas/cierrez'},
     ],
     activeTab: 3,
     objectToPrint: null,

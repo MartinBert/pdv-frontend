@@ -19,7 +19,7 @@
                 type="text"
                 v-model="object.nombre"
                 :counter="50"
-                label="Razón social"
+                label="Nombre"
                 required
                 :rules="[(v) => !!v || 'Campo requerido...']"
               ></v-text-field>

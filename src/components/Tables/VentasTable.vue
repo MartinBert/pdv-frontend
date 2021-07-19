@@ -84,9 +84,11 @@ import Print from "../Buttons/Print";
 export default {
   data: () => ({
     icon: "mdi-check-circle",
-    loguedUser: JSON.parse(localStorage.getItem("userData")),
     ventas: [],
-    token: localStorage.getItem("token"),
+    loaded: false,
+    tenant: "",
+    service: "ventas",
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
@@ -108,13 +110,16 @@ export default {
         value: "mediosPago",
         sortable: false,
       },
-      { text: "Planes de pago", value: "planesPago", sortable: false },
+      { text: "Planes de pago", value: "planPago", sortable: false },
       { text: "Precio de venta", value: "totalVenta" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
+     if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
     this.filterObjects();
   },
 

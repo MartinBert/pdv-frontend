@@ -85,11 +85,6 @@ export default {
           this.loaded = true;
         });
     },
-
-    newObject() {
-      this.$router.push({ name: "empresasForm", params: { id: 0 } });
-    },
-
     edit(id) {
       this.$router.push({ name: "empresasForm", params: { id: id } });
     },

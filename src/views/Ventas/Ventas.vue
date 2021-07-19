@@ -1,24 +1,28 @@
 <template>
-  <v-container style="min-width: 100%;">
-    <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" />
-      <v-card min-width="100%">
-          <VentasTable
-            :items="ventas"
-            v-on:print="print"
-            v-on:seeDetails="seeDetails"
-            v-if="loaded && activeTab === 1"
-          />
-          <Pagination
-            :page="filterParams.page"
-            :totalPages="filterParams.totalPages"
-            :totalVisible="7"
-            v-on:changePage="filterObjects"
-            v-if="loaded && activeTab === 1"
-          />
-          <Spinner v-if="!loaded" />
-          <VentaDetails />
-          <VentasReportsDialog />
-      </v-card>   
+  <v-container
+    style="min-width: 98%;
+    margin-left:1px;
+  "
+  >
+    <TabBar :tabs="tabs" :activeTab="activeTab" />
+    <v-card min-width="100%">
+      <VentasTable
+        :items="ventas"
+        v-on:print="print"
+        v-on:seeDetails="seeDetails"
+        v-if="loaded && activeTab === 1"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded && activeTab === 1"
+      />
+      <Spinner v-if="!loaded" />
+      <VentaDetails />
+      <VentasReportsDialog />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -27,7 +31,7 @@ import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
-import TabBar from "../../components/Graphics/TabBar";
+import TabBar from "../../components/Generics/TabBar";
 import VentasTable from "../../components/Tables/VentasTable";
 import VentaDetails from "../../components/Details/VentaDetails";
 export default {
@@ -45,19 +49,19 @@ export default {
       page: 1,
       size: 10,
       totalPages: 0,
+      tab: null,
     },
-    tabs: [
-      { id: 1, route: "", title: "Comprobantes Emitidos" },
-      { id: 2, route: "", title: "Presupuesto" },
-      { id: 3, route: "", title: "Cierre de Ventas Diario" },
-    ],
-    activeTab: 1,
     loaded: false,
     tenant: "",
     service: "comprobantesFiscales",
     token: localStorage.getItem("token"),
+    tabs:[
+      { id: 1, title: "Comprobantes", route: '/ventas/list' },
+      { id: 2, title: "Presupuesto", route: '/presupuesto' },
+      { id: 3, title: "Cierre de ventas Diario", route: '/ventas/cierrez' },
+    ]
   }),
-
+  activeTab:1,
   components: {
     VentasReportsDialog,
     Pagination,
@@ -70,9 +74,6 @@ export default {
   mounted() {
     this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
-    this.tabs[0].route = `/${this.tenant}/ventas/list`;
-    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`;
-    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`;
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
