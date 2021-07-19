@@ -1,3 +1,4 @@
+
 <template>
   <v-container>
     <TabBar :tabs="tabs" :activeTab="setActiveTabComponent" v-if="loaded" />
