@@ -1,28 +1,30 @@
 <template>
-  <v-container>
-    <TabBar :tabs="tabs" :activeTab="activeTab"/>
-    <v-form class="mb-3" v-if="loaded">
-      <v-row>
-        <v-col cols="1">
-          <v-btn class="primary" @click="generateZClosure()" raised
-            >Realizar cierre z</v-btn
-          >
-        </v-col>
-        <v-col></v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.marcaName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
+  <v-container style="min-width: 97%;"> 
+    <TabBar :tabs="tabs" :activeTab="activeTab" />
+    <v-card min-width="100%">
+      <v-form class="mb-3" v-if="loaded">
+        <v-row>
+          <v-col cols="1">
+            <v-btn class="primary" @click="generateZClosure()" raised
+              >Realizar cierre z</v-btn
+            >
+          </v-col>
+          <v-col></v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="filterParams.marcaName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
+    </v-card>
     <CierrezTable
       :items="cierres"
       v-on:seeDetails="seeDetails"
@@ -57,7 +59,7 @@ import VentasService from "../../services/VentasService";
 import CierrezTable from "../../components/Tables/CierrezTable";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
-import TabBar from "../../components/Graphics/TabBar";
+import TabBar from "../../components/Generics/TabBar";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import PrintSelectionDialog from "../../components/Dialogs/PrintSelectionDialog";
 import CierrezDetails from "../../components/Details/CierrezDetails.vue";
@@ -87,9 +89,9 @@ export default {
       size: 100000,
     },
     tabs: [
-      { id: 1, title: "Comprobantes Emitidos", route:'/ventas/list'},
-      { id: 2, title: "Presupuesto", route:'/ventas/comprobantes'},
-      { id: 3, title: "Cierre Z", route:'/ventas/cierrez'},
+      { id: 1, title: "Comprobantes Emitidos", route: "/ventas/list" },
+      { id: 2, title: "Presupuesto", route: "/ventas/comprobantes" },
+      { id: 3, title: "Cierre de ventas Diario", route: "/ventas/cierrez" },
     ],
     activeTab: 3,
     objectToPrint: null,
@@ -162,7 +164,7 @@ export default {
         let iva21 = 0;
         let iva10 = 0;
         let iva27 = 0;
-        let mediosPagoDetalle = []
+        let mediosPagoDetalle = [];
         this.comprobantes.forEach((comprobante) => {
           const totalIva21 = comprobante.productoDescription.reduce(
             (acc, producto) => {
@@ -171,14 +173,34 @@ export default {
                   producto.discountPercent > 0 &&
                   producto.surchargePercent > 0
                 ) {
-                  const salePriceWithDiscountAndSurcharge = producto.salePrice + producto.surchargeAmount - producto.discountAmount;
-                  acc += salePriceWithDiscountAndSurcharge - calculatePercentReductionInAmount(salePriceWithDiscountAndSurcharge, 21) 
+                  const salePriceWithDiscountAndSurcharge =
+                    producto.salePrice +
+                    producto.surchargeAmount -
+                    producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscountAndSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscountAndSurcharge,
+                      21
+                    );
                 } else if (producto.discountPercent > 0) {
-                  const salePriceWithDiscount = producto.salePrice - producto.discountAmount;
-                  acc += salePriceWithDiscount - calculatePercentReductionInAmount(salePriceWithDiscount, 21) 
+                  const salePriceWithDiscount =
+                    producto.salePrice - producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscount -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscount,
+                      21
+                    );
                 } else if (producto.surchargePercent > 0) {
-                  const salePriceWithSurcharge = producto.salePrice + producto.surchargeAmount;
-                  acc += salePriceWithSurcharge - calculatePercentReductionInAmount(salePriceWithSurcharge, 21) 
+                  const salePriceWithSurcharge =
+                    producto.salePrice + producto.surchargeAmount;
+                  acc +=
+                    salePriceWithSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithSurcharge,
+                      21
+                    );
                 } else {
                   acc += producto.saleIvaAmount;
                 }
@@ -195,14 +217,34 @@ export default {
                   producto.discountPercent > 0 &&
                   producto.surchargePercent > 0
                 ) {
-                  const salePriceWithDiscountAndSurcharge = producto.salePrice + producto.surchargeAmount - producto.discountAmount;
-                  acc += salePriceWithDiscountAndSurcharge - calculatePercentReductionInAmount(salePriceWithDiscountAndSurcharge, 10.5) 
+                  const salePriceWithDiscountAndSurcharge =
+                    producto.salePrice +
+                    producto.surchargeAmount -
+                    producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscountAndSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscountAndSurcharge,
+                      10.5
+                    );
                 } else if (producto.discountPercent > 0) {
-                  const salePriceWithDiscount = producto.salePrice - producto.discountAmount;
-                  acc += salePriceWithDiscount - calculatePercentReductionInAmount(salePriceWithDiscount, 10.5) 
+                  const salePriceWithDiscount =
+                    producto.salePrice - producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscount -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscount,
+                      10.5
+                    );
                 } else if (producto.surchargePercent > 0) {
-                  const salePriceWithSurcharge = producto.salePrice + producto.surchargeAmount;
-                  acc += salePriceWithSurcharge - calculatePercentReductionInAmount(salePriceWithSurcharge, 10.5) 
+                  const salePriceWithSurcharge =
+                    producto.salePrice + producto.surchargeAmount;
+                  acc +=
+                    salePriceWithSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithSurcharge,
+                      10.5
+                    );
                 } else {
                   acc += producto.saleIvaAmount;
                 }
@@ -218,14 +260,34 @@ export default {
                   producto.discountPercent > 0 &&
                   producto.surchargePercent > 0
                 ) {
-                  const salePriceWithDiscountAndSurcharge = producto.salePrice + producto.surchargeAmount - producto.discountAmount;
-                  acc += salePriceWithDiscountAndSurcharge - calculatePercentReductionInAmount(salePriceWithDiscountAndSurcharge, 27) 
+                  const salePriceWithDiscountAndSurcharge =
+                    producto.salePrice +
+                    producto.surchargeAmount -
+                    producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscountAndSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscountAndSurcharge,
+                      27
+                    );
                 } else if (producto.discountPercent > 0) {
-                  const salePriceWithDiscount = producto.salePrice - producto.discountAmount;
-                  acc += salePriceWithDiscount - calculatePercentReductionInAmount(salePriceWithDiscount, 27) 
+                  const salePriceWithDiscount =
+                    producto.salePrice - producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscount -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscount,
+                      27
+                    );
                 } else if (producto.surchargePercent > 0) {
-                  const salePriceWithSurcharge = producto.salePrice + producto.surchargeAmount;
-                  acc += salePriceWithSurcharge - calculatePercentReductionInAmount(salePriceWithSurcharge, 27) 
+                  const salePriceWithSurcharge =
+                    producto.salePrice + producto.surchargeAmount;
+                  acc +=
+                    salePriceWithSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithSurcharge,
+                      27
+                    );
                 } else {
                   acc += producto.saleIvaAmount;
                 }
@@ -234,56 +296,66 @@ export default {
             },
             0
           );
-          if(mediosPagoDetalle.length > 0){
+          if (mediosPagoDetalle.length > 0) {
             let previousRegisterPaymenthMethod = [];
-            comprobante.mediosPago.forEach(comprobanteMedio => {
-              mediosPagoDetalle.forEach(medioDetalle => {
-                if(medioDetalle.medioPago.id === comprobanteMedio.id){
+            comprobante.mediosPago.forEach((comprobanteMedio) => {
+              mediosPagoDetalle.forEach((medioDetalle) => {
+                if (medioDetalle.medioPago.id === comprobanteMedio.id) {
                   previousRegisterPaymenthMethod.push(medioDetalle);
                 }
-              })
-            })
-            if(previousRegisterPaymenthMethod.length > 0){
-              previousRegisterPaymenthMethod.forEach(medioDetalle => {
-                  medioDetalle.total += Number(comprobante.totalVenta);
-                  medioDetalle.importeTotalIva += Number(sumarNumeros([totalIva21, totalIva10, totalIva27]));
-                  medioDetalle.totalIva21 += Number(totalIva21);
-                  medioDetalle.totalIva10 += Number(totalIva10);
-                  medioDetalle.totalIva27 += Number(totalIva27);
-              })
-            }else{
-              comprobante.mediosPago.forEach(comprobanteMedio => {
+              });
+            });
+            if (previousRegisterPaymenthMethod.length > 0) {
+              previousRegisterPaymenthMethod.forEach((medioDetalle) => {
+                medioDetalle.total += Number(comprobante.totalVenta);
+                medioDetalle.importeTotalIva += Number(
+                  sumarNumeros([totalIva21, totalIva10, totalIva27])
+                );
+                medioDetalle.totalIva21 += Number(totalIva21);
+                medioDetalle.totalIva10 += Number(totalIva10);
+                medioDetalle.totalIva27 += Number(totalIva27);
+              });
+            } else {
+              comprobante.mediosPago.forEach((comprobanteMedio) => {
                 const obj = {
                   medioPago: comprobanteMedio,
                   total: Number(comprobante.totalVenta),
-                  importeTotalIva: sumarNumeros([totalIva21, totalIva10, totalIva27]),
+                  importeTotalIva: sumarNumeros([
+                    totalIva21,
+                    totalIva10,
+                    totalIva27,
+                  ]),
                   totalIva21: Number(totalIva21),
                   totalIva10: Number(totalIva10),
                   totalIva27: Number(totalIva27),
-                }
+                };
                 mediosPagoDetalle.push(obj);
-              })
+              });
             }
-          }else{
-            comprobante.mediosPago.forEach(comprobanteMedio => {
+          } else {
+            comprobante.mediosPago.forEach((comprobanteMedio) => {
               const obj = {
                 medioPago: comprobanteMedio,
                 total: comprobante.totalVenta,
-                importeTotalIva: sumarNumeros([totalIva21, totalIva10, totalIva27]),
+                importeTotalIva: sumarNumeros([
+                  totalIva21,
+                  totalIva10,
+                  totalIva27,
+                ]),
                 totalIva21,
                 totalIva10,
                 totalIva27,
-              }
+              };
               mediosPagoDetalle.push(obj);
-            })
+            });
           }
           return (
             (iva21 += totalIva21), (iva10 += totalIva10), (iva27 += totalIva27)
           );
         });
-        this.savePaymentMethodDetails(mediosPagoDetalle)
-        setTimeout(()=>{
-          if(result.isConfirmed){
+        this.savePaymentMethodDetails(mediosPagoDetalle);
+        setTimeout(() => {
+          if (result.isConfirmed) {
             const cierreZ = {
               sucursal: this.loguedUser.sucursal,
               empresa: this.loguedUser.empresa,
@@ -295,33 +367,33 @@ export default {
               totalIva21: iva21,
               totalIva10: iva10,
               totalIva27: iva27,
-              fecha: new Date()
-            }
+              fecha: new Date(),
+            };
             GenericService(this.tenant, this.service, this.token)
-            .save(cierreZ)
-            .then(()=>{
-              this.filterObjects();
-            })
+              .save(cierreZ)
+              .then(() => {
+                this.filterObjects();
+              });
             this.loaded = true;
-          }else{
-            this.comprobantes = []
+          } else {
+            this.comprobantes = [];
             this.loaded = true;
           }
-        }, 1000)
+        }, 1000);
       });
     },
 
-    savePaymentMethodDetails(mediosPagoDetalle){
-      try{
-        mediosPagoDetalle.forEach(medioPagoDetalle => {
+    savePaymentMethodDetails(mediosPagoDetalle) {
+      try {
+        mediosPagoDetalle.forEach((medioPagoDetalle) => {
           GenericService(this.tenant, "mediosPagoDetalle", this.token)
-          .save(medioPagoDetalle)
-          .then(data => {
-            this.savedMedioDetalles.push(data.data);
-          })
-        })
-      }catch(err){
-        console.error(err)
+            .save(medioPagoDetalle)
+            .then((data) => {
+              this.savedMedioDetalles.push(data.data);
+            });
+        });
+      } catch (err) {
+        console.error(err);
       }
     },
 

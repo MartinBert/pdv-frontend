@@ -17,6 +17,9 @@ export function decimalPercent(integerPercent) {
 export function calculatePercentaje(number, percent) {
     return roundTwoDecimals(Number(number) * decimalPercent(Number(percent)));
 }
+export function calculatepriceFixed(totalVenta, priceFixed) {
+    return (totalVenta - priceFixed);
+}
 
 export function calculateAmountPlusPercentaje(number, percent) {
     return roundTwoDecimals(number * (1 + decimalPercent(percent)))

@@ -1,98 +1,5 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-form style="justify-content: center;">
-      <v-row>
-        <v-col>
-          <v-autocomplete
-            :items="depositos"
-            item-text="nombre"
-            item-value="id"
-            label="Depósito"
-            v-model="typeList"
-            @change="filterObjects()"
-          />
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="filterParams.productoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Nombre"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="filterParams.productoCodigo"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Codigo"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="filterParams.productoCodigoBarras"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Codigo de barras"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="filterParams.productoMarcaName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Marca"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="filterParams.productoPrimerAtributoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Atributo"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-autocomplete
-            :items="realDeposits"
-            item-text="nombre"
-            :return-object="true"
-            label="A depósito"
-            v-model="destinationDepositForMigrations"
-            required
-            style="width: 250px"
-          />
-        </v-col>
-        <v-col>
-          <form
-            @submit.prevent="migrateStockToOtherDeposit()"
-            style="margin: 10px;"
-          >
-            <v-btn class="primary" type="submit">Migrar seleccionados</v-btn>
-          </form>
-        </v-col>
-      </v-row>
-    </v-form>
     <v-data-table :headers="headers" :items="stock" class="elevation-6">
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
@@ -102,16 +9,12 @@
           mdi-delete
         </v-icon>
       </template>
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">
-          Reset
-        </v-btn>
-      </template>
     </v-data-table>
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+import StocksService from "../../services/StocksService";
 export default {
   data: () => ({
     stock: [],
@@ -131,7 +34,7 @@ export default {
       size: 10,
       totalPages: 0,
     },
-    depositsFilterParams: {
+    depositosFilterParams: {
       depositoName: "",
       perfilId: "",
       sucursalId: "",
@@ -147,6 +50,8 @@ export default {
       { text: "Cantidad", value: "cantidad" },
       { text: "Acciones", value: "acciones", sorteable: false },
     ],
+    perfil:"",
+    perfilId:"",
     loaded: false,
     tenant: "",
     service: "stock",
@@ -160,10 +65,69 @@ export default {
   }),
   mounted() {
     this.tenant = this.$route.params.tenant;
+   
+    // if (this.loguedUser.perfil > 1) {
+      //this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      //this.depositsFilterParams.sucursalId = this.loguedUser.sucursal.id;
+    //}
     this.items();
     this.getOtherModels();
+    this.filterObjects();
   },
   methods: {
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      if (this.typeList > 0) {
+        this.searchForDeposit(this.typeList);
+      } else {
+        this.search();
+      }
+    },
+    search() {
+      GenericService(this.tenant, "stock", this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.stocks = data.data.content;
+          if (this.migration.length > 0) {
+            this.migration.filter((el) => {
+              this.stocks.filter((e) => {
+                if (el.id === e.id) {
+                  e.selected = true;
+                }
+              });
+            });
+          }
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
+
+    searchForDeposit(typeList) {
+      this.filterParams.stockDepositoId = typeList;
+      StocksService(this.tenant, this.service, this.token)
+        .filterStockForDepositId(this.filterParams)
+        .then((data) => {
+          this.stocks = data.data.content;
+          if (this.migration.length > 0) {
+            this.migration.filter((el) => {
+              this.stocks.filter((e) => {
+                if (el.id === e.id) {
+                  e.selected = true;
+                }
+              });
+            });
+          }
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
+
     items() {
       GenericService(this.tenant, "stock", this.token)
         .filter(this.filterParams)
@@ -175,7 +139,7 @@ export default {
     },
     getOtherModels() {
       GenericService(this.tenant, "depositos", this.token)
-        .filter(this.depositsFilterParams)
+        .filter(this.depositosFilterParams)
         .then((data) => {
           this.depositos = data.data.content;
           this.depositos.push({
