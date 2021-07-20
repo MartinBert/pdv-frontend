@@ -380,7 +380,7 @@ export default {
       },
       {
         name: "libroivaventas",
-        title: "LibroIvaVentas",
+        title: "Libros",
         visible: false,
         icon: "/../images/icons/libro.svg",
         childs: [

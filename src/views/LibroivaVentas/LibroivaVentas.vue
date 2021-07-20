@@ -133,7 +133,7 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="comprobantesFiscales"
+        :items="documentosComerciales"
       >
         <template v-slot:[`item.acciones`]="{}">
           <Print />
@@ -157,34 +157,26 @@ export default {
     checkbox1: false,
     checkbox2:false,
     checkbox3:false,
-    comprobantesFiscales: [],
-    object: {
-      comprobante: [],
-    },
-    productos: [],
+    documentosComerciales: [],
+    FiscalCondicion:[],
+    file: null,
     filterParams: {
-      letra: "",
-      condicionVenta: "",
-      numeroCbte: "",
-      fechaEmision: "",
-      fechaVto: "",
-      logoUrl: "",
-      barCode: "",
-      cae: "",
-      totalVenta: "",
+      numeroCbte:"",
+      FechaEmision:"",
+      FechaVto:"",
+      ciudad:"",
+      provincia:"",
+      ingBruto:"",
       page: 1,
       size: 10,
       totalPages: 0,
     },
+    loaded: false,
     tenant: "",
-    idObject: "",
-    service: "comprobantesFiscales",
+    service: "documentosComerciales",
     token: localStorage.getItem("token"),
-    dialogStock: false,
-    loguedUser: JSON.parse(localStorage.getItem("userData")),
-    checkImportStatus: 0,
     deleteDialogStatus: false,
-    file: null,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     menu1: false,
     menu2: false,
     headers: [
@@ -215,28 +207,17 @@ export default {
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterProof();
+    this.filterObjects();
   },
 
   methods: {
-   filterProof(){
-      GenericService(this.tenant, "comprobantesFiscales", this.token)
+ filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          if (this.object.comprobante.length > 0) {
-            this.object.comprobante.forEach((el) => {
-              data.data.content.forEach((e) => {
-                if (e.id === el.id) {
-                  e.selected = true;
-                }
-              });
-            });
-          }
+          this.documentosComerciales = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
-          this.comprobantesFiscales = data.data.content;
           this.loaded = true;
         });
     },

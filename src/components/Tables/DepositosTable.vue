@@ -35,6 +35,10 @@
       </v-row>
     </v-form>
     <v-data-table :headers="headers" :items="depositos" class="elevation-6">
+      <template v-slot:[`item.deposito`]="{ item }">
+        <Add :object="item" v-on:add="addDeposit" v-if="!item.deposito"/>
+        <Checked :object="item" v-on:uncheck="uncheckDeposit" v-if="item.deposito"/>
+      </template>
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
           mdi-pencil
@@ -49,14 +53,6 @@
         >
         <span v-if="item.cantidadMinima">{{ item.cantidadMinima }}</span>
       </template>
-      <template v-slot:[`item.deposito`]="{ item }">
-        <Checked
-          :object="item"
-          v-on:uncheck="uncheck"
-          v-if="item.selected === true"
-        />
-        <Add :object="item" v-on:add="add" v-else />
-      </template>
     </v-data-table>
   </v-container>
 </template>
@@ -64,7 +60,6 @@
 import GenericService from "../../services/GenericService";
 import Add from "../Buttons/Add";
 import Checked from "../Buttons/Checked";
-
 export default {
   data: () => ({
     depositos: [],
@@ -85,7 +80,6 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     headers: [
       { text: "Nombre", value: "nombre" },
-      { text: "Deposito Determinado", value: "deposito[0].valor" },
       { text: "Migrar", value: "deposito", sortable: false },
       { text: "Cantidad", value: "cantidad" },
       { text: "Acciones", value: "acciones", sortable: false },
@@ -93,7 +87,7 @@ export default {
   }),
   components: {
     Add,
-    Checked,
+    Checked
   },
 
   mounted() {
@@ -121,11 +115,11 @@ export default {
     newObject() {
       this.$router.push({ name: "depositosForm", params: { id: 0 } });
     },
-    add(object) {
-      this.$emit("add", object);
+    addDeposit(object) {
+      this.$emit("add", object , "addDeposit");
     },
-    uncheck(object) {
-      this.$emit("uncheck", object);
+    uncheckDeposit(object) {
+      this.$emit("uncheck", object ,"uncheckDeposit");
     },
     editItem(itemId) {
       this.$emit("editItem", itemId);

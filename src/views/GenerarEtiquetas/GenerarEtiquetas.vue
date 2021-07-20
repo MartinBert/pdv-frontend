@@ -4,9 +4,71 @@
     margin-left:5px;
   "
   >
-    <TabBar :tabs="tabs" :activeTab="activeTab" style="margin-bottom:26px"/>
+    <TabBar :tabs="tabs" :activeTab="activeTab" style="margin-bottom:15px"/>
     <v-card min-width="100%">
       <Error :errorStatus="errorStatus" />
+      <v-row style="justify-content: center;" class="mt-1">
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Nombre de producto"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoCodigo"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Codigo de producto"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoCodigoBarras"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Codigo de barras"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoMarcaName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Marca"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoPrimerAtributoName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Atributo"
+          append-icon="mdi-magnify"
+        />
+      </v-col>
+    </v-row>
       <v-row>
         <v-col cols="12">
           <v-data-table
