@@ -298,7 +298,6 @@ import {
   generateBarCode,
   calculatePercentaje,
   decimalPercent,
-  generateFiveDecimalCode,
   roundTwoDecimals,
   transformPositive,
   calculateAmountMinusPercentaje,
@@ -1182,6 +1181,7 @@ export default {
                       addZerosInString("08", numberOfReceipt),
                     fechaEmision: formatDate(getCurrentDate()),
                     fechaVto: formatDate(dateOfCaeExpiration),
+                    correlativoComprobante: numberOfReceipt,
                     condicionVenta: condVenta,
                     productos: products,
                     productosDetalle: productsDetail,
@@ -1559,99 +1559,107 @@ export default {
       const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
       const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
       const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
-
-      comprobante = {
-        letra: "X",
-        numeroCbte: generateFiveDecimalCode(),
-        fechaEmision: formatDate(fecha),
-        fechaVto: formatDate(fecha),
-        condicionVenta: condVenta,
-        productos: products,
-        productosDetalle: productsDetail,
-        productoDescription: productsDescription,
-        barCode: generateBarCode(),
-        cae: "",
-        logoUrl: this.loguedUser.sucursal.logo,
-        puntoVenta: ptoVenta,
-        sucursal: sucursal,
-        documentoComercial: documento,
-        empresa: empresa,
-        cliente: cliente,
-        totalVenta: totalVenta,
-        subTotal: subTotal,
-        totalDescuentoGlobal: this.descuentoGlobal,
-        totalRecargoGlobal: this.recargoGlobal,
-        porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-        porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-        totalIva21: amountOfIva21,
-        totalIva10: amountOfIva10,
-        totalIva27: amountOfIva27,
-        porcentajeRecargoPlan: planPercentSurcharge,
-        porcentajeDescuentoPlan: planPercentDiscount,
-        totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-        totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-        mediosPago: [mediosPago],
-        planesPago: [planesPago],
-        nombreDocumento: documento.nombre,
-      };
-      /*** Evaluate required sale form data ***/
-      if (comprobante.mediosPago[0] !== undefined) {
-        if (Number(comprobante.totalVenta) !== 0) {
-          /*** Save receipt in database and print ticket ***/
-          GenericService(tenant, "comprobantesFiscales", token)
-            .save(comprobante)
-            .then(() => {
-              ReportsService(tenant, service, token)
-                .onCloseSaleReport(comprobante)
-                .then((res) => {
-                  file = new Blob([res["data"]], {
-                    type: "application/pdf",
-                  });
-                  fileURL = URL.createObjectURL(file);
-                  window.open(fileURL, "_blank");
-                })
-                .then(() => {
-                  /*** Save stocks modifications ***/
-                  this.applyStockModifications(comprobante)
-                    .then((data) => {
-                      const productsBelowMinimumStock = data[0];
-                      const productsWithoutStockOnDefaultDeposit = data[1];
-                      const productsOutOfStockAndDeposits = data[2];
-                      this.$successAlert("Venta realizada").then(() => {
-                        VentasService(
-                          this.tenant,
-                          this.service,
-                          this.token
-                        ).checkProductsAndDepositsStatus(
-                          productsBelowMinimumStock,
-                          productsWithoutStockOnDefaultDeposit,
-                          productsOutOfStockAndDeposits
-                        );
-                      });
-                    })
-                    .finally(() => {
-                      /*** Reset view objects and status ***/
-                      this.clear();
-                      this.loaded = true;
+      VentasService(tenant, "ventas", token)
+      .getPreviousCorrelativeDocumentNumber(sucursal.id, documento.codigoDocumento)
+      .then(data => {
+        const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
+        comprobante = {
+          letra: "X",
+          numeroCbte:
+            addZerosInString("04", ptoVenta.idFiscal) +
+            "-" +
+            addZerosInString("08", numeroCorrelativoDeComprobante),
+          correlativoComprobante: numeroCorrelativoDeComprobante,
+          fechaEmision: formatDate(fecha),
+          fechaVto: formatDate(fecha),
+          condicionVenta: condVenta,
+          productos: products,
+          productosDetalle: productsDetail,
+          productoDescription: productsDescription,
+          barCode: generateBarCode(),
+          cae: "",
+          logoUrl: this.loguedUser.sucursal.logo,
+          puntoVenta: ptoVenta,
+          sucursal: sucursal,
+          documentoComercial: documento,
+          empresa: empresa,
+          cliente: cliente,
+          totalVenta: totalVenta,
+          subTotal: subTotal,
+          totalDescuentoGlobal: this.descuentoGlobal,
+          totalRecargoGlobal: this.recargoGlobal,
+          porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+          porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+          totalIva21: amountOfIva21,
+          totalIva10: amountOfIva10,
+          totalIva27: amountOfIva27,
+          porcentajeRecargoPlan: planPercentSurcharge,
+          porcentajeDescuentoPlan: planPercentDiscount,
+          totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+          totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+          mediosPago: [mediosPago],
+          planesPago: [planesPago],
+          nombreDocumento: documento.nombre,
+        };
+        /*** Evaluate required sale form data ***/
+        if (comprobante.mediosPago[0] !== undefined) {
+          if (Number(comprobante.totalVenta) !== 0) {
+            /*** Save receipt in database and print ticket ***/
+            GenericService(tenant, "comprobantesFiscales", token)
+              .save(comprobante)
+              .then(() => {
+                ReportsService(tenant, service, token)
+                  .onCloseSaleReport(comprobante)
+                  .then((res) => {
+                    file = new Blob([res["data"]], {
+                      type: "application/pdf",
                     });
-                });
-            });
-        } else {
-          this.$errorAlert("No hay productos seleccionados en la venta").then(
-            (result) => {
-              if (result.isDismissed) {
-                this.loaded = true;
+                    fileURL = URL.createObjectURL(file);
+                    window.open(fileURL, "_blank");
+                  })
+                  .then(() => {
+                    /*** Save stocks modifications ***/
+                    this.applyStockModifications(comprobante)
+                      .then((data) => {
+                        const productsBelowMinimumStock = data[0];
+                        const productsWithoutStockOnDefaultDeposit = data[1];
+                        const productsOutOfStockAndDeposits = data[2];
+                        this.$successAlert("Venta realizada").then(() => {
+                          VentasService(
+                            this.tenant,
+                            this.service,
+                            this.token
+                          ).checkProductsAndDepositsStatus(
+                            productsBelowMinimumStock,
+                            productsWithoutStockOnDefaultDeposit,
+                            productsOutOfStockAndDeposits
+                          );
+                        });
+                      })
+                      .finally(() => {
+                        /*** Reset view objects and status ***/
+                        this.clear();
+                        this.loaded = true;
+                      });
+                  });
+              });
+          } else {
+            this.$errorAlert("No hay productos seleccionados en la venta").then(
+              (result) => {
+                if (result.isDismissed) {
+                  this.loaded = true;
+                }
               }
-            }
-          );
-        }
-      } else {
-        this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
-          if (result.isDismissed) {
-            this.loaded = true;
+            );
           }
-        });
-      }
+        } else {
+          this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
+            if (result.isDismissed) {
+              this.loaded = true;
+            }
+          });
+        }
+      })
     },
 
     savePresupuesto(){
@@ -1883,82 +1891,91 @@ export default {
       const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
       const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
 
-      comprobante = {
-        letra: "P",
-        numeroCbte: generateFiveDecimalCode(),
-        fechaEmision: formatDate(fecha),
-        fechaVto: formatDate(fecha),
-        fechaVencimiento,
-        condicionVenta: condVenta,
-        vencido: 'vigente',
-        productos: products,
-        productosDetalle: productsDetail,
-        productoDescription: productsDescription,
-        barCode: generateBarCode(),
-        cae: "",
-        logoUrl: this.loguedUser.sucursal.logo,
-        puntoVenta: ptoVenta,
-        sucursal: sucursal,
-        documentoComercial: documento,
-        empresa: empresa,
-        cliente: cliente,
-        totalVenta: totalVenta,
-        subTotal: subTotal,
-        totalDescuentoGlobal: this.descuentoGlobal,
-        totalRecargoGlobal: this.recargoGlobal,
-        porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-        porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-        totalIva21: amountOfIva21,
-        totalIva10: amountOfIva10,
-        totalIva27: amountOfIva27,
-        porcentajeRecargoPlan: planPercentSurcharge,
-        porcentajeDescuentoPlan: planPercentDiscount,
-        totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-        totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-        mediosPago: [mediosPago],
-        planesPago: [planesPago],
-        nombreDocumento: documento.nombre,
-      };
-      /*** Evaluate required sale form data ***/
-      if (comprobante.mediosPago[0] !== undefined) {
-        if (Number(comprobante.totalVenta) !== 0) {
-          /*** Save receipt in database and print ticket ***/
-          GenericService(tenant, "comprobantesFiscales", token)
-            .save(comprobante)
-            .then(() => {
-              ReportsService(tenant, service, token)
-                .onCloseSaleReport(comprobante)
-                .then((res) => {
-                  file = new Blob([res["data"]], {
-                    type: "application/pdf",
-                  });
-                  fileURL = URL.createObjectURL(file);
-                  window.open(fileURL, "_blank");
-                })
-                .then(() => {
-                  this.$successAlert("Presupuesto generado")
-                  .then(()=>{
-                    this.clear();
-                    this.loaded = true;
+      VentasService(tenant, "ventas", token)
+      .getPreviousCorrelativeDocumentNumber(sucursal.id, documento.codigoDocumento)
+      .then(data => {
+        const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
+        comprobante = {
+          letra: "P",
+          numeroCbte:
+            addZerosInString("04", ptoVenta.idFiscal) +
+            "-" +
+            addZerosInString("08", numeroCorrelativoDeComprobante),
+          correlativoComprobante: numeroCorrelativoDeComprobante,
+          fechaEmision: formatDate(fecha),
+          fechaVto: formatDate(fecha),
+          fechaVencimiento,
+          condicionVenta: condVenta,
+          vencido: 'vigente',
+          productos: products,
+          productosDetalle: productsDetail,
+          productoDescription: productsDescription,
+          barCode: generateBarCode(),
+          cae: "",
+          logoUrl: this.loguedUser.sucursal.logo,
+          puntoVenta: ptoVenta,
+          sucursal: sucursal,
+          documentoComercial: documento,
+          empresa: empresa,
+          cliente: cliente,
+          totalVenta: totalVenta,
+          subTotal: subTotal,
+          totalDescuentoGlobal: this.descuentoGlobal,
+          totalRecargoGlobal: this.recargoGlobal,
+          porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+          porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+          totalIva21: amountOfIva21,
+          totalIva10: amountOfIva10,
+          totalIva27: amountOfIva27,
+          porcentajeRecargoPlan: planPercentSurcharge,
+          porcentajeDescuentoPlan: planPercentDiscount,
+          totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+          totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+          mediosPago: [mediosPago],
+          planesPago: [planesPago],
+          nombreDocumento: documento.nombre,
+        };
+        /*** Evaluate required sale form data ***/
+        if (comprobante.mediosPago[0] !== undefined) {
+          if (Number(comprobante.totalVenta) !== 0) {
+            /*** Save receipt in database and print ticket ***/
+            GenericService(tenant, "comprobantesFiscales", token)
+              .save(comprobante)
+              .then(() => {
+                ReportsService(tenant, service, token)
+                  .onCloseSaleReport(comprobante)
+                  .then((res) => {
+                    file = new Blob([res["data"]], {
+                      type: "application/pdf",
+                    });
+                    fileURL = URL.createObjectURL(file);
+                    window.open(fileURL, "_blank");
                   })
-                });
-            });
-        } else {
-          this.$errorAlert("No hay productos seleccionados en la venta").then(
-            (result) => {
-              if (result.isDismissed) {
-                this.loaded = true;
+                  .then(() => {
+                    this.$successAlert("Presupuesto generado")
+                    .then(()=>{
+                      this.clear();
+                      this.loaded = true;
+                    })
+                  });
+              });
+          } else {
+            this.$errorAlert("No hay productos seleccionados en la venta").then(
+              (result) => {
+                if (result.isDismissed) {
+                  this.loaded = true;
+                }
               }
-            }
-          );
-        }
-      } else {
-        this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
-          if (result.isDismissed) {
-            this.loaded = true;
+            );
           }
-        });
-      }
+        } else {
+          this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
+            if (result.isDismissed) {
+              this.loaded = true;
+            }
+          });
+        }
+      })
     },
 
     async applyStockModifications(comprobante) {

@@ -197,6 +197,7 @@ export default {
 
               this.object.letra = letraDocumentoComercial;
               this.object.numeroCbte = addZerosInString("04", puntoVenta) + "-" + addZerosInString("08", numberOfReceipt);
+              this.object.correlativoComprobante = numberOfReceipt;
               this.object.fechaEmision = formatDate(getCurrentDate());
               this.object.fechaVto = formatDate(dateOfCaeExpiration);
               this.object.barCode = barCode;
@@ -261,6 +262,8 @@ export default {
 
     saveNoFiscal() {
       const letraDocumentoComercial = this.object.documentoComercial.letra;
+      const sucursalId = this.object.sucursal.id;
+      const codigoDocumento = this.object.documentoComercial.codigoDocumento;
       const nombreDocumentoComercial = this.object.documentoComercial.nombre;
       const puntoVenta = this.object.puntoVenta.idFiscal;
       const planPago = this.object.planesPago[0];
@@ -268,53 +271,58 @@ export default {
       let file;
       let fileURL;
 
-      this.object.letra = letraDocumentoComercial;
-      this.object.numeroCbte = addZerosInString("04", puntoVenta) + "-" + addZerosInString("08", this.object.id);
-      this.object.fechaEmision = formatDate(getCurrentDate());
-      this.object.fechaVto = formatDate(getCurrentDate());
-      this.object.nombreDocumento = nombreDocumentoComercial;
-      this.object.condicionVenta = condVenta;
+      VentasService(this.tenant, "ventas", this.token)
+      .getPreviousCorrelativeDocumentNumber(sucursalId, codigoDocumento)
+      .then(data => {
+        const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
+        this.object.letra = letraDocumentoComercial;
+        this.object.numeroCbte = addZerosInString("04", puntoVenta) + "-" + addZerosInString("08", numeroCorrelativoDeComprobante);
+        this.object.correlativoComprobante = numeroCorrelativoDeComprobante;
+        this.object.fechaEmision = formatDate(getCurrentDate());
+        this.object.fechaVto = formatDate(getCurrentDate());
+        this.object.nombreDocumento = nombreDocumentoComercial;
+        this.object.condicionVenta = condVenta;
 
-      let comprobante = this.object;
-      /*** Evaluate required sale form data ***/
-      GenericService(this.tenant, "comprobantesFiscales", this.token)
-        .save(comprobante)
-        .then(() => {
-          ReportsService(this.tenant, "ventas", this.token)
-            .onCloseSaleReport(comprobante)
-            .then((res) => {
-              file = new Blob([res["data"]], {
-                type: "application/pdf",
-              });
-              fileURL = URL.createObjectURL(file);
-              window.open(fileURL, "_blank");
-            })
-            .then(() => {
-              /*** Save stocks modifications ***/
-              this.applyStockModifications(comprobante)
-                .then((data) => {
-                  const productsBelowMinimumStock = data[0];
-                  const productsWithoutStockOnDefaultDeposit = data[1];
-                  const productsOutOfStockAndDeposits = data[2];
-                  this.$successAlert("Venta realizada").then(() => {
-                    VentasService(
-                      this.tenant,
-                      this.service,
-                      this.token
-                    ).checkProductsAndDepositsStatus(
-                      productsBelowMinimumStock,
-                      productsWithoutStockOnDefaultDeposit,
-                      productsOutOfStockAndDeposits
-                    );
-                  });
-                })
-                .finally(() => {
-                  /*** Reset view objects and status ***/
-                  this.clear();
+        let comprobante = this.object;
+        /*** Evaluate required sale form data ***/
+        GenericService(this.tenant, "comprobantesFiscales", this.token)
+          .save(comprobante)
+          .then(() => {
+            ReportsService(this.tenant, "ventas", this.token)
+              .onCloseSaleReport(comprobante)
+              .then((res) => {
+                file = new Blob([res["data"]], {
+                  type: "application/pdf",
                 });
-            });
-        });
-        
+                fileURL = URL.createObjectURL(file);
+                window.open(fileURL, "_blank");
+              })
+              .then(() => {
+                /*** Save stocks modifications ***/
+                this.applyStockModifications(comprobante)
+                  .then((data) => {
+                    const productsBelowMinimumStock = data[0];
+                    const productsWithoutStockOnDefaultDeposit = data[1];
+                    const productsOutOfStockAndDeposits = data[2];
+                    this.$successAlert("Venta realizada").then(() => {
+                      VentasService(
+                        this.tenant,
+                        this.service,
+                        this.token
+                      ).checkProductsAndDepositsStatus(
+                        productsBelowMinimumStock,
+                        productsWithoutStockOnDefaultDeposit,
+                        productsOutOfStockAndDeposits
+                      );
+                    });
+                  })
+                  .finally(() => {
+                    /*** Reset view objects and status ***/
+                    this.clear();
+                  });
+              });
+          });
+        })
     },
 
     async applyStockModifications(comprobante) {
