@@ -45,7 +45,7 @@ export default {
   },
 
   mounted() {
-    this.tenant = this.$rounte.params.tenant;
+    this.tenant = this.$route.params.tenant;
   },
 
   methods: {
