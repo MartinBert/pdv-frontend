@@ -44,6 +44,10 @@ export default {
     TabBar,
   },
 
+  mounted() {
+    this.tenant = this.$rounte.params.tenant;
+  },
+
   methods: {
     seeDetails(objects) {
       let title = "Productos";
