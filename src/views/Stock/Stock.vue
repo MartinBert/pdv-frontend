@@ -4,7 +4,12 @@
    margin-left:1px;
    "
   >
-    <v-tabs fixed-tabs background-color="indigo" dark style="margin-bottom:13px">
+    <v-tabs
+      fixed-tabs
+      background-color="indigo"
+      dark
+      style="margin-bottom:13px"
+    >
       <v-tab @click="newObject()" raise>
         Nuevo
       </v-tab>
@@ -31,68 +36,24 @@
             @change="filterObjects()"
           />
         </v-col>
-        <v-col cols="3">
+        <v-col cols="4">
           <v-text-field
-            v-model="filterParams.productoName"
+            v-model="search1"
             v-on:input="filterObjects()"
             dense
             outlined
             rounded
             class="text-left mt-2"
-            label="Nombre"
+            label="Buscar en Todo"
             append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.productoCodigo"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Codigo"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.productoCodigoBarras"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Codigo de barras"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.productoMarcaName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Marca"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="filterParams.productoPrimerAtributoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2" 
-            label="Atributo"
-            append-icon="mdi-magnify"
+            style="width: 500px"
           ></v-text-field>
         </v-col>
         <v-col cols="4">
           <form @submit.prevent="migrateStockToOtherDeposit()">
+            <v-btn class="primary" type="submit" style="margin-left:300px;"
+              >Migrar seleccionados</v-btn
+            >
             <v-autocomplete
               :items="realDeposits"
               item-text="nombre"
@@ -102,18 +63,26 @@
               required
               style="width: 250px"
             />
-            <v-btn class="primary" type="submit" style="margin-left:300px;">Migrar seleccionados</v-btn>
           </form>
         </v-col>
       </v-row>
-      <v-data-table :headers="headers" :items="productos" class="elevation-6">
+      <v-data-table
+        :headers="headers"
+        :items="stocks"
+        :search="search1"
+        class="elevation-6"
+        ref="stockTable"
+      >
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item)">
+          <v-icon small class="mr-2" @click="edit(item)">
             mdi-pencil
           </v-icon>
           <v-icon small @click="deleteItem(item)">
             mdi-delete
           </v-icon>
+        </template>
+        <template v-slot:[`item.migrar`]="{ item }">
+        <input type="checkbox" v-model="item.selected" @click="addToMigration(item)">
         </template>
       </v-data-table>
       <Pagination
@@ -144,6 +113,8 @@
   </v-container>
 </template>
 <script>
+//import Add from "../../components/Buttons/Add.vue";
+//import Checked from "../../components/Buttons/Checked.vue";
 import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
 import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
@@ -153,10 +124,19 @@ import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import DepositMigrationDialog from "../../components/Dialogs/DepositMigrationDialog";
-import { getCurrentDate, formatDate } from '../../helpers/dateHelper';
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
+import Swal from "sweetalert2";
 export default {
+    props: {
+    level: {
+     
+    }
+  },
   data: () => ({
-    stock: [],
+    check: false,
+    selected: [],
+    search1: "",
+    stocks: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       productoName: "",
@@ -172,19 +152,19 @@ export default {
       perfilId: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
-    depositsFilterParams:{
+    depositsFilterParams: {
       depositoName: "",
       perfilId: "",
       sucursalId: "",
       page: 1,
-      size: 100000
+      size: 100000,
     },
-    productos:[],
+    productos: [],
     loaded: false,
     tenant: "",
-    service: "productos",
+    service: "stock",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     depositos: [],
@@ -192,14 +172,17 @@ export default {
     typeList: 0,
     migration: [],
     destinationDepositForMigrations: {},
-        headers: [
-      { text: "Productos", value: "nombre" },
-      { text: "Atributos", value: "atributos[0].valor" },
-      { text: "Marca", value: "marca.nombre" },
-      { text: "Codigo de Barras", value: "codigoBarra" },
-      { text: "Codigo de producto", value: "codigoProducto" },
-      { text: "Cantidad", value: "cantidad.value[0]" },
+    headers: [
+      { text: "Productos", value: "producto.nombre" },
+      { text: "Atributos", value: "producto.atributos[0].valor" },
+      { text: "Marca", value: "producto.marca.nombre" },
+      { text: "Codigo de Barras", value: "producto.codigoBarra" },
+      { text: "Codigo de producto", value: "producto.codigoProducto" },
+      { text: "Cantidad", value: "cantidad" },
+      { text: "Cantidad Minima", value: "cantidadMinima" },
+      { text: "Deposito", value: "deposito.nombre" },
       { text: "Acciones", value: "acciones", sorteable: false },
+      { text: "Migrar a otro Deposito", value: "migrar" },
     ],
   }),
   components: {
@@ -209,13 +192,15 @@ export default {
     //StocksTable,
     Pagination,
     Spinner,
-    DeleteDialog
+    DeleteDialog,
+    // Add,
+    //Checked,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterParams.perfilId = this.loguedUser.perfil;
     this.depositsFilterParams.perfilId = this.loguedUser.perfil;
-    if(this.loguedUser.perfil > 1){
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
       this.depositsFilterParams.sucursalId = this.loguedUser.sucursal.id;
     }
@@ -224,13 +209,6 @@ export default {
   },
   methods: {
     filterObjects() {
-      GenericService(this.tenant, this.service, this.token)
-        .filter(this.filterParams)
-        .then((data) => {
-          this.productos = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
       if (this.typeList > 0) {
         this.searchForDeposit(this.typeList);
       } else {
@@ -238,18 +216,18 @@ export default {
       }
     },
     search() {
-      GenericService(this.tenant, this.service, this.token)
+      GenericService(this.tenant, "stock", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.stocks = data.data.content;
-          if(this.migration.length > 0){
-            this.migration.filter(el => {
-              this.stocks.filter(e => {
-                if(el.id === e.id){
+          if (this.migration.length > 0) {
+            this.migration.filter((el) => {
+              this.stocks.filter((e) => {
+                if (el.id === e.id) {
                   e.selected = true;
                 }
-              })
-            })
+              });
+            });
           }
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
@@ -258,20 +236,23 @@ export default {
           this.loaded = true;
         });
     },
+
+    changeIcon() {},
+
     searchForDeposit(typeList) {
       this.filterParams.stockDepositoId = typeList;
-      StocksService(this.tenant, "stock", this.token)
+      StocksService(this.tenant, this.service, this.token)
         .filterStockForDepositId(this.filterParams)
         .then((data) => {
           this.stocks = data.data.content;
-          if(this.migration.length > 0){
-            this.migration.filter(el => {
-              this.stocks.filter(e => {
-                if(el.id === e.id){
+          if (this.migration.length > 0) {
+            this.migration.filter((el) => {
+              this.stocks.filter((e) => {
+                if (el.id === e.id) {
                   e.selected = true;
                 }
-              })
-            })
+              });
+            });
           }
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
@@ -289,7 +270,7 @@ export default {
             id: 0,
             nombre: "Todos",
           });
-          this.realDeposits = this.depositos.filter(el => el.id !== 0);
+          this.realDeposits = this.depositos.filter((el) => el.id !== 0);
         });
     },
     newObject() {
@@ -302,8 +283,8 @@ export default {
       this.idObjet = id;
       this.deleteDialogStatus = true;
     },
-    deleteConfirmation(result){
-      return result ? this.deleteObject() : this.deleteDialogStatus = false;
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
     deleteObject() {
       this.dialog = true;
@@ -313,9 +294,11 @@ export default {
         .then(() => {
           this.filterObjects();
         })
-        .catch(()=>{
-          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
-        })
+        .catch(() => {
+          this.$errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          );
+        });
     },
     applyMassiveStocksRestrictions() {
       this.$store.commit("stocks/dialogMutation");
@@ -333,10 +316,10 @@ export default {
         sucursalId: "",
         perfilId: "",
         page: 1,
-        size: 100000
-      }
+        size: 100000,
+      };
       filterParams.perfilId = this.loguedUser.perfil;
-      if(this.loguedUser.perfil > 1){
+      if (this.loguedUser.perfil > 1) {
         filterParams.sucursalId = this.loguedUser.sucursal.id;
       }
       GenericService(this.tenant, this.service, this.token)
@@ -349,7 +332,10 @@ export default {
           stockWithRestrictions.forEach((el) => {
             GenericService(this.tenant, this.service, this.token).save(el);
           });
-          this.saveHistorial(stockWithRestrictions, "Cambio masivo en límite de existencias mínimas");
+          this.saveHistorial(
+            stockWithRestrictions,
+            "Cambio masivo en límite de existencias mínimas"
+          );
           this.$store.commit("stocks/resetStates");
           this.filterObjects(this.typeList);
         });
@@ -369,10 +355,10 @@ export default {
         sucursalId: "",
         perfilId: "",
         page: 1,
-        size: 100000
-      }
+        size: 100000,
+      };
       filterParams.perfilId = this.loguedUser.perfil;
-      if(this.loguedUser.perfil > 1){
+      if (this.loguedUser.perfil > 1) {
         filterParams.sucursalId = this.loguedUser.sucursal.id;
       }
       let depositToModifyId = this.$store.state.stocks.selectedDeposits[0].id;
@@ -388,106 +374,156 @@ export default {
             el.algorim = el.producto.codigoBarra + el.deposito.id;
             GenericService(this.tenant, this.service, this.token).update(el);
           });
-          
-          this.saveHistorial(affectedProducts, "Movimiento masivo de stock entre depósitos");
+
+          this.saveHistorial(
+            affectedProducts,
+            "Movimiento masivo de stock entre depósitos"
+          );
           this.$store.commit("stocks/resetStates");
-          setTimeout(()=>{this.filterObjects(this.typeList);}, 500);
+          setTimeout(() => {
+            this.filterObjects(this.typeList);
+          }, 500);
         });
     },
-    addToMigration(object){
-      this.migration.push(object);
-      this.stocks.filter(el => el.id === object.id)[0].selected = true;
-      this.$refs.stockTable.$forceUpdate();
+
+    add(item) {
+      this.$emit("add", item);
     },
-    removeOfMigration(object){
-      this.migration = this.migration.filter(el => el.id !== object.id);
-      this.stocks.filter(el => el.id === object.id)[0].selected = false;
-      this.$refs.stockTable.$forceUpdate();
-    },
-    migrateStockToOtherDeposit(){
+    addToMigration(item) {
       if(this.migration.length > 0){
+
+       const filterMigration = this.migration.filter(el=>
+            el.id === item.id
+       )
+       if(filterMigration.length > 0){
+         this.migration = this.migration.filter(el=> 
+              el.id != item.id         
+         )
+        this.stocks.filter((el) => el.id === item.id)[0].selected = false;
+        this.$refs.stockTable.$forceUpdate();
+       }else{
+        this.migration.push(item);
+        this.stocks.filter((el) => el.id === item.id)[0].selected = true;
+        this.$refs.stockTable.$forceUpdate();
+       }
+      }else{
+
+      this.migration.push(item);
+      this.stocks.filter((el) => el.id === item.id)[0].selected = true;
+      this.$refs.stockTable.$forceUpdate();
+      }
+
+      console.log(this.migration);
+
+    },
+    removeOfMigration(item) {
+      this.migration = this.migration.filter((el) => el.id !== item.id);
+      this.stocks.filter((el) => el.id === item.id)[0].selected = false;
+      this.$refs.stockTable.$forceUpdate();
+    },
+    migrateStockToOtherDeposit() {
+      if (this.migration.length > 0) {
         this.loaded = false;
-        this.migration.forEach(el => {
+        this.migration.forEach((el) => {
           el.deposito = this.destinationDepositForMigrations;
           el.algorim = el.producto.codigoBarra + el.deposito.id;
-          GenericService(this.tenant, this.service, this.token)
-          .update(el);
-        })
-        
+          GenericService(this.tenant, "stock", this.token).update(el);
+        });
+
+        Swal.fire("Exitosa", "", "success");
+
         this.saveHistorial(this.migration, "Migración de productos");
-        
+
         this.migration = [];
         this.destinationDepositForMigrations = {};
-        setTimeout(()=>{this.filterObjects(this.typeList);}, 500);
-      }else{
-        this.$errorAlert("Debe seleccionar al menos 1 producto para migrar su stock de depósito");
+        setTimeout(() => {
+          this.filterObjects(this.typeList);
+        }, 500);
+      } else {
+        this.$errorAlert(
+          "Debe seleccionar al menos 1 producto para migrar su stock de depósito"
+        );
       }
     },
-    saveHistorial(stocks, str){
+    saveHistorial(stocks, str) {
       const stockHistory = {
         stocks: stocks,
         descripcion: str,
         fecha: formatDate(getCurrentDate()),
-        usuario:this.loguedUser.nombre,
-        sucursal: this.loguedUser.sucursal
-      }
-      GenericService(this.tenant, 'historialStock', this.token)
-      .save(stockHistory);
+        usuario: this.loguedUser.nombre,
+        sucursal: this.loguedUser.sucursal,
+      };
+      GenericService(this.tenant, "historialStock", this.token).save(
+        stockHistory
+      );
     },
-    openDialog(param){
+    openDialog(param) {
       switch (param) {
-        case "minimumStockRestriction":{
+        case "minimumStockRestriction": {
           this.$store.commit("stocks/dialogMutation");
           break;
         }
-        case "stockMigration":{
+        case "stockMigration": {
           const deposits = this.depositos.filter((el) => el.id !== 0);
           this.$store.commit("stocks/allDepositsMutation", deposits);
           this.$store.commit("stocks/depositMigrationDialogMutation");
           break;
         }
-        default:{
-          this.$store.commit('stocks/stockReportsDialogMutation');
+        default: {
+          this.$store.commit("stocks/stockReportsDialogMutation");
           break;
         }
       }
     },
-    setAtributesValues(atributes){
+    setAtributesValues(atributes) {
       let str = atributes.reduce((acc, element) => {
-        if(element.valor){
+        if (element.valor) {
           return acc + element.valor + ",";
-        }else{
+        } else {
           return acc + element.valorNumerico.toString() + ",";
         }
       }, "");
       return str;
     },
-    modifyAlgorim(){
+    modifyAlgorim() {
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
-      .getAll(0, 100000)
-      .then(data => {
-        let stockForModify = data.data.content;
-        stockForModify.forEach(el => {
-          el.algorim = el.producto.codigoBarra + el.deposito.id;
-        })
-        GenericService(this.tenant, this.service, this.token)
-        .saveAll(stockForModify)
-        .then(()=>{
-          this.filterObjects();
-        })
-        .catch(err => {
-          console.log(err);
-        })
-      })
+        .getAll(0, 100000)
+        .then((data) => {
+          let stockForModify = data.data.content;
+          stockForModify.forEach((el) => {
+            el.algorim = el.producto.codigoBarra + el.deposito.id;
+          });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(stockForModify)
+            .then(() => {
+              this.filterObjects();
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        });
     },
-    checkStocks(){
+
+    uncheck(object) {
+      this.$emit("uncheck", object, "uncheck");
+    },
+    checkStocks() {
       GenericService(this.tenant, this.service, this.token)
-      .getAll(0, 100000)
-      .then(data => {
-        console.log(data.data.content);
-      })
-    }
+        .getAll(0, 100000)
+        .then((data) => {
+          console.log(data.data.content);
+        });
+    },
   },
 };
 </script>
+<style>
+.oculto {
+  display: none;
+  color: red;
+}
+.visible {
+  display: block;
+}
+</style>

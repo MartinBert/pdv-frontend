@@ -36,8 +36,12 @@
     </v-form>
     <v-data-table :headers="headers" :items="depositos" class="elevation-6">
       <template v-slot:[`item.deposito`]="{ item }">
-        <Add :object="item" v-on:add="addDeposit" v-if="!item.deposito"/>
-        <Checked :object="item" v-on:uncheck="uncheckDeposit" v-if="item.deposito"/>
+        <Add :itemId="item" v-on:add="addDeposit" v-if="!item.deposito" />
+        <Checked
+          :itemId="item"
+          v-on:uncheck="uncheckDeposit"
+          v-if="item.deposito"
+        />
       </template>
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
@@ -72,6 +76,7 @@ export default {
       size: 10,
       totalPages: 0,
     },
+    object:{},
     loaded: false,
     tenant: "",
     service: "depositos",
@@ -87,7 +92,7 @@ export default {
   }),
   components: {
     Add,
-    Checked
+    Checked,
   },
 
   mounted() {
@@ -101,7 +106,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
+      GenericService(this.tenant, this.service, this.token) 
         .filter(this.filterParams)
         .then((data) => {
           this.depositos = data.data.content;
@@ -116,10 +121,10 @@ export default {
       this.$router.push({ name: "depositosForm", params: { id: 0 } });
     },
     addDeposit(object) {
-      this.$emit("add", object , "addDeposit");
+      this.$emit("addDeposit", object, "addDeposit");
     },
     uncheckDeposit(object) {
-      this.$emit("uncheck", object ,"uncheckDeposit");
+      this.$emit("uncheckDeposit", object,"uncheckDeposit");
     },
     editItem(itemId) {
       this.$emit("editItem", itemId);
@@ -130,8 +135,8 @@ export default {
     openStockMovementHistoryDialog() {
       this.$store.commit("stocks/stockHistoryDialogMutation");
     },
-    selectDefaultDeposit(object) {
-      this.$emit("selectDefaultDeposit", object);
+    selectDefaultDeposit(itemId) {
+      this.$emit("selectDefaultDeposit", itemId);
     },
   },
 };
