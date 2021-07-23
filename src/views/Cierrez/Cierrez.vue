@@ -91,7 +91,7 @@ export default {
     },
     tabs: [
       { id: 1, title: "Comprobantes Emitidos", route: "/ventas/list" },
-      { id: 2, title: "Presupuesto", route: "/ventas/comprobantes" },
+      { id: 2, title: "Presupuesto", route: "/ventas/presupuesto" },
       { id: 3, title: "Cierre de ventas Diario", route: "/ventas/cierrez" },
     ],
     activeTab: 3,
@@ -118,9 +118,6 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.tabs[0].route = `/${this.tenant}/ventas/list`;
-    this.tabs[1].route = `/${this.tenant}/ventas/presupuesto`;
-    this.tabs[2].route = `/${this.tenant}/ventas/cierrez`;
     if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
       this.invoiceFilterParams.sucursalId = this.loguedUser.sucursal.id;

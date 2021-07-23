@@ -59,7 +59,6 @@ import IvasForm from "../views/Ivas/IvasForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
 import Mensajes from "../views/Mensajes/Mensajes.vue";
 import Calendar from "../views/Calendar/Calendar.vue";
-import PresupuestoForm from "../views/Presupuesto/PresupuestoForm.vue";
 import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
 import Cierrez from "../views/Cierrez/Cierrez.vue";
 import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
@@ -282,12 +281,6 @@ const routes = [
                 path: 'ventas/presupuesto',
                 name: 'presupuesto',
                 component: Presupuesto,
-                meta: { requiresAuth: true }
-            },
-            {
-                path: 'presupuesto',
-                name: 'presupuestoForm',
-                component: PresupuestoForm,
                 meta: { requiresAuth: true }
             },
             {

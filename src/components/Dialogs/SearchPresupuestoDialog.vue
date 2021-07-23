@@ -22,7 +22,7 @@
                   <tr>
                     <td>{{ object.numeroCbte }}</td>
                     <td>{{ object.fechaEmision }}</td>
-                    <td>{{object.totalVenta}}</td>
+                    <td>{{ object.totalVenta }}</td>
                     <td class="text-center">
                       <Detail :objectsArray="object.productosDetalle" v-on:seeDetails="seeDetails"/>
                     </td>
@@ -83,6 +83,7 @@ export default {
         fechaEmision: "",
         comprobanteCerrado: "",
         numeroComprobante: "",
+        validityStatus: true,
         totalVenta: "",
         page: 1,
         size: 10,
