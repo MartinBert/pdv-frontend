@@ -112,6 +112,17 @@
                         placeholder="Seleccione un plan de pago"
                       ></v-autocomplete>
                     </v-col>
+                    <v-col cols="6" v-if="object.documento && object.documento.nombre === 'Presupuesto'">
+                      <label for="date_input">Fecha de vencimiento de presupuesto</label>
+                      <v-text-field 
+                        id="date_input" 
+                        type="date" 
+                        outlined 
+                        filled 
+                        dense
+                        v-model="object.fechaVencimiento"
+                      />
+                    </v-col>
                   </v-row>
                 </v-col>
                 <v-col cols="4">
@@ -1660,6 +1671,7 @@ export default {
       const token = this.token;
       const service = this.service;
       const condVenta = this.checkSaleCondition(planesPago);
+      const fechaVencimiento = this.object.fechaVencimiento;
       let file;
       let fileURL;
       let comprobante;
@@ -1876,7 +1888,9 @@ export default {
         numeroCbte: generateFiveDecimalCode(),
         fechaEmision: formatDate(fecha),
         fechaVto: formatDate(fecha),
+        fechaVencimiento,
         condicionVenta: condVenta,
+        vencido: 'vigente',
         productos: products,
         productosDetalle: productsDetail,
         productoDescription: productsDescription,

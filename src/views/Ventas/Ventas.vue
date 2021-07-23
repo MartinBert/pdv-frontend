@@ -48,8 +48,7 @@ export default {
       totalVenta: "",
       page: 1,
       size: 10,
-      totalPages: 0,
-      tab: null,
+      totalPages: 0
     },
     loaded: false,
     tenant: "",
@@ -57,11 +56,12 @@ export default {
     token: localStorage.getItem("token"),
     tabs:[
       { id: 1, title: "Comprobantes", route: '/ventas/list' },
-      { id: 2, title: "Presupuesto", route: '/presupuesto' },
+      { id: 2, title: "Presupuesto", route: '/ventas/presupuesto' },
       { id: 3, title: "Cierre de ventas Diario", route: '/ventas/cierrez' },
-    ]
+    ],
+    activeTab: 1
   }),
-  activeTab:1,
+
   components: {
     VentasReportsDialog,
     Pagination,
