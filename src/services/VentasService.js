@@ -71,6 +71,13 @@ export default (tenant,service,token) =>{
                 headers: { Authorization: "Bearer " + token }
             })
             return data;
+        },
+
+        getPreviousCorrelativeDocumentNumber(sucursalId, codigoDocumento){
+            let data = axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/getPreviousCorrelativeDocumentNumber/${sucursalId}/${codigoDocumento}`, {
+                headers: { Authorization: "Bearer " + token }
+            })
+            return data;
         }
     }
 }
