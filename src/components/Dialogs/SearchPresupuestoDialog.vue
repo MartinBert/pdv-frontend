@@ -83,7 +83,7 @@ export default {
         fechaEmision: "",
         comprobanteCerrado: "",
         numeroComprobante: "",
-        vencido: "vigente",
+        validityStatus: true,
         totalVenta: "",
         page: 1,
         size: 10,
