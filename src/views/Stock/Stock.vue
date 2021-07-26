@@ -36,7 +36,7 @@
             @change="filterObjects()"
           />
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
           <v-text-field
             v-model="search1"
             v-on:input="filterObjects()"
@@ -49,21 +49,21 @@
             style="width: 500px"
           ></v-text-field>
         </v-col>
-        <v-col cols="4">
+        <v-col>
           <form @submit.prevent="migrateStockToOtherDeposit()">
-            <v-btn class="primary" type="submit" style="margin-left:300px;"
-              >Migrar seleccionados</v-btn
-            >
-            <v-autocomplete
-              :items="realDeposits"
-              item-text="nombre"
-              :return-object="true"
-              label="A depósito"
-              v-model="destinationDepositForMigrations"
-              required
-              style="width: 250px"
-            />
-          </form>
+          <v-autocomplete
+            :items="realDeposits"
+            item-text="nombre"
+            :return-object="true"
+            label="A depósito"
+            v-model="destinationDepositForMigrations"
+            required
+            style="width: 250px"
+          />
+          <v-btn class="primary" type="submit" style="margin-left:300px;
+          margin-top:-120px
+          ">Migrar seleccionados</v-btn>
+        </form>
         </v-col>
       </v-row>
       <v-data-table
@@ -82,10 +82,7 @@
           </v-icon>
         </template>
         <template v-slot:[`item.migrar`]="{ item }">
-        <v-checkbox
-              color="indigo"
-              @click="addToMigration(item)"
-        ></v-checkbox> 
+          <v-checkbox color="indigo" @click="addToMigration(item)"></v-checkbox>
         </template>
       </v-data-table>
       <Pagination
@@ -130,12 +127,17 @@ import DepositMigrationDialog from "../../components/Dialogs/DepositMigrationDia
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 import Swal from "sweetalert2";
 export default {
-    props: {
-    level: {
-     
-    }
+  props: {
+    level: {},
   },
   data: () => ({
+     depositoRules: [
+        v => !!v || 'Campo requerido',
+      ],
+     required: {
+      type: Boolean,
+      default: false,
+    },
     check: false,
     selected: [],
     search1: "",
@@ -393,31 +395,26 @@ export default {
       this.$emit("add", item);
     },
     addToMigration(item) {
-      if(this.migration.length > 0){
-
-       const filterMigration = this.migration.filter(el=>
-            el.id === item.id
-       )
-       if(filterMigration.length > 0){
-         this.migration = this.migration.filter(el=> 
-              el.id != item.id         
-         )
-        this.stocks.filter((el) => el.id === item.id)[0].selected = false;
-        this.$refs.stockTable.$forceUpdate();
-       }else{
+      if (this.migration.length > 0) {
+        const filterMigration = this.migration.filter(
+          (el) => el.id === item.id
+        );
+        if (filterMigration.length > 0) {
+          this.migration = this.migration.filter((el) => el.id != item.id);
+          this.stocks.filter((el) => el.id === item.id)[0].selected = false;
+          this.$refs.stockTable.$forceUpdate();
+        } else {
+          this.migration.push(item);
+          this.stocks.filter((el) => el.id === item.id)[0].selected = true;
+          this.$refs.stockTable.$forceUpdate();
+        }
+      } else {
         this.migration.push(item);
         this.stocks.filter((el) => el.id === item.id)[0].selected = true;
         this.$refs.stockTable.$forceUpdate();
-       }
-      }else{
-
-      this.migration.push(item);
-      this.stocks.filter((el) => el.id === item.id)[0].selected = true;
-      this.$refs.stockTable.$forceUpdate();
       }
 
       console.log(this.migration);
-
     },
     removeOfMigration(item) {
       this.migration = this.migration.filter((el) => el.id !== item.id);
