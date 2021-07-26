@@ -82,7 +82,10 @@
           </v-icon>
         </template>
         <template v-slot:[`item.migrar`]="{ item }">
-        <input type="checkbox" v-model="item.selected" @click="addToMigration(item)">
+        <v-checkbox
+              color="indigo"
+              @click="addToMigration(item)"
+        ></v-checkbox> 
         </template>
       </v-data-table>
       <Pagination
