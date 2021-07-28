@@ -3,13 +3,61 @@
   margin-right:40px;
   ">
     <v-card>
-      <DepositosTable
-        :items="depositos"
-        v-on:deleteItem="deleteItem"
-        v-on:editItem="editItem"
-        v-on:selectDefaultDeposit="selectDefaultDeposit"
-        v-if="loaded"
-      />
+     <v-form class="mb-0">
+      <v-row>
+        <v-col cols="9" class="mt-2 d-flex">
+          <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>
+          <v-btn class="primary ml-1" @click="openStockMovementHistoryDialog()"
+            >MOVIMIENTOS DE STOCK</v-btn
+          >
+          <div style="width: 300px">
+            <v-file-input
+              dense
+              v-model="file"
+              class="mt-0"
+              placeholder="Importar depósitos"
+              accept=".xlsx, xls"
+              @change="importDocuments($event)"
+            ></v-file-input>
+          </div>
+        </v-col>
+        <v-col cols="1"></v-col>
+        <v-col cols="2">
+          <v-text-field
+            style="width: 300px"
+            v-model="filterParams.depositoName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
+    <v-data-table :headers="headers" :items="depositos" class="elevation-6" ref="depositosTable">
+      <template v-slot:[`item.depositoporDefecto`]="{}">
+          <v-checkbox
+              color="indigo"
+            ></v-checkbox>
+      </template>
+      <template v-slot:[`item.acciones`]="{ item }">
+        <v-icon small class="mr-2" @click="editItem(item)">
+          mdi-pencil
+        </v-icon>
+        <v-icon small @click="deleteItem(item)">
+          mdi-delete
+        </v-icon>
+      </template>
+      <template v-slot:[`item.cantidad`]="{ item }">
+        <span v-if="!item.cantidadMinima"
+          >Sin existencias mínimas asignadas</span
+        >
+        <span v-if="item.cantidadMinima">{{ item.cantidadMinima }}</span>
+      </template>
+    </v-data-table>
       <Pagination
         :page="filterParams.page"
         :totalPages="filterParams.totalPages"
@@ -30,13 +78,17 @@
 import GenericService from "../../services/GenericService";
 import XLSX from "xlsx";
 import StockHistoryDialog from "../../components/Dialogs/StockHistoryDialog";
-import DepositosTable from "../../components/Tables/DepositosTable";
+//import DepositosTable from "../../components/Tables/DepositosTable";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 export default {
   data: () => ({
+    item:"",
+    selected:[],
+    stocks:[],
     depositos: [],
+    depositosDefault:[],
     file: null,
     filterParams: {
       depositoName: "",
@@ -46,6 +98,12 @@ export default {
       size: 10,
       totalPages: 0,
     },
+       headers: [
+      {text:"Id", value:"id"},
+      { text: "Nombre", value: "nombre" },
+      { text: "Deposito predeterminado", value: "depositoporDefecto"},
+      { text: "Acciones", value: "acciones", sortable: false },
+    ],
     loaded: false,
     tenant: "",
     service: "depositos",
@@ -56,7 +114,7 @@ export default {
 
   components: {
     StockHistoryDialog,
-    DepositosTable,
+    //DepositosTable,
     DeleteDialog,
     Spinner,
     Pagination,
@@ -82,9 +140,11 @@ export default {
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
           }
+          
           this.loaded = true;
         });
     },
+  
 
     editItem(id) {
       this.$router.push({ name: "depositosForm", params: { id: id } });
@@ -172,9 +232,18 @@ export default {
       return importacion;
     },
 
-    selectDefaultDeposit(deposit) {
+    newObject() {
+      this.$router.push({ name: "depositosForm", params: { id: 0 } });
+    },
+
+    openStockMovementHistoryDialog() {
+      this.$store.commit("stocks/stockHistoryDialogMutation");
+    },
+
+    selectDefaultDeposit(item) {
       this.loaded = false;
       const filterParams = {
+
         depositoName: "",
         perfilId: this.loguedUser.perfil,
         sucursalId: this.loguedUser.sucursal.id,
@@ -189,10 +258,9 @@ export default {
           let allDefaultDeposits = allDeposits.filter(
             (el) => el.defaultDeposit === "1"
           );
-
           if (allDefaultDeposits.length > 0) {
             let defaultBranchDeposit = allDefaultDeposits.filter(
-              (el) => el.sucursales.id === deposit.sucursales.id
+              (el) => el.sucursales.id === item.sucursales.id
             )[0];
 
             if (defaultBranchDeposit) {
@@ -200,17 +268,18 @@ export default {
                 defaultBranchDeposit,
                 "nullDefaultStatus"
               );
-              this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
+              this.modifyDepositStatus(item, "changeStatusToDefaultDeposit");
               this.refreshView();
             } else {
-              this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
+              this.modifyDepositStatus(item, "changeStatusToDefaultDeposit");
               this.refreshView();
             }
           } else {
-            this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
+            this.modifyDepositStatus(item, "changeStatusToDefaultDeposit");
             this.refreshView();
           }
         });
+       
     },
 
     modifyDepositStatus(deposit, statusType) {

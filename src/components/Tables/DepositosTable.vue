@@ -34,14 +34,12 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table :headers="headers" :items="depositos" class="elevation-6">
+    <v-data-table :headers="headers" :items="depositos" class="elevation-6" ref="depositosTable">
       <template v-slot:[`item.deposito`]="{ item }">
-        <Add :itemId="item" v-on:add="addDeposit" v-if="!item.deposito" />
-        <Checked
-          :itemId="item"
-          v-on:uncheck="uncheckDeposit"
-          v-if="item.deposito"
-        />
+          <v-checkbox
+              color="indigo"
+              @click="addToMigration(item)"
+            ></v-checkbox>
       </template>
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
@@ -62,11 +60,12 @@
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import Add from "../Buttons/Add";
-import Checked from "../Buttons/Checked";
+//import Add from "../Buttons/Add";
+//import Checked from "../Buttons/Checked";
 export default {
   data: () => ({
     depositos: [],
+    depositosDefault:[],
     file: null,
     filterParams: {
       depositoName: "",
@@ -91,8 +90,8 @@ export default {
     ],
   }),
   components: {
-    Add,
-    Checked,
+    //Add,
+   // Checked,
   },
 
   mounted() {
@@ -135,8 +134,31 @@ export default {
     openStockMovementHistoryDialog() {
       this.$store.commit("stocks/stockHistoryDialogMutation");
     },
-    selectDefaultDeposit(itemId) {
-      this.$emit("selectDefaultDeposit", itemId);
+    selectDefaultDeposit(item) {
+      this.$emit("selectDefaultDeposit", item);
+    },
+
+    addToMigration(item) {
+      if (this.depositosDefault.length > 0) {
+        const filterDepositos = this.depositosDefault.filter(
+          (el) => el.id === item.id
+        );
+        if (filterDepositos.length > 0) {
+          this.depositosDefault = this.depositosDefault.filter((el) => el.id != item.id);
+          this.stocks.filter((el) => el.id === item.id)[0].selected = false;
+          this.$refs.depositosTable.$forceUpdate();
+        } else {
+          this.depositosDefault.push(item);
+          this.stocks.filter((el) => el.id === item.id)[0].selected = true;
+          this.$refs.depositosTable.$forceUpdate();
+        }
+      } else {
+        this.depositosDefault.push(item);
+        this.stocks.filter((el) => el.id === item.id)[0].selected = true;
+        this.$refs.depositosTable.$forceUpdate();
+      }
+
+      console.log(this.depositos);
     },
   },
 };

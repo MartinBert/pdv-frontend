@@ -108,10 +108,10 @@ export default {
       { text: "Detalles", value: "productos", sortable: false },
       {
         text: "Medios de pago empleados",
-        value: "mediosPago",
+        value: "mediosPago.value[0]",
         sortable: false,
       },
-      { text: "Planes de pago", value: "planPago", sortable: false },
+      { text: "Planes de pago", value: "planesPago.value[0]", sortable: false },
       { text: "Precio de venta", value: "totalVenta" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],

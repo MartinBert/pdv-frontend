@@ -81,6 +81,7 @@ export default {
       size: 10,
       totalPages: 0,
     },
+    file:"",
     loaded: false,
     tenant: "",
     service: "mediosPago",
@@ -149,7 +150,7 @@ export default {
     },
 
     addZClosure(object) {
-      this.$emit("addZClosure", object, "addZClosure");
+      this.$emit("addZClosure",object, "addZClosure");
     },
 
     uncheckZClosure(object) {
