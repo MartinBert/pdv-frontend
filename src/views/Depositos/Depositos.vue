@@ -99,7 +99,7 @@ export default {
     selected: [],
     stocks: [],
     depositos: [],
-    depositosDefault: [],
+    defaultDeposit:[],
     file: null,
     filterParams: {
       depositoName: "",
@@ -264,25 +264,25 @@ export default {
     },
 
     selectDefaultDeposit(item) {
-      if (this.depositosDefault.length > 0) {
-        const filterDepositos = this.depositosDefault.filter(
+      if (this.defaultDeposit.length > 0) {
+        const filterDepositos = this.defaultDeposit.filter(
           (el) => el.id === item.id
         );
         if (filterDepositos.length > 0) {
-          this.depositosDefault = this.depositosDefault.filter(
+          this.defaultDeposit = this.defaultDeposit.filter(
             (el) => el.id != item.id
           );
           this.depositos.filter((el) => el.id === item.id)[0].selected = false;
         } else {
-          this.depositosDefault.push(item);
+          this.defaultDeposit.push(item);
           this.depositos.filter((el) => el.id === item.id)[0].selected = true;
         }
       } else {
-        this.depositosDefault.push(item);
+        this.defaultDeposit.push(item);
         this.depositos.filter((el) => el.id === item.id)[0].selected = true;
       }
 
-      console.log(this.depositosDefault);
+      console.log(this.defaultDeposit);
     },
 
     modifyDepositStatus(deposit, statusType) {

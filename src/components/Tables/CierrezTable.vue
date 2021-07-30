@@ -46,7 +46,7 @@ export default {
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     headers: [
-      { text: "Fecha", value: "fechaEmision" },
+      { text: "Fecha", value: "fecha" },
       { text: "Numero de Comprobante", value: "id" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
