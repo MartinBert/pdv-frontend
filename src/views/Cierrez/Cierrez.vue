@@ -1,3 +1,4 @@
+
 <template>
   <v-container style="min-width: 97%;">
     <TabBar :tabs="tabs" :activeTab="activeTab" />
