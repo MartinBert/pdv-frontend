@@ -53,7 +53,7 @@
     </v-form>
     <v-row style="justify-content: center;">
       <v-col>
-        <h2>Lista de comprobantes emitidos</h2>
+        <h2 style="text-align:center;">Lista de comprobantes emitidos</h2>
       </v-col>
     </v-row>
     <v-data-table
@@ -65,7 +65,7 @@
       <template v-slot:[`item.productos`]="{ item }">
         <Detail :objectsArray="item.productos" v-on:seeDetails="seeDetails" />
       </template>
-      <template v-slot:[`item.mediosPagos`]="{ item }">
+      <template v-slot:[`item.mediosPago`]="{ item }">
         <Detail :objectsArray="item.mediosPago" v-on:seeDetails="seeDetails" />
       </template>
       <template v-slot:[`item.planesPago`]="{ item }">
@@ -82,6 +82,9 @@ import GenericService from "../../services/GenericService";
 import Detail from "../Buttons/Detail";
 import Print from "../Buttons/Print";
 export default {
+   props: {
+    items: Array,
+  },
   data: () => ({
     icon: "mdi-check-circle",
     ventas: [],
@@ -108,10 +111,10 @@ export default {
       { text: "Detalles", value: "productos", sortable: false },
       {
         text: "Medios de pago empleados",
-        value: "mediosPago.value[0]",
+        value: "mediosPago",
         sortable: false,
       },
-      { text: "Planes de pago", value: "planesPago.value[0]", sortable: false },
+      { text: "Planes de pago", value: "planesPago", sortable: false },
       { text: "Precio de venta", value: "totalVenta" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],

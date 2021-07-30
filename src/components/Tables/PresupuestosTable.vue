@@ -43,7 +43,7 @@
     </v-form>
     <v-row style="justify-content: center;">
       <v-col>
-        <h2 style="text-align:center;">Lista de comprobantes emitidos</h2>
+        <h2 style="text-align:center;">Lista de Presupuestos emitidos</h2>
       </v-col>
     </v-row>
     <v-data-table

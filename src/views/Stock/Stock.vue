@@ -178,6 +178,7 @@ export default {
     migration: [],
     destinationDepositForMigrations: {},
     headers: [
+      {text:"Id", value:"id"},
       { text: "Productos", value: "producto.nombre" },
       { text: "Atributos", value: "producto.atributos[0].valor" },
       { text: "Marca", value: "producto.marca.nombre" },
@@ -186,8 +187,8 @@ export default {
       { text: "Cantidad", value: "cantidad" },
       { text: "Cantidad Minima", value: "cantidadMinima" },
       { text: "Deposito", value: "deposito.nombre" },
-      { text: "Acciones", value: "acciones", sorteable: false },
-      { text: "Migrar a otro Deposito", value: "migrar" },
+      { text: "Acciones", value: "acciones", sortable: false },
+      { text: "Migrar a otro Deposito", value: "migrar", sortable:false},
     ],
   }),
   components: {

@@ -33,10 +33,14 @@
         <Edit :itemId="item.id" v-on:editItem="editItem" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
+       <template v-slot:[`item.coutas`]="{item}">
+         <Detail :objectsArray="item.planesPago" v-on:seeDetails="seeDetails" />
+      </template>
     </v-data-table>
   </v-container>
 </template>
 <script>
+import Detail from "../Buttons/Detail";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
 import GenericService from "../../services/GenericService";
@@ -59,14 +63,15 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     headers: [
       { text: "Nombre", value: "nombre" },
-      { text: "Cantidad de coutas", value: "coutas" },
-      { text: "Porcentaje de recargo", value: "porcentaje" },
+      { text: "Cantidad de coutas", value: "coutas"},
+      { text: "Porcentaje de recargo", value: "porcentaje"},
       { text: "Accciones", value: "acciones", sortable: false },
     ],
   }),
   components: {
     Edit,
     Delete,
+    Detail
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -100,8 +105,8 @@ export default {
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
     },
-    seeDetails(item) {
-      this.$emit("seeDetails", item);
+    seeDetails(objects) {
+      this.$emit("seeDetails", objects);
     }
   },
 };

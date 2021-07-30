@@ -80,7 +80,6 @@ export default {
     headers: [
       { text: "Nombre", value: "nombre" },
       { text: "Razon Social", value: "razonSocial" },
-      { text: "Localidad", value: "cliente.localidad" },
       { text: "Cuit", value: "cuit" },
       { text: "Detalles", value: "detalles" },
       { text: "Acciones", value: "acciones" },
