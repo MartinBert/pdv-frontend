@@ -1,63 +1,71 @@
 <template>
-  <v-container style="min-width: 98%;
+  <v-container
+    style="min-width: 98%;
   margin-right:40px;
-  ">
+  "
+  >
     <v-card>
-     <v-form class="mb-0">
-      <v-row>
-        <v-col cols="9" class="mt-2 d-flex">
-          <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>
-          <v-btn class="primary ml-1" @click="openStockMovementHistoryDialog()"
-            >MOVIMIENTOS DE STOCK</v-btn
-          >
-          <div style="width: 300px">
-            <v-file-input
+      <v-form class="mb-0">
+        <v-row>
+          <v-col cols="9" class="mt-2 d-flex">
+            <v-btn class="primary" @click="newObject()" raised>NUEVO</v-btn>
+            <v-btn
+              class="primary ml-1"
+              @click="openStockMovementHistoryDialog()"
+              >MOVIMIENTOS DE STOCK</v-btn
+            >
+            <div style="width: 300px">
+              <v-file-input
+                dense
+                v-model="file"
+                class="mt-0"
+                placeholder="Importar depósitos"
+                accept=".xlsx, xls"
+                @change="importDocuments($event)"
+              ></v-file-input>
+            </div>
+          </v-col>
+          <v-col cols="1"></v-col>
+          <v-col cols="2">
+            <v-text-field
+              style="width: 300px"
+              v-model="filterParams.depositoName"
+              v-on:input="filterObjects()"
               dense
-              v-model="file"
-              class="mt-0"
-              placeholder="Importar depósitos"
-              accept=".xlsx, xls"
-              @change="importDocuments($event)"
-            ></v-file-input>
-          </div>
-        </v-col>
-        <v-col cols="1"></v-col>
-        <v-col cols="2">
-          <v-text-field
-            style="width: 300px"
-            v-model="filterParams.depositoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            placeholder="Búsqueda"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <v-data-table :headers="headers" :items="depositos" class="elevation-6" ref="depositosTable">
-      <template v-slot:[`item.depositoporDefecto`]="{}">
-          <v-checkbox
-              color="indigo"
-            ></v-checkbox>
-      </template>
-      <template v-slot:[`item.acciones`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          mdi-pencil
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete
-        </v-icon>
-      </template>
-      <template v-slot:[`item.cantidad`]="{ item }">
-        <span v-if="!item.cantidadMinima"
-          >Sin existencias mínimas asignadas</span
-        >
-        <span v-if="item.cantidadMinima">{{ item.cantidadMinima }}</span>
-      </template>
-    </v-data-table>
+              outlined
+              rounded
+              class="text-left"
+              placeholder="Búsqueda"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
+      <v-data-table
+        :headers="headers"
+        :items="depositos"
+        class="elevation-6"
+        ref="depositosTable"
+      >
+        <template v-slot:[`item.depositoporDefecto`]="{ item }">
+          <v-checkbox color="indigo" :isChecked="isChecked" @click="selectDefaultDeposit(item)">
+          </v-checkbox>
+        </template>
+        <template v-slot:[`item.acciones`]="{ item }">
+          <v-icon small class="mr-2" @click="editItem(item)">
+            mdi-pencil
+          </v-icon>
+          <v-icon small @click="deleteItem(item)">
+            mdi-delete
+          </v-icon>
+        </template>
+        <template v-slot:[`item.cantidad`]="{ item }">
+          <span v-if="!item.cantidadMinima"
+            >Sin existencias mínimas asignadas</span
+          >
+          <span v-if="item.cantidadMinima">{{ item.cantidadMinima }}</span>
+        </template>
+      </v-data-table>
       <Pagination
         :page="filterParams.page"
         :totalPages="filterParams.totalPages"
@@ -83,12 +91,15 @@ import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 export default {
+  props:{
+    isChecked:[]
+  },
   data: () => ({
-    item:"",
-    selected:[],
-    stocks:[],
+    item: "",
+    selected: [],
+    stocks: [],
     depositos: [],
-    depositosDefault:[],
+    depositosDefault: [],
     file: null,
     filterParams: {
       depositoName: "",
@@ -98,10 +109,10 @@ export default {
       size: 10,
       totalPages: 0,
     },
-       headers: [
-      {text:"Id", value:"id"},
+    headers: [
+      { text: "Id", value: "id" },
       { text: "Nombre", value: "nombre" },
-      { text: "Deposito predeterminado", value: "depositoporDefecto"},
+      { text: "Deposito predeterminado", value: "depositoporDefecto" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
     loaded: false,
@@ -130,6 +141,9 @@ export default {
   },
 
   methods: {
+    persist() {
+      localStorage.isChecked = this.isChecked;
+    },
     filterObjects(page) {
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
@@ -140,12 +154,21 @@ export default {
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
           }
-          
+
           this.loaded = true;
         });
     },
-  
 
+    initIsChecked: function() {
+      const stored = localStorage.getItem("isChecked");
+      if (stored === null) {
+        console.log("Nothing stored; default to `true`");
+        return true;
+      } else {
+        console.log("Using stored value " + stored);
+        return stored == "true";
+      }
+    },
     editItem(id) {
       this.$router.push({ name: "depositosForm", params: { id: id } });
     },
@@ -241,45 +264,25 @@ export default {
     },
 
     selectDefaultDeposit(item) {
-      this.loaded = false;
-      const filterParams = {
-
-        depositoName: "",
-        perfilId: this.loguedUser.perfil,
-        sucursalId: this.loguedUser.sucursal.id,
-        page: 1,
-        size: 100000,
-      };
-
-      GenericService(this.tenant, this.service, this.token)
-        .filter(filterParams)
-        .then((data) => {
-          let allDeposits = data.data.content;
-          let allDefaultDeposits = allDeposits.filter(
-            (el) => el.defaultDeposit === "1"
+      if (this.depositosDefault.length > 0) {
+        const filterDepositos = this.depositosDefault.filter(
+          (el) => el.id === item.id
+        );
+        if (filterDepositos.length > 0) {
+          this.depositosDefault = this.depositosDefault.filter(
+            (el) => el.id != item.id
           );
-          if (allDefaultDeposits.length > 0) {
-            let defaultBranchDeposit = allDefaultDeposits.filter(
-              (el) => el.sucursales.id === item.sucursales.id
-            )[0];
+          this.depositos.filter((el) => el.id === item.id)[0].selected = false;
+        } else {
+          this.depositosDefault.push(item);
+          this.depositos.filter((el) => el.id === item.id)[0].selected = true;
+        }
+      } else {
+        this.depositosDefault.push(item);
+        this.depositos.filter((el) => el.id === item.id)[0].selected = true;
+      }
 
-            if (defaultBranchDeposit) {
-              this.modifyDepositStatus(
-                defaultBranchDeposit,
-                "nullDefaultStatus"
-              );
-              this.modifyDepositStatus(item, "changeStatusToDefaultDeposit");
-              this.refreshView();
-            } else {
-              this.modifyDepositStatus(item, "changeStatusToDefaultDeposit");
-              this.refreshView();
-            }
-          } else {
-            this.modifyDepositStatus(item, "changeStatusToDefaultDeposit");
-            this.refreshView();
-          }
-        });
-       
+      console.log(this.depositosDefault);
     },
 
     modifyDepositStatus(deposit, statusType) {
@@ -296,6 +299,13 @@ export default {
       setTimeout(() => {
         this.filterObjects();
       }, 500);
+    },
+  },
+
+  watch: {
+    isChecked() {
+      console.log("storing value " + this.isChecked);
+      localStorage.setItem("isChecked", this.isChecked);
     },
   },
 };

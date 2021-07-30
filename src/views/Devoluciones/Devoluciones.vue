@@ -12,7 +12,8 @@
             dense
             outlined
             rounded
-            type="number"
+            oninput="this.value=this.value.replace(/[^0-9.]/g,'');"
+            type="text"
             class="text-left"
             placeholder="Búsqueda especial"
             append-icon="mdi-magnify"
