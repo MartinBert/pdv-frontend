@@ -1,13 +1,13 @@
 
 <template>
-  <v-container style="min-width: 97%;"> 
+  <v-container style="min-width: 97%;">
     <TabBar :tabs="tabs" :activeTab="activeTab" />
     <v-card min-width="100%">
       <v-form class="mb-3" v-if="loaded">
         <v-row>
           <v-col cols="1">
             <v-btn class="primary" @click="generateZClosure()" raised
-              >Realizar cierre z</v-btn
+              >Realizar cierre z diario</v-btn
             >
           </v-col>
           <v-col></v-col>
@@ -25,14 +25,14 @@
           </v-col>
         </v-row>
       </v-form>
+      <CierrezTable
+        :items="cierres"
+        v-on:seeDetails="seeDetails"
+        v-on:print="print"
+        v-on:deleteItem="deleteItem"
+        v-if="loaded"
+      />
     </v-card>
-    <CierrezTable
-      :items="cierres"
-      v-on:seeDetails="seeDetails"
-      v-on:print="print"
-      v-on:deleteItem="deleteItem"
-      v-if="loaded"
-    />
     <Pagination
       :page="filterParams.page"
       :totalPages="filterParams.totalPages"

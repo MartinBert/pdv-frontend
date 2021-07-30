@@ -77,14 +77,16 @@
           </div>
           <v-text-field
             v-if="alterationType === 1"
-            type="number"
+            oninput="this.value=this.value.replace(/[^0-9.]/g,'');"
+            type="text"
             label="Ingrese la variación porcentual en los precios"
             v-model="object.percent"
             required
           />
           <v-text-field
             v-if="alterationType === 2"
-            type="number"
+            oninput="this.value=this.value.replace(/[^0-9.]/g,'');"
+            type="text"
             label="Ingrese el monto de variación en los precios"
             v-model="object.amount"
             required

@@ -88,6 +88,7 @@ export default {
             this.filterParams.page = 1;
           }
           this.loaded = true;
+          console.log(this.planesPago);
         });
     },
     newObject() {
@@ -99,6 +100,9 @@ export default {
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
     },
+    seeDetails(item) {
+      this.$emit("seeDetails", item);
+    }
   },
 };
 </script>
