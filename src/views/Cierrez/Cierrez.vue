@@ -208,7 +208,6 @@ export default {
           );
           const totalIva10 = comprobante.productoDescription.reduce(
             (acc, producto) => {
-              console.log(producto);
               if (producto.saleIvaPercent == 10.5) {
                 if (
                   producto.discountPercent > 0 &&
@@ -311,6 +310,7 @@ export default {
                 medioDetalle.totalIva21 += Number(totalIva21);
                 medioDetalle.totalIva10 += Number(totalIva10);
                 medioDetalle.totalIva27 += Number(totalIva27);
+                medioDetalle.cantidadComprobantes += 1;
               });
             } else {
               comprobante.mediosPago.forEach((comprobanteMedio) => {
@@ -325,6 +325,7 @@ export default {
                   totalIva21: Number(totalIva21),
                   totalIva10: Number(totalIva10),
                   totalIva27: Number(totalIva27),
+                  cantidadComprobantes: 1
                 };
                 mediosPagoDetalle.push(obj);
               });
@@ -342,6 +343,7 @@ export default {
                 totalIva21,
                 totalIva10,
                 totalIva27,
+                cantidadComprobantes: 1
               };
               mediosPagoDetalle.push(obj);
             });
