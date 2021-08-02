@@ -74,6 +74,7 @@ export default {
       totalPages: 0,
     },
     headers: [
+      {text:"Id", value:"id"},
       { text: "Nombre", value: "nombre" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],

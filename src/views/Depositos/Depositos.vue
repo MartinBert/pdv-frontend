@@ -276,10 +276,12 @@ export default {
         } else {
           this.defaultDeposit.push(item);
           this.depositos.filter((el) => el.id === item.id)[0].selected = true;
+           this.$refs.depositosTable.$forceUpdate();
         }
       } else {
         this.defaultDeposit.push(item);
         this.depositos.filter((el) => el.id === item.id)[0].selected = true;
+        this.$refs.depositosTable.$forceUpdate();
       }
 
       console.log(this.defaultDeposit);

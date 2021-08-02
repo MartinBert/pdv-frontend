@@ -74,6 +74,7 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+        console.log(this.cierres);
     },
     seeDetails(object) {
       this.$emit("seeDetails", object);

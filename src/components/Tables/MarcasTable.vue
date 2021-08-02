@@ -97,11 +97,8 @@ export default {
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     headers: [
-      {
-        text: "Nombre",
-        align: "start",
-        value: "nombre",
-      },
+      {text:"Id", value:"id"},
+      {text:"Nombre" , value:"nombre"},
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),

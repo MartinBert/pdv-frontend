@@ -57,10 +57,10 @@
       </v-col>
     </v-row>
     <v-data-table
-      style="background-color: transparent"
       :headers="headers"
       :items="ventas"
       class="elevation-6"
+      hide-default-footer
     >
       <template v-slot:[`item.productos`]="{ item }">
         <Detail :objectsArray="item.productos" v-on:seeDetails="seeDetails" />
@@ -75,10 +75,17 @@
         <Print :object="item" v-on:print="print" />
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+import Pagination from "../../components/Pagination";
 import Detail from "../Buttons/Detail";
 import Print from "../Buttons/Print";
 export default {
@@ -90,7 +97,7 @@ export default {
     ventas: [],
     loaded: false,
     tenant: "",
-    service: "ventas",
+    service: "comprobantesFiscales",
     token: localStorage.getItem("token"),
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
@@ -105,7 +112,7 @@ export default {
       totalPages: 0,
     },
     headers: [
-      { text: "Fecha de Venta", value: "fechaEmision" },
+      { text: "Fecha de Venta", value: "fechaEmision.value[0]" },
       { text: "Codigo de barra", value: "barCode" },
       { text: "Comprobante", value: "nombreDocumento", sortable: false },
       { text: "Detalles", value: "productos", sortable: false },
@@ -128,13 +135,14 @@ export default {
   },
 
   components: {
+    Pagination,
     Detail,
     Print,
   },
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
@@ -144,6 +152,7 @@ export default {
           }
           this.loaded = true;
         });
+        console.log(this.ventas);
     },
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");

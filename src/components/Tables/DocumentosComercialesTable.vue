@@ -36,6 +36,7 @@
       :items="documentosComerciales"
       :headers="headers"
       class="elevation-6"
+      hide-default-footer
     >
       <template v-slot:[`item.tipo`]="{ item }">
         <v-alert type="success" dense v-if="item.tipo">Fiscal</v-alert>
@@ -57,12 +58,19 @@
         </v-icon>
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
   </v-container>
 </template>
 <script>
 //import Edit from "../Buttons/Edit";
 //import Delete from "../Buttons/Delete";
 import GenericService from "../../services/GenericService";
+import Pagination from "../../components/Pagination"
 
 export default {
   data: () => ({
@@ -90,6 +98,7 @@ export default {
   }),
 
   components: {
+    Pagination
     // Delete,
     //Edit,
   },

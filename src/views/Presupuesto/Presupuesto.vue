@@ -46,6 +46,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+
   },
 
   methods: {
@@ -69,6 +70,7 @@ export default {
           window.open(fileURL, "_blank");
         });
     },
+
 
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");

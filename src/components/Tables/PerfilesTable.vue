@@ -50,9 +50,6 @@ export default {
     deleteDialogStatus: false,
     headers: [
       { text: "Nombre", value: "nombre" },
-      { text: "Usuario", value: "usuario" },
-      { text: "Perfil", value: "perfil.nombre" },
-      { text: "Empresa", value: "empresa.alias" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
