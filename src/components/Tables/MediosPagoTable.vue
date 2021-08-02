@@ -45,6 +45,18 @@
           v-if="item.sumaEnCierreDeCaja"
         />
       </template>
+      <template v-slot:[`item.aplicaCierreZ`] = {item}>
+       <Add
+          :object="item"
+          v-on:add="addZClosure"
+          v-if="!item.aplicaCierreZ"
+        />
+        <Checked
+          :object="item"
+          v-on:uncheck="uncheckZClosure"
+          v-if="item.aplicaCierreZ"
+        />
+      </template>
       <template v-slot:[`item.acciones`]="{ item }">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
@@ -69,6 +81,7 @@ export default {
       size: 10,
       totalPages: 0,
     },
+    file:"",
     loaded: false,
     tenant: "",
     service: "mediosPago",
@@ -137,7 +150,7 @@ export default {
     },
 
     addZClosure(object) {
-      this.$emit("addZClosure", object, "addZClosure");
+      this.$emit("addZClosure",object, "addZClosure");
     },
 
     uncheckZClosure(object) {

@@ -24,7 +24,8 @@
             </v-col>
             <v-col class="col-4">
               <v-text-field
-                type="number"
+                type="text"
+                oninput="this.value=this.value.replace(/[^0-9.]/g,'');"
                 v-model="object.cuotas"
                 label="Cantidad de cuotas"
                 required

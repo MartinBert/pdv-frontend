@@ -43,7 +43,7 @@
     </v-form>
     <v-row style="justify-content: center;">
       <v-col>
-        <h2>Lista de comprobantes emitidos</h2>
+        <h2 style="text-align:center;">Lista de Presupuestos emitidos</h2>
       </v-col>
     </v-row>
     <v-data-table
@@ -86,7 +86,7 @@ export default {
     loaded: false,
     tenant: "",
     listennerOfStore: 0,
-    service: "ventas",
+    service: "presupuesto",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     token: localStorage.getItem("token"),
     filterParams: {
@@ -136,7 +136,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      VentasService(this.tenant, "ventas", this.token)
+      VentasService(this.tenant, "presupuesto", this.token)
         .getPresupuestos(this.filterParams)
         .then((data) => {
           data.data.content.forEach(presupuesto => {
