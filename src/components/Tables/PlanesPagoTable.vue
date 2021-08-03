@@ -28,18 +28,30 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table :headers="headers" :items="planesPago" class="elevation-6">
+    <v-data-table
+      :headers="headers"
+      :items="planesPago"
+      class="elevation-6"
+      hide-default-footer
+    >
       <template v-slot:[`item.acciones`]="{ item }">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
-       <template v-slot:[`item.coutas`]="{item}">
-         <Detail :objectsArray="item.planesPago" v-on:seeDetails="seeDetails" />
+      <template v-slot:[`item.coutas`]="{ item }">
+        <Detail :objectsArray="item.planesPago" v-on:seeDetails="seeDetails" />
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
   </v-container>
 </template>
 <script>
+import Pagination from "../Pagination";
 import Detail from "../Buttons/Detail";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
@@ -63,15 +75,16 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     headers: [
       { text: "Nombre", value: "nombre" },
-      { text: "Cantidad de coutas", value: "coutas"},
-      { text: "Porcentaje de recargo", value: "porcentaje"},
+      { text: "Cantidad de coutas", value: "coutas" },
+      { text: "Porcentaje de recargo", value: "porcentaje" },
       { text: "Accciones", value: "acciones", sortable: false },
     ],
   }),
   components: {
     Edit,
     Delete,
-    Detail
+    Detail,
+    Pagination,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -107,7 +120,7 @@ export default {
     },
     seeDetails(objects) {
       this.$emit("seeDetails", objects);
-    }
+    },
   },
 };
 </script>
