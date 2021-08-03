@@ -178,7 +178,6 @@ export default {
     migration: [],
     destinationDepositForMigrations: {},
     headers: [
-      {text:"Id", value:"id"},
       { text: "Productos", value: "producto.nombre" },
       { text: "Atributos", value: "producto.atributos[0].valor" },
       { text: "Marca", value: "producto.marca.nombre" },

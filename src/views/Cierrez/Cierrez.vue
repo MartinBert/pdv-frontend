@@ -33,13 +33,7 @@
         v-if="loaded"
       />
     </v-card>
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
+
     <Spinner v-if="!loaded" />
     <DeleteDialog
       :status="deleteDialogStatus"
@@ -58,7 +52,6 @@ import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import VentasService from "../../services/VentasService";
 import CierrezTable from "../../components/Tables/CierrezTable";
-import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import TabBar from "../../components/Generics/TabBar";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
@@ -108,7 +101,6 @@ export default {
 
   components: {
     CierrezTable,
-    Pagination,
     Spinner,
     DeleteDialog,
     CierrezDetails,
