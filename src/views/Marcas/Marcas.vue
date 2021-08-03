@@ -3,7 +3,6 @@
    margin-right: 40px;
   ">
     <v-card>
-     
       <MarcasTable
         :items="marcas"
         v-on:editItem="edit"

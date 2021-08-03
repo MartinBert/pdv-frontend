@@ -20,7 +20,12 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table :headers="headers" :items="propiedades" class="elevation-6" hide-default-footer>
+    <v-data-table
+      :headers="headers"
+      :items="propiedades"
+      class="elevation-6"
+      hide-default-footer
+    >
       <v-dialog v-model="dialog" max-width="500px">
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -46,12 +51,11 @@
         </v-btn>
       </template>
     </v-data-table>
-        <Pagination
+    <Pagination
       :page="filterParams.page"
       :totalPages="filterParams.totalPages"
       :totalVisible="7"
       v-on:changePage="filterObjects"
-      v-if="loaded"
     />
   </v-container>
 </template>
@@ -84,7 +88,7 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
   components: {
-    Pagination
+    Pagination,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;

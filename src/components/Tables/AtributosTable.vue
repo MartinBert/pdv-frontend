@@ -60,7 +60,6 @@
       :totalPages="filterParams.totalPages"
       :totalVisible="7"
       v-on:changePage="filterObjects"
-      v-if="loaded"
     />
   </v-container>
 </template>

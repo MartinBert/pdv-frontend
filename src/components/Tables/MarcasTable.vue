@@ -75,7 +75,6 @@
       :totalPages="filterParams.totalPages"
       :totalVisible="7"
       v-on:changePage="filterObjects"
-      v-if="loaded"
     />
   </v-container>
 </template>
@@ -118,7 +117,8 @@ export default {
     this.filterObjects();
   },
   methods: {
-    filterObjects() {
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, "marcas", this.token)
         .filter(this.filterParams)
         .then((data) => {

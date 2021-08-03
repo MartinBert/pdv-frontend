@@ -70,7 +70,6 @@
         v-on:add="reactivationOfProduct"
         v-if="loaded"
       />
-   
       <Spinner v-if="!loaded" />
       <DeleteDialog
         :status="deleteDialogStatus"
