@@ -32,7 +32,7 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table :headers="headers" :items="marcas" class="elevation-6">
+    <v-data-table :headers="headers" :items="marcas" class="elevation-6"  hide-default-footer>
       <v-dialog v-model="dialog" max-width="500px">
         <v-card-text>
           <v-container>
@@ -70,10 +70,18 @@
         </v-btn>
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
   </v-container>
 </template>
 
 <script>
+import Pagination from "../../components/Pagination";
 import GenericService from "../../services/GenericService";
 
 export default {
@@ -97,12 +105,14 @@ export default {
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     headers: [
-      {text:"Id", value:"id"},
-      {text:"Nombre" , value:"nombre"},
+      { text: "Id", value: "id" },
+      { text: "Nombre", value: "nombre" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
-
+  components: {
+    Pagination,
+  },
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects();

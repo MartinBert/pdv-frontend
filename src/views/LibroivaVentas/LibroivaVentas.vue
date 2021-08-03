@@ -204,7 +204,6 @@ export default {
       return this.formatDate(this.date);
     },
   },
-
   watch: {
     date() {
       this.dateFormatted = this.formatDate(this.date);

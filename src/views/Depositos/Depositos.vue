@@ -46,9 +46,10 @@
         :items="depositos"
         class="elevation-6"
         ref="depositosTable"
+        hide-default-footer
       >
         <template v-slot:[`item.depositoporDefecto`]="{ item }">
-          <v-checkbox color="indigo" :isChecked="isChecked" @click="selectDefaultDeposit(item)">
+          <v-checkbox color="indigo" :isChecked="isChecked" @click="selectDefaultDeposit1(item)">
           </v-checkbox>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
@@ -71,7 +72,6 @@
         :totalPages="filterParams.totalPages"
         :totalVisible="7"
         v-on:changePage="filterObjects"
-        v-if="loaded"
       />
       <Spinner v-if="!loaded" />
       <DeleteDialog
@@ -263,6 +263,37 @@ export default {
       this.$store.commit("stocks/stockHistoryDialogMutation");
     },
 
+      selectDefaultDeposit1(deposit) {
+      this.loaded = false;
+      const filterParams = {
+        depositoName: "",
+        perfilId: this.loguedUser.perfil,
+        sucursalId: this.loguedUser.sucursal.id,
+        page: 1,
+        size: 100000
+      }
+      GenericService(this.tenant, this.service, this.token)
+        .filter(filterParams)
+        .then((data) => {
+          let allDeposits = data.data.content;
+          let allDefaultDeposits = allDeposits.filter(el => el.defaultDeposit === "1");
+          if (allDefaultDeposits.length > 0) {
+            let defaultBranchDeposit = allDefaultDeposits.filter(el => el.sucursales.id === deposit.sucursales.id)[0];
+            
+            if(defaultBranchDeposit){
+              this.modifyDepositStatus(defaultBranchDeposit, 'nullDefaultStatus')
+              this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+              this.refreshView();
+            }else{
+              this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+              this.refreshView();
+            }
+          } else {
+            this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+            this.refreshView();
+          }
+        });
+    },
     selectDefaultDeposit(item) {
       if (this.defaultDeposit.length > 0) {
         const filterDepositos = this.defaultDeposit.filter(

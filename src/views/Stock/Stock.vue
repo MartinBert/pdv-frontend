@@ -72,6 +72,7 @@
         :search="search1"
         class="elevation-6"
         ref="stockTable"
+        hide-default-footer
       >
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small class="mr-2" @click="edit(item)">

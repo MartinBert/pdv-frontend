@@ -62,15 +62,29 @@
         />
       </v-col>
     </v-row>
-    <v-data-table class="elevation-6" :headers="headers" :items="productos" style="background-color: transparent">
+    <v-data-table
+      class="elevation-6"
+      :headers="headers"
+      :items="productos"
+      style="background-color: transparent"
+      hide-default-footer
+    >
       <template v-slot:[`item.acciones`]="{ item }">
-        <Edit :itemId="item.id" v-on:editItem="editItem"/>
-        <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
+        <Edit :itemId="item.id" v-on:editItem="editItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
   </v-container>
 </template>
 <script>
+import Pagination from "../../components/Pagination";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
 import GenericService from "../../services/GenericService";
@@ -113,9 +127,10 @@ export default {
     };
   },
 
-  components:{
+  components: {
     Delete,
-    Edit
+    Edit,
+    Pagination,
   },
 
   mounted() {
