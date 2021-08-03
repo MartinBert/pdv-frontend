@@ -70,7 +70,7 @@ export default {
   data: () => ({
     editedItem: {
       valor: "",
-      valorNumerico: 0,
+      valorNumerico:"",
     },
     atributos: [],
     headers: [

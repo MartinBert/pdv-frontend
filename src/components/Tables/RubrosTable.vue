@@ -63,11 +63,11 @@
       :totalPages="filterParams.totalPages"
       :totalVisible="7"
       v-on:changePage="filterObjects"
-      v-if="loaded"
     />
   </v-container>
 </template>
 <script>
+import Pagination from "../Pagination";
 import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
@@ -93,7 +93,9 @@ export default {
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
-  components: {},
+  components: {
+    Pagination
+  },
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects();
