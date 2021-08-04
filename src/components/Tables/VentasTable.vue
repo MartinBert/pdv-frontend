@@ -133,6 +133,7 @@ export default {
   },
   methods: {
     filterObjects(page) {
+      console.log(this.filterParams)
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)

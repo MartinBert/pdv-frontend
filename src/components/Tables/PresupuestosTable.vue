@@ -136,7 +136,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      VentasService(this.tenant, "presupuesto", this.token)
+      VentasService(this.tenant, "ventas", this.token)
         .getPresupuestos(this.filterParams)
         .then((data) => {
           data.data.content.forEach(presupuesto => {
