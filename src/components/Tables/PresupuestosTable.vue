@@ -55,7 +55,7 @@
       <template v-slot:[`item.productos`]="{ item }">
         <Detail :objectsArray="item.productos" v-on:seeDetails="seeDetails" />
       </template>
-      <template v-slot:[`item.mediosPagos`]="{ item }">
+      <template v-slot:[`item.mediosPago`]="{ item }">
         <Detail :objectsArray="item.mediosPago" v-on:seeDetails="seeDetails" />
       </template>
       <template v-slot:[`item.planesPago`]="{ item }">
@@ -106,12 +106,8 @@ export default {
       { text: "Codigo de barra", value: "barCode" },
       { text: "Comprobante", value: "nombreDocumento", sortable: false },
       { text: "Detalles", value: "productos", sortable: false },
-      {
-        text: "Medios de pago empleados",
-        value: "mediosPago",
-        sortable: false,
-      },
-      { text: "Planes de pago", value: "planPago", sortable: false },
+      { text: "Medios de pago empleados", value: "mediosPago", sortable: false},
+      { text: "Planes de pago", value: "planesPago", sortable: false },
       { text: "Precio de venta", value: "totalVenta" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
@@ -149,6 +145,7 @@ export default {
             }
           })
           this.presupuestos = data.data.content;
+          console.log(this.presupuestos);
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;

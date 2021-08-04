@@ -7,10 +7,9 @@
     <TabBar :tabs="tabs" :activeTab="activeTab" />
     <v-card min-width="100%">
       <VentasTable
-        :items="ventas"
         v-on:print="print"
         v-on:seeDetails="seeDetails"
-        v-if="loaded && activeTab === 1"
+        v-if="activeTab === 1"
       />
       <Spinner v-if="!loaded" />
       <VentaDetails />
@@ -19,7 +18,6 @@
   </v-container>
 </template>
 <script>
-import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
 import Spinner from "../../components/Graphics/Spinner";
@@ -30,22 +28,7 @@ export default {
   data: () => ({
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    ventas: [],
-    filterParams: {
-      blackReceiptFilter: "",
-      sucursalId: "",
-      fechaEmision: "",
-      comprobanteCerrado: "",
-      numeroComprobante: "",
-      totalVenta: "",
-      page: 1,
-      size: 10,
-      totalPages: 0
-    },
-    loaded: false,
-    tenant: "",
-    service: "comprobantesFiscales",
-    token: localStorage.getItem("token"),
+    loaded: true,
     tabs:[
       { id: 1, title: "Comprobantes", route: '/ventas/list' },
       { id: 2, title: "Presupuesto", route: '/ventas/presupuesto' },
@@ -64,28 +47,9 @@ export default {
 
   mounted() {
     this.$store.commit("eventual/resetStates");
-    this.tenant = this.$route.params.tenant;
-    if (this.loguedUser.perfil > 1) {
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
-    this.filterObjects();
   },
 
   methods: {
-    filterObjects(page) {
-      if (page) this.filterParams.page = page;
-      GenericService(this.tenant, "comprobantesFiscales", this.token)
-        .filter(this.filterParams)
-        .then((data) => {
-          this.ventas = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
-          this.loaded = true;
-        });
-    },
-
     seeDetails(objects) {
       let title = "Productos";
       if (objects[0] && objects[0].cuotas) title = "Planes de pago";

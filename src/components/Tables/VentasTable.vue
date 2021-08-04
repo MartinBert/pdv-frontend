@@ -89,15 +89,12 @@ import Pagination from "../../components/Pagination";
 import Detail from "../Buttons/Detail";
 import Print from "../Buttons/Print";
 export default {
-   props: {
-    items: Array,
-  },
   data: () => ({
     icon: "mdi-check-circle",
     ventas: [],
     loaded: false,
     tenant: "",
-    service: "comprobantesFiscales",
+    service: "ventas",
     token: localStorage.getItem("token"),
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
@@ -109,10 +106,9 @@ export default {
       totalVenta: "",
       page: 1,
       size: 10,
-      totalPages: 0,
     },
     headers: [
-      { text: "Fecha de Venta", value: "fechaEmision.value[0]" },
+      { text: "Fecha de Venta", value: "fechaEmision" },
       { text: "Codigo de barra", value: "barCode" },
       { text: "Comprobante", value: "nombreDocumento", sortable: false },
       { text: "Detalles", value: "productos", sortable: false },
@@ -126,6 +122,7 @@ export default {
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
+
   mounted() {
     this.tenant = this.$route.params.tenant;
      if (this.loguedUser.perfil > 1) {
@@ -139,9 +136,9 @@ export default {
     Detail,
     Print,
   },
+
   methods: {
     filterObjects(page) {
-      console.log(this.filterParams)
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
@@ -153,8 +150,8 @@ export default {
           }
           this.loaded = true;
         });
-        console.log(this.ventas);
     },
+
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
     },
