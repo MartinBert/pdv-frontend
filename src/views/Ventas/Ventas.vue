@@ -29,6 +29,8 @@ export default {
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     loaded: true,
+    token: localStorage.getItem("token"),
+    tenant: "",
     tabs:[
       { id: 1, title: "Comprobantes", route: '/ventas/list' },
       { id: 2, title: "Presupuesto", route: '/ventas/presupuesto' },
@@ -46,6 +48,7 @@ export default {
   },
 
   mounted() {
+    this.tenant = this.$route.params.tenant;
     this.$store.commit("eventual/resetStates");
   },
 
