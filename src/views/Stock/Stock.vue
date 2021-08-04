@@ -72,6 +72,7 @@
         :search="search1"
         class="elevation-6"
         ref="stockTable"
+        hide-default-footer
       >
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small class="mr-2" @click="edit(item)">
@@ -90,7 +91,6 @@
         :totalPages="filterParams.totalPages"
         :totalVisible="7"
         v-on:changePage="filterObjects"
-        v-if="loaded"
       />
       <Spinner v-if="!loaded" />
       <DeleteDialog
@@ -178,7 +178,6 @@ export default {
     migration: [],
     destinationDepositForMigrations: {},
     headers: [
-      {text:"Id", value:"id"},
       { text: "Productos", value: "producto.nombre" },
       { text: "Atributos", value: "producto.atributos[0].valor" },
       { text: "Marca", value: "producto.marca.nombre" },

@@ -10,9 +10,16 @@
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" class="ml-1" />
       </template>
     </v-data-table>
+      <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
   </v-container>
 </template>
 <script>
+import Pagination from "../Pagination";
 import GenericService from "../../services/GenericService";
 import Print from "../Buttons/Print";
 import Detail from "../Buttons/Detail";
@@ -55,6 +62,7 @@ export default {
     Detail,
     Print,
     Delete,
+    Pagination
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -74,6 +82,7 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+        console.log(this.cierres);
     },
     seeDetails(object) {
       this.$emit("seeDetails", object);

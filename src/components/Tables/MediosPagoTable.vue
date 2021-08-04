@@ -29,7 +29,12 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table :headers="headers" :items="mediosPago" class="elevation-6">
+    <v-data-table
+      :headers="headers"
+      :items="mediosPago"
+      class="elevation-6"
+      hide-default-footer
+    >
       <template v-slot:[`item.planPago`]="{ item }">
         <Detail :objectsArray="item.planPago" v-on:seeDetails="seeDetails" />
       </template>
@@ -45,12 +50,8 @@
           v-if="item.sumaEnCierreDeCaja"
         />
       </template>
-      <template v-slot:[`item.aplicaCierreZ`] = {item}>
-       <Add
-          :object="item"
-          v-on:add="addZClosure"
-          v-if="!item.aplicaCierreZ"
-        />
+      <template v-slot:[`item.aplicaCierreZ`]="{ item }">
+        <Add :object="item" v-on:add="addZClosure" v-if="!item.aplicaCierreZ" />
         <Checked
           :object="item"
           v-on:uncheck="uncheckZClosure"
@@ -62,9 +63,16 @@
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
   </v-container>
 </template>
 <script>
+import Pagination from "../Pagination";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
 import Detail from "../Buttons/Detail";
@@ -81,7 +89,7 @@ export default {
       size: 10,
       totalPages: 0,
     },
-    file:"",
+    file: "",
     loaded: false,
     tenant: "",
     service: "mediosPago",
@@ -107,6 +115,7 @@ export default {
     Detail,
     Add,
     Checked,
+    Pagination,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -150,7 +159,7 @@ export default {
     },
 
     addZClosure(object) {
-      this.$emit("addZClosure",object, "addZClosure");
+      this.$emit("addZClosure", object, "addZClosure");
     },
 
     uncheckZClosure(object) {

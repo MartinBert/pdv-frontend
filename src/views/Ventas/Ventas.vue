@@ -12,13 +12,6 @@
         v-on:seeDetails="seeDetails"
         v-if="loaded && activeTab === 1"
       />
-      <Pagination
-        :page="filterParams.page"
-        :totalPages="filterParams.totalPages"
-        :totalVisible="7"
-        v-on:changePage="filterObjects"
-        v-if="loaded && activeTab === 1"
-      />
       <Spinner v-if="!loaded" />
       <VentaDetails />
       <VentasReportsDialog />
@@ -29,7 +22,6 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
-import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import TabBar from "../../components/Generics/TabBar";
 import VentasTable from "../../components/Tables/VentasTable";
@@ -64,7 +56,6 @@ export default {
 
   components: {
     VentasReportsDialog,
-    Pagination,
     Spinner,
     VentasTable,
     VentaDetails,
@@ -83,7 +74,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, "comprobantesFiscales", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;

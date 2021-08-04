@@ -9,13 +9,6 @@
         v-on:deleteItem="deleteItem"
         v-if="loaded"
       />
-      <Pagination
-        :page="filterParams.page"
-        :totalPages="filterParams.totalPages"
-        :totalVisible="7"
-        v-on:changePage="filterObjects"
-        v-if="loaded"
-      />
       <Spinner v-if="!loaded" />
       <DeleteDialog
         :status="deleteDialogStatus"
@@ -28,7 +21,6 @@
 import GenericService from "../../services/GenericService";
 import PuntosVentaTable from "../../components/Tables/PuntosVentaTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
-import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 export default {
   data: () => ({
@@ -54,7 +46,6 @@ export default {
   components: {
     PuntosVentaTable,
     DeleteDialog,
-    Pagination,
     Spinner,
   },
 

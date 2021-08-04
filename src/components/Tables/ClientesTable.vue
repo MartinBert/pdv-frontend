@@ -41,7 +41,7 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table :headers="headers" :items="clientes" class="elevation-6">
+    <v-data-table :headers="headers" :items="clientes" class="elevation-6" hide-default-footer>
       <template v-slot:[`item.detalles`]="{ item }">
         <Detail :object="item" v-on:seeDetails="seeDetails" />
       </template>
@@ -50,9 +50,16 @@
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
     </v-data-table>
+       <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+      />
   </v-container>
 </template>
 <script>
+import Pagination from "../Pagination";
 import GenericService from "../../services/GenericService";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
@@ -89,6 +96,7 @@ export default {
     Edit,
     Delete,
     Detail,
+    Pagination
   },
   mounted() {
     this.tenant = this.$route.params.tenant;

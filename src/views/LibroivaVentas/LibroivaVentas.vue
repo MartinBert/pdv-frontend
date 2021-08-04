@@ -133,16 +133,24 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="documentosComerciales"
+        :items="comprobantesFiscales"
+        hide-default-footer
       >
         <template v-slot:[`item.acciones`]="{}">
           <Print />
         </template>
       </v-data-table>
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+      />
     </v-card>
   </v-container>
 </template>
 <script>
+import Pagination from "../../components/Pagination";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -155,24 +163,27 @@ export default {
         .substr(0, 10)
     ),
     checkbox1: false,
-    checkbox2:false,
-    checkbox3:false,
-    documentosComerciales: [],
-    FiscalCondicion:[],
+    checkbox2: false,
+    checkbox3: false,
+    comprobantesFiscales: [],
+    comprobantesComerciales: [],
+    FiscalCondicion: [],
     file: null,
-
-     filterParams: {
+    sucusal: [],
+    empresa: [],
+    ivas: [],
+    filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
+      validityStatus: false,
       totalVenta: "",
       page: 1,
       size: 10,
       totalPages: 0,
-      tab: null,
-     },
+    },
     loaded: false,
     tenant: "",
     service: "comprobantesFiscales",
@@ -182,26 +193,30 @@ export default {
     menu1: false,
     menu2: false,
     headers: [
-      { text: "Fecha", value: "fechaEmision" },
-      { text: "Comprobante", value: "letra" },
+      { text: "Fecha", value: "fecha" },
+      { text: "Comprobante", value: "documentosComerciales.nombre" },
       { text: "Razon Social", value: "condicionVenta" },
       { text: "Condicion Iva", value: "" },
-      { text: "N° Cuit", value: "" },
+      { text: "N° Cuit", value: "empresa.cuit" },
       { text: "Neto Grabado", value: "" },
-      { text: "Iva 27%", value: "" },
-      { text: "Iva 21%", value: "" },
+      { text: "Iva 27%", value: "ivaCompras" },
+      { text: "Iva 21%", value: "ivaVentas" },
       { text: "Iva 10,5%", value: "" },
       { text: "Iva 0 %", value: "" },
       { text: "Total Facturado", value: "totalVenta" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
+
+  components: {
+    Pagination,
+  },
+
   computed: {
     computedDateFormatted() {
       return this.formatDate(this.date);
     },
   },
-
   watch: {
     date() {
       this.dateFormatted = this.formatDate(this.date);
@@ -213,12 +228,13 @@ export default {
   },
 
   methods: {
- filterObjects(page) {
+    filterObjects(page) {
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.documentosComerciales = data.data.content;
+          this.comprobantesFiscales = data.data.content;
+          console.log(this.comprobantesFiscales);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });

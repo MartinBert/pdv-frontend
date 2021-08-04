@@ -35,7 +35,7 @@
             </v-col>
             <v-col v-if="clasificacion.tipoAtributo === 2">
               <v-text-field
-                type="number"
+                type="Number"
                 v-model="object.valorNumerico"
                 label="Valor numérico"
               ></v-text-field>

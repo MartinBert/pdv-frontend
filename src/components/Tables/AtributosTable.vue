@@ -45,7 +45,7 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table :headers="headers" :items="atributos" class="elevation-6">
+    <v-data-table :headers="headers" :items="atributos" class="elevation-6"  hide-default-footer>
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
           mdi-pencil
@@ -55,15 +55,22 @@
         </v-icon>
       </template>
     </v-data-table>
+      <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+import Pagination from "../Pagination";
 export default {
   data: () => ({
     editedItem: {
       valor: "",
-      valorNumerico: 0,
+      valorNumerico:"",
     },
     atributos: [],
     headers: [
@@ -85,6 +92,9 @@ export default {
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
+  components:{
+    Pagination
+  },
 
   mounted() {
     this.tenant = this.$route.params.tenant;

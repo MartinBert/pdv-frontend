@@ -70,13 +70,6 @@
         v-on:add="reactivationOfProduct"
         v-if="loaded"
       />
-      <Pagination
-        :page="filterParams.page"
-        :totalPages="filterParams.totalPages"
-        :totalVisible="7"
-        v-on:changePage="filterObjects"
-        v-if="loaded"
-      />
       <Spinner v-if="!loaded" />
       <DeleteDialog
         :status="deleteDialogStatus"
@@ -125,7 +118,6 @@
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import Spinner from "../../components/Graphics/Spinner";
-import Pagination from "../../components/Pagination";
 import ProductosTable from "../../components/Tables/ProductosTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import TabBar from "../../components/Generics/TabBar";
@@ -198,7 +190,6 @@ export default {
 
   components: {
     Spinner,
-    Pagination,
     ProductosTable,
     DeleteDialog,
     TabBar

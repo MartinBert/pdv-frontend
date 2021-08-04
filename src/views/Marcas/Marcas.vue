@@ -3,18 +3,10 @@
    margin-right: 40px;
   ">
     <v-card>
-     
       <MarcasTable
         :items="marcas"
         v-on:editItem="edit"
         v-on:deleteItem="deleteItem"
-        v-if="loaded"
-      />
-      <Pagination
-        :page="filterParams.page"
-        :totalPages="filterParams.totalPages"
-        :totalVisible="7"
-        v-on:changePage="filterObjects"
         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
@@ -28,7 +20,6 @@
 <script>
 import GenericService from "../../services/GenericService";
 import MarcasTable from "../../components/Tables/MarcasTable";
-import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import XLSX from "xlsx";
@@ -52,7 +43,6 @@ export default {
 
   components: {
     MarcasTable,
-    Pagination,
     Spinner,
     DeleteDialog,
   },

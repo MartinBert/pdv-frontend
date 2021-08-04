@@ -2,13 +2,6 @@
   <v-container style="min-width: 100%;">
     <v-card>
       <CajaTable :items="objects" v-on:seeDetails="seeDetails" v-if="loaded" />
-      <Pagination
-        :page="filterParams.page"
-        :totalPages="filterParams.totalPages"
-        :totalVisible="7"
-        v-on:changePage="filterObjects"
-        v-if="loaded"
-      />
       <Spinner v-if="!loaded" />
       <CajaDetails />
     </v-card>
@@ -19,7 +12,6 @@ import GenericService from "../../services/GenericService";
 import CajaDetails from "../../components/Details/CajaDetails";
 import Spinner from "../../components/Graphics/Spinner";
 import CajaTable from "../../components/Tables/CajaTable";
-import Pagination from "../../components/Pagination";
 import axios from "axios";
 export default {
   data: () => ({
@@ -43,7 +35,6 @@ export default {
     CajaDetails,
     Spinner,
     CajaTable,
-    Pagination,
   },
 
   mounted() {

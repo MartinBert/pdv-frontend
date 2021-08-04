@@ -9,13 +9,6 @@
         v-on:deleteItem="deleteItem"
         v-if="loaded"
       />
-      <Pagination
-        :page="filterParams.page"
-        :totalPages="filterParams.totalPages"
-        :totalVisible="7"
-        v-on:changePage="filterObjects"
-        v-if="loaded"
-      />
       <Spinner v-if="!loaded" />
       <DeleteDialog
         :status="deleteDialogStatus"
@@ -29,7 +22,6 @@ import GenericService from "../../services/GenericService";
 import DocumentosComercialesTable from "../../components/Tables/DocumentosComercialesTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import Spinner from "../../components/Graphics/Spinner";
-import Pagination from "../../components/Pagination";
 import XLSX from "xlsx";
 export default {
   data: () => ({
@@ -52,7 +44,6 @@ export default {
 
   components: {
     DocumentosComercialesTable,
-    Pagination,
     Spinner,
     DeleteDialog,
   },

@@ -52,13 +52,6 @@
         v-on:seeDetails="seeDetails"
         v-if="loaded"
       />
-      <Pagination
-        :page="filterParams.page"
-        :totalPages="filterParams.totalPages"
-        :totalVisible="7"
-        v-on:changePage="filterObjects"
-        v-if="loaded"
-      />
       <Spinner v-if="!loaded" />
       <DeleteDialog
         :status="deleteDialogStatus"
@@ -72,7 +65,6 @@
 import GenericService from "../../services/GenericService";
 import DistribuidoresTable from "../../components/Tables/DistribuidoresTable";
 import Spinner from "../../components/Graphics/Spinner";
-import Pagination from "../../components/Pagination";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import DistribuidorDetail from "../../components/Details/DistribuidorDetails";
 export default {
@@ -98,7 +90,6 @@ export default {
   }),
 
   components: {
-    Pagination,
     DistribuidoresTable,
     DistribuidorDetail,
     DeleteDialog,
