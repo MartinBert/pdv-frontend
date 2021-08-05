@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="1">
           <v-btn class="primary" @click="generateZClosure()" raised
-            >Realizar cierre z diario</v-btn
+            >Realizar cierre ventas diario</v-btn
           >
         </v-col>
         <v-col></v-col>
