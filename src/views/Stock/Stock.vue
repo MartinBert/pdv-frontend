@@ -156,7 +156,7 @@ export default {
       sucursalId: "",
       perfilId: "",
       page: 1,
-      size: 1000,
+      size: 10,
       totalPages: 0,
     },
     depositsFilterParams: {
