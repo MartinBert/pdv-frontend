@@ -3,28 +3,6 @@
   <v-container style="min-width: 97%;">
     <TabBar :tabs="tabs" :activeTab="activeTab" />
     <v-card min-width="100%">
-      <v-form class="mb-3" v-if="loaded">
-        <v-row>
-          <v-col cols="1">
-            <v-btn class="primary" @click="generateZClosure()" raised
-              >Realizar cierre z diario</v-btn
-            >
-          </v-col>
-          <v-col></v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="filterParams.marcaName"
-              v-on:input="filterObjects()"
-              dense
-              outlined
-              rounded
-              class="text-left"
-              placeholder="Búsqueda"
-              append-icon="mdi-magnify"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
       <CierrezTable
         :items="cierres"
         v-on:seeDetails="seeDetails"

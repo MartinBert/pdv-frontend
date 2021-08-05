@@ -23,7 +23,12 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table class="elevation-6" :headers="headers" :items="objects">
+    <v-data-table
+      class="elevation-6"
+      :headers="headers"
+      :items="objects"
+      hide-default-footer
+    >
       <template v-slot:[`item.detalles`]="{ item }">
         <Detail :object="item" v-on:seeDetails="seeDetails" />
       </template>
@@ -65,7 +70,7 @@ export default {
   }),
   components: {
     Detail,
-    Pagination
+    Pagination,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;

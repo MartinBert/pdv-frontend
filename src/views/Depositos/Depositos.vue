@@ -49,8 +49,15 @@
         hide-default-footer
       >
         <template v-slot:[`item.depositoporDefecto`]="{ item }">
-          <v-checkbox color="indigo" :isChecked="isChecked" @click="selectDefaultDeposit1(item)">
-          </v-checkbox>
+             <Add
+              v-if="!item.depositoporDefecto == '1'"
+              @click="selectDefaultDeposit(item)"
+            />
+            <Checked
+              :object="item"
+              v-on:uncheck="uncheck"
+              v-if="item.depositoporDefecto"
+            />
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)">
@@ -83,6 +90,8 @@
   </v-container>
 </template>
 <script>
+import Add  from "../../components/Buttons/Add";
+import Checked from "../../components/Buttons/Checked";
 import GenericService from "../../services/GenericService";
 import XLSX from "xlsx";
 import StockHistoryDialog from "../../components/Dialogs/StockHistoryDialog";
@@ -91,15 +100,16 @@ import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 export default {
-  props:{
-    isChecked:[]
+  props: {
+    isChecked: [],
   },
   data: () => ({
+    radioGroup:"",
     item: "",
-    selected: [],
+    selected: "",
     stocks: [],
     depositos: [],
-    defaultDeposit:[],
+    defaultDeposit: [],
     file: null,
     filterParams: {
       depositoName: "",
@@ -129,6 +139,8 @@ export default {
     DeleteDialog,
     Spinner,
     Pagination,
+    Add,
+    Checked
   },
 
   mounted() {
@@ -159,6 +171,16 @@ export default {
         });
     },
 
+    add(object) {
+      this.$emit("add", object);
+    },
+    uncheck(object) {
+      this.$emit("uncheck", object);
+    },
+
+    selectDefaultDeposit2(object) {
+      this.$emit("selectDefaultDeposit", object);
+    },
     initIsChecked: function() {
       const stored = localStorage.getItem("isChecked");
       if (stored === null) {
@@ -263,33 +285,68 @@ export default {
       this.$store.commit("stocks/stockHistoryDialogMutation");
     },
 
-      selectDefaultDeposit1(deposit) {
+    addDepositDefault(deposit) {
+       GenericService(this.tenant, this.service, this.token)
+       .filter(this.filterParams)
+       .then((data)=>{
+         let allDeposits = data.data.content;
+         let allDefaultDeposits = allDeposits.filter(el=>el.defaultDeposit==="1");
+         if(allDefaultDeposits.length > 0){
+           let defaultBranchDeposit = allDefaultDeposits.filter(el => el.sucursales.id === deposit.sucursales.id)[0];
+         
+         if(defaultBranchDeposit.length > 0){
+          this.defaultDeposit = this.defaultBranchDeposit.filter((el) => el.id != deposit.id);
+          this.deposit.filter((el) => el.id === deposit.id)[0].selected = false;
+          this.$refs.depositosTable.$forceUpdate();
+         }else {
+          this.defaultDeposit.push(allDefaultDeposits);
+          this.deposit.filter((el) => el.id === deposit.id)[0].selected = true;
+          this.$refs.depositosTable.$forceUpdate();
+        }
+        } else {
+        this.defaultDeposit.push(allDefaultDeposits);
+        this.deposit.filter((el) => el.id === deposit.id)[0].selected = true;
+        this.$refs.depositosTable.$forceUpdate();
+        }
+       })
+       console.log(this.defaultDeposit);
+    },
+    selectDefaultDeposit1(deposit){
       this.loaded = false;
       const filterParams = {
+        id:"",
         depositoName: "",
         perfilId: this.loguedUser.perfil,
         sucursalId: this.loguedUser.sucursal.id,
         page: 1,
-        size: 100000
-      }
+        size: 100000,
+      };
       GenericService(this.tenant, this.service, this.token)
         .filter(filterParams)
         .then((data) => {
           let allDeposits = data.data.content;
-          let allDefaultDeposits = allDeposits.filter(el => el.defaultDeposit === "1");
+          let allDefaultDeposits = allDeposits.filter(
+            (el) => el.defaultDeposit === "1"
+          );
+
           if (allDefaultDeposits.length > 0) {
-            let defaultBranchDeposit = allDefaultDeposits.filter(el => el.sucursales.id === deposit.sucursales.id)[0];
-            
-            if(defaultBranchDeposit){
-              this.modifyDepositStatus(defaultBranchDeposit, 'nullDefaultStatus')
-              this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+            let defaultBranchDeposit = allDefaultDeposits.filter(
+              (el) => el.sucursales.id === deposit.sucursales.id
+            )[0];
+
+            if (defaultBranchDeposit) {
+              this.modifyDepositStatus(
+                defaultBranchDeposit,
+                "nullDefaultStatus"
+              );
+              this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
               this.refreshView();
-            }else{
-              this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+            } else {
+              this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
               this.refreshView();
             }
           } else {
-            this.modifyDepositStatus(deposit, 'changeStatusToDefaultDeposit')
+            this.modifyDepositStatus(deposit, "changeStatusToDefaultDeposit");
             this.refreshView();
           }
         });
@@ -307,7 +364,7 @@ export default {
         } else {
           this.defaultDeposit.push(item);
           this.depositos.filter((el) => el.id === item.id)[0].selected = true;
-           this.$refs.depositosTable.$forceUpdate();
+          this.$refs.depositosTable.$forceUpdate();
         }
       } else {
         this.defaultDeposit.push(item);

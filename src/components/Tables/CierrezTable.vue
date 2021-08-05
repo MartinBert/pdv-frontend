@@ -1,6 +1,28 @@
 <template>
   <v-container style="min-width: 98%;">
-    <v-data-table class="elevation-6" :headers="headers" :items="cierres">
+    <v-form class="mb-3" v-if="loaded">
+      <v-row>
+        <v-col cols="1">
+          <v-btn class="primary" @click="generateZClosure()" raised
+            >Realizar cierre z diario</v-btn
+          >
+        </v-col>
+        <v-col></v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="search"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
+    <v-data-table class="elevation-6" :headers="headers" :items="cierres" :search="search">
       <template v-slot:[`item.acciones`]="{ item }">
         <Detail
           :objectsArray="item.comprobantesFiscales"
@@ -10,7 +32,7 @@
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" class="ml-1" />
       </template>
     </v-data-table>
-      <Pagination
+    <Pagination
       :page="filterParams.page"
       :totalPages="filterParams.totalPages"
       :totalVisible="7"
@@ -26,6 +48,7 @@ import Detail from "../Buttons/Detail";
 import Delete from "../Buttons/Delete";
 export default {
   data: () => ({
+    search:"",
     cierres: [],
     comprobantes: [],
     file: null,
@@ -62,7 +85,7 @@ export default {
     Detail,
     Print,
     Delete,
-    Pagination
+    Pagination,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -82,7 +105,7 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-        console.log(this.cierres);
+      console.log(this.cierres);
     },
     seeDetails(object) {
       this.$emit("seeDetails", object);
