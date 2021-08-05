@@ -51,24 +51,19 @@
         </v-col>
         <v-col>
           <form @submit.prevent="migrateStockToOtherDeposit()">
-            <v-autocomplete
-              :items="realDeposits"
-              item-text="nombre"
-              :return-object="true"
-              label="A depósito"
-              v-model="destinationDepositForMigrations"
-              required
-              style="width: 250px"
-            />
-            <v-btn
-              class="primary"
-              type="submit"
-              style="margin-left:300px;
+          <v-autocomplete
+            :items="realDeposits"
+            item-text="nombre"
+            :return-object="true"
+            label="A depósito"
+            v-model="destinationDepositForMigrations"
+            required
+            style="width: 250px"
+          />
+          <v-btn class="primary" type="submit" style="margin-left:300px;
           margin-top:-120px
-          "
-              >Migrar seleccionados</v-btn
-            >
-          </form>
+          ">Migrar seleccionados</v-btn>
+        </form>
         </v-col>
       </v-row>
       <v-data-table
@@ -136,8 +131,10 @@ export default {
     level: {},
   },
   data: () => ({
-    depositoRules: [(v) => !!v || "Campo requerido"],
-    required: {
+     depositoRules: [
+        v => !!v || 'Campo requerido',
+      ],
+     required: {
       type: Boolean,
       default: false,
     },
@@ -159,7 +156,7 @@ export default {
       sucursalId: "",
       perfilId: "",
       page: 1,
-      size: 1000000,
+      size: 10,
       totalPages: 0,
     },
     depositsFilterParams: {
@@ -167,7 +164,7 @@ export default {
       perfilId: "",
       sucursalId: "",
       page: 1,
-      size: 100000,
+      size: 20000,
     },
     productos: [],
     loaded: false,
@@ -190,7 +187,7 @@ export default {
       { text: "Cantidad Minima", value: "cantidadMinima" },
       { text: "Deposito", value: "deposito.nombre" },
       { text: "Acciones", value: "acciones", sortable: false },
-      { text: "Migrar a otro Deposito", value: "migrar", sortable: false },
+      { text: "Migrar a otro Deposito", value: "migrar", sortable:false},
     ],
   }),
   components: {
