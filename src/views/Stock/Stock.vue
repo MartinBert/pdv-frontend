@@ -213,7 +213,8 @@ export default {
     this.getOtherModels();
   },
   methods: {
-    filterObjects() {
+    filterObjects(page) {
+       if (page) this.filterParams.page = page;
       if (this.typeList > 0) {
         this.searchForDeposit(this.typeList);
       } else {

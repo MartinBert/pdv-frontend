@@ -49,15 +49,12 @@
         hide-default-footer
       >
         <template v-slot:[`item.depositoporDefecto`]="{ item }">
-             <Add
-              v-if="!item.depositoporDefecto == '1'"
-              @click="selectDefaultDeposit(item)"
-            />
-            <Checked
-              :object="item"
-              v-on:uncheck="uncheck"
-              v-if="item.depositoporDefecto"
-            />
+          <v-checkbox
+            :on-icon="'mdi-check'"
+            :off-icon="'mdi-plus'"
+            @click="selectDefaultDeposit1(item)"
+          >
+          </v-checkbox>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)">
@@ -90,8 +87,6 @@
   </v-container>
 </template>
 <script>
-import Add  from "../../components/Buttons/Add";
-import Checked from "../../components/Buttons/Checked";
 import GenericService from "../../services/GenericService";
 import XLSX from "xlsx";
 import StockHistoryDialog from "../../components/Dialogs/StockHistoryDialog";
@@ -104,7 +99,7 @@ export default {
     isChecked: [],
   },
   data: () => ({
-    radioGroup:"",
+    radioGroup: "",
     item: "",
     selected: "",
     stocks: [],
@@ -120,7 +115,6 @@ export default {
       totalPages: 0,
     },
     headers: [
-      { text: "Id", value: "id" },
       { text: "Nombre", value: "nombre" },
       { text: "Deposito predeterminado", value: "depositoporDefecto" },
       { text: "Acciones", value: "acciones", sortable: false },
@@ -139,8 +133,6 @@ export default {
     DeleteDialog,
     Spinner,
     Pagination,
-    Add,
-    Checked
   },
 
   mounted() {
@@ -286,35 +278,47 @@ export default {
     },
 
     addDepositDefault(deposit) {
-       GenericService(this.tenant, this.service, this.token)
-       .filter(this.filterParams)
-       .then((data)=>{
-         let allDeposits = data.data.content;
-         let allDefaultDeposits = allDeposits.filter(el=>el.defaultDeposit==="1");
-         if(allDefaultDeposits.length > 0){
-           let defaultBranchDeposit = allDefaultDeposits.filter(el => el.sucursales.id === deposit.sucursales.id)[0];
-         
-         if(defaultBranchDeposit.length > 0){
-          this.defaultDeposit = this.defaultBranchDeposit.filter((el) => el.id != deposit.id);
-          this.deposit.filter((el) => el.id === deposit.id)[0].selected = false;
-          this.$refs.depositosTable.$forceUpdate();
-         }else {
-          this.defaultDeposit.push(allDefaultDeposits);
-          this.deposit.filter((el) => el.id === deposit.id)[0].selected = true;
-          this.$refs.depositosTable.$forceUpdate();
-        }
-        } else {
-        this.defaultDeposit.push(allDefaultDeposits);
-        this.deposit.filter((el) => el.id === deposit.id)[0].selected = true;
-        this.$refs.depositosTable.$forceUpdate();
-        }
-       })
-       console.log(this.defaultDeposit);
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          let allDeposits = data.data.content;
+          let allDefaultDeposits = allDeposits.filter(
+            (el) => el.defaultDeposit === "1"
+          );
+          if (allDefaultDeposits.length > 0) {
+            let defaultBranchDeposit = allDefaultDeposits.filter(
+              (el) => el.sucursales.id === deposit.sucursales.id
+            )[0];
+
+            if (defaultBranchDeposit.length > 0) {
+              this.defaultDeposit = this.defaultBranchDeposit.filter(
+                (el) => el.id != deposit.id
+              );
+              this.deposit.filter(
+                (el) => el.id === deposit.id
+              )[0].selected = false;
+              this.$refs.depositosTable.$forceUpdate();
+            } else {
+              this.defaultDeposit.push(allDefaultDeposits);
+              this.deposit.filter(
+                (el) => el.id === deposit.id
+              )[0].selected = true;
+              this.$refs.depositosTable.$forceUpdate();
+            }
+          } else {
+            this.defaultDeposit.push(allDefaultDeposits);
+            this.deposit.filter(
+              (el) => el.id === deposit.id
+            )[0].selected = true;
+            this.$refs.depositosTable.$forceUpdate();
+          }
+        });
+      console.log(this.defaultDeposit);
     },
-    selectDefaultDeposit1(deposit){
+    selectDefaultDeposit1(deposit) {
       this.loaded = false;
       const filterParams = {
-        id:"",
+        id: "",
         depositoName: "",
         perfilId: this.loguedUser.perfil,
         sucursalId: this.loguedUser.sucursal.id,
@@ -388,7 +392,7 @@ export default {
     refreshView() {
       setTimeout(() => {
         this.filterObjects();
-      }, 500);
+      }, 300);
     },
   },
 
