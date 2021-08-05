@@ -156,7 +156,7 @@ export default {
       sucursalId: "",
       perfilId: "",
       page: 1,
-      size: 10,
+      size: 1000,
       totalPages: 0,
     },
     depositsFilterParams: {
@@ -164,7 +164,7 @@ export default {
       perfilId: "",
       sucursalId: "",
       page: 1,
-      size: 20000,
+      size: 10,
     },
     productos: [],
     loaded: false,

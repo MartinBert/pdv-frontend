@@ -48,11 +48,11 @@
         ref="depositosTable"
         hide-default-footer
       >
-        <template v-slot:[`item.depositoporDefecto`]="{ item }">
+        <template v-slot:[`item.depositoporDefecto`]="{ item}">
           <v-checkbox
             :on-icon="'mdi-check'"
             :off-icon="'mdi-plus'"
-            @click="selectDefaultDeposit1(item)"
+            @click="selectDefaultDeposit(item)"
           >
           </v-checkbox>
         </template>
