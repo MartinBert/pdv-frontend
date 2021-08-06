@@ -72,11 +72,12 @@ export default {
       valor: "",
       valorNumerico:"",
     },
+    file:"",
     atributos: [],
     headers: [
       { text: "Id", value: "id" },
       { text: "Text", value: "valor" },
-      { text: "Valor Numerico", value: "valorNumerico" },
+      { text: "Valor Numerico", value: "valor" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
     filterParams: {

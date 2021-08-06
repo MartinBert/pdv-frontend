@@ -115,15 +115,6 @@
       </v-col>
     </v-row>
       </v-row>
-      <StocksTable
-      :items="productos"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-on:add="addToMigration"
-      v-on:uncheck="removeOfMigration"
-      v-if="loaded"
-      ref="stockTable"
-    />
       <v-data-table
         :headers="headers"
         :items="stocks"
@@ -225,7 +216,7 @@ export default {
     productos: [],
     loaded: false,
     tenant: "",
-    service: "stock",
+    service: "ventas",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     depositos: [],

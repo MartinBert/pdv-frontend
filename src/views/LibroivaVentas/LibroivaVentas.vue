@@ -189,15 +189,15 @@ export default {
     },
     loaded: false,
     tenant: "",
-    service: "documentosComerciales",
+    service: "ventas",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     menu1: false,
     menu2: false,
     headers: [
-      { text: "Fecha", value: "venta.fechaEmision.value" },
-      { text: "Comprobante", value: "tipo"},
+      { text: "Fecha", value: "fechaEmision" },
+      { text: "Comprobante", value: "documento.tipo"},
       { text: "Razon Social", value: "razonSocial" },
       { text: "Condicion Iva", value: "nombre" },
       { text: "N° Cuit", value: "cuit" },
@@ -233,7 +233,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;

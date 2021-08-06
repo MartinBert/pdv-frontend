@@ -35,8 +35,9 @@
             </v-col>
             <v-col v-if="clasificacion.tipoAtributo === 2">
               <v-text-field
-                type="Number"
-                v-model="object.valorNumerico"
+                type="text"
+                oninput="this.value=this.value.replace(/[^0-9.]/g,'');"
+                v-model="object.valor"
                 label="Valor numérico"
               ></v-text-field>
             </v-col>
