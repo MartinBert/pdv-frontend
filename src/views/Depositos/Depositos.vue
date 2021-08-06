@@ -48,13 +48,14 @@
         ref="depositosTable"
         hide-default-footer
       >
-        <template v-slot:[`item.depositoporDefecto`]="{ item}">
+        <template v-slot:[`item.defaultDeposit`]="{ item , index}">
+          <p v-show="viewCheckboxState === 1">
+            {{(item.defaultDeposit) ? checkboxModel[index] = true : checkboxModel[index] = false}}
+          </p>
           <v-checkbox
-            :on-icon="'mdi-check'"
-            :off-icon="'mdi-plus'"
-            @click="selectDefaultDeposit1(item)"
-          >
-          </v-checkbox>
+           v-model="checkboxModel[index]"
+           @change="selectDefaultDeposit1(item)"
+          ></v-checkbox>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)">
@@ -103,9 +104,11 @@ export default {
     item: "",
     selected: "",
     stocks: [],
+    checkboxModel:{},
     depositos: [],
     defaultDeposit: [],
     file: null,
+    viewCheckboxState: 0,
     filterParams: {
       depositoName: "",
       perfilId: "",
@@ -116,7 +119,7 @@ export default {
     },
     headers: [
       { text: "Nombre", value: "nombre" },
-      { text: "Deposito predeterminado", value: "depositoporDefecto" },
+      { text: "Deposito predeterminado", value: "defaultDeposit" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
     loaded: false,

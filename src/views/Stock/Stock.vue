@@ -50,7 +50,7 @@
             margin-left:200px;
             "
           />
-          <v-btn class="primary" type="submit" style="margin-left:750px;
+          <v-btn class="primary" type="submit" style="margin-left:600px;
           margin-top:-120px
           ">Migrar seleccionados</v-btn>
         </form>

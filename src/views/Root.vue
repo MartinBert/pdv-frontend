@@ -150,6 +150,12 @@ export default {
             title: "Presupuesto",
             visible: false,
           },
+           {
+            path: "/ventas/devoluciones",
+            name: "devoluciones",
+            title: "Devoluciones",
+            visible: false,
+          },
           {
             path: "/ventas/cierrez",
             name: "Cierrez",
