@@ -52,7 +52,7 @@
           <v-checkbox
             :on-icon="'mdi-check'"
             :off-icon="'mdi-plus'"
-            @click="selectDefaultDeposit(item)"
+            @click="selectDefaultDeposit1(item)"
           >
           </v-checkbox>
         </template>

@@ -133,11 +133,13 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="comprobantesFiscales"
+        :items="ventas"
         hide-default-footer
       >
-        <template v-slot:[`item.acciones`]="{}">
-          <Print />
+        <template v-slot:[`item.acciones`]="{item}">
+          <Print 
+           :itemId="item.id"
+          />
         </template>
       </v-data-table>
       <Pagination
@@ -165,6 +167,7 @@ export default {
     checkbox1: false,
     checkbox2: false,
     checkbox3: false,
+    ventas:[],
     comprobantesFiscales: [],
     comprobantesComerciales: [],
     FiscalCondicion: [],
@@ -186,18 +189,18 @@ export default {
     },
     loaded: false,
     tenant: "",
-    service: "comprobantesFiscales",
+    service: "documentosComerciales",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     menu1: false,
     menu2: false,
     headers: [
-      { text: "Fecha", value: "fecha" },
-      { text: "Comprobante", value: "documentosComerciales.nombre" },
-      { text: "Razon Social", value: "condicionVenta" },
-      { text: "Condicion Iva", value: "" },
-      { text: "N° Cuit", value: "empresa.cuit" },
+      { text: "Fecha", value: "venta.fechaEmision.value" },
+      { text: "Comprobante", value: "tipo"},
+      { text: "Razon Social", value: "razonSocial" },
+      { text: "Condicion Iva", value: "nombre" },
+      { text: "N° Cuit", value: "cuit" },
       { text: "Neto Grabado", value: "" },
       { text: "Iva 27%", value: "ivaCompras" },
       { text: "Iva 21%", value: "ivaVentas" },
@@ -230,14 +233,16 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
+      GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.comprobantesFiscales = data.data.content;
-          console.log(this.comprobantesFiscales);
+          this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+
+        console.log(this.ventas);
+
     },
 
     formatDate(date) {

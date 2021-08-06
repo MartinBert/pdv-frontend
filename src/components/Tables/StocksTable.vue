@@ -1,6 +1,6 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-data-table :headers="headers" :items="stock" class="elevation-6">
+    <v-data-table :headers="headers" :items="productos" class="elevation-6" ref="stockTable">
       <template v-slot:[`item.acciones`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
           mdi-pencil
@@ -17,7 +17,8 @@ import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
 export default {
   data: () => ({
-    stock: [],
+    stocks: [],
+    productos:[],
     filterParams: {
       productoName: "",
       productoCodigo: "",
@@ -54,7 +55,7 @@ export default {
     perfilId:"",
     loaded: false,
     tenant: "",
-    service: "stock",
+    service: "productos",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     depositos: [],
@@ -70,27 +71,18 @@ export default {
       //this.filterParams.sucursalId = this.loguedUser.sucursal.id;
       //this.depositsFilterParams.sucursalId = this.loguedUser.sucursal.id;
     //}
-    this.items();
     this.getOtherModels();
-    this.filterObjects();
+    this.search();
   },
   methods: {
-    filterObjects(page) {
-      if (page) this.filterParams.page = page;
-      if (this.typeList > 0) {
-        this.searchForDeposit(this.typeList);
-      } else {
-        this.search();
-      }
-    },
     search() {
-      GenericService(this.tenant, "stock", this.token)
+      GenericService(this.tenant, "productos", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.stocks = data.data.content;
+          this.productos = data.data.content;
           if (this.migration.length > 0) {
             this.migration.filter((el) => {
-              this.stocks.filter((e) => {
+              this.productos.filter((e) => {
                 if (el.id === e.id) {
                   e.selected = true;
                 }
@@ -124,16 +116,6 @@ export default {
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
           }
-          this.loaded = true;
-        });
-    },
-
-    items() {
-      GenericService(this.tenant, "stock", this.token)
-        .filter(this.filterParams)
-        .then((data) => {
-          this.stock = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },

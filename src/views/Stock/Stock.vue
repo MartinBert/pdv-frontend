@@ -25,7 +25,7 @@
     </v-tabs>
     <br />
     <v-card>
-      <v-row class="ml-1">
+       <v-row class="ml-1">
         <v-col cols="3">
           <v-autocomplete
             :items="depositos"
@@ -35,19 +35,6 @@
             v-model="typeList"
             @change="filterObjects()"
           />
-        </v-col>
-        <v-col cols="3">
-          <v-text-field
-            v-model="search1"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left mt-2"
-            label="Buscar en Todo"
-            append-icon="mdi-magnify"
-            style="width: 500px"
-          ></v-text-field>
         </v-col>
         <v-col>
           <form @submit.prevent="migrateStockToOtherDeposit()">
@@ -65,11 +52,81 @@
           ">Migrar seleccionados</v-btn>
         </form>
         </v-col>
+        <v-row style="justify-content: center;" class="mt-1">
+              <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Nombre"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+          <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoMarcaName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Marca"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoCodigo"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Codigo de producto"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productosCodigoBarras"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Codigo de barras"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field
+          v-model="filterParams.productoPrimerAtributoName"
+          v-on:input="filterObjects()"
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Atributo"
+          append-icon="mdi-magnify"
+        />
+      </v-col>
+    </v-row>
       </v-row>
+      <StocksTable
+      :items="productos"
+      v-on:editItem="edit"
+      v-on:deleteItem="deleteItem"
+      v-on:add="addToMigration"
+      v-on:uncheck="removeOfMigration"
+      v-if="loaded"
+      ref="stockTable"
+    />
       <v-data-table
         :headers="headers"
         :items="stocks"
-        :search="search1"
         class="elevation-6"
         ref="stockTable"
         hide-default-footer
@@ -140,7 +197,6 @@ export default {
     },
     check: false,
     selected: [],
-    search1: "",
     stocks: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
