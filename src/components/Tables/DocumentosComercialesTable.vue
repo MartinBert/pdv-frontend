@@ -50,7 +50,7 @@
         >
       </template>
       <template v-slot:[`item.acciones`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
+        <v-icon :itemId="item.id" v-on:editItem="editItem">
           mdi-pencil
         </v-icon>
         <v-icon small @click="deleteItem(item)">

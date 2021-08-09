@@ -25,7 +25,7 @@
     </v-tabs>
     <br />
     <v-card>
-       <v-row class="ml-1">
+      <v-row class="ml-1">
         <v-col cols="4">
           <v-autocomplete
             style="margin-left:300px"
@@ -39,84 +39,89 @@
         </v-col>
         <v-col>
           <form @submit.prevent="migrateStockToOtherDeposit()">
-          <v-autocomplete
-            :items="realDeposits"
-            item-text="nombre"
-            :return-object="true"
-            label="A depósito"
-            v-model="destinationDepositForMigrations"
-            required
-            style="width: 250px;
+            <v-autocomplete
+              :items="realDeposits"
+              item-text="nombre"
+              :return-object="true"
+              label="A depósito"
+              v-model="destinationDepositForMigrations"
+              required
+              style="width: 250px;
             margin-left:200px;
             "
-          />
-          <v-btn class="primary" type="submit" style="margin-left:600px;
+            />
+            <v-btn
+              class="primary"
+              type="submit"
+              style="margin-left:600px;
           margin-top:-120px
-          ">Migrar seleccionados</v-btn>
-        </form>
+          "
+              >Migrar seleccionados</v-btn
+            >
+          </form>
         </v-col>
         <v-row style="justify-content: center;" class="mt-1">
-              <v-col cols="2">
-        <v-text-field
-          v-model="filterParams.productoName"
-          v-on:input="filterObjects()"
-          dense
-          outlined
-          rounded
-          class="text-left"
-          label="Nombre"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-      </v-col>
           <v-col cols="2">
-        <v-text-field
-          v-model="filterParams.productoMarcaName"
-          v-on:input="filterObjects()"
-          dense
-          outlined
-          rounded
-          class="text-left"
-          label="Marca"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="2">
-        <v-text-field
-          v-model="filterParams.productoCodigo"
-          v-on:input="filterObjects()"
-          dense
-          outlined
-          rounded
-          class="text-left"
-          label="Codigo de producto"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="2">
-        <v-text-field
-          v-model="filterParams.productosCodigoBarras"
-          v-on:input="filterObjects()"
-          dense
-          outlined
-          rounded
-          class="text-left"
-          label="Codigo de barras"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="2">
-        <v-text-field
-          v-model="filterParams.productoPrimerAtributoName"
-          v-on:input="filterObjects()"
-          dense
-          outlined
-          rounded
-          class="text-left"
-          label="Atributo"
-          append-icon="mdi-magnify"
-        />
-      </v-col>
-    </v-row>
+            <v-text-field
+              v-model="filterParams.productoName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Nombre"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productoMarcaName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Marca"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productoCodigo"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Codigo de producto"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productosCodigoBarras"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Codigo de barras"
+              append-icon="mdi-magnify"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model="filterParams.productoPrimerAtributoName"
+              v-on:input="filterObjects()"
+              dense
+              outlined
+              rounded
+              class="text-left"
+              label="Atributo"
+              append-icon="mdi-magnify"
+            />
+          </v-col>
+        </v-row>
       </v-row>
       <v-data-table
         :headers="headers"
@@ -126,12 +131,12 @@
         hide-default-footer
       >
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small class="mr-2" @click="edit(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="deleteItem(item)">
-            mdi-delete
-          </v-icon>
+           <Edit :itemId="item.id" v-on:editItem="editItem" />
+            <Delete
+              :itemId="item.id"
+              v-on:deleteItem="deleteItem"
+              v-if="item.estado != 2"
+            />
         </template>
         <template v-slot:[`item.migrar`]="{ item }">
           <v-checkbox color="indigo" @click="addToMigration(item)"></v-checkbox>
@@ -164,6 +169,8 @@
   </v-container>
 </template>
 <script>
+import Edit from "../../components/Buttons/Edit";
+import Delete from "../../components/Buttons/Delete";
 //import Add from "../../components/Buttons/Add.vue";
 //import Checked from "../../components/Buttons/Checked.vue";
 import GenericService from "../../services/GenericService";
@@ -182,10 +189,8 @@ export default {
     level: {},
   },
   data: () => ({
-     depositoRules: [
-        v => !!v || 'Campo requerido',
-      ],
-     required: {
+    depositoRules: [(v) => !!v || "Campo requerido"],
+    required: {
       type: Boolean,
       default: false,
     },
@@ -237,13 +242,15 @@ export default {
       { text: "Cantidad Minima", value: "cantidadMinima" },
       { text: "Deposito", value: "deposito.nombre" },
       { text: "Acciones", value: "acciones", sortable: false },
-      { text: "Migrar a otro Deposito", value: "migrar", sortable:false},
+      { text: "Migrar a otro Deposito", value: "migrar", sortable: false },
     ],
   }),
   components: {
     ModifyMinimumStocksDialog,
     DepositMigrationDialog,
     StockReportsDialog,
+    Edit,
+    Delete,
     //StocksTable,
     Pagination,
     Spinner,
@@ -272,7 +279,7 @@ export default {
       }
     },
     search() {
-      GenericService(this.tenant,this.service, this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.stocks = data.data.content;
@@ -332,12 +339,14 @@ export default {
     newObject() {
       this.$router.push({ name: "stockForm", params: { id: 0 } });
     },
+     editItem(itemId) {
+      this.$emit("editItem", itemId);
+    },
+    deleteItem(itemId) {
+      this.$emit("deleteItem", itemId);
+    },
     edit(id) {
       this.$router.push({ name: "stockForm", params: { id: id } });
-    },
-    deleteItem(id) {
-      this.idObjet = id;
-      this.deleteDialogStatus = true;
     },
     deleteConfirmation(result) {
       return result ? this.deleteObject() : (this.deleteDialogStatus = false);
