@@ -22,7 +22,7 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table class="elevation-6" :headers="headers" :items="cierres" :search="search">
+    <v-data-table class="elevation-6" :headers="headers" :items="cierres" :search="search"  hide-default-footer>
       <template v-slot:[`item.acciones`]="{ item }">
         <Detail
           :objectsArray="item.comprobantesFiscales"
@@ -48,6 +48,12 @@ import GenericService from "../../services/GenericService";
 import Print from "../Buttons/Print";
 import Detail from "../Buttons/Detail";
 import Delete from "../Buttons/Delete";
+import { questionAlert } from "../../helpers/alerts";
+import {
+  roundTwoDecimals,
+  calculatePercentReductionInAmount,
+  sumarNumeros,
+} from "../../helpers/mathHelper";
 export default {
   data: () => ({
     search:"",
@@ -109,7 +115,7 @@ export default {
         });
       console.log(this.cierres);
     },
-      generateZClosure() {
+    generateZClosure() {
       this.loaded = false;
       this.invoiceFilterParams.fechaEmision = formatDate(getCurrentDate());
       VentasService(this.tenant, "ventas", this.token)
@@ -118,6 +124,241 @@ export default {
           this.comprobantes = data.data.content;
           this.closeOrCancelZ();
         });
+    },
+     async closeOrCancelZ() {
+      questionAlert(
+        "Este proceso realizará el cierre z diario",
+        "Desea continuar"
+      ).then((result) => {
+        this.comprobantes.forEach((comprobante) => {
+          comprobante.cerradoEnCierreZ = true;
+        });
+        const total = this.comprobantes.reduce(
+          (acc, el) => acc + roundTwoDecimals(parseFloat(el.totalVenta)),
+          0
+        );
+        let iva21 = 0;
+        let iva10 = 0;
+        let iva27 = 0;
+        let mediosPagoDetalle = [];
+        this.comprobantes.forEach((comprobante) => {
+          const totalIva21 = comprobante.productoDescription.reduce(
+            (acc, producto) => {
+              if (producto.saleIvaPercent == 21) {
+                if (
+                  producto.discountPercent > 0 &&
+                  producto.surchargePercent > 0
+                ) {
+                  const salePriceWithDiscountAndSurcharge =
+                    producto.salePrice +
+                    producto.surchargeAmount -
+                    producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscountAndSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscountAndSurcharge,
+                      21
+                    );
+                } else if (producto.discountPercent > 0) {
+                  const salePriceWithDiscount =
+                    producto.salePrice - producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscount -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscount,
+                      21
+                    );
+                } else if (producto.surchargePercent > 0) {
+                  const salePriceWithSurcharge =
+                    producto.salePrice + producto.surchargeAmount;
+                  acc +=
+                    salePriceWithSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithSurcharge,
+                      21
+                    );
+                } else {
+                  acc += producto.saleIvaAmount;
+                }
+              }
+              return acc;
+            },
+            0
+          );
+          const totalIva10 = comprobante.productoDescription.reduce(
+            (acc, producto) => {
+              if (producto.saleIvaPercent == 10.5) {
+                if (
+                  producto.discountPercent > 0 &&
+                  producto.surchargePercent > 0
+                ) {
+                  const salePriceWithDiscountAndSurcharge =
+                    producto.salePrice +
+                    producto.surchargeAmount -
+                    producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscountAndSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscountAndSurcharge,
+                      10.5
+                    );
+                } else if (producto.discountPercent > 0) {
+                  const salePriceWithDiscount =
+                    producto.salePrice - producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscount -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscount,
+                      10.5
+                    );
+                } else if (producto.surchargePercent > 0) {
+                  const salePriceWithSurcharge =
+                    producto.salePrice + producto.surchargeAmount;
+                  acc +=
+                    salePriceWithSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithSurcharge,
+                      10.5
+                    );
+                } else {
+                  acc += producto.saleIvaAmount;
+                }
+              }
+              return acc;
+            },
+            0
+          );
+          const totalIva27 = comprobante.productoDescription.reduce(
+            (acc, producto) => {
+              if (producto.saleIvaPercent == 27) {
+                if (
+                  producto.discountPercent > 0 &&
+                  producto.surchargePercent > 0
+                ) {
+                  const salePriceWithDiscountAndSurcharge =
+                    producto.salePrice +
+                    producto.surchargeAmount -
+                    producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscountAndSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscountAndSurcharge,
+                      27
+                    );
+                } else if (producto.discountPercent > 0) {
+                  const salePriceWithDiscount =
+                    producto.salePrice - producto.discountAmount;
+                  acc +=
+                    salePriceWithDiscount -
+                    calculatePercentReductionInAmount(
+                      salePriceWithDiscount,
+                      27
+                    );
+                } else if (producto.surchargePercent > 0) {
+                  const salePriceWithSurcharge =
+                    producto.salePrice + producto.surchargeAmount;
+                  acc +=
+                    salePriceWithSurcharge -
+                    calculatePercentReductionInAmount(
+                      salePriceWithSurcharge,
+                      27
+                    );
+                } else {
+                  acc += producto.saleIvaAmount;
+                }
+              }
+              return acc;
+            },
+            0
+          );
+          if (mediosPagoDetalle.length > 0) {
+            let previousRegisterPaymenthMethod = [];
+            comprobante.mediosPago.forEach((comprobanteMedio) => {
+              mediosPagoDetalle.forEach((medioDetalle) => {
+                if (medioDetalle.medioPago.id === comprobanteMedio.id) {
+                  previousRegisterPaymenthMethod.push(medioDetalle);
+                }
+              });
+            });
+            if (previousRegisterPaymenthMethod.length > 0) {
+              previousRegisterPaymenthMethod.forEach((medioDetalle) => {
+                medioDetalle.total += Number(comprobante.totalVenta);
+                medioDetalle.importeTotalIva += Number(
+                  sumarNumeros([totalIva21, totalIva10, totalIva27])
+                );
+                medioDetalle.totalIva21 += Number(totalIva21);
+                medioDetalle.totalIva10 += Number(totalIva10);
+                medioDetalle.totalIva27 += Number(totalIva27);
+                medioDetalle.cantidadComprobantes += 1;
+              });
+            } else {
+              comprobante.mediosPago.forEach((comprobanteMedio) => {
+                const obj = {
+                  medioPago: comprobanteMedio,
+                  total: Number(comprobante.totalVenta),
+                  importeTotalIva: sumarNumeros([
+                    totalIva21,
+                    totalIva10,
+                    totalIva27,
+                  ]),
+                  totalIva21: Number(totalIva21),
+                  totalIva10: Number(totalIva10),
+                  totalIva27: Number(totalIva27),
+                  cantidadComprobantes: 1
+                };
+                mediosPagoDetalle.push(obj);
+              });
+            }
+          } else {
+            comprobante.mediosPago.forEach((comprobanteMedio) => {
+              const obj = {
+                medioPago: comprobanteMedio,
+                total: comprobante.totalVenta,
+                importeTotalIva: sumarNumeros([
+                  totalIva21,
+                  totalIva10,
+                  totalIva27,
+                ]),
+                totalIva21,
+                totalIva10,
+                totalIva27,
+                cantidadComprobantes: 1
+              };
+              mediosPagoDetalle.push(obj);
+            });
+          }
+          return (
+            (iva21 += totalIva21), (iva10 += totalIva10), (iva27 += totalIva27)
+          );
+        });
+        this.savePaymentMethodDetails(mediosPagoDetalle);
+        setTimeout(() => {
+          if (result.isConfirmed) {
+            const cierreZ = {
+              sucursal: this.loguedUser.sucursal,
+              empresa: this.loguedUser.empresa,
+              comprobantesFiscales: this.comprobantes,
+              total,
+              cantidadVentas: parseInt(this.comprobantes.length),
+              detalleMediosPago: this.savedMedioDetalles,
+              totalSumatoriaIva: sumarNumeros([iva21, iva10, iva27]),
+              totalIva21: iva21,
+              totalIva10: iva10,
+              totalIva27: iva27,
+              fecha: new Date(),
+            };
+            GenericService(this.tenant, this.service, this.token)
+              .save(cierreZ)
+              .then(() => {
+                this.filterObjects();
+              });
+            this.loaded = true;
+          } else {
+            this.comprobantes = [];
+            this.loaded = true;
+          }
+        }, 1000);
+      });
     },
     seeDetails(object) {
       this.$emit("seeDetails", object);

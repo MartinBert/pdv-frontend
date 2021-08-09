@@ -51,6 +51,7 @@
       :headers="headers"
       :items="presupuestos"
       class="elevation-6"
+      hide-default-footer
     >
       <template v-slot:[`item.productos`]="{ item }">
         <Detail :objectsArray="item.productos" v-on:seeDetails="seeDetails" />
@@ -66,11 +67,18 @@
         <Billing :object="item" v-on:billing="billing" class="ml-1"/>
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
     <Spinner v-if="!loaded"/>
     <BillingBudgetDialog :listennerOfStore="listennerOfStore"/>
   </v-container>
 </template>
 <script>
+import Pagination from "../Pagination";
 import VentasService from "../../services/VentasService";
 import GenericService from "../../services/GenericService";
 import BillingBudgetDialog from '../../components/Dialogs/BillingBudgetDialog';
@@ -126,6 +134,7 @@ export default {
     Print,
     Spinner,
     Billing,
+    Pagination,
     BillingBudgetDialog
   },
 
