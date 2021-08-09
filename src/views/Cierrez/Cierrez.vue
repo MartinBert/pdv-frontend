@@ -11,7 +11,6 @@
         v-if="loaded"
       />
     </v-card>
-
     <Spinner v-if="!loaded" />
     <DeleteDialog
       :status="deleteDialogStatus"

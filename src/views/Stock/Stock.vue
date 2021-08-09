@@ -28,7 +28,7 @@
       <v-row class="ml-1">
         <v-col cols="4">
           <v-autocomplete
-            style="margin-left:300px"
+            style="margin-left:100px"
             :items="depositos"
             item-text="nombre"
             item-value="id"
@@ -47,13 +47,13 @@
               v-model="destinationDepositForMigrations"
               required
               style="width: 250px;
-            margin-left:200px;
+            margin-left:50px;
             "
             />
             <v-btn
               class="primary"
               type="submit"
-              style="margin-left:600px;
+              style="margin-left:350px;
           margin-top:-120px
           "
               >Migrar seleccionados</v-btn
