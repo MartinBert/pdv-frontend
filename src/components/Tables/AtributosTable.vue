@@ -47,12 +47,8 @@
     </v-form>
     <v-data-table :headers="headers" :items="atributos" class="elevation-6"  hide-default-footer>
       <template v-slot:[`item.acciones`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          mdi-pencil
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete
-        </v-icon>
+        <Edit :itemId="item.id" v-on:editItem="editItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
       </template>
     </v-data-table>
       <Pagination
@@ -64,6 +60,8 @@
   </v-container>
 </template>
 <script>
+import Edit from "../../components/Buttons/Edit";
+import Delete from "../../components/Buttons/Delete";
 import GenericService from "../../services/GenericService";
 import Pagination from "../Pagination";
 export default {
@@ -94,7 +92,9 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
   components:{
-    Pagination
+    Pagination,
+    Edit,
+    Delete
   },
 
   mounted() {

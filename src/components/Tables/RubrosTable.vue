@@ -45,12 +45,8 @@
         </v-card-actions>
       </v-dialog>
       <template v-slot:[`item.acciones`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          mdi-pencil
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete
-        </v-icon>
+        <Edit :itemId="item.id" v-on:editItem="editItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize">
@@ -67,6 +63,8 @@
   </v-container>
 </template>
 <script>
+import Edit from "../../components/Buttons/Edit";
+import Delete from "../../components/Buttons/Delete";
 import Pagination from "../Pagination";
 import GenericService from "../../services/GenericService";
 export default {
@@ -94,7 +92,9 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
   }),
   components: {
-    Pagination
+    Pagination,
+    Edit,
+    Delete
   },
   mounted() {
     this.tenant = this.$route.params.tenant;

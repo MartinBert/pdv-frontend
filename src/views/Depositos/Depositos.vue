@@ -58,12 +58,8 @@
           ></v-checkbox>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="deleteItem(item)">
-            mdi-delete
-          </v-icon>
+         <Edit :itemId="item.id" v-on:editItem="editItem" />
+          <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
         </template>
         <template v-slot:[`item.cantidad`]="{ item }">
           <span v-if="!item.cantidadMinima"
@@ -88,6 +84,8 @@
   </v-container>
 </template>
 <script>
+import Edit from "../../components/Buttons/Edit";
+import Delete from "../../components/Buttons/Delete";
 import GenericService from "../../services/GenericService";
 import XLSX from "xlsx";
 import StockHistoryDialog from "../../components/Dialogs/StockHistoryDialog";
@@ -135,6 +133,8 @@ export default {
     //DepositosTable,
     DeleteDialog,
     Spinner,
+    Edit,
+    Delete,
     Pagination,
   },
 
