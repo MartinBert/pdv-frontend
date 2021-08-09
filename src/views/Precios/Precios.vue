@@ -248,8 +248,10 @@ export default {
     updatePrices() {
       if (this.object.percent && this.object.percent !== 0) {
         this.applyModification("percent");
+        this.$router.push('productos')
       } else if (this.object.amount && this.object.amount !== 0) {
         this.applyModification("amount");
+         this.$router.push('productos')
       } else {
         this.$errorAlert(
           "Debe indicar un valor porcentual o fijo distinto a cero"

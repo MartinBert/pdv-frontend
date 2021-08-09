@@ -10,7 +10,7 @@
         <v-col></v-col>
         <v-col cols="3">
           <v-text-field
-            v-model="search"
+            v-model="filterParams.date"
             v-on:input="filterObjects()"
             dense
             outlined
