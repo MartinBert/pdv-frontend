@@ -41,6 +41,8 @@
   </v-container>
 </template>
 <script>
+import VentasService from "../../services/VentasService";
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 import Pagination from "../Pagination";
 import GenericService from "../../services/GenericService";
 import Print from "../Buttons/Print";
@@ -106,6 +108,16 @@ export default {
           this.loaded = true;
         });
       console.log(this.cierres);
+    },
+      generateZClosure() {
+      this.loaded = false;
+      this.invoiceFilterParams.fechaEmision = formatDate(getCurrentDate());
+      VentasService(this.tenant, "ventas", this.token)
+        .getUniqueDateSales(this.invoiceFilterParams)
+        .then((data) => {
+          this.comprobantes = data.data.content;
+          this.closeOrCancelZ();
+        });
     },
     seeDetails(object) {
       this.$emit("seeDetails", object);

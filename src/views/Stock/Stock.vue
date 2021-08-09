@@ -99,7 +99,7 @@
           </v-col>
           <v-col cols="2">
             <v-text-field
-              v-model="filterParams.productosCodigoBarras"
+              v-model="filterParams.productoCodigoBarras"
               v-on:input="filterObjects()"
               dense
               outlined

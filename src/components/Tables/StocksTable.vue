@@ -1,9 +1,6 @@
 <template>
   <v-container style="min-width: 100%;">
-    <v-data-table :headers="headers" :items="productos" class="elevation-6" ref="stockTable">
-      <template v-slot:[`item.acciones`]="{ item }">
-        
-      </template>
+    <v-data-table :headers="headers" :items="productos" class="elevation-6">
     </v-data-table>
   </v-container>
 </template>
