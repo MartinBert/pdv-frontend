@@ -67,7 +67,8 @@
               <v-col>
                 <v-text-field
                   placeholder="Ingrese el monto de la operación"
-                  type="number"
+                  type="text"
+                  oninput="this.value=this.value.replace(/[^0-9.]/g,'');"
                   v-model="dialogObject.totalVenta"
                   required
                   style="width: 100%;"
