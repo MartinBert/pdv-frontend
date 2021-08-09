@@ -28,7 +28,7 @@
       <v-row class="ml-1">
         <v-col cols="4">
           <v-autocomplete
-            style="margin-left:100px"
+            style="margin-left:50px"
             :items="depositos"
             item-text="nombre"
             item-value="id"
@@ -60,7 +60,9 @@
             >
           </form>
         </v-col>
-        <v-row style="justify-content: center;" class="mt-1">
+        <v-row style="justify-content: center;
+         margin-top:-40px;
+        ">
           <v-col cols="2">
             <v-text-field
               v-model="filterParams.productoName"
