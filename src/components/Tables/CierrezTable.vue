@@ -32,12 +32,14 @@
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" class="ml-1" />
       </template>
     </v-data-table>
+     <CierrezDetails />
     <Pagination
       :page="filterParams.page"
       :totalPages="filterParams.totalPages"
       :totalVisible="7"
       v-on:changePage="filterObjects"
     />
+
   </v-container>
 </template>
 <script>
@@ -45,6 +47,7 @@ import VentasService from "../../services/VentasService";
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 import Pagination from "../Pagination";
 import GenericService from "../../services/GenericService";
+import CierrezDetails from "../../components/Details/CierrezDetails.vue";
 import Print from "../Buttons/Print";
 import Detail from "../Buttons/Detail";
 import Delete from "../Buttons/Delete";
@@ -94,6 +97,7 @@ export default {
     Print,
     Delete,
     Pagination,
+    CierrezDetails,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;

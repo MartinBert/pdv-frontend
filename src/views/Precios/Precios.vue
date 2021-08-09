@@ -98,6 +98,7 @@
         </div>
       </v-card-text>
     </v-card>
+    <Spinner v-if="!loaded" />
   </v-container>
 </template>
 <script>
@@ -109,6 +110,7 @@ import {
   restarNumeros,
   sumarNumeros,
 } from "../../helpers/mathHelper";
+import Spinner from "../../components/Graphics/Spinner";
 import GenericService from "../../services/GenericService";
 import TabBar from "../../components/Generics/TabBar.vue";
 export default {
@@ -180,6 +182,7 @@ export default {
 
   components: {
     TabBar,
+    Spinner
   },
 
   mounted() {
@@ -236,6 +239,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(correctedProducts)
             .then(() => {
+              this.$router.push('productos')
               this.$successAlert("Precios corregidos");
               this.loaded = true;
             })
@@ -243,6 +247,7 @@ export default {
               console.error(err);
             });
         });
+
     },
 
     updatePrices() {
@@ -256,7 +261,6 @@ export default {
           "Debe indicar un valor porcentual o fijo distinto a cero"
         );
       }
-      this.$router.push('productos')
     },
 
     applyModification(modificationType) {
