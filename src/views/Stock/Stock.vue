@@ -219,7 +219,7 @@ export default {
     productos: [],
     loaded: false,
     tenant: "",
-    service: "ventas",
+    service: "stock",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     depositos: [],
@@ -272,7 +272,7 @@ export default {
       }
     },
     search() {
-      GenericService(this.tenant, "stock", this.token)
+      GenericService(this.tenant,this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.stocks = data.data.content;
