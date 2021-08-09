@@ -49,7 +49,6 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects();
   },
   methods: {
     filterObjects(page) {

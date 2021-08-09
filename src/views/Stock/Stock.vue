@@ -341,8 +341,8 @@ export default {
     newObject() {
       this.$router.push({ name: "stockForm", params: { id: 0 } });
     },
-     editItem(itemId) {
-      this.$emit("editItem", itemId);
+    editItem(itemId) {
+      this.$router.push({ name: "stockForm", params: { id: itemId } });
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
@@ -456,6 +456,7 @@ export default {
     add(item) {
       this.$emit("add", item);
     },
+    
     addToMigration(item) {
       if (this.migration.length > 0) {
         const filterMigration = this.migration.filter(

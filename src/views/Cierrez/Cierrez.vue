@@ -8,6 +8,7 @@
         v-on:seeDetails="seeDetails"
         v-on:print="print"
         v-on:deleteItem="deleteItem"
+        v-on:zClosure="generateZClosure"
         v-if="loaded"
       />
     </v-card>
@@ -27,13 +28,14 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-//import VentasService from "../../services/VentasService";
+import VentasService from "../../services/VentasService";
 import CierrezTable from "../../components/Tables/CierrezTable";
 import Spinner from "../../components/Graphics/Spinner";
 import TabBar from "../../components/Generics/TabBar";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import PrintSelectionDialog from "../../components/Dialogs/PrintSelectionDialog";
 import CierrezDetails from "../../components/Details/CierrezDetails.vue";
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 import { questionAlert } from "../../helpers/alerts";
 import {
   roundTwoDecimals,
@@ -104,7 +106,17 @@ export default {
         });
     },
 
-    async closeOrCancelZ() {
+    generateZClosure() {
+      this.loaded = false;
+      this.invoiceFilterParams.fechaEmision = formatDate(getCurrentDate());
+      VentasService(this.tenant, "ventas", this.token)
+        .getUniqueDateSales(this.invoiceFilterParams)
+        .then((data) => {
+          this.comprobantes = data.data.content;
+          this.closeOrCancelZ();
+        });
+    },
+     async closeOrCancelZ() {
       questionAlert(
         "Este proceso realizará el cierre z diario",
         "Desea continuar"
@@ -339,7 +351,6 @@ export default {
         }, 1000);
       });
     },
-
     savePaymentMethodDetails(mediosPagoDetalle) {
       try {
         mediosPagoDetalle.forEach((medioPagoDetalle) => {

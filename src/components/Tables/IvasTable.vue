@@ -12,10 +12,12 @@
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
     </v-data-table>
+    <Spinner v-if="!loaded" />
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+import Spinner from "../Graphics/Spinner.vue"
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
 export default {
@@ -44,7 +46,9 @@ export default {
   components: {
     Edit,
     Delete,
+    Spinner
   },
+  
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects();
