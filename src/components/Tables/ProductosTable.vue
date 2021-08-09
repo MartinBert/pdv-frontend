@@ -61,6 +61,20 @@
           append-icon="mdi-magnify"
         />
       </v-col>
+      <v-col cols="2">
+        <v-autocomplete
+          v-model="filterParams.productoEstado"
+          :items="[{id: 1, text: 'Activo'}, {id: 2, text: 'Inactivo'}]"
+          v-on:input="filterObjects()"
+          item-value="id"
+          dense
+          outlined
+          filled
+          class="text-left"
+          label="Estado de producto"
+          append-icon="mdi-arrow-down"
+        />
+      </v-col>
     </v-row>
     <v-data-table
       class="elevation-6"
@@ -71,7 +85,8 @@
     >
       <template v-slot:[`item.acciones`]="{ item }">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
-        <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem" v-if="item.estado === 1"/>
+        <Add :object="item" v-on:add="add" v-else/>
       </template>
     </v-data-table>
     <Pagination
@@ -86,6 +101,7 @@
 import Pagination from "../../components/Pagination";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
+import Add from "../Buttons/Add";
 import GenericService from "../../services/GenericService";
 
 export default {
@@ -113,10 +129,12 @@ export default {
         productoPrimerAtributoName: "",
         productoSegundoAtributoName: "",
         productoTercerAtributoName: "",
+        productoEstado: 1,
         page: 1,
         size: 10,
         totalPages: 0,
       },
+      perfil: "",
       productos: [],
       loaded: false,
       tenant: "",
@@ -130,10 +148,12 @@ export default {
     Delete,
     Edit,
     Pagination,
+    Add
   },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.perfil = this.loguedUser.perfil;
     this.filterObjects();
   },
 

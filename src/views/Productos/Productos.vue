@@ -50,17 +50,6 @@
               @change="onChange($event)"
             ></v-file-input>
           </v-col>
-          <v-col cols="3" v-if="perfil < 3">
-            <v-select
-              :items="estados"
-              v-model="estadoSelecionado"
-              item-text="text"
-              :return-object="true"
-              outlined
-              dense
-              @input="filterObjects()"
-            ></v-select>
-          </v-col>
         </v-row>
       </v-form>
       <ProductosTable
@@ -155,21 +144,6 @@ export default {
       { id: 1, text: "Activos" },
       { id: 2, text: "Inactivos" },
     ],
-    estadoSelecionado: { id: 1, text: "Activos" },
-    filterParams: {
-      sucursalId: "",
-      productoName: "",
-      productoCodigo: "",
-      productoCodigoBarras: "",
-      productoMarcaName: "",
-      productoPrimerAtributoName: "",
-      productoSegundoAtributoName: "",
-      productoTercerAtributoName: "",
-      productoEstado: "",
-      page: 1,
-      size: 10,
-      totalPages: 0,
-    },
     tabs: [
       { id: 1, title: "Lista", route: '/productos' },
       { id: 2, title: "Nuevo", route: '/productos/form/0' },
@@ -177,7 +151,7 @@ export default {
       { id: 4, title: "Modificar precios", route: '/precios' },
     ],
     activeTab: 1,
-    loaded: false,
+    loaded: true,
     tenant: '',
     idObject: "",
     service: "productos",
@@ -199,33 +173,9 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.getOtherModels(0, 100000);
     this.perfil = this.loguedUser.perfil;
-    if (this.loguedUser.perfil > 1) {
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
-    this.filterObjects();
-    
   },
 
   methods: {
-    filterObjects(page) {
-      if (page) this.filterParams.page = page;
-      if (this.estadoSelecionado.id > 1) {
-        this.filterParams.productoEstado = 2;
-      } else {
-        this.filterParams.productoEstado = 0;
-      }
-      if (this.loguedUser.perfil > 1) {
-        this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-      }
-      GenericService(this.tenant, "productos", this.token)
-        .filter(this.filterParams)
-        .then((data) => {
-          this.productos = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
-    },
-
     getOtherModels(page, size) {
       const services = [
         "marcas",
@@ -300,16 +250,19 @@ export default {
                 "Desea hacerlo"
               ).then((result) => {
                 if (result.isConfirmed) {
-                  let inactiveProduct = this.productos.filter(
-                    (el) => el.id === this.idObject
-                  )[0];
-                  inactiveProduct.estado = 2;
                   GenericService(this.tenant, this.service, this.token)
-                    .save(inactiveProduct)
-                    .then(this.filterObjects())
-                    .catch((err) => {
-                      console.error(err);
-                    });
+                  .get(this.idObject)
+                  .then(res => {
+                    let inactiveProduct = res.data;
+                    inactiveProduct.estado = 2;
+                    console.log(inactiveProduct);
+                    GenericService(this.tenant, this.service, this.token)
+                      .save(inactiveProduct)
+                      .then(this.refreshPage())
+                      .catch((err) => {
+                        console.error(err);
+                      });
+                  })
                 }
               });
             }
@@ -328,11 +281,14 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .save(object)
             .then(() => {
-              this.filterObjects();
-              this.getOtherModels(0, 100000);
+              this.refreshPage();
             });
         }
       });
+    },
+
+    refreshPage(){
+      window.location.reload();
     },
 
     //Load excel
