@@ -300,7 +300,7 @@ export default {
       productoPrimerAtributoName: "",
       productoSegundoAtributoName: "",
       productoTercerAtributoName: "",
-      productoEstado: 0,
+      productoEstado: 1,
       stockDepositoId: "",
       sucursalId: "",
       perfilId: "",
