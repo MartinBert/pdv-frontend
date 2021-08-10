@@ -13,7 +13,6 @@
         </v-row>
       </v-form>
       <IvasTable
-        :items="ivas"
         v-on:editItem="edit"
         v-on:deleteItem="deleteItem"
         v-if="loaded"
@@ -25,7 +24,6 @@
         v-on:changePage="filterObjects"
         v-if="loaded"
       />
-      <Spinner v-if="!loaded" />
       <DeleteDialog
         :status="deleteDialogStatus"
         v-on:deleteConfirmation="deleteConfirmation"
@@ -37,7 +35,6 @@
 import GenericService from "../../services/GenericService";
 import IvasTable from "../../components/Tables/IvasTable";
 import Pagination from "../../components/Pagination";
-import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 export default {
   data: () => ({
@@ -47,7 +44,6 @@ export default {
       size: 10,
       totalPages: 0,
     },
-    loaded: false,
     tenant: "",
     service: "ivas",
     token: localStorage.getItem("token"),
@@ -58,26 +54,14 @@ export default {
   components: {
     IvasTable,
     Pagination,
-    Spinner,
     DeleteDialog,
   },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects();
   },
 
   methods: {
-    filterObjects(page) {
-      if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
-        .filter(this.filterParams)
-        .then((data) => {
-          this.ivas = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
-    },
 
     newObject() {
       this.$router.push({ name: "ivasForm", params: { id: 0 } });
