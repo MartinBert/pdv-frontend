@@ -210,7 +210,7 @@ export default {
       { text: "Fecha", value: "fechaEmision" },
       { text: "Comprobante", value: "nombreDocumento"},
       {text:"Numero Comprobantes", value:"numeroCbte"},
-      { text: "Razon Social", value: "sucursal.razonSocial" },
+      { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value:"sucursal.condicionIva" },
       { text: "N° Cuit", value: "sucursal.cuit" },
       { text: "Neto Grabado", value: "sucursal.ingBruto" },
