@@ -81,7 +81,7 @@
       :headers="headers"
       :items="productos"
       style="background-color: transparent"
-      hide-default-footer
+      c
     >
       <template v-slot:[`item.acciones`]="{ item }">
         <Edit :itemId="item.id" v-on:editItem="editItem" />

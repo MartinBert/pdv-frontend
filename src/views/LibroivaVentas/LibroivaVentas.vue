@@ -91,36 +91,37 @@
       <v-row style="justify-content: center;">
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.letra"
+            v-model="filterParams.nombreDocumento"
             dense
             outlined
             rounded
             label="Nombre Comprobante"
             class="text-left"
-            @input="filterProof()"
+            v-on:input="filterObjects()"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.numeroCbte"
+            v-model="filterParams.numeroComprobante"
             dense
             outlined
             rounded
             label="Numero Comprobante"
             class="text-left"
             append-icon="mdi-magnify"
-            @input="filterProof()"
+            v-on:input="filterObjects()"
           ></v-text-field>
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.condicionVenta"
+            v-model="filterParams.razonSocial"
             dense
             outlined
             rounded
-            label="Condicion Venta"
+            label="Razon Social"
             class="text-left"
+            v-on:input="filterObjects()"
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
@@ -163,6 +164,7 @@ export default {
         .toISOString()
         .substr(0, 10)
     ),
+    sucursales:[],
     checkbox1: false,
     checkbox2: false,
     checkbox3: false,
@@ -190,6 +192,7 @@ export default {
       fechaVto:"",
       ingresosBrutos:"",
       cae:"",
+      porcentaje:"",
       condicionIva:"",
       condicionVenta:"",
       barCode:"",
@@ -210,6 +213,7 @@ export default {
       { text: "Fecha", value: "fechaEmision" },
       { text: "Comprobante", value: "nombreDocumento"},
       {text:"Numero Comprobantes", value:"numeroCbte"},
+      {text:"Condicion Ventas", value:"condicionVenta"},
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value:"sucursal.condicionIva" },
       { text: "N° Cuit", value: "sucursal.cuit" },
