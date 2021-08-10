@@ -147,10 +147,10 @@ export default {
       productos: [],
       typeList: 0,
       typeProductsList: [],
-      loguedUser: {},
-      token: "",
       tenant: "",
       service: "",
+      token: localStorage.getItem("token"),
+      loguedUser: JSON.parse(localStorage.getItem("userData")),
       filterParams: {
         productos: {
           stockDepositoId: "",
@@ -161,7 +161,7 @@ export default {
           productoPrimerAtributoName: "",
           productoSegundoAtributoName: "",
           productoTercerAtributoName: "",
-          productoEstado: 0,
+          productoEstado: 1,
           sucursalId: "",
           perfilId: "",
           page: 1,
@@ -185,8 +185,6 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.token = localStorage.getItem("token");
-    this.loguedUser = JSON.parse(localStorage.getItem("userData"));
     this.generalAsignation();
     this.createtypeProductsList();
     this.filterObjects(this.typeList);

@@ -136,10 +136,8 @@
         :items="ventas"
         hide-default-footer
       >
-        <template v-slot:[`item.acciones`]="{item}">
-          <Print 
-           :itemId="item.id"
-          />
+        <template v-slot:[`item.condicionIva`]="{item}">
+          <Detail :item="item.sucursal.condicionIva" @click="seeDetails()" />
         </template>
       </v-data-table>
       <Pagination
@@ -152,6 +150,7 @@
   </v-container>
 </template>
 <script>
+import Detail from "../../components/Buttons/Detail";
 import Pagination from "../../components/Pagination";
 import GenericService from "../../services/GenericService";
 export default {
@@ -183,6 +182,18 @@ export default {
       numeroComprobante: "",
       validityStatus: false,
       totalVenta: "",
+      documentosComerciales:"",
+      cuit:"",
+      razonSocial:"",
+      ivaCompras:"",
+      ivaVentas:"",
+      fechaVto:"",
+      ingresosBrutos:"",
+      cae:"",
+      condicionIva:"",
+      condicionVenta:"",
+      barCode:"",
+      nombreDocumento:"",
       page: 1,
       size: 10,
       totalPages: 0,
@@ -197,22 +208,19 @@ export default {
     menu2: false,
     headers: [
       { text: "Fecha", value: "fechaEmision" },
-      { text: "Comprobante", value: "documento.tipo"},
-      { text: "Razon Social", value: "razonSocial" },
-      { text: "Condicion Iva", value: "nombre" },
-      { text: "N° Cuit", value: "cuit" },
-      { text: "Neto Grabado", value: "" },
-      { text: "Iva 27%", value: "ivaCompras" },
-      { text: "Iva 21%", value: "ivaVentas" },
-      { text: "Iva 10,5%", value: "" },
-      { text: "Iva 0 %", value: "" },
+      { text: "Comprobante", value: "nombreDocumento"},
+      {text:"Numero Comprobantes", value:"numeroCbte"},
+      { text: "Razon Social", value: "sucursal.razonSocial" },
+      { text: "Condicion Iva", value:"sucursal.condicionIva" },
+      { text: "N° Cuit", value: "sucursal.cuit" },
+      { text: "Neto Grabado", value: "sucursal.ingBruto" },
       { text: "Total Facturado", value: "totalVenta" },
-      { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
 
   components: {
     Pagination,
+    Detail
   },
 
   computed: {
@@ -243,6 +251,10 @@ export default {
 
         console.log(this.ventas);
 
+    },
+      seeDetails(item) {
+      this.$emit("seeDetails", item);
+      console.log("asfsdf");
     },
 
     formatDate(date) {
