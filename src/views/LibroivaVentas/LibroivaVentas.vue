@@ -5,88 +5,65 @@
   >
     <v-card min-width="100%">
       <v-row style="justify-content: center;">
-        <v-col cols="3">
-          <v-menu
-            ref="menu1"
-            v-model="menu1"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            offset-y
+           <v-col
+      cols="12"
+      sm="6"
+    >
+      <v-date-picker
+        v-model="dates"
+        multiple
+      ></v-date-picker>
+    </v-col>
+    <v-col
+      cols="12"
+      sm="6"
+    >
+      <v-menu
+        ref="menu"
+        v-model="menu"
+        :close-on-content-click="false"
+        :return-value.sync="dates"
+        transition="scale-transition"
+        offset-y
+        min-width="auto"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-combobox
+            v-model="dates"
+            multiple
+            chips
+            small-chips
+            label="Multiple picker in menu"
+            prepend-icon="mdi-calendar"
+            readonly
+            v-bind="attrs"
+            v-on="on"
+          ></v-combobox>
+        </template>
+        <v-date-picker
+          v-model="dates"
+          multiple
+          no-title
+          scrollable
+        >
+          <v-spacer></v-spacer>
+          <v-btn
+            text
+            color="primary"
+            @click="menu = false"
           >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="dateFormatted"
-                label="Fecha desde"
-                hint="MM/DD/YYYY format"
-                persistent-hint
-                prepend-icon="mdi-calendar"
-                v-bind="attrs"
-                @blur="date = parseDate(dateFormatted)"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="date"
-              no-title
-              @input="menu1 = false"
-            ></v-date-picker>
-          </v-menu>
-        </v-col>
-
-        <v-col cols="3">
-          <v-menu
-            v-model="menu2"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
+            Cancel
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            @click="$refs.menu.save(dates)"
           >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="computedDateFormatted"
-                label="Fecha Hasta"
-                hint="MM/DD/YYYY format"
-                persistent-hint
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="date"
-              no-title
-              @input="menu2 = false"
-            ></v-date-picker>
-          </v-menu>
-        </v-col>
-        <v-col cols="2">
-          <v-checkbox v-model="checkbox1">
-            <template v-slot:label>
-              <div>
-                Facturas A
-              </div>
-            </template>
-          </v-checkbox>
-        </v-col>
-        <v-col cols="2">
-          <v-checkbox v-model="checkbox2">
-            <template v-slot:label>
-              <div>
-                Facturas B
-              </div>
-            </template>
-          </v-checkbox>
-        </v-col>
-        <v-col cols="2">
-          <v-checkbox v-model="checkbox3">
-            <template v-slot:label>
-              <div>
-                Facturas C
-              </div>
-            </template>
-          </v-checkbox>
-        </v-col>
+            OK
+          </v-btn>
+        </v-date-picker>
+      </v-menu>
+    </v-col>
       </v-row>
       <v-row style="justify-content: center;">
         <v-col cols="2">
@@ -149,8 +126,8 @@
        <template v-slot:[`item.porcentaje`]="{ item }">
          <Detail :objects="item.porcentaje" @click="seeDetails(item)"/>
       </template>
-       <template v-slot:[`item.porcentaje.iva`]="{ item }">
-         <Detail :objects="item.porcentaje.iva" @click="seeDetails(item)"/>
+       <template v-slot:[`item.porcentajeas`]="{ item }">
+         <Detail :objects="item.porcentajeas" @click="seeDetails(item)"/>
       </template>
       </v-data-table>
       <Pagination
@@ -232,7 +209,7 @@ export default {
       { text: "Neto Grabado", value: "sucursal.ingBruto" },
       { text: "Iva 27%", value: "ivaCompras" },
       { text: "Iva 21%", value: "ivaVentas" },
-      { text: "Iva 10,5%", value: "porcentaje.iva" },
+      { text: "Iva 10,5%", value: "porcentajeas" },
       { text: "Iva 0 %", value: "porcentaje" },
       { text: "Total Facturado", value: "totalVenta" },
     ],
