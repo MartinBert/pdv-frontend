@@ -136,8 +136,8 @@
         :items="ventas"
         hide-default-footer
       >
-        <template v-slot:[`item.condicionIva`]="{item}">
-          <Detail :item="item.sucursal.condicionIva" @click="seeDetails()" />
+        <template v-slot:[`item.sucursal.condicionIva`]="{item}">
+          <Detail :item="item.sucursal.condicionIva" v-on:seeDetails="seeDetails" />
         </template>
       </v-data-table>
       <Pagination
@@ -214,6 +214,10 @@ export default {
       { text: "Condicion Iva", value:"sucursal.condicionIva" },
       { text: "N° Cuit", value: "sucursal.cuit" },
       { text: "Neto Grabado", value: "sucursal.ingBruto" },
+      { text: "Iva 27%", value: "ivaCompras" },
+      { text: "Iva 21%", value: "ivaVentas" },
+      { text: "Iva 10,5%", value: "" },
+      { text: "Iva 0 %", value: "" },
       { text: "Total Facturado", value: "totalVenta" },
     ],
   }),
@@ -254,7 +258,6 @@ export default {
     },
       seeDetails(item) {
       this.$emit("seeDetails", item);
-      console.log("asfsdf");
     },
 
     formatDate(date) {
