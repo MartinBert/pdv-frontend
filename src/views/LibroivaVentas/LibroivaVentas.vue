@@ -137,9 +137,21 @@
         :items="ventas"
         hide-default-footer
       >
-        <template v-slot:[`item.sucursal.condicionIva`]="{item}">
-          <Detail :item="item.sucursal.condicionIva" v-on:seeDetails="seeDetails" />
-        </template>
+        <template v-slot:[`item.cliente.condicionIva`]="{ item }">
+        <Detail :objects="item.cliente.condicionIva" @click="seeDetails(item)"/>
+      </template>
+      <template v-slot:[`item.ivaCompras`]="{ item }">
+         <Detail :objects="item.ivaCompras" @click="seeDetails(item)"/>
+      </template>
+       <template v-slot:[`item.ivaVentas`]="{ item }">
+         <Detail :objects="item.ivaVentas" @click="seeDetails(item)"/>
+      </template>
+       <template v-slot:[`item.porcentaje`]="{ item }">
+         <Detail :objects="item.porcentaje" @click="seeDetails(item)"/>
+      </template>
+       <template v-slot:[`item.porcentaje.iva`]="{ item }">
+         <Detail :objects="item.porcentaje.iva" @click="seeDetails(item)"/>
+      </template>
       </v-data-table>
       <Pagination
         :page="filterParams.page"
@@ -215,13 +227,13 @@ export default {
       {text:"Numero Comprobantes", value:"numeroCbte"},
       {text:"Condicion Ventas", value:"condicionVenta"},
       { text: "Razon Social", value: "cliente.razonSocial" },
-      { text: "Condicion Iva", value:"sucursal.condicionIva" },
+      { text: "Condicion Iva", value:"cliente.condicionIva" },
       { text: "N° Cuit", value: "sucursal.cuit" },
       { text: "Neto Grabado", value: "sucursal.ingBruto" },
       { text: "Iva 27%", value: "ivaCompras" },
       { text: "Iva 21%", value: "ivaVentas" },
-      { text: "Iva 10,5%", value: "" },
-      { text: "Iva 0 %", value: "" },
+      { text: "Iva 10,5%", value: "porcentaje.iva" },
+      { text: "Iva 0 %", value: "porcentaje" },
       { text: "Total Facturado", value: "totalVenta" },
     ],
   }),
@@ -260,8 +272,8 @@ export default {
         console.log(this.ventas);
 
     },
-      seeDetails(item) {
-      this.$emit("seeDetails", item);
+      seeDetails(objects) {
+      this.$emit("seeDetails" , objects);
     },
 
     formatDate(date) {

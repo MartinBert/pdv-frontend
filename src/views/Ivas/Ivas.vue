@@ -39,6 +39,7 @@ import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 export default {
   data: () => ({
     ivas: [],
+    loaded:false,
     filterParams: {
       page: 1,
       size: 10,
