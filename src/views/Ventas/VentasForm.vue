@@ -283,6 +283,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
+import StocksService from "../../services/StocksService";
 import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
@@ -343,7 +344,11 @@ export default {
     individualPercent: "",
     listennerOfListChange: 0,
     clientIp: "",
-    resetPresupuestSearch: false
+    resetPresupuestSearch: false,
+    processStockResult: [],
+    productsWithoutStock: [],
+    productsInOtherDeposits: [],
+    lowStock: []
   }),
 
   components: {
@@ -1231,30 +1236,7 @@ export default {
                           });
                       })
                       .then(() => {
-                        /*** Save stocks modifications ***/
                         this.applyStockModifications(comprobante)
-                          .then((data) => {
-                            const productsBelowMinimumStock = data[0];
-                            const productsWithoutStockOnDefaultDeposit =
-                              data[1];
-                            const productsOutOfStockAndDeposits = data[2];
-                            this.$successAlert("Venta realizada").then(() => {
-                              VentasService(
-                                this.tenant,
-                                this.service,
-                                this.token
-                              ).checkProductsAndDepositsStatus(
-                                productsBelowMinimumStock,
-                                productsWithoutStockOnDefaultDeposit,
-                                productsOutOfStockAndDeposits
-                              );
-                            });
-                          })
-                          .finally(() => {
-                            /*** Reset view objects and status ***/
-                            this.clear();
-                            this.loaded = true;
-                          });
                       });
                   } else {
                     this.$errorAlert("Tipo de comprobante no disponible").then(
@@ -1618,29 +1600,7 @@ export default {
                     window.open(fileURL, "_blank");
                   })
                   .then(() => {
-                    /*** Save stocks modifications ***/
                     this.applyStockModifications(comprobante)
-                      .then((data) => {
-                        const productsBelowMinimumStock = data[0];
-                        const productsWithoutStockOnDefaultDeposit = data[1];
-                        const productsOutOfStockAndDeposits = data[2];
-                        this.$successAlert("Venta realizada").then(() => {
-                          VentasService(
-                            this.tenant,
-                            this.service,
-                            this.token
-                          ).checkProductsAndDepositsStatus(
-                            productsBelowMinimumStock,
-                            productsWithoutStockOnDefaultDeposit,
-                            productsOutOfStockAndDeposits
-                          );
-                        });
-                      })
-                      .finally(() => {
-                        /*** Reset view objects and status ***/
-                        this.clear();
-                        this.loaded = true;
-                      });
                   });
               });
           } else {
@@ -1978,83 +1938,131 @@ export default {
       })
     },
 
-    async applyStockModifications(comprobante) {
-      const filterParam = {
-        sucursalId: this.loguedUser.sucursal.id,
-        productoName: "",
-        productoCodigo: "",
-        productoMarcaName: "",
-        productoCodigoBarras: "",
-        productoPrimerAtributoName: "",
-        page: 1,
-        size: 100000,
-      };
-      let productsBelowMinimumStock = [];
-      let productsWithoutStockOnDefaultDeposit = [];
-      let productsOutOfStockAndDeposits = [];
-      let stocks;
-      let receiptData = comprobante;
-      await GenericService(this.tenant, "stock", this.token)
-        .filter(filterParam)
-        .then((data) => {
-          stocks = data.data.content;
-          stocks.forEach((stock) => {
-            receiptData.productos.forEach((productInReceipt) => {
-              if (stock.producto.id === productInReceipt.id) {
-                productInReceipt.checked = true;
-                switch (stock.deposito.id) {
-                  case this.defaultDeposit.id:
-                    stock.cantidad =
-                      parseFloat(stock.cantidad) -
-                      parseFloat(productInReceipt.cantUnidades);
-                    receiptData.productos = receiptData.productos.filter(
-                      (el) => el.id !== productInReceipt.id
-                    );
-                    if (
-                      stock.cantidadMinima &&
-                      stock.cantidad < Number(stock.cantidadMinima)
-                    ) {
-                      productsBelowMinimumStock.push(stock);
-                    }
-                    GenericService(this.tenant, "stock", this.token).save(
-                      stock
-                    );
-                    break;
-                  default:
-                    stock.cantidad =
-                      parseFloat(stock.cantidad) -
-                      parseFloat(productInReceipt.cantUnidades);
-                    receiptData.productos = receiptData.productos.filter(
-                      (el) => el.id !== productInReceipt.id
-                    );
-                    if (
-                      stock.cantidadMinima &&
-                      stock.cantidad < Number(stock.cantidadMinima)
-                    ) {
-                      productsBelowMinimumStock.push(stock);
-                    }
-                    GenericService(this.tenant, "stock", this.token).save(
-                      stock
-                    );
-                    productsWithoutStockOnDefaultDeposit.push(stock);
-                    break;
-                }
+    applyStockModifications(comprobante) {
+      comprobante.productos.forEach((product) => {
+        StocksService(this.tenant, "stock", this.token)
+        .getStockByProductCodeBarInDefaultDeposit(product.codigoBarra, comprobante.sucursal.id)
+        .then(data => {
+          let stock = data.data;
+          if(stock){
+            stock.cantidad = stock.cantidad - Number(product.cantUnidades);
+            this.saveStockModifications(stock, comprobante.productos.length);
+          }else{
+            StocksService(this.tenant, "stock", this.token)
+            .getStockByProductCodeBarInAnyDeposit(product.codigoBarra, comprobante.sucursal.id)
+            .then(data => {
+              let firstStockDetected = data.data[0];
+              if(firstStockDetected){
+                firstStockDetected.cantidad = firstStockDetected.cantidad - Number(product.cantUnidades);
+                this.saveStockModifications(firstStockDetected, comprobante.productos.length);
+              }else{
+                this.saveStockModifications(product.nombre, comprobante.productos.length);
               }
-            });
-          });
-          const viewCheckedProductsInReceipt = receiptData.productos.filter(
-            (el) => !el.checked
-          );
-          if (viewCheckedProductsInReceipt.length > 0) {
-            productsOutOfStockAndDeposits = viewCheckedProductsInReceipt;
+            })
           }
-        });
+        })
+      })
+    },
 
-      return [
-        productsBelowMinimumStock,
-        productsWithoutStockOnDefaultDeposit,
-        productsOutOfStockAndDeposits,
-      ];
+    saveStockModifications(stock, processProductsLength){
+        if(typeof(stock) === 'string'){
+          this.productsWithoutStock.push(stock);
+          this.processStockResult.push("success");
+          if(this.processStockResult.length === processProductsLength) {
+            this.endSaleProcess()
+          }
+        }else{
+          if(stock.cantidadMinima && !stock.cantidadMinima.includes("asign") && stock.cantidad < parseFloat(stock.cantidadMinima)){
+            this.lowStock.push(stock.producto.nombre);
+          }
+          if(!stock.deposito.defaultDeposit){
+            this.productsInOtherDeposits.push(stock.producto.nombre)
+          }
+          GenericService(this.tenant, "stock", this.token)
+          .save(stock)
+          .then(() => {
+            this.processStockResult.push("success");
+            if(this.processStockResult.length === processProductsLength) {
+              this.endSaleProcess()
+            }
+          })
+          .catch(err => {
+            this.$errorAlert("Error al procesar stock");
+            this.loaded = true;
+            console.error(err);
+          })
+        }
+    },
+
+    endSaleProcess(){
+      if(this.productsWithoutStock.length > 0){
+        this.$infoAlert2(`No existo un registro de stock de estos productos: ${this.productsWithoutStock.reduce((acc, el)=> acc + ', ' + el)}.`)
+        .then(() => {
+          if(this.lowStock.length > 0){
+            this.$infoAlert2(`Productos bajos de stock: ${this.lowStock.reduce((acc, el)=> acc + ', ' + el)}`)
+            .then(() => {
+              if(this.productsInOtherDeposits.length > 0){
+                this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce((acc, el)=> acc + ', ' + el)}. Sus unidades fueron descontadas de otros depósitos.`)
+                .then(() => {
+                  this.$successAlert("Facturación realizada")
+                  .then(()=>{
+                    this.clear()
+                  })
+                })
+              }else{
+                this.$successAlert("Facturación realizada")
+                .then(()=>{
+                  this.clear()
+                })
+              }
+            })
+          }else if(this.productsInOtherDeposits.length > 0){
+            this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce((acc, el)=> acc + ', ' + el)}. Sus unidades fueron descontadas de otros depósitos.`)
+            .then(() => {
+              this.$successAlert("Facturación realizada")
+              .then(()=>{
+                this.clear()
+              })
+            })
+          }else{
+            this.$successAlert("Facturación realizada")
+            .then(()=>{
+              this.clear()
+            })
+          }
+        })
+      }else if(this.lowStock.length > 0){
+        this.$infoAlert2(`Productos bajos de stock: ${this.lowStock.reduce((acc, el)=> acc + ', ' + el)}`)
+        .then(() => {
+          if(this.productsInOtherDeposits.length > 0){
+            this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce((acc, el)=> acc + ', ' + el)}. Sus unidades fueron descontadas de otros depósitos.`)
+            .then(() => {
+              this.$successAlert("Facturación realizada")
+              .then(()=>{
+                this.clear()
+              })
+            })
+          }else{
+            this.$successAlert("Facturación realizada")
+            .then(()=>{
+              this.clear()
+            })
+          }
+        })
+      }else if(this.productsInOtherDeposits.length > 0){
+        this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce((acc, el)=> acc + ', ' + el)}. Sus unidades fueron descontadas de otros depósitos.`)
+        .then(() => {
+          this.$successAlert("Facturación realizada")
+          .then(()=>{
+            this.clear()
+          })
+        })
+      }else{
+        this.$successAlert("Facturación realizada")
+        .then(()=>{
+          this.clear()
+        })
+      }
     },
 
     checkSaleCondition(paymentPlan) {
@@ -2087,6 +2095,7 @@ export default {
       this.listennerOfListChange = 999999999;
       this.resetPresupuestSearch = true;
       this.$store.commit("productos/resetStates");
+      this.loaded = true;
     },
 
     /******************************************************************************************************/
