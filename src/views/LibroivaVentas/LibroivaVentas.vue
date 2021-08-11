@@ -108,27 +108,12 @@
         class="elevation-6"
         :items="ventas"
         hide-default-footer
-      >
+      > 
         <template v-slot:[`item.cliente.condicionIva`]="{ item }">
           <Detail
             :objects="item.cliente.condicionIva"
             @click="seeDetails(item)"
           />
-        </template>
-        <template v-slot:[`item.ivaVentas`]="{ item }">
-          <v-alert v-if="!item.ivaVentas" dense class="success"
-            >Iva Ventas</v-alert
-          >
-        </template>
-        <template v-slot:[`item.ivaCompras`]="{ item }">
-          <v-alert v-if="item.ivaCompras" dense class="info"
-            >Iva Compras</v-alert
-          >
-        </template>
-        <template v-slot:[`item.iva`]="{ item }">
-          <v-alert v-if="item.ivaCompras" dense class="info"
-            >Iva Compras</v-alert
-          >
         </template>
       </v-data-table>
       <Pagination
@@ -205,11 +190,13 @@ export default {
       documentosComerciales: "",
       cuit: "",
       razonSocial: "",
-      ivaCompras: "",
-      ivaVentas: "",
       fechaVto: "",
       ingresosBrutos: "",
       cae: "",
+      subTotal:"",
+      totalIva21:"",
+      totalIva27:"",
+      totalIva10:"",
       porcentaje: "",
       condicionIva: "",
       condicionVenta: "",
@@ -234,12 +221,12 @@ export default {
       { text: "Condicion Ventas", value: "condicionVenta" },
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva" },
-      { text: "N° Cuit", value: "sucursal.cuit" },
+      { text: "N° Cuit", value: "cliente.cuit" },
       { text: "Neto Grabado", value: "sucursal.ingBruto" },
-      { text: "Iva 27%", value: "ivaCompras" },
-      { text: "Iva 21%", value: "ivaVentas" },
-      { text: "Iva 10,5%", value: "iva" },
-      { text: "Iva 0 %", value: "porcentaje" },
+      { text: "Iva 27%", value: "totalIva27" },
+      { text: "Iva 21%", value: "totalIva21" },
+      { text: "Iva 10,5%", value: "totalIva10" },
+      { text: "Iva 0 %", value: "Iva0" },
       { text: "Total Facturado", value: "totalVenta" },
     ],
   }),
@@ -290,10 +277,8 @@ export default {
 
       console.log(this.ventas);
     },
-     selectedNames() {
-      return this.selectedInvoice
-        .filter(invoice => invoice.selected)
-        .map(invoice => invoice.nombreDocumento);
+     filterInvoice() {
+    
     },
     createDate(date, param) {
       const integerDate = generateIntegerDate(date);
