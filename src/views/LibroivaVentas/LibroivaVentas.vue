@@ -218,7 +218,6 @@ export default {
       { text: "Fecha", value: "fechaEmision" },
       { text: "Comprobante", value: "nombreDocumento" },
       { text: "Numero Comprobantes", value: "numeroCbte" },
-      { text: "Condicion Ventas", value: "condicionVenta" },
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva" },
       { text: "N° Cuit", value: "cliente.cuit" },
