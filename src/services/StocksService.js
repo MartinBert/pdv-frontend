@@ -9,5 +9,16 @@ export default (tenant, service, token) => {
             })
         },
 
+        getStockByProductCodeBarInDefaultDeposit(codeBar, sucursalId) {
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/items/${codeBar}/${sucursalId}`, {
+                headers: { Authorization: "Bearer " + token }
+            })
+        },
+
+        getStockByProductCodeBarInAnyDeposit(codeBar, sucursalId){
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/items/any/${codeBar}/${sucursalId}`, {
+                headers: { Authorization: "Bearer " + token }
+            })
+        }
     }
 }
