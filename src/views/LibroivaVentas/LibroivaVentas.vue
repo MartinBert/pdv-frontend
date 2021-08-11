@@ -5,90 +5,62 @@
   >
     <v-card min-width="100%">
       <v-row style="justify-content: center;">
-        <v-col cols="3">
-          <v-menu
-            ref="menu1"
-            v-model="menu1"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            offset-y
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="dateFormatted"
-                label="Fecha desde"
-                hint="MM/DD/YYYY format"
-                persistent-hint
-                prepend-icon="mdi-calendar"
-                v-bind="attrs"
-                @blur="date = parseDate(dateFormatted)"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="date"
-              no-title
-              @input="menu1 = false"
-            ></v-date-picker>
-          </v-menu>
-        </v-col>
-
-        <v-col cols="3">
-          <v-menu
-            v-model="menu2"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="computedDateFormatted"
-                label="Fecha Hasta"
-                hint="MM/DD/YYYY format"
-                persistent-hint
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="date"
-              no-title
-              @input="menu2 = false"
-            ></v-date-picker>
-          </v-menu>
-        </v-col>
-        <v-col cols="2">
-          <v-checkbox v-model="checkbox1">
-            <template v-slot:label>
-              <div>
-                Facturas A
-              </div>
-            </template>
-          </v-checkbox>
-        </v-col>
-        <v-col cols="2">
-          <v-checkbox v-model="checkbox2">
-            <template v-slot:label>
-              <div>
-                Facturas B
-              </div>
-            </template>
-          </v-checkbox>
-        </v-col>
-        <v-col cols="2">
-          <v-checkbox v-model="checkbox3">
-            <template v-slot:label>
-              <div>
-                Facturas C
-              </div>
-            </template>
-          </v-checkbox>
-        </v-col>
+          <v-col>
+              <form
+                @submit.prevent="
+                  salesForDate(
+                    loguedUser.sucursal,
+                    object.fechaDesde,
+                    object.fechaHasta
+                  )
+                "
+              >
+              <v-col cols="2">
+                  <div class="d-block">
+                  <v-text-field
+                    id="input1"
+                    name="input1"
+                    type="date"
+                    v-model="fechaDesde"
+                    label="Fecha desde"
+                    @input="createDate(fechaDesde, 'fechaDesde')"
+                    required
+                  >
+                  </v-text-field>
+                  <v-text-field
+                    id="input2"
+                    name="input2"
+                    type="date"
+                    label="Fecha hasta"
+                    v-model="fechaHasta"
+                    @input="createDate(fechaHasta, 'fechaHasta')"
+                    required
+                  >
+                  </v-text-field>
+                  <v-btn class="primary v-btn--block" type="submit"
+                   style="margin-left:400px;
+                   margin-top:-100px;
+                   "
+                  >Imprimir libro</v-btn
+                >
+                  </div>
+              </v-col>
+          <v-col cols="3">
+                <v-checkbox
+                v-model="filterParamsInvoice.nombreDocumento"
+                v-on:click="filterNameInvoice()"
+                style="margin-left:900px;
+                margin-top:-100px;
+                "
+                label="Factura(A)"
+              ></v-checkbox>
+          </v-col>
+              </form>
+            </v-col>
       </v-row>
-      <v-row style="justify-content: center;">
+      <v-row style="justify-content: center;
+       margin-top:-5px;
+      ">
         <v-col cols="2">
           <v-text-field
             v-model="filterParams.nombreDocumento"
@@ -103,7 +75,7 @@
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.numeroComprobante"
+            v-model="filterParams.numeroCbte"
             dense
             outlined
             rounded
@@ -138,20 +110,26 @@
         hide-default-footer
       >
         <template v-slot:[`item.cliente.condicionIva`]="{ item }">
-        <Detail :objects="item.cliente.condicionIva" @click="seeDetails(item)"/>
-      </template>
-      <template v-slot:[`item.ivaCompras`]="{ item }">
-         <Detail :objects="item.ivaCompras" @click="seeDetails(item)"/>
-      </template>
-       <template v-slot:[`item.ivaVentas`]="{ item }">
-         <Detail :objects="item.ivaVentas" @click="seeDetails(item)"/>
-      </template>
-       <template v-slot:[`item.porcentaje`]="{ item }">
-         <Detail :objects="item.porcentaje" @click="seeDetails(item)"/>
-      </template>
-       <template v-slot:[`item.porcentajeas`]="{ item }">
-         <Detail :objects="item.porcentajeas" @click="seeDetails(item)"/>
-      </template>
+          <Detail
+            :objects="item.cliente.condicionIva"
+            @click="seeDetails(item)"
+          />
+        </template>
+        <template v-slot:[`item.ivaVentas`]="{ item }">
+          <v-alert v-if="!item.ivaVentas" dense class="success"
+            >Iva Ventas</v-alert
+          >
+        </template>
+        <template v-slot:[`item.ivaCompras`]="{ item }">
+          <v-alert v-if="item.ivaCompras" dense class="info"
+            >Iva Compras</v-alert
+          >
+        </template>
+        <template v-slot:[`item.iva`]="{ item }">
+          <v-alert v-if="item.ivaCompras" dense class="info"
+            >Iva Compras</v-alert
+          >
+        </template>
       </v-data-table>
       <Pagination
         :page="filterParams.page"
@@ -163,8 +141,15 @@
   </v-container>
 </template>
 <script>
+import ReportsService from "../../services/ReportsService";
 import Detail from "../../components/Buttons/Detail";
 import Pagination from "../../components/Pagination";
+import {
+  generateIntegerDate,
+  getYearsList,
+  monthsList,
+} from "../../helpers/dateHelper";
+import { exportPDF } from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -176,11 +161,14 @@ export default {
         .toISOString()
         .substr(0, 10)
     ),
-    sucursales:[],
+    selectedInvoice:[],
+    years: getYearsList(),
+    sucursales: [],
     checkbox1: false,
     checkbox2: false,
     checkbox3: false,
-    ventas:[],
+    checkedInvoice:[],
+    ventas: [],
     comprobantesFiscales: [],
     comprobantesComerciales: [],
     FiscalCondicion: [],
@@ -188,6 +176,24 @@ export default {
     sucusal: [],
     empresa: [],
     ivas: [],
+    object: {
+        documento: {},
+        cliente: {},
+        fechaDesde: null,
+        fechaHasta: null,
+        mes: null,
+        year: null,
+        year2: null,
+      },
+      fechaDesde: null,
+      fechaHasta: null,
+      fechaDesde2: null,
+      fechaHasta2: null,
+      fechaDesde3: null,
+      fechaHasta3: null,
+    filterParamsInvoice:{
+      nombreDocumento:"",
+    },
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
@@ -196,18 +202,18 @@ export default {
       numeroComprobante: "",
       validityStatus: false,
       totalVenta: "",
-      documentosComerciales:"",
-      cuit:"",
-      razonSocial:"",
-      ivaCompras:"",
-      ivaVentas:"",
-      fechaVto:"",
-      ingresosBrutos:"",
-      cae:"",
-      porcentaje:"",
-      condicionIva:"",
-      condicionVenta:"",
-      barCode:"",
+      documentosComerciales: "",
+      cuit: "",
+      razonSocial: "",
+      ivaCompras: "",
+      ivaVentas: "",
+      fechaVto: "",
+      ingresosBrutos: "",
+      cae: "",
+      porcentaje: "",
+      condicionIva: "",
+      condicionVenta: "",
+      barCode: "",
       nombreDocumento:"",
       page: 1,
       size: 10,
@@ -223,16 +229,16 @@ export default {
     menu2: false,
     headers: [
       { text: "Fecha", value: "fechaEmision" },
-      { text: "Comprobante", value: "nombreDocumento"},
-      {text:"Numero Comprobantes", value:"numeroCbte"},
-      {text:"Condicion Ventas", value:"condicionVenta"},
+      { text: "Comprobante", value: "nombreDocumento" },
+      { text: "Numero Comprobantes", value: "numeroCbte" },
+      { text: "Condicion Ventas", value: "condicionVenta" },
       { text: "Razon Social", value: "cliente.razonSocial" },
-      { text: "Condicion Iva", value:"cliente.condicionIva" },
+      { text: "Condicion Iva", value: "cliente.condicionIva" },
       { text: "N° Cuit", value: "sucursal.cuit" },
       { text: "Neto Grabado", value: "sucursal.ingBruto" },
       { text: "Iva 27%", value: "ivaCompras" },
       { text: "Iva 21%", value: "ivaVentas" },
-      { text: "Iva 10,5%", value: "porcentajeas" },
+      { text: "Iva 10,5%", value: "iva" },
       { text: "Iva 0 %", value: "porcentaje" },
       { text: "Total Facturado", value: "totalVenta" },
     ],
@@ -240,7 +246,7 @@ export default {
 
   components: {
     Pagination,
-    Detail
+    Detail,
   },
 
   computed: {
@@ -256,6 +262,7 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.filterObjects();
+    this.months = monthsList;
   },
 
   methods: {
@@ -269,11 +276,54 @@ export default {
           this.loaded = true;
         });
 
-        console.log(this.ventas);
-
+      console.log(this.ventas);
     },
-      seeDetails(objects) {
-      this.$emit("seeDetails" , objects);
+    filterNameInvoice(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.ventas = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
+
+      console.log(this.ventas);
+    },
+     selectedNames() {
+      return this.selectedInvoice
+        .filter(invoice => invoice.selected)
+        .map(invoice => invoice.nombreDocumento);
+    },
+    createDate(date, param) {
+      const integerDate = generateIntegerDate(date);
+      if (param === "fechaDesde") {
+        this.object.fechaDesde = integerDate;
+      } else {
+        this.object.fechaHasta = integerDate;
+      }
+    },
+     salesForDate(sucursal, fechaDesde, fechaHasta) {
+      //if (this.notPassSucursalValidations()) return this.error('sucursal');
+      let id = sucursal.id;
+      ReportsService(this.tenant, this.service, this.token)
+        .salesForDate(id, fechaDesde, fechaHasta)
+        .then((res) => {
+          exportPDF(res);
+        });
+    },
+
+    salesForMonth(sucursal, year, month) {
+      //if (this.notPassSucursalValidations()) return this.error('sucursal');
+      let id = sucursal.id;
+      ReportsService(this.tenant, this.service, this.token)
+        .salesForMonth(id, year, month)
+        .then((res) => {
+          exportPDF(res);
+        });
+    },
+    seeDetails(objects) {
+      this.$emit("seeDetails", objects);
     },
 
     formatDate(date) {
