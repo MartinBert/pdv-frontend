@@ -82,7 +82,7 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     headers: [
       { text: "Fecha", value: "fecha" },
-      { text: "Numero de Comprobante", value: "id" },
+      { text: "Numero de Comprobante", value: "numeroCorrelativo" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),

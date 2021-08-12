@@ -28,6 +28,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
+import CierrezService from "../../services/CierrezService";
 import VentasService from "../../services/VentasService";
 import CierrezTable from "../../components/Tables/CierrezTable";
 import Spinner from "../../components/Graphics/Spinner";
@@ -116,7 +117,8 @@ export default {
           this.closeOrCancelZ();
         });
     },
-     async closeOrCancelZ() {
+
+    async closeOrCancelZ() {
       questionAlert(
         "Este proceso realizará el cierre z diario",
         "Desea continuar"
@@ -338,12 +340,21 @@ export default {
               totalIva27: iva27,
               fecha: new Date(),
             };
-            GenericService(this.tenant, this.service, this.token)
-              .save(cierreZ)
-              .then(() => {
-                this.filterObjects();
-              });
-            this.loaded = true;
+            CierrezService(this.tenant, this.sevice, this.token)
+            .getPreviousCorrelativeNumber(this.loguedUser.sucursal.id)
+            .then(data => {
+              const correlativeNumber = data.data += 1;
+              cierreZ.numeroCorrelativo = correlativeNumber;
+              GenericService(this.tenant, this.service, this.token)
+                .save(cierreZ)
+                .then(() => {
+                  this.filterObjects();
+                });
+              this.loaded = true;
+            })
+            .catch(err => {
+              console.error(err);
+            })
           } else {
             this.comprobantes = [];
             this.loaded = true;
