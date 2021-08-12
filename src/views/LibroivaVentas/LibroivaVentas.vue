@@ -47,8 +47,7 @@
               </v-col>
           <v-col cols="3">
                 <v-checkbox
-                v-model="filterParamsInvoice.nombreDocumento"
-                v-on:click="filterNameInvoice()"
+                v-on:change="filterObjects()"
                 style="margin-left:900px;
                 margin-top:-100px;
                 "
@@ -58,12 +57,17 @@
               </form>
             </v-col>
       </v-row>
+       <v-row>
+        <v-col>
+          <h2 style="text-align:center;">Libro Iva Ventas</h2>
+        </v-col>
+      </v-row>
       <v-row style="justify-content: center;
        margin-top:-5px;
       ">
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.nombreDocumento"
+            v-model="filterParams.letra"
             dense
             outlined
             rounded
@@ -75,7 +79,7 @@
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.numeroCbte"
+            v-model="filterParams.codigoDocumento"
             dense
             outlined
             rounded
@@ -96,11 +100,6 @@
             v-on:input="filterObjects()"
             append-icon="mdi-magnify"
           ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <h2 style="text-align:center;">Libro Iva Ventas</h2>
         </v-col>
       </v-row>
       <v-data-table
@@ -134,7 +133,7 @@ import {
   getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
-import { exportPDF } from "../../helpers/exportFileHelper";
+import { exportPDF} from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -176,12 +175,10 @@ export default {
       fechaHasta2: null,
       fechaDesde3: null,
       fechaHasta3: null,
-    filterParamsInvoice:{
-      nombreDocumento:"",
-    },
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
+      codigoDocumento:"",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
@@ -193,6 +190,7 @@ export default {
       fechaVto: "",
       ingresosBrutos: "",
       cae: "",
+      letra:"",
       subTotal:"",
       totalIva21:"",
       totalIva27:"",
@@ -201,7 +199,9 @@ export default {
       condicionIva: "",
       condicionVenta: "",
       barCode: "",
-      nombreDocumento:"",
+      nombre:"",
+      documentoName:"",
+      documentoComercialName:"",
       page: 1,
       size: 10,
       totalPages: 0,
@@ -216,7 +216,7 @@ export default {
     menu2: false,
     headers: [
       { text: "Fecha", value: "fechaEmision" },
-      { text: "Comprobante", value: "nombreDocumento" },
+      { text: "Comprobante", value: "letra" },
       { text: "Numero Comprobantes", value: "numeroCbte" },
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva" },
@@ -254,7 +254,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
+      GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
@@ -276,9 +276,6 @@ export default {
 
       console.log(this.ventas);
     },
-     filterInvoice() {
-    
-    },
     createDate(date, param) {
       const integerDate = generateIntegerDate(date);
       if (param === "fechaDesde") {
@@ -292,16 +289,6 @@ export default {
       let id = sucursal.id;
       ReportsService(this.tenant, this.service, this.token)
         .salesForDate(id, fechaDesde, fechaHasta)
-        .then((res) => {
-          exportPDF(res);
-        });
-    },
-
-    salesForMonth(sucursal, year, month) {
-      //if (this.notPassSucursalValidations()) return this.error('sucursal');
-      let id = sucursal.id;
-      ReportsService(this.tenant, this.service, this.token)
-        .salesForMonth(id, year, month)
         .then((res) => {
           exportPDF(res);
         });
