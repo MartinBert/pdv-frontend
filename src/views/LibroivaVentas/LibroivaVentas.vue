@@ -65,13 +65,13 @@
       <v-row style="justify-content: center;
        margin-top:-5px;
       ">
-        <v-col cols="2">
+      <v-col cols="2">
           <v-text-field
-            v-model="filterParams.letra"
+            v-model="filterParams.nombreDocumento"
             dense
             outlined
             rounded
-            label="Nombre Comprobante"
+            label="Busqueda por Nombre documento"
             class="text-left"
             v-on:input="filterObjects()"
             append-icon="mdi-magnify"
@@ -79,11 +79,23 @@
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.codigoDocumento"
+            v-model="filterParams.fechaEmision"
             dense
             outlined
             rounded
-            label="Numero Comprobante"
+            label="Busqueda por Fecha Emision"
+            class="text-left"
+            v-on:input="filterObjects()"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.numeroComprobante"
+            dense
+            outlined
+            rounded
+            label="Busqueda por numero de comprobante"
             class="text-left"
             append-icon="mdi-magnify"
             v-on:input="filterObjects()"
@@ -91,11 +103,11 @@
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.razonSocial"
+            v-model="filterParams.blackReceiptFilter"
             dense
             outlined
             rounded
-            label="Razon Social"
+            label="Busqueda especial"
             class="text-left"
             v-on:input="filterObjects()"
             append-icon="mdi-magnify"
@@ -186,6 +198,7 @@ export default {
       totalVenta: "",
       documentosComerciales: "",
       cuit: "",
+      numeroCbte:"",
       razonSocial: "",
       fechaVto: "",
       ingresosBrutos: "",
@@ -216,8 +229,8 @@ export default {
     menu2: false,
     headers: [
       { text: "Fecha", value: "fechaEmision" },
-      { text: "Comprobante", value: "letra" },
-      { text: "Numero Comprobantes", value: "numeroCbte" },
+      { text: "Comprobante", value: "nombreDocumento" },
+      { text: "Numero Comprobantes", value: "barCode" },
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva" },
       { text: "N° Cuit", value: "cliente.cuit" },
