@@ -84,6 +84,7 @@
 <script>
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
+import CajaService from "../../services/CajaService";
 import Spinner from "../../components/Graphics/Spinner";
 import Error from "../../components/Error";
 import { restarNumeros, roundTwoDecimals } from "../../helpers/mathHelper";
@@ -210,28 +211,35 @@ export default {
     save() {
       this.$refs.form.validate();
       this.loaded = false;
-      this.object.sucursal = this.loguedUser.sucursal;
-      this.object.diferencia = this.diferencia;
-      this.ventas.forEach((el) => {
-        el.cerrado = "cerrado";
-      });
-      this.object.fecha = formatDate(getCurrentDate());
-
-      GenericService(this.tenant, "comprobantesFiscales", this.token).saveAll(
-        this.ventas
-      );
-
-      GenericService(this.tenant, this.service, this.token)
-        .save(this.object)
-        .then(() => {
-          this.$router.push({ name: "caja" });
-        })
-        .catch((error) => {
-          if (error.response.status == 500) {
-            this.errorStatus = true;
-            this.loaded = true;
-          }
+      const sucursal = this.loguedUser.sucursal;
+      CajaService(this.tenant, this.service, this.token)
+      .getPreviousCorrelativeNumber(sucursal.id)
+      .then(data => {
+        const correlativeNumber = data.data += 1;
+        this.object.numeroCorrelativo = correlativeNumber;
+        this.object.sucursal = sucursal;
+        this.object.diferencia = this.diferencia;
+        this.ventas.forEach((el) => {
+          el.cerrado = "cerrado";
         });
+        this.object.fecha = formatDate(getCurrentDate());
+
+        GenericService(this.tenant, "comprobantesFiscales", this.token).saveAll(
+          this.ventas
+        );
+
+        GenericService(this.tenant, this.service, this.token)
+          .save(this.object)
+          .then(() => {
+            this.$router.push({ name: "caja" });
+          })
+          .catch((error) => {
+            if (error.response.status == 500) {
+              this.errorStatus = true;
+              this.loaded = true;
+            }
+          });
+      })
     },
 
     back() {

@@ -64,6 +64,7 @@ export default {
     clientIp: "",
     headers: [
       { text: "Fecha", value: "fecha" },
+      { text: "Número", value: "numeroCorrelativo" },
       { text: "Descripcion", value: "descripcion" },
       { text: "Detalles", value: "detalles", sortable: false },
     ],
