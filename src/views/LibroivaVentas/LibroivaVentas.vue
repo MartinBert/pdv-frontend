@@ -7,13 +7,6 @@
       <v-row style="justify-content: center;">
           <v-col>
               <form
-                @submit.prevent="
-                  salesForDate(
-                    loguedUser.sucursal,
-                    object.fechaDesde,
-                    object.fechaHasta
-                  )
-                "
               >
               <v-col cols="2">
                   <div class="d-block">
@@ -37,7 +30,9 @@
                     required
                   >
                   </v-text-field>
-                  <v-btn class="primary v-btn--block" type="submit"
+                  <v-btn class="primary v-btn--block" type="button" @click="salesForDate1(loguedUser.sucursal,
+                    object.fechaDesde,
+                    object.fechaHasta)"
                    style="margin-left:400px;
                    margin-top:-100px;
                    "
@@ -128,7 +123,7 @@ import {
   getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
-import { exportPDF} from "../../helpers/exportFileHelper";
+//import { exportExcel} from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -280,13 +275,16 @@ export default {
         this.object.fechaHasta = integerDate;
       }
     },
-     salesForDate(sucursal, fechaDesde, fechaHasta) {
+     salesForDate1(sucursal, fechaDesde, fechaHasta) {
       //if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
+      console.log(sucursal,fechaDesde,fechaHasta);
       ReportsService(this.tenant, this.service, this.token)
         .salesForDate(id, fechaDesde, fechaHasta)
         .then((res) => {
-          exportPDF(res);
+          console.log(res);
+          console.log(res);
+          //exportExcel(res);
         });
     },
     seeDetails(objects) {
