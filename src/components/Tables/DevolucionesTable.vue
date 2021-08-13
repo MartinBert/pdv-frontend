@@ -42,8 +42,8 @@ export default {
      headers: [
       { text: "Descripcion", value: "descripcion" },
       { text: "Fecha", value: "fecha" },
-      { text: "Producto Devueltos", value: "productos" },
-      { text: "Productos Cedidos", value: "productosSalientes" },
+      { text: "Producto Devueltos", value: "productos", sortable:false},
+      { text: "Productos Cedidos", value: "productosSalientes", sortable:false},
       { text: "Comprobante", value: "nombreDocumento" },
       { text: "Total", value: "totalDevolucion" },
       { text: "Acciones", value: "acciones", sortable:false},

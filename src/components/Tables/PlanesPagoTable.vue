@@ -75,7 +75,7 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     headers: [
       { text: "Nombre", value: "nombre" },
-      { text: "Cantidad de coutas", value: "coutas" },
+      { text: "Cantidad de coutas", value: "coutas", sortable:false},
       { text: "Porcentaje de recargo", value: "porcentaje" },
       { text: "Accciones", value: "acciones", sortable: false },
     ],
