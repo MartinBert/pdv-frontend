@@ -4,6 +4,7 @@
   ">
     <v-card>
       <MarcasTable
+       :items="devoluciones"
         v-on:editItem="edit"
         v-on:deleteItem="deleteItem"
         v-if="loaded"
@@ -48,6 +49,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterObjects();
   },
   methods: {
     filterObjects(page) {
