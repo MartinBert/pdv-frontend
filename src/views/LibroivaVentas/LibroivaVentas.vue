@@ -65,18 +65,6 @@
       <v-row style="justify-content: center;
        margin-top:-5px;
       ">
-      <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.nombreDocumento"
-            dense
-            outlined
-            rounded
-            label="Busqueda por Nombre documento"
-            class="text-left"
-            v-on:input="filterObjects()"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
         <v-col cols="2">
           <v-text-field
             v-model="filterParams.fechaEmision"
@@ -95,6 +83,7 @@
             dense
             outlined
             rounded
+            type="number"
             label="Busqueda por numero de comprobante"
             class="text-left"
             append-icon="mdi-magnify"
@@ -120,12 +109,6 @@
         :items="ventas"
         hide-default-footer
       > 
-        <template v-slot:[`item.cliente.condicionIva`]="{ item }">
-          <Detail
-            :objects="item.cliente.condicionIva"
-            @click="seeDetails(item)"
-          />
-        </template>
       </v-data-table>
       <Pagination
         :page="filterParams.page"
@@ -138,7 +121,7 @@
 </template>
 <script>
 import ReportsService from "../../services/ReportsService";
-import Detail from "../../components/Buttons/Detail";
+//import Detail from "../../components/Buttons/Detail";
 import Pagination from "../../components/Pagination";
 import {
   generateIntegerDate,
@@ -245,7 +228,7 @@ export default {
 
   components: {
     Pagination,
-    Detail,
+    //Detail,
   },
 
   computed: {
