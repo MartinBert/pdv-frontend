@@ -6,6 +6,19 @@
         <v-col>
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.fechaEmision"
+            v-on:input="filterObjects()"
+            dense
+            rounded
+            outlined
+            type="text"
+            class="text-left"
+            placeholder="Búsqueda por fecha"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
         <v-col cols="3">
           <v-text-field
             v-model="filterParams.blackReceiptFilter"
@@ -61,6 +74,7 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       sucursalId: "",
+      fechaEmision:"",
       blackReceiptFilter: "",
       page: 1,
       size: 10,
