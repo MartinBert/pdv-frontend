@@ -43,7 +43,7 @@ export default {
       { text: "Descripcion", value: "descripcion" },
       { text: "Fecha", value: "fecha" },
       { text: "Producto Devueltos", value: "productos" },
-      { text: "Productos Saliente", value: "productosSalientes" },
+      { text: "Productos Cedidos", value: "productosSalientes" },
       { text: "Comprobante", value: "nombreDocumento" },
       { text: "Total", value: "totalDevolucion" },
       { text: "Acciones", value: "acciones", sortable:false},

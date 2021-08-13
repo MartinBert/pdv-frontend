@@ -88,8 +88,8 @@ export default {
       { text: "Nombre", value: "nombre" },
       { text: "Razon Social", value: "razonSocial" },
       { text: "Cuit", value: "cuit" },
-      { text: "Detalles", value: "detalles" },
-      { text: "Acciones", value: "acciones" },
+      { text: "Detalles", value: "detalles", sortable:false},
+      { text: "Acciones", value: "acciones" , sortable:false},
     ],
   }),
   components: {

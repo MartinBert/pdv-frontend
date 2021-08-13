@@ -51,7 +51,7 @@ export default {
     headers: [
       { text: "Nombre", value: "nombre" },
       { text: "Razon Social", value: "razonSocial" },
-      { text: "Detalles", value: "detalles" },
+      { text: "Detalles", value: "detalles", sortable:false},
       { text: "Cuit", value: "cuit" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
