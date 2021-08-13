@@ -112,7 +112,7 @@ export default {
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
       { text: "Codigo de barra", value: "barCode" },
-      { text: "Comprobante", value: "numeroCorrelativo"},
+      { text: "Comprobante", value: "correlativoComprobante"},
       { text: "Detalles", value: "productos", sortable: false },
       { text: "Medios de pago empleados", value: "mediosPago", sortable: false},
       { text: "Planes de pago", value: "planesPago", sortable: false },
