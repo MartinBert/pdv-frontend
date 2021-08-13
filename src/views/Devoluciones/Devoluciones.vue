@@ -19,7 +19,7 @@
             append-icon="mdi-magnify"
           ></v-text-field>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.blackReceiptFilter"
             v-on:input="filterObjects()"
