@@ -1,6 +1,7 @@
 <template>
-  <v-container>
-    <v-form class="mb-3">
+  <v-container style="min-width: 98%;">
+    <v-card>
+      <v-form class="mb-3">
       <v-row>
         <v-col>
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
@@ -10,6 +11,7 @@
             v-model="filterParams.blackReceiptFilter"
             v-on:input="filterObjects()"
             dense
+            rounded
             outlined
             type="text"
             class="text-left"
@@ -36,6 +38,7 @@
     <Spinner v-if="!loaded"/>
     <DevolucionDetails/>
     <ReceiptDialog v-on:receipt="saveChanges"/>
+    </v-card>
   </v-container>
 </template>
 <script>
