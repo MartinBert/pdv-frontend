@@ -59,6 +59,10 @@ import IvasForm from "../views/Ivas/IvasForm.vue";
 import Manuales from "../views/Manuales/Manuales.vue";
 import Mensajes from "../views/Mensajes/Mensajes.vue";
 import Calendar from "../views/Calendar/Calendar.vue";
+import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
+import Cierrez from "../views/Cierrez/Cierrez.vue";
+import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
+import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 
 Vue.use(VueRouter)
 
@@ -152,6 +156,12 @@ const routes = [
                 component: MarcasForm,
                 meta: { requiresAuth: true }
             },
+            {
+                path: 'libroivaventas',
+                name: 'libroivaventas',
+                component: LibroivaVentas,
+                meta: { requiresAuth: true }
+            },
 
             {
                 path: 'calendar',
@@ -159,7 +169,6 @@ const routes = [
                 component: Calendar,
                 meta: { requiresAuth: true }
             },
-
             {
                 path: 'clientes',
                 name: 'clientes',
@@ -251,6 +260,12 @@ const routes = [
                 meta: { requiresAuth: true }
             },
             {
+                path: 'etiquetas',
+                name: 'etiquetas',
+                component: GenerarEtiquetas,
+                meta: { requiresAuth: true }
+            },
+            {
                 path: 'ventas/list',
                 name: 'ventas',
                 component: Ventas,
@@ -260,6 +275,18 @@ const routes = [
                 path: 'ventas',
                 name: 'ventasForm',
                 component: VentasForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'ventas/presupuesto',
+                name: 'presupuesto',
+                component: Presupuesto,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'ventas/cierrez',
+                name: 'cierrez',
+                component: Cierrez,
                 meta: { requiresAuth: true }
             },
             {

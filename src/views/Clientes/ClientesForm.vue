@@ -1,10 +1,19 @@
 <template>
-  <v-container>
-    <Error :errorStatus="errorStatus"/>
+  <v-container
+ style="min-width: 98%;
+  margin-right:40px;
+  "
+  >
+    <Error :errorStatus="errorStatus" />
     <v-card min-width="100%" v-if="loaded">
       <div>
-        <v-form ref="form" v-model="valid" :lazy-validation="false" class="mt-5">
-          <v-row class="ma-1">
+        <v-form
+          ref="form"
+          v-model="valid"
+          :lazy-validation="false"
+          class="mt-0"
+        >
+          <v-row class="ma-0">
             <v-col>
               <v-select
                 type="text"
@@ -66,6 +75,16 @@
             <v-col>
               <v-text-field
                 type="text"
+                v-model="object.region"
+                :counter="50"
+                label="Localidad"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                type="text"
                 v-model="object.direccion"
                 :counter="50"
                 label="Dirección"
@@ -124,9 +143,13 @@
               ></v-text-field>
             </v-col>
           </v-row>
-          <div class="ma-1">
+          <div class="ma-0">
             <v-col class="col-6">
-              <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid"
+              <v-btn
+                class="mr-4"
+                color="primary"
+                @click="save"
+                :disabled="!valid"
                 >Guardar</v-btn
               >
               <v-btn color="default" @click="back()">Cancelar</v-btn>
@@ -135,13 +158,13 @@
         </v-form>
       </div>
     </v-card>
-    <Spinner v-if="!loaded"/>
+    <Spinner v-if="!loaded" />
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import Spinner from '../../components/Graphics/Spinner';
-import Error from '../../components/Error';
+import Spinner from "../../components/Graphics/Spinner";
+import Error from "../../components/Error";
 export default {
   data: () => ({
     valid: true,
@@ -161,7 +184,7 @@ export default {
 
   components: {
     Spinner,
-    Error
+    Error,
   },
 
   mounted() {

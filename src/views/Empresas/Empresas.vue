@@ -1,65 +1,29 @@
 <template>
-  <v-container>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col>
-          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.empresaSocialReason"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            placeholder="Razón social"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.empresaName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            placeholder="Nombre de empresa"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.empresaCuit"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            placeholder="CUIT"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <EmpresasTable
-      :items="empresas"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-on:seeDetails="seeDetails"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded" />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
-    <EmpresaDetails/>
+  <v-container  style="min-width: 98%;
+  margin-right:40px;
+  ">
+    <v-card>
+      <EmpresasTable
+        :items="empresas"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-on:seeDetails="seeDetails"
+        v-if="loaded"
+      />
+      <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+      <EmpresaDetails />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -90,12 +54,12 @@ export default {
     deleteDialogStatus: false,
   }),
 
-  components:{
+  components: {
     Spinner,
     Pagination,
     EmpresasTable,
     EmpresaDetails,
-    DeleteDialog
+    DeleteDialog,
   },
 
   mounted() {
@@ -109,7 +73,7 @@ export default {
 
   methods: {
     filterObjects(page) {
-      if(page) this.filterParams.page = page;
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -121,11 +85,6 @@ export default {
           this.loaded = true;
         });
     },
-
-    newObject() {
-      this.$router.push({ name: "empresasForm", params: { id: 0 } });
-    },
-
     edit(id) {
       this.$router.push({ name: "empresasForm", params: { id: id } });
     },
@@ -135,8 +94,8 @@ export default {
       this.deleteDialogStatus = true;
     },
 
-    deleteConfirmation(result){
-      return result ? this.deleteObject() : this.deleteDialogStatus = false;
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
 
     deleteObject() {
@@ -147,14 +106,16 @@ export default {
         .then(() => {
           this.filterObjects();
         })
-        .catch(()=>{
-          this.$errorAlert("El registro se encuentra asociado a otros elementos en el sistema");
-        })
+        .catch(() => {
+          this.$errorAlert(
+            "El registro se encuentra asociado a otros elementos en el sistema"
+          );
+        });
     },
 
-    seeDetails(object){
-      this.$store.commit('details/mutateDialog');
-      this.$store.commit('details/addObjectToDetail', object);
+    seeDetails(object) {
+      this.$store.commit("details/mutateDialog");
+      this.$store.commit("details/addObjectToDetail", object);
     },
   },
 };

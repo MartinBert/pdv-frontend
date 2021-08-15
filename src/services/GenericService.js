@@ -1,3 +1,4 @@
+
 import axios from "axios";
 
 export default (tenant, service, token) => {
@@ -14,8 +15,8 @@ export default (tenant, service, token) => {
             })
         },
 
-        save: function (body) {
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`, body, {
+        save: async function (body) {
+            return await axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}`, body, {
                 headers: { Authorization: "Bearer " + token }
             })
         },
@@ -37,6 +38,7 @@ export default (tenant, service, token) => {
                 headers: { Authorization: "Bearer " + token }
             })
             return data;
+            
         },
 
         update(object) {

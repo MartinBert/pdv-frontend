@@ -7,6 +7,12 @@ export function exportPDF(res) {
     return window.open(fileURL, "_blank");
 }
 
+export function exportPDF1(res) {
+    let file = new Blob([res["data"]], { type: "application/pdf" });
+    let fileURL = URL.createObjectURL(file);
+    return window.open(fileURL, "_blank");
+}
+
 export function exportExcel(headers, data) {
     let wb = XLSX.utils.book_new();
     wb.Props = {
@@ -46,4 +52,38 @@ export function exportExcel(headers, data) {
         return buf;
     }
     saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), "productos.xlsx");
+}
+
+export function exportExcelLibro(headers, data) {
+    let wb = XLSX.utils.book_new();
+    wb.Props = {
+        Title: "Libroiva",
+        CreatedDate: new Date()
+    };
+    wb.SheetNames.push("libroivaventas");
+    let ws_data = [headers];
+    data.forEach(el => {
+        ws_data.push([
+            el.fecha,
+            el.numeroComprobante,
+            el.razonSocial,
+            el.cuit,
+            el.netoGrabado,
+            el.totalIva27,
+            el.totalIva21,
+            el.totalIva10,
+            el.totalIva0,
+            el.totalVenta,
+        ])
+    })
+    let ws = XLSX.utils.aoa_to_sheet(ws_data);
+    wb.Sheets["libroivaventas"] = ws;
+    let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+    function s2ab(s) {
+        let buf = new ArrayBuffer(s.length);
+        let view = new Uint8Array(buf);
+        for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
+    saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), "libroiva.xlsx");
 }

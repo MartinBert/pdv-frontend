@@ -15,6 +15,7 @@ export default {
   },
   methods: {
     print() {
+      console.log(this.object);
       this.$emit("print", this.object);
     },
   },

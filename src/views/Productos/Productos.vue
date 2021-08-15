@@ -1,30 +1,30 @@
 <template>
-  <v-container>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col cols="12" v-if="perfil < 3">
-          <v-btn class="primary ml-1" @click="view = 'listOfProducts'" raised
-            >LISTA</v-btn
-          >
-          <v-btn class="primary ml-1" @click="newObject()" raised>NUEVO</v-btn>
-          <v-btn class="primary ml-1" @click="view = 'labelPrinting'"
-            >GENERAR ETIQUETAS</v-btn
-          >
-          <v-btn class="primary ml-1" @click="goPricesManagerView()"
-            >MODIFICAR PRECIOS</v-btn
-          >
-          <v-btn class="primary ml-1" @click="getReport()" raised
-            >REPORTE</v-btn
-          >
-          <v-btn
-            v-if="loaded"
-            class="primary ml-1"
-            @click="exportGeneralExcel()"
-            raised
-            >EXPORTAR EXCEL</v-btn
-          >
+  <v-container
+    class="container"
+    style="min-width: 98%;
+    margin-left:5px;
+  "
+  >
+    <TabBar
+      :tabs="tabs"
+      :activeTab="activeTab"
+    />
+    <v-card>
+      <v-form class="mb-0" v-on:click="show = !show">
+        <v-row class="m-5">
+          <v-col cols="6" v-if="perfil < 3">
+            <v-btn class="primary ml-2" @click="getReport()" raised
+              >REPORTE</v-btn
+            >
+            <v-btn
+              v-if="loaded"
+              class="primary ml-2"
+              @click="exportGeneralExcel()"
+              raised
+              >EXPORTAR EXCEL</v-btn
+            >
 
-          <!-- 
+            <!-- 
           Este servicio corrige los precios de la 
           lista, calculando sus valores basados en los 
           porcentajes de iva compra, iva venta, ganancia 
@@ -32,139 +32,39 @@
           cálculos se realizan partiendo del costo bruto
           del artículo y no de de su precio final de venta.
           -->
-          <v-btn
-            v-if="perfil === 1"
-            class="primary ml-1"
-            @click="correctPriceInList()"
-            raised
-            >Corregir lista de precios</v-btn
-          >
-
-
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="6"></v-col>
-        <v-col v-if="perfil < 3 && view == 'listOfProducts'">
-          <v-file-input
-            class="mt-3"
-            dense
-            v-model="file"
-            placeholder="Importar"
-            accept=".xlsx, xls"
-            @change="onChange($event)"
-          ></v-file-input>
-        </v-col>
-        <v-col v-if="view == 'listOfProducts' && perfil < 3">
-          <v-select
-            :items="estados"
-            v-model="estadoSelecionado"
-            item-text="text"
-            :return-object="true"
-            outlined
-            dense
-            @input="filterObjects()"
-          ></v-select>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col class="mt-2 ml-3" v-if="view == 'labelPrinting'">
-          <h2>Seleccion de productos</h2>
-        </v-col>
-        <v-col></v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Nombre de producto"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoCodigo"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Codigo de producto"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoCodigoBarras"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Codigo de barras"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoMarcaName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Marca"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.productoPrimerAtributoName"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Atributo"
-            append-icon="mdi-magnify"
-          />
-        </v-col>
-        <v-col></v-col>
-      </v-row>
-    </v-form>
-    <ProductosTable
-      :items="productos"
-      v-on:editItem="edit"
-      v-on:deleteItem="deleteItem"
-      v-on:add="reactivationOfProduct"
-      v-if="loaded && view === 'listOfProducts'"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded && view === 'listOfProducts'"
-    />
-    <LabelPrinting
-      v-if="view === 'labelPrinting'"
-      :productos="productos"
-      :page="filterParams.page"
-      :totalVisible="filterParams.size"
-      :totalPages="filterParams.totalPages"
-      :tenant="tenant"
-      :token="token"
-      v-on:changePage="changePage"
-      v-on:checkProduct="checkProductInList"
-    />
-    <Spinner v-if="!loaded" />
-    <DeleteDialog
-      :status="deleteDialogStatus"
-      v-on:deleteConfirmation="deleteConfirmation"
-    />
+            <v-btn
+              v-if="perfil === 1"
+              class="primary ml-2"
+              @click="correctPriceInList()"
+              raised
+              >Corregir lista de precios</v-btn
+            >
+          </v-col>
+          <v-col cols="3" v-if="perfil < 3">
+            <v-file-input
+              class="mt-2"
+              dense
+              v-model="file"
+              placeholder="Importar"
+              accept=".xlsx, xls"
+              @change="onChange($event)"
+            ></v-file-input>
+          </v-col>
+        </v-row>
+      </v-form>
+      <ProductosTable
+        :items="productos"
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-on:add="reactivationOfProduct"
+        v-if="loaded"
+      />
+      <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
+    </v-card>
     <template>
       <v-dialog
         v-model="loader"
@@ -206,25 +106,26 @@
 <script>
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-import LabelPrinting from "../../components/LabelPrinting";
 import Spinner from "../../components/Graphics/Spinner";
-import Pagination from "../../components/Pagination";
 import ProductosTable from "../../components/Tables/ProductosTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
+import TabBar from "../../components/Generics/TabBar";
+
 import {
   generateBarCode,
   roundTwoDecimals,
   decimalPercent,
   calculateImportWithoutIvaPercent,
   restarNumeros,
-  calculateAmountPlusPercentaje
+  calculateAmountPlusPercentaje,
 } from "../../helpers/mathHelper";
 import { exportExcel } from "../../helpers/exportFileHelper";
 import XLSX from "xlsx";
 export default {
   data: () => ({
+    tab:null,
+    show: true,
     icon: "mdi-check-circle",
-    view: "listOfProducts",
     perfil: "",
     loader: false,
     loaderStatus: false,
@@ -243,23 +144,15 @@ export default {
       { id: 1, text: "Activos" },
       { id: 2, text: "Inactivos" },
     ],
-    estadoSelecionado: { id: 1, text: "Activos" },
-    filterParams: {
-      sucursalId: "",
-      productoName: "",
-      productoCodigo: "",
-      productoCodigoBarras: "",
-      productoMarcaName: "",
-      productoPrimerAtributoName: "",
-      productoSegundoAtributoName: "",
-      productoTercerAtributoName: "",
-      productoEstado: "",
-      page: 1,
-      size: 10,
-      totalPages: 0,
-    },
-    loaded: false,
-    tenant: "",
+    tabs: [
+      { id: 1, title: "Lista", route: '/productos' },
+      { id: 2, title: "Nuevo", route: '/productos/form/0' },
+      { id: 3, title: "Generar Etiqueta", route: '/etiquetas' },
+      { id: 4, title: "Modificar precios", route: '/precios' },
+    ],
+    activeTab: 1,
+    loaded: true,
+    tenant: '',
     idObject: "",
     service: "productos",
     token: localStorage.getItem("token"),
@@ -270,40 +163,19 @@ export default {
   }),
 
   components: {
-    LabelPrinting,
     Spinner,
-    Pagination,
     ProductosTable,
     DeleteDialog,
+    TabBar
   },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterObjects();
     this.getOtherModels(0, 100000);
     this.perfil = this.loguedUser.perfil;
   },
 
   methods: {
-    filterObjects(page) {
-      if (page) this.filterParams.page = page;
-      if (this.estadoSelecionado.id > 1) {
-        this.filterParams.productoEstado = 2;
-      } else {
-        this.filterParams.productoEstado = 0;
-      }
-      if(this.loguedUser.perfil > 1){
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-      }
-      GenericService(this.tenant, "productos", this.token)
-        .filter(this.filterParams)
-        .then((data) => {
-          this.productos = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
-    },
-
     getOtherModels(page, size) {
       const services = [
         "marcas",
@@ -347,10 +219,6 @@ export default {
       });
     },
 
-    newObject() {
-      this.$router.push({ name: "productosForm", params: { id: 0 } });
-    },
-
     edit(id) {
       this.$router.push({ name: "productosForm", params: { id: id } });
     },
@@ -382,16 +250,19 @@ export default {
                 "Desea hacerlo"
               ).then((result) => {
                 if (result.isConfirmed) {
-                  let inactiveProduct = this.productos.filter(
-                    (el) => el.id === this.idObject
-                  )[0];
-                  inactiveProduct.estado = 2;
                   GenericService(this.tenant, this.service, this.token)
-                    .save(inactiveProduct)
-                    .then(this.filterObjects())
-                    .catch((err) => {
-                      console.error(err);
-                    });
+                  .get(this.idObject)
+                  .then(res => {
+                    let inactiveProduct = res.data;
+                    inactiveProduct.estado = 2;
+                    console.log(inactiveProduct);
+                    GenericService(this.tenant, this.service, this.token)
+                      .save(inactiveProduct)
+                      .then(this.refreshPage())
+                      .catch((err) => {
+                        console.error(err);
+                      });
+                  })
                 }
               });
             }
@@ -410,11 +281,14 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .save(object)
             .then(() => {
-              this.filterObjects();
-              this.getOtherModels(0, 100000);
+              this.refreshPage();
             });
         }
       });
+    },
+
+    refreshPage(){
+      window.location.reload();
     },
 
     //Load excel
@@ -434,7 +308,7 @@ export default {
         let workbook = XLSX.read(data, { type: "binary" });
 
         let sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(function (y) {
+        sheet_name_list.forEach(function(y) {
           let exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
           if (exceljson.length > 0) {
             for (let i = 0; i < exceljson.length; i++) {
@@ -443,7 +317,6 @@ export default {
           }
         });
         let prod = this.validateImport(excel);
-        console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
@@ -507,17 +380,30 @@ export default {
                 (1 + decimalPercent(ivaVent))
             ),
             costoNeto: roundTwoDecimals(
-              element.precioTotal / (1 + decimalPercent(ivaVent)) / (1 + ganancia) / (1 + decimalPercent(ivaComp))
+              element.precioTotal /
+                (1 + decimalPercent(ivaVent)) /
+                (1 + ganancia) /
+                (1 + decimalPercent(ivaComp))
             ),
             ivaCompra: roundTwoDecimals(
-              (element.precioTotal /
+              element.precioTotal /
                 (1 + ganancia) /
-                (1 + decimalPercent(ivaVent))) -
-                element.precioTotal / (1 + decimalPercent(ivaVent)) / (1 + ganancia) / (1 + decimalPercent(ivaComp))
+                (1 + decimalPercent(ivaVent)) -
+                element.precioTotal /
+                  (1 + decimalPercent(ivaVent)) /
+                  (1 + ganancia) /
+                  (1 + decimalPercent(ivaComp))
             ),
             ganancia: element.ganancia,
-            precioSinIva: roundTwoDecimals(element.precioTotal / (1 + decimalPercent(ivaVent))),
-            ivaVenta: roundTwoDecimals(element.precioTotal - roundTwoDecimals(element.precioTotal / (1 + decimalPercent(ivaVent)))),
+            precioSinIva: roundTwoDecimals(
+              element.precioTotal / (1 + decimalPercent(ivaVent))
+            ),
+            ivaVenta: roundTwoDecimals(
+              element.precioTotal -
+                roundTwoDecimals(
+                  element.precioTotal / (1 + decimalPercent(ivaVent))
+                )
+            ),
             precioTotal: element.precioTotal,
             estado: 1,
           };
@@ -640,10 +526,6 @@ export default {
           let fileURL = URL.createObjectURL(file);
           window.open(fileURL, "_blank");
         });
-    },
-
-    goPricesManagerView() {
-      this.$router.push({ name: "precios" });
     },
 
     setAtributesValues(atributes) {
@@ -798,28 +680,28 @@ export default {
     /******************************************************************************************************/
     /* ALL FUNCTIONS TO APPLY CORRECTIONS TO THE PRICE LIST ----------------------------------------------*/
     /******************************************************************************************************/
-    correctPriceInList(){
+    correctPriceInList() {
       this.loaded = false;
       this.filterParams.page = 1;
       this.filterParams.size = 1000000;
       GenericService(this.tenant, this.service, this.token)
-      .filter(this.filterParams)
-      .then(data => {
-        const products = data.data.content;
-        let correctedProducts = products.map(el => {
-          el = this.calculations(el);
-          return el;
-        })
-        GenericService(this.tenant, this.service, this.token)
-        .saveAll(correctedProducts)
-        .then(()=>{
-          this.$successAlert("Precios corregidos")
-          this.loaded = true;
-        })
-        .catch(err => {
-          console.error(err);
-        })
-      })
+        .filter(this.filterParams)
+        .then((data) => {
+          const products = data.data.content;
+          let correctedProducts = products.map((el) => {
+            el = this.calculations(el);
+            return el;
+          });
+          GenericService(this.tenant, this.service, this.token)
+            .saveAll(correctedProducts)
+            .then(() => {
+              this.$successAlert("Precios corregidos");
+              this.loaded = true;
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
     },
 
     calculations(object) {
@@ -828,10 +710,7 @@ export default {
         object.ivaComprasObject.porcentaje
       );
       object.precioCosto = object.costoNeto;
-      object.ivaCompra = restarNumeros([
-        object.costoBruto,
-        object.costoNeto,
-      ]);
+      object.ivaCompra = restarNumeros([object.costoBruto, object.costoNeto]);
       object.precioSinIva = calculateAmountPlusPercentaje(
         object.costoBruto,
         object.ganancia
@@ -842,7 +721,7 @@ export default {
       );
       object.ivaVenta = restarNumeros([
         object.precioTotal,
-        object.precioSinIva
+        object.precioSinIva,
       ]);
 
       return object;
@@ -850,3 +729,11 @@ export default {
   },
 };
 </script>
+<style>
+.active_tab {
+  background-color: black;
+}
+.filtros {
+  margin-right: 20px;
+}
+</style>

@@ -1,136 +1,58 @@
 <template>
-  <v-container>
-    <v-form class="mb-3">
-      <v-row>
-        <v-col>
-          <v-btn class="primary" @click="seeReports()" raised
-            >Reporte de Ventas</v-btn
-          >
-        </v-col>
-        <v-spacer></v-spacer>
-        <v-col>
-          <v-text-field
-            type="text"
-            v-model="filterParams.fechaEmision"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            label="Búsqueda por fecha"
-            class="text-left"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            type="number"
-            v-model="filterParams.numeroComprobante"
-            v-on:input="filterObjects()"
-            dense
-            outlined
-            rounded
-            label="Búsqueda por número de comprobante"
-            placeholder=" "
-            class="text-left"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            type="number"
-            v-model="filterParams.blackReceiptFilter"
-            dense
-            outlined
-            rounded
-            class="text-left"
-            label="Búsqueda especial"
-            placeholder=" "
-            append-icon="mdi-magnify"
-            @input="filterObjects()"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-form>
-    <VentasTable
-      :items="ventas"
-      v-on:print="print"
-      v-on:seeDetails="seeDetails"
-      v-if="loaded"
-    />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded" />
-    <VentaDetails />
-    <VentasReportsDialog />
+  <v-container
+    style="min-width: 98%;
+    margin-left:1px;
+  "
+  >
+    <TabBar :tabs="tabs" :activeTab="activeTab" />
+    <v-card min-width="100%">
+      <VentasTable
+        v-on:print="print"
+        v-on:seeDetails="seeDetails"
+        v-if="activeTab === 1"
+      />
+      <Spinner v-if="!loaded" />
+      <VentaDetails />
+      <VentasReportsDialog />
+    </v-card>
   </v-container>
 </template>
 <script>
-import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
-import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
+import TabBar from "../../components/Generics/TabBar";
 import VentasTable from "../../components/Tables/VentasTable";
 import VentaDetails from "../../components/Details/VentaDetails";
 export default {
   data: () => ({
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    ventas: [],
-    filterParams: {
-      blackReceiptFilter: "",
-      sucursalId: "",
-      fechaEmision: "",
-      comprobanteCerrado: "",
-      numeroComprobante: "",
-      totalVenta: "",
-      page: 1,
-      size: 10,
-      totalPages: 0,
-    },
-    loaded: false,
-    tenant: "",
-    service: "comprobantesFiscales",
+    loaded: true,
     token: localStorage.getItem("token"),
+    tenant: "",
+    tabs:[
+      { id: 1, title: "Comprobantes", route: '/ventas/list' },
+      { id: 2, title: "Presupuesto", route: '/ventas/presupuesto' },
+      { id: 3, title: "Cierre de ventas Diario", route: '/ventas/cierrez' },
+    ],
+    activeTab: 1
   }),
 
   components: {
     VentasReportsDialog,
-    Pagination,
     Spinner,
     VentasTable,
-    VentaDetails
+    VentaDetails,
+    TabBar,
   },
 
   mounted() {
-    this.$store.commit("eventual/resetStates");
     this.tenant = this.$route.params.tenant;
-    if (this.loguedUser.perfil > 1) {
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
-    this.filterObjects();
+    this.$store.commit("eventual/resetStates");
   },
 
   methods: {
-      filterObjects(page) {
-        if(page) this.filterParams.page = page;
-        GenericService(this.tenant, "ventas", this.token)
-          .filter(this.filterParams)
-          .then((data) => {
-            this.ventas = data.data.content;
-            this.filterParams.totalPages = data.data.totalPages;
-            if(this.filterParams.totalPages < this.filterParams.page){
-              this.filterParams.page = 1;
-            }
-            this.loaded = true;
-          });
-    },
-
     seeDetails(objects) {
       let title = "Productos";
       if (objects[0] && objects[0].cuotas) title = "Planes de pago";
@@ -154,6 +76,10 @@ export default {
 
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
+    },
+
+    setActiveTabComponent(id) {
+      this.activeTab = id;
     },
 
     containValue(value) {
@@ -182,3 +108,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.v-form {
+  padding: 10px;
+}
+</style>

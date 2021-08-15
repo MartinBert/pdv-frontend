@@ -1,36 +1,45 @@
 <template>
-  <v-card min-width="100%">
-    <Error :errorStatus="errorStatus"/>
-    <div v-if="loaded">
-      <v-form ref="form" 
-       class="mt-5">
-        <v-row class="ma-1">
-            <v-col class="col-6"> 
-              <v-text-field 
-              type="text"
-              v-model="object.nombre"
-              :counter="50"
-              label="Nombre"
-              required
-              :rules="[v => !!v || 'Campo requerido...']"
-            ></v-text-field>
+  <v-container style="min-width: 98%;
+   margin-right: 40px;
+  ">
+    <v-card>
+      <Error :errorStatus="errorStatus" />
+      <div v-if="loaded">
+        <v-form ref="form" class="mt-5">
+          <v-row class="ma-1">
+            <v-col class="col-6">
+              <v-text-field
+                type="text"
+                v-model="object.nombre"
+                :counter="50"
+                label="Nombre"
+                required
+                :rules="[(v) => !!v || 'Campo requerido...']"
+              ></v-text-field>
             </v-col>
-        </v-row>
-        <div class="ma-1">
-          <v-col class="col-6">
-            <v-btn class="mr-4" color="primary" @click="save" :disabled="!valid">Guardar</v-btn>
-            <v-btn color="default" @click="back()">Cancelar</v-btn>
-          </v-col>
-        </div>
-      </v-form>
-    </div>
-    <Spinner v-if="!loaded"/>
-  </v-card>
+          </v-row>
+          <div class="ma-1">
+            <v-col class="col-6">
+              <v-btn
+                class="mr-4"
+                color="primary"
+                @click="save"
+                :disabled="!valid"
+                >Guardar</v-btn
+              >
+              <v-btn color="default" @click="back()">Cancelar</v-btn>
+            </v-col>
+          </div>
+        </v-form>
+      </div>
+      <Spinner v-if="!loaded" />
+    </v-card>
+  </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
-import Spinner from '../../components/Graphics/Spinner';
-import Error from '../../components/Error';
+import Spinner from "../../components/Graphics/Spinner";
+import Error from "../../components/Error";
 export default {
   data: () => ({
     valid: true,
@@ -42,9 +51,9 @@ export default {
     errorStatus: false,
   }),
 
-  components:{
+  components: {
     Spinner,
-    Error
+    Error,
   },
 
   mounted() {
@@ -59,7 +68,7 @@ export default {
     getObject(id) {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
-        .then(data => {
+        .then((data) => {
           this.object = data.data;
           this.loaded = true;
         });
@@ -73,7 +82,7 @@ export default {
         .then(() => {
           this.$router.push({ name: "marcas" });
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status == 500) {
             this.errorStatus = true;
             this.loaded = true;
@@ -83,7 +92,7 @@ export default {
 
     back() {
       this.$router.push({ name: "marcas" });
-    }
-  }
+    },
+  },
 };
 </script>

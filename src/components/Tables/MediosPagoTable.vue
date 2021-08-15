@@ -1,74 +1,171 @@
 <template>
-  <v-container>
-    <v-simple-table style="background-color: transparent">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Planes asociados</th>
-          <th>Suma en arqueo de caja</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody v-for="item in items" :key="item.id">
-        <tr>
-          <td>{{ item.nombre }}</td>
-          <td>
-            <Detail
-              :objectsArray="item.planPago"
-              v-on:seeDetails="seeDetails"
-            />
-          </td>
-          <td>
-            <Add
-              :object="item"
-              v-on:add="add"
-              v-if="!item.sumaEnCierreDeCaja"
-            />
-            <Checked
-              :object="item"
-              v-on:uncheck="uncheck"
-              v-if="item.sumaEnCierreDeCaja"
-            />
-          </td>
-          <td>
-            <Edit :itemId="item.id" v-on:editItem="editItem" />
-            <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
+  <v-container style="min-width: 100%;">
+    <v-form class="mb-0">
+      <v-row>
+        <v-col cols="1">
+          <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
+        </v-col>
+        <v-col cols="3">
+          <v-file-input
+            v-model="file"
+            class="mt-0"
+            placeholder="Importar medios de pago"
+            accept=".xlsx, xls"
+            @change="onChange($event)"
+          ></v-file-input>
+        </v-col>
+        <v-col cols="6"></v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.medioPagoName"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-form>
+    <v-data-table
+      :headers="headers"
+      :items="mediosPago"
+      class="elevation-6"
+      hide-default-footer
+    >
+      <template v-slot:[`item.planPago`]="{ item }">
+        <Detail :objectsArray="item.planPago" v-on:seeDetails="seeDetails" />
+      </template>
+      <template v-slot:[`item.sumaEnCierreDeCaja`]="{ item }">
+        <Add
+          :object="item"
+          v-on:add="addCloseBox"
+          v-if="!item.sumaEnCierreDeCaja"
+        />
+        <Checked
+          :object="item"
+          v-on:uncheck="uncheckCloseBox"
+          v-if="item.sumaEnCierreDeCaja"
+        />
+      </template>
+      <template v-slot:[`item.aplicaCierreZ`]="{ item }">
+        <Add :object="item" v-on:add="addZClosure" v-if="!item.aplicaCierreZ" />
+        <Checked
+          :object="item"
+          v-on:uncheck="uncheckZClosure"
+          v-if="item.aplicaCierreZ"
+        />
+      </template>
+      <template v-slot:[`item.acciones`]="{ item }">
+        <Edit :itemId="item.id" v-on:editItem="editItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
+      </template>
+    </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
   </v-container>
 </template>
 <script>
+import Pagination from "../Pagination";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
 import Detail from "../Buttons/Detail";
 import Add from "../Buttons/Add";
 import Checked from "../Buttons/Checked";
+import GenericService from "../../services/GenericService";
 export default {
-  props: {
-    items: Array,
-  },
+  data: () => ({
+    mediosPago: [],
+    filterParams: {
+      sucursalId: "",
+      medioPagoName: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    file: "",
+    loaded: false,
+    tenant: "",
+    service: "mediosPago",
+    token: localStorage.getItem("token"),
+    deleteDialogStatus: false,
+    seePlansDialog: false,
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    headers: [
+      { text: "Nombre", value: "nombre" },
+      { text: "Plan de Pago", value: "planPago", sortable: false },
+      {
+        text: "Suma Arqueo de caja",
+        value: "sumaEnCierreDeCaja",
+        sortable: false,
+      },
+      { text: "Aplica en cierre z", value: "aplicaCierreZ", sortable: false },
+      { text: "Acciones", value: "acciones", sortable: false },
+    ],
+  }),
   components: {
     Edit,
     Delete,
     Detail,
     Add,
     Checked,
+    Pagination,
+  },
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+    if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.filterObjects();
   },
   methods: {
+    filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.mediosPago = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
+    newObject() {
+      this.$router.push({ name: "mediosPagoForm", params: { id: 0 } });
+    },
+
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },
+
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
     },
-    add(object) {
-      this.$emit("add", object);
+
+    addCloseBox(object) {
+      this.$emit("addCloseBox", object, "addCloseBox");
     },
-    uncheck(object) {
-      this.$emit("uncheck", object);
+
+    uncheckCloseBox(object) {
+      this.$emit("uncheckCloseBox", object, "uncheckCloseBox");
     },
+
+    addZClosure(object) {
+      this.$emit("addZClosure", object, "addZClosure");
+    },
+
+    uncheckZClosure(object) {
+      this.$emit("uncheckZClosure", object, "uncheckZClosure");
+    },
+
     seeDetails(objects) {
       this.$emit("seeDetails", objects);
     },

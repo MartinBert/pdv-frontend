@@ -1,18 +1,32 @@
 <template>
-  <v-container>
-    <v-form class="mb-3">
+  <v-container style="min-width: 98%;">
+    <v-card>
+      <v-form class="mb-3">
       <v-row>
         <v-col>
           <v-btn class="primary" @click="newObject()" raised>Nuevo</v-btn>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterParams.fechaEmision"
+            v-on:input="filterObjects()"
+            dense
+            rounded
+            outlined
+            type="text"
+            class="text-left"
+            placeholder="Búsqueda por fecha"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
           <v-text-field
             v-model="filterParams.blackReceiptFilter"
             v-on:input="filterObjects()"
             dense
-            outlined
             rounded
-            type="number"
+            outlined
+            type="text"
             class="text-left"
             placeholder="Búsqueda especial"
             append-icon="mdi-magnify"
@@ -37,6 +51,7 @@
     <Spinner v-if="!loaded"/>
     <DevolucionDetails/>
     <ReceiptDialog v-on:receipt="saveChanges"/>
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -59,6 +74,7 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       sucursalId: "",
+      fechaEmision:"",
       blackReceiptFilter: "",
       page: 1,
       size: 10,
