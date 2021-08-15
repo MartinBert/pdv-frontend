@@ -68,7 +68,7 @@ module.exports = {
       host: '66.97.47.166',
       port: 80,
       https: false,
-      public: 'https://prysoftgestion.com',
+      public: '66.97.47.166:80',
       disableHostCheck: true,
       hotOnly: false,
 
