@@ -77,6 +77,7 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.filterParams.sucursalId = this.loguedUser.sucursal.id
     this.filterObjects();
+    this.getClientIpForFiscalController();
   },
   methods: {
     filterObjects(page) {
@@ -107,6 +108,12 @@ export default {
     seeDetails(object) {
       this.$emit("seeDetails", object);
     },
+    getClientIpForFiscalController() {
+      axios.get("https://api.ipify.org?format=json").then((data) => {
+        this.clientIp = data.data.ip;
+      });
+    },
+
   },
 };
 </script>

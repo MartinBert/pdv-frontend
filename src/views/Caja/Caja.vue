@@ -17,6 +17,10 @@ export default {
   data: () => ({
     objects: [],
     loaded: false,
+	filterParams:{
+	page: 1,
+	size: 1
+},
     tenant: "",
     service: "caja",
     token: localStorage.getItem("token"),
