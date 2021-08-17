@@ -30,7 +30,8 @@
                     required
                   >
                   </v-text-field>
-                  <v-btn class="primary v-btn--block" type="button" @click="salesForDate1(loguedUser.sucursal,
+                  <v-btn class="primary v-btn--block" type="button" @click="salesForDate1(
+                    loguedUser.sucursal,
                     object.fechaDesde,
                     object.fechaHasta)"
                    style="margin-left:400px;
@@ -123,7 +124,7 @@ import {
   getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
-//import { exportExcel} from "../../helpers/exportFileHelper";
+import { exportPDF} from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -276,16 +277,34 @@ export default {
       }
     },
      salesForDate1(sucursal, fechaDesde, fechaHasta) {
-      //if (this.notPassSucursalValidations()) return this.error('sucursal');
+      if (this.notPassSucursalValidations()) return this.error('sucursal');
       let id = sucursal.id;
       console.log(sucursal,fechaDesde,fechaHasta);
       ReportsService(this.tenant, this.service, this.token)
         .salesForDate(id, fechaDesde, fechaHasta)
         .then((res) => {
-          console.log(res);
-          console.log(res);
-          //exportExcel(res);
+      
+          exportPDF(res);
         });
+    },
+        notPassSucursalValidations(){
+      if(this.loguedUser.sucursal) return false;
+      return true;
+    },
+
+    
+    error(type){
+      let error = '';
+      switch (type) {
+        case 'products':
+            error = "Debe seleccionar al menos un producto para este reporte";
+          break;
+        default:
+            error = "Debe seleccionar una sucursal para realizar el reporte";
+          break;
+      }
+      this.$errorAlert(error);
+      return;
     },
     seeDetails(objects) {
       this.$emit("seeDetails", objects);
