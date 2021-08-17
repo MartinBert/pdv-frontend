@@ -124,7 +124,7 @@ import {
   getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
-import { exportPDF} from "../../helpers/exportFileHelper";
+import { exportExcel} from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -268,6 +268,7 @@ export default {
 
       console.log(this.ventas);
     },
+
     createDate(date, param) {
       const integerDate = generateIntegerDate(date);
       if (param === "fechaDesde") {
@@ -284,7 +285,7 @@ export default {
         .salesForDate(id, fechaDesde, fechaHasta)
         .then((res) => {
       
-          exportPDF(res);
+          exportExcel(res);
         });
     },
         notPassSucursalValidations(){
