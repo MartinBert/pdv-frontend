@@ -474,7 +474,7 @@ export default {
         productoPrimerAtributoName: "",
         productoSegundoAtributoName: "",
         productoTercerAtributoName: "",
-        productoEstado: "",
+        productoEstado: 1,
         page: 1,
         size: 1,
         totalPages: 0,
