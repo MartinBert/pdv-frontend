@@ -23,7 +23,6 @@
               raised
               >EXPORTAR EXCEL</v-btn
             >
-
             <!-- 
           Este servicio corrige los precios de la 
           lista, calculando sus valores basados en los 

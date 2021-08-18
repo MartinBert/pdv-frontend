@@ -77,6 +77,7 @@
             ref="tableOfProducts"
             :headers="headers"
             :items="productos"
+            hide-default-footer
           >
             <template v-slot:[`item.acciones`]="{ item }">
               <Add :object="item" v-if="!item.selected" v-on:add="selectItem" />
