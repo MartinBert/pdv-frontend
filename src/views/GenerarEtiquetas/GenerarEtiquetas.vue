@@ -238,7 +238,6 @@ export default {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects();
-    this.filterObjectsTable();
   },
 
   components: {
