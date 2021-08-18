@@ -248,28 +248,16 @@ export default {
   },
 
   methods: {
-    filterObjects(page) {
+     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      if (this.loguedUser.perfil > 1) {
-        this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-      }
       GenericService(this.tenant, "productos", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          const productsOfGlobalStore = this.$store.state.productos.products;
-          data.data.content.forEach((product) => {
-            productsOfGlobalStore.forEach((productOfGlobalStore) => {
-              if (product.id === productOfGlobalStore.id) {
-                product.selected = true;
-              }
-            });
-          });
           this.productos = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
-
     selectItem(object) {
       this.$store.commit("productos/addProductsToList", object);
       this.filterObjects();
