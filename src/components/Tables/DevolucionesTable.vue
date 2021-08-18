@@ -34,14 +34,15 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       sucursalId: "",
+      fecha:"",
       blackReceiptFilter: "",
       page: 1,
       size: 10,
       totalPages: 0,
     },
      headers: [
-      { text: "Descripcion", value: "descripcion" },
       { text: "Fecha", value: "fecha" },
+      { text: "Descripcion", value: "descripcion" },
       { text: "Producto Devueltos", value: "productos", sortable:false},
       { text: "Productos Cedidos", value: "productosSalientes", sortable:false},
       { text: "Comprobante", value: "nombreDocumento" },
