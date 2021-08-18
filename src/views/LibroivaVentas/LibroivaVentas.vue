@@ -5,62 +5,69 @@
   >
     <v-card min-width="100%">
       <v-row style="justify-content: center;">
-          <v-col>
-              <form
-              >
-              <v-col cols="2">
-                  <div class="d-block">
-                  <v-text-field
-                    id="input1"
-                    name="input1"
-                    type="date"
-                    v-model="fechaDesde"
-                    label="Fecha desde"
-                    @input="createDate(fechaDesde, 'fechaDesde')"
-                    required
-                  >
-                  </v-text-field>
-                  <v-text-field
-                    id="input2"
-                    name="input2"
-                    type="date"
-                    label="Fecha hasta"
-                    v-model="fechaHasta"
-                    @input="createDate(fechaHasta, 'fechaHasta')"
-                    required
-                  >
-                  </v-text-field>
-                  <v-btn class="primary v-btn--block" type="button" @click="salesForDate1(
-                    loguedUser.sucursal,
-                    object.fechaDesde,
-                    object.fechaHasta)"
-                   style="margin-left:400px;
+        <v-col>
+          <form>
+            <v-col cols="2">
+              <div class="d-block">
+                <v-text-field
+                  id="input1"
+                  name="input1"
+                  type="date"
+                  v-model="fechaDesde"
+                  label="Fecha desde"
+                  @input="createDate(fechaDesde, 'fechaDesde')"
+                  required
+                >
+                </v-text-field>
+                <v-text-field
+                  id="input2"
+                  name="input2"
+                  type="date"
+                  label="Fecha hasta"
+                  v-model="fechaHasta"
+                  @input="createDate(fechaHasta, 'fechaHasta')"
+                  required
+                >
+                </v-text-field>
+                <v-btn
+                  class="primary v-btn--block"
+                  type="button"
+                  @click="
+                    salesForDate1(
+                      loguedUser.sucursal,
+                      object.fechaDesde,
+                      object.fechaHasta
+                    )
+                  "
+                  style="margin-left:400px;
                    margin-top:-100px;
                    "
                   >Imprimir libro</v-btn
                 >
-                  </div>
-              </v-col>
-          <v-col cols="3">
-                <v-checkbox
+              </div>
+            </v-col>
+            <v-col cols="3">
+              <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
                 margin-top:-100px;
                 "
                 label="Factura(A)"
               ></v-checkbox>
-          </v-col>
-              </form>
             </v-col>
+          </form>
+        </v-col>
       </v-row>
-       <v-row>
+      <v-row>
         <v-col>
           <h2 style="text-align:center;">Libro Iva Ventas</h2>
         </v-col>
       </v-row>
-      <v-row style="justify-content: center;
+      <v-row
+        style="justify-content: center;
        margin-top:-5px;
-      ">
+      "
+      >
         <v-col cols="2">
           <v-text-field
             v-model="filterParams.fechaEmision"
@@ -104,7 +111,7 @@
         class="elevation-6"
         :items="ventas"
         hide-default-footer
-      > 
+      >
       </v-data-table>
       <Pagination
         :page="filterParams.page"
@@ -124,7 +131,7 @@ import {
   getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
-import { exportExcel} from "../../helpers/exportFileHelper";
+import { exportExcelLibro } from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -136,13 +143,13 @@ export default {
         .toISOString()
         .substr(0, 10)
     ),
-    selectedInvoice:[],
+    selectedInvoice: [],
     years: getYearsList(),
     sucursales: [],
     checkbox1: false,
     checkbox2: false,
     checkbox3: false,
-    checkedInvoice:[],
+    checkedInvoice: [],
     ventas: [],
     comprobantesFiscales: [],
     comprobantesComerciales: [],
@@ -152,24 +159,24 @@ export default {
     empresa: [],
     ivas: [],
     object: {
-        documento: {},
-        cliente: {},
-        fechaDesde: null,
-        fechaHasta: null,
-        mes: null,
-        year: null,
-        year2: null,
-      },
+      documento: {},
+      cliente: {},
       fechaDesde: null,
       fechaHasta: null,
-      fechaDesde2: null,
-      fechaHasta2: null,
-      fechaDesde3: null,
-      fechaHasta3: null,
+      mes: null,
+      year: null,
+      year2: null,
+    },
+    fechaDesde: null,
+    fechaHasta: null,
+    fechaDesde2: null,
+    fechaHasta2: null,
+    fechaDesde3: null,
+    fechaHasta3: null,
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
-      codigoDocumento:"",
+      codigoDocumento: "",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
@@ -177,23 +184,23 @@ export default {
       totalVenta: "",
       documentosComerciales: "",
       cuit: "",
-      numeroCbte:"",
+      numeroCbte: "",
       razonSocial: "",
       fechaVto: "",
       ingresosBrutos: "",
       cae: "",
-      letra:"",
-      subTotal:"",
-      totalIva21:"",
-      totalIva27:"",
-      totalIva10:"",
+      letra: "",
+      subTotal: "",
+      totalIva21: "",
+      totalIva27: "",
+      totalIva10: "",
       porcentaje: "",
       condicionIva: "",
       condicionVenta: "",
       barCode: "",
-      nombre:"",
-      documentoName:"",
-      documentoComercialName:"",
+      nombre: "",
+      documentoName: "",
+      documentoComercialName: "",
       page: 1,
       size: 10,
       totalPages: 0,
@@ -277,31 +284,30 @@ export default {
         this.object.fechaHasta = integerDate;
       }
     },
-     salesForDate1(sucursal, fechaDesde, fechaHasta) {
-      if (this.notPassSucursalValidations()) return this.error('sucursal');
+    salesForDate1(sucursal, fechaDesde, fechaHasta) {
+      if (this.notPassSucursalValidations()) return this.error("sucursal");
       let id = sucursal.id;
-      console.log(sucursal,fechaDesde,fechaHasta);
+
       ReportsService(this.tenant, this.service, this.token)
         .salesForDate(id, fechaDesde, fechaHasta)
         .then((res) => {
-      
-          exportExcel(res);
+          console.log(res);
+          exportExcelLibro(res);
         });
     },
-        notPassSucursalValidations(){
-      if(this.loguedUser.sucursal) return false;
+    notPassSucursalValidations() {
+      if (this.loguedUser.sucursal) return false;
       return true;
     },
 
-    
-    error(type){
-      let error = '';
+    error(type) {
+      let error = "";
       switch (type) {
-        case 'products':
-            error = "Debe seleccionar al menos un producto para este reporte";
+        case "products":
+          error = "Debe seleccionar al menos un producto para este reporte";
           break;
         default:
-            error = "Debe seleccionar una sucursal para realizar el reporte";
+          error = "Debe seleccionar una sucursal para realizar el reporte";
           break;
       }
       this.$errorAlert(error);

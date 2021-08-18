@@ -192,7 +192,7 @@ export default {
       productoPrimerAtributoName: "",
       productoSegundoAtributoName: "",
       productoTercerAtributoName: "",
-      productoEstado: "",
+      productoEstado: 1,
       page: 1,
       size: 10,
       totalPages: 0,
@@ -238,6 +238,7 @@ export default {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects();
+    this.filterObjectsTable();
   },
 
   components: {
@@ -248,11 +249,23 @@ export default {
   },
 
   methods: {
+
      filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, "productos", this.token)
+      if (this.loguedUser.perfil > 1) {
+        this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      }
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
+          const productsOfGlobalStore = this.$store.state.productos.products;
+          data.data.content.forEach((product) => {
+            productsOfGlobalStore.forEach((productOfGlobalStore) => {
+              if (product.id === productOfGlobalStore.id) {
+                product.selected = true;
+              }
+            });
+          });
           this.productos = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
