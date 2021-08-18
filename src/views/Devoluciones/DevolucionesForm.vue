@@ -579,7 +579,7 @@ export default {
       });
 
       const getNextInvoiceNumber = (lastInvoiceNumber) => {
-        return lastInvoiceNumber++;
+        return lastInvoiceNumber + 1;
       }
 
       const passPaymentsMethodsValidation = (mediosPago) => {
