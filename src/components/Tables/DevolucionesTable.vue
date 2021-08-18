@@ -74,6 +74,7 @@ export default {
     receiptDialogData: null,
     temporalObject: null,
   }),
+
   components: {
     Print,
     Detail,
@@ -81,6 +82,7 @@ export default {
     Spinner,
     Pagination
   },
+
   watch: {
     listenner: function () {
       this.filterObjects();
@@ -93,6 +95,7 @@ export default {
     }
     this.filterObjects();
   },
+
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;

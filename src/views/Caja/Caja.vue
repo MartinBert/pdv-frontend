@@ -23,6 +23,10 @@ export default {
       totalPages: 0,
     },
     loaded: false,
+	filterParams:{
+	page: 1,
+	size: 1
+},
     tenant: "",
     service: "caja",
     token: localStorage.getItem("token"),

@@ -114,6 +114,12 @@ export default {
     seeDetails(object) {
       this.$emit("seeDetails", object);
     },
+    getClientIpForFiscalController() {
+      axios.get("https://api.ipify.org?format=json").then((data) => {
+        this.clientIp = data.data.ip;
+      });
+    },
+
   },
 };
 </script>
