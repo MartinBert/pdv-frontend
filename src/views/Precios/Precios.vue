@@ -144,6 +144,7 @@ export default {
       text: "Aplicar modificación de precios a todos los productos",
     },
     view: "listOfProducts",
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     distribuidores: [],
     selectedDistribuidores: [],
     marcas: [],
@@ -163,7 +164,7 @@ export default {
       productoPrimerAtributoName: "",
       productoSegundoAtributoName: "",
       productoTercerAtributoName: "",
-      productoEstado: "",
+      productoEstado: 1,
       page: 1,
       size: 100000,
     },
@@ -187,11 +188,11 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.getObjects();
     this.$store.commit("eventual/resetStates");
-    //if (this.loguedUser.perfil > 1) {
-      //this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    //}
+    if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.getObjects();
   },
 
   methods: {
