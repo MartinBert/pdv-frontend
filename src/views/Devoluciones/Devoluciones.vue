@@ -61,7 +61,6 @@ import { addZerosInString } from '../../helpers/stringHelper';
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       sucursalId: "",
       fecha:"",
