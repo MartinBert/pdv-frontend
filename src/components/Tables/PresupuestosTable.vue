@@ -154,7 +154,6 @@ export default {
             }
           })
           this.presupuestos = data.data.content;
-          console.log(this.presupuestos);
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
