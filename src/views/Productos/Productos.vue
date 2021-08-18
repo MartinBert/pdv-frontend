@@ -32,13 +32,6 @@
           cálculos se realizan partiendo del costo bruto
           del artículo y no de de su precio final de venta.
           -->
-            <v-btn
-              v-if="perfil === 1"
-              class="primary ml-2"
-              @click="correctPriceInList()"
-              raised
-              >Corregir lista de precios</v-btn
-            >
           </v-col>
           <v-col cols="3" v-if="perfil < 3">
             <v-file-input
