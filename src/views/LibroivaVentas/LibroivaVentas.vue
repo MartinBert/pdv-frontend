@@ -256,11 +256,10 @@ export default {
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.ventas = data.data.content;
+          this.ventas = data.data.content.filter(r=> r.numeroComprobante == 'FACTURA A');
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-
       console.log(this.ventas);
     },
     filterNameInvoice(page) {
