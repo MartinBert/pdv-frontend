@@ -6,7 +6,6 @@
   >
     <TabBar :tabs="tabs" :activeTab="activeTab" style="margin-bottom:15px"/>
     <v-card min-width="100%">
-      <Error :errorStatus="errorStatus" />
       <v-row style="justify-content: center;" class="mt-1">
       <v-col cols="2">
         <v-text-field
