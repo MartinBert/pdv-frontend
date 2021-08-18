@@ -10,9 +10,17 @@
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+      v-if="loaded"
+    />
   </v-container>
 </template>
 <script>
+import Pagination from "../Pagination";
 import GenericService from "../../services/GenericService";
 import Edit from "../Buttons/Edit";
 import Delete from "../Buttons/Delete";
@@ -41,12 +49,13 @@ export default {
       { text: "Usuario", value: "username" },
       { text: "Perfil", value: "perfil.nombre" },
       { text: "Empresa", value: "empresa" },
-      { text: "Acciones", value: "acciones", sortable: false},
+      { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
   components: {
     Edit,
     Delete,
+    Pagination,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
