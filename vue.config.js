@@ -62,24 +62,24 @@ g+Zo0Hp428LZOpn7pTpEDYj9wj61tNsTnlxo25O6UjhE651U0kcxVokQlVtktA==
 -----END CERTIFICATE-----`
 
 module.exports = {
-    devServer: {
+   // devServer: {
       /**** PRODUCTION ****/
-      open: process.platform === 'darwin',
-      host: '66.97.47.166',
-      port: 80,
-      https: false,
-      public: '66.97.47.166:80',
-      disableHostCheck: true,
-      hotOnly: false,
+    //open: process.platform === 'darwin',
+     // host: '66.97.47.166',
+     // port: 80,
+      //https: false,
+     // public: '66.97.47.166:80',
+     // disableHostCheck: true,
+     // hotOnly: false,
 
       /**** LOCAL ****/
-      // open: process.platform === 'darwin',
-      // host: '0.0.0.0',
-      // port: 8001,
-      // https: false,
-      // public: '0.0.0.0:8001',
-      // disableHostCheck: true,
-      // hotOnly: false,
+       open: process.platform === 'darwin',
+       host: '0.0.0.0',
+       port: 8001,
+       https: false,
+       public: '0.0.0.0:8001',
+       disableHostCheck: true,
+       hotOnly: false,
     },
     publicPath: "/",
     "transpileDependencies": [
