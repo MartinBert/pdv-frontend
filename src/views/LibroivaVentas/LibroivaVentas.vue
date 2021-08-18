@@ -109,7 +109,7 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="ventas"
+        :items="filterInvoice"
         hide-default-footer
       >
       </v-data-table>
@@ -156,6 +156,7 @@ export default {
     FiscalCondicion: [],
     file: null,
     sucusal: [],
+    filterInvoice:[],
     empresa: [],
     ivas: [],
     object: {
@@ -255,8 +256,8 @@ export default {
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          let ventas = data.data.content;
-          let filterInvoice = ventas.filter(
+          this.ventas = data.data.content;
+          const filterInvoice = this.ventas.filter(
             (el)=>el.nombreDocumento == "FACTURAS"
           )
           if(filterInvoice == "FACTURAS"){
