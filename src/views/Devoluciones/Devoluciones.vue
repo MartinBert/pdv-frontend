@@ -8,7 +8,7 @@
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.fechaEmision"
+            v-model="filterParams.fecha"
             v-on:input="filterObjects()"
             dense
             rounded
@@ -74,7 +74,7 @@ export default {
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       sucursalId: "",
-      fechaEmision:"",
+      fecha:"",
       blackReceiptFilter: "",
       page: 1,
       size: 10,
