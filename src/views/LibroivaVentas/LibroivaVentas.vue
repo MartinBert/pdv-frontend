@@ -198,8 +198,7 @@ export default {
       condicionIva: "",
       condicionVenta: "",
       barCode: "",
-      nombre: "",
-      documentoName: "",
+      nombreDocumento:"",
       documentoComercialName: "",
       page: 1,
       size: 10,
@@ -256,25 +255,18 @@ export default {
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.ventas = data.data.content.filter(r=> r.numeroComprobante == 'FACTURA A');
+          let ventas = data.data.content;
+          let filterInvoice = ventas.filter(
+            (el)=>el.nombreDocumento == "FACTURAS"
+          )
+          if(filterInvoice == "FACTURAS"){
+            return console.log(filterInvoice);
+          }
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
       console.log(this.ventas);
     },
-    filterNameInvoice(page) {
-      if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
-        .filter(this.filterParams)
-        .then((data) => {
-          this.ventas = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          this.loaded = true;
-        });
-
-      console.log(this.ventas);
-    },
-
     createDate(date, param) {
       const integerDate = generateIntegerDate(date);
       if (param === "fechaDesde") {
