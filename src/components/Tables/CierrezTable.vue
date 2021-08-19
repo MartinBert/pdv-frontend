@@ -59,13 +59,15 @@ export default {
     file: null,
     filterParams: {
       sucursalId: "",
-      fecha:"",
+      fechaEmision:"",
+      numeroCorrelativo:"",
       page: 1,
       size: 10,
       totalPages: 0,
     },
     invoiceFilterParams: {
       sucursalId: "",
+      numeroCorrelativo:"",
       fechaEmision: "",
       page: 1,
       size: 100000,
