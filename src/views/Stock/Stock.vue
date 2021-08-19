@@ -134,7 +134,7 @@
       >
         <template v-slot:[`item.acciones`]="{ item }">
            <Edit :itemId="item.id" v-on:editItem="editItem" />
-          <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
+          <Delete :id="item.id" v-on:deleteItem="deleteItem"/>
         </template>
         <template v-slot:[`item.migrar`]="{ item }">
           <v-checkbox color="indigo" @click="addToMigration(item)"></v-checkbox>
@@ -197,6 +197,7 @@ export default {
     stocks: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
+      id:"",
       productoName: "",
       productoCodigo: "",
       productoCodigoBarras: "",
@@ -357,43 +358,45 @@ export default {
       this.idObject = id;
       this.deleteDialogStatus = true;
     },
-      deleteObject() {
+
+      deleteObject(id) {
+      this.idObject = id;
       this.dialog = true;
       this.deleteDialogStatus = false;
-      GenericService(this.tenant, "productos", this.token)
-        .delete(this.idObject)
+      StocksService(this.tenant, this.service, this.token)
+        .deleteProduct(this.idObjet)
         .then(() => {
           this.filterObjects();
         })
         .catch(() => {
           this.$errorAlert(
             "El registro se encuentra asociado a otros elementos en el sistema"
-          ).then((result) => {
-            if (result.isDismissed) {
-              this.$questionAlert(
-                "Puede desactivar el producto para no verlo en la tabla",
-                "Desea hacerlo"
-              ).then((result) => {
-                if (result.isConfirmed) {
-                  GenericService(this.tenant, "productos", this.token)
-                  .get(this.idObject)
-                  .then(res => {
-                    let inactiveProduct = res.data;
-                    inactiveProduct.estado = 2;
-                    console.log(inactiveProduct);
-                    GenericService(this.tenant, "productos", this.token)
-                      .save(inactiveProduct)
-                      .then(this.refreshPage())
-                      .catch((err) => {
-                        console.error(err);
-                      });
-                  })
-                }
-              });
-            }
-          });
+          );
         });
     },
+
+    
+    reactivationOfProduct(object) {
+      this.$questionAlert(
+        "Atención, esta acción activará el producto en el sistema",
+        "Desea continuar"
+      ).then((result) => {
+        if (result.isConfirmed) {
+          this.loaded = false;
+          object.estado = 1;
+          GenericService(this.tenant, this.service, this.token)
+            .save(object)
+            .then(() => {
+              this.refreshPage();
+            });
+        }
+      });
+    },
+
+    refreshPage(){
+      window.location.reload();
+    },
+  
     applyMassiveStocksRestrictions() {
       this.$store.commit("stocks/dialogMutation");
       this.loaded = false;
