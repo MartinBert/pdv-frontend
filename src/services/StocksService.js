@@ -19,6 +19,11 @@ export default (tenant, service, token) => {
             return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/items/any/${codeBar}/${sucursalId}`, {
                 headers: { Authorization: "Bearer " + token }
             })
-        }
+        },
+        delete(id) {
+            return axios.delete(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/items/any/${id}`, {
+                headers: { Authorization: "Bearer " + token }
+            })
+        },
     }
 }

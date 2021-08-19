@@ -60,12 +60,13 @@ export function exportExcelLibro(headers, data) {
         Title: "Libroiva",
         CreatedDate: new Date()
     };
-    wb.SheetNames.push("libroivaventas");
+    wb.SheetNames.push("LibroivaVentas");
     let ws_data = [headers];
     data.forEach(el => {
         ws_data.push([
             el.fecha,
-            el.numeroComprobante,
+            el.nombre,
+            el.numero,
             el.razonSocial,
             el.cuit,
             el.netoGrabado,
@@ -77,7 +78,7 @@ export function exportExcelLibro(headers, data) {
         ])
     })
     let ws = XLSX.utils.aoa_to_sheet(ws_data);
-    wb.Sheets["libroivaventas"] = ws;
+    wb.Sheets["LibroivaVentas"] = ws;
     let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
     function s2ab(s) {
         let buf = new ArrayBuffer(s.length);

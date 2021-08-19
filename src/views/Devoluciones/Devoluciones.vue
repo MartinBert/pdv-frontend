@@ -8,8 +8,8 @@
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.fecha"
-            v-on:input="filterObjects()"
+            v-model="fechaEmision"
+            @input="listenner++"
             dense
             rounded
             outlined
@@ -21,8 +21,8 @@
         </v-col>
         <v-col cols="2">
           <v-text-field
-            v-model="filterParams.blackReceiptFilter"
-            v-on:input="filterObjects()"
+            v-model="blackReceiptFilter"
+            @input="listenner++"
             dense
             rounded
             outlined
@@ -35,20 +35,12 @@
       </v-row>
     </v-form>
     <DevolucionesTable
-      :items="devoluciones"
+      :filter="{fechaEmision, blackReceiptFilter}"
+      :listenner="listenner"
       v-on:add="add"
       v-on:print="print"
       v-on:seeDetails="seeDetails"
-      v-if="loaded"
     />
-    <Pagination
-      :page="filterParams.page"
-      :totalPages="filterParams.totalPages"
-      :totalVisible="7"
-      v-on:changePage="filterObjects"
-      v-if="loaded"
-    />
-    <Spinner v-if="!loaded"/>
     <DevolucionDetails/>
     <ReceiptDialog v-on:receipt="saveChanges"/>
     </v-card>
@@ -58,9 +50,7 @@
 import axios from "axios";
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
-import Pagination from "../../components/Pagination";
 import DevolucionesTable from "../../components/Tables/DevolucionesTable";
-import Spinner from "../../components/Graphics/Spinner";
 import ReceiptDialog from "../../components/Dialogs/ReceiptDialog";
 import DevolucionDetails from "../../components/Details/DevolucionDetails";
 import { formatDate, getCurrentDate, getInternationalDate, formatDateWithoutSlash } from "../../helpers/dateHelper";
@@ -70,7 +60,6 @@ import { formatFiscalInvoice } from '../../helpers/receiptFormatHelper';
 import { addZerosInString } from '../../helpers/stringHelper';
 export default {
   data: () => ({
-    devoluciones: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
       sucursalId: "",
@@ -80,6 +69,8 @@ export default {
       size: 10,
       totalPages: 0
     },
+    fechaEmision:"",
+    blackReceiptFilter: "",
     loaded: false,
     tenant: "",
     service: "devoluciones",
@@ -88,43 +79,21 @@ export default {
     activeDetailDialog: false,
     receiptDialogData: null,
     temporalObject: null,
+    listenner: 0
   }),
-
   components: {
     ReceiptDialog,
     DevolucionDetails,
-    Pagination,
-    DevolucionesTable,
-    Spinner
+    DevolucionesTable
   },
   
   mounted() {
     this.tenant = this.$route.params.tenant;
-    if(this.loguedUser.perfil > 1){
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
-    this.filterObjects();
   },
-
   methods: {
-    filterObjects(page){
-      if(page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
-        .filter(this.filterParams)
-        .then(data => {
-          this.devoluciones = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          if(this.filterParams.totalPages < this.filterParams.page){
-              this.filterParams.page = 1;
-          }
-          this.loaded = true;
-        });
-    },
-
     newObject() {
       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
     },
-
     print(object){
       ReportsService(this.tenant, "ventas", this.token)
       .onCloseSaleReport(object.comprobante)
@@ -136,18 +105,15 @@ export default {
         window.open(fileURL, "_blank");
       });
     },
-
     seeDetails(object){
       this.$store.commit('details/addTitleToDetail', "Productos")
       this.$store.commit('details/addObjectsToDetail', object);
       this.$store.commit('details/mutateDialog');
     },
-
     add(o){
       this.temporalObject = o;
       this.$store.commit('receipt/receiptDialogMutation');
     },
-
     saveChanges(){
       this.receiptDialogData = this.$store.state.receipt.receipt;
       this.$questionAlert('Atención, esta acción generará un comprobante en el sistema', 'Desea continuar')
@@ -163,7 +129,6 @@ export default {
         }
       })
     },
-
     processAndSaveFiscal() {
       this.loaded = false;
       /*** Constants ***/
@@ -188,7 +153,6 @@ export default {
         documento.codigoDocumento,
         totalVenta
       );
-
       /*** Mutable vars ***/
       let comprobante;
       let file;
@@ -215,7 +179,6 @@ export default {
         
         /*** Format invoice according to type ***/
         invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice)
-
         /*** Evaluate required sales form data ***/
         if (mediosPago !== undefined) {
         /*** Send invoice to AFIP ***/
@@ -227,7 +190,6 @@ export default {
             const barCode = sucursal.cuit + addZerosInString("02", documento.codigoDocumento) + addZerosInString("04", ptoVenta.idFiscal) + cae + formatDateWithoutSlash(dateOfCaeExpiration);
             
             if(planesPago.cuotas > 1){condVenta = false;}else{condVenta = true;}
-
             comprobante = {
               letra: documento.letra,
               numeroCbte: numberOfReceipt,
@@ -257,7 +219,6 @@ export default {
                   
                 devolucion.comprobante = comprobanteGenerado;
                 devolucion.totalDevolucion = comprobanteGenerado.totalVenta;
-
                 GenericService(tenant, this.service, token)
                 .save(devolucion)
                 .then(() => {
@@ -289,7 +250,6 @@ export default {
         }
       });
     },
-
     processAndSaveNoFiscal() {
       this.loaded = false;
       /* Constants */ 
@@ -306,16 +266,13 @@ export default {
       const service = "ventas";
       const fecha = getCurrentDate();
       const detail = processDetailReceipt(documento.codigoDocumento, totalVenta);
-
       /* Mutable vars */ 
       let file;
       let fileURL;
       let comprobante;
       let condVenta;
       let devolucion = this.temporalObject;
-
       /**** End declarations ****/
-
       if (planesPago) {
         if (planesPago.length < 2) {
           if (planesPago[0].cuotas > 1) {
@@ -329,7 +286,6 @@ export default {
       } else {
         condVenta = true;
       }
-
       comprobante = {
         letra: documento.letra,
         numeroCbte: generateFiveDecimalCode(),
@@ -349,7 +305,6 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-
       GenericService(tenant, "comprobantesFiscales", token).save(comprobante)
       .then((data) => {
         let comprobanteGenerado = data.data;
@@ -373,7 +328,6 @@ export default {
               });
           });
       })
-
       this.temporalObject = null;
       this.$store.commit("productos/resetStates");
     },

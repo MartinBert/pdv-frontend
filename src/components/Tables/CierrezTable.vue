@@ -10,7 +10,7 @@
         <v-col></v-col>
         <v-col cols="3">
           <v-text-field
-            v-model="filterParams.date"
+            v-model="filterParams.fecha"
             v-on:input="filterObjects()"
             dense
             outlined
@@ -59,13 +59,15 @@ export default {
     file: null,
     filterParams: {
       sucursalId: "",
-      date: "",
+      fechaEmision:"",
+      numeroCorrelativo:"",
       page: 1,
       size: 10,
       totalPages: 0,
     },
     invoiceFilterParams: {
       sucursalId: "",
+      numeroCorrelativo:"",
       fechaEmision: "",
       page: 1,
       size: 100000,

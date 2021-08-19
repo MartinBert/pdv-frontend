@@ -4,7 +4,6 @@
     <TabBar :tabs="tabs" :activeTab="activeTab" />
     <v-card min-width="100%">
       <CierrezTable
-        :items="cierres"
         v-on:seeDetails="seeDetails"
         v-on:print="print"
         v-on:deleteItem="deleteItem"

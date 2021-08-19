@@ -134,11 +134,7 @@
       >
         <template v-slot:[`item.acciones`]="{ item }">
            <Edit :itemId="item.id" v-on:editItem="editItem" />
-            <Delete
-              :itemId="item.id"
-              v-on:deleteItem="deleteItem"
-              v-if="item.estado != 2"
-            />
+          <Delete :id="item.id" v-on:deleteItem="deleteItem"/>
         </template>
         <template v-slot:[`item.migrar`]="{ item }">
           <v-checkbox color="indigo" @click="addToMigration(item)"></v-checkbox>
@@ -201,6 +197,7 @@ export default {
     stocks: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
+      id:"",
       productoName: "",
       productoCodigo: "",
       productoCodigoBarras: "",
@@ -338,14 +335,18 @@ export default {
           this.realDeposits = this.depositos.filter((el) => el.id !== 0);
         });
     },
+     deleteLine(id) {
+      const filter = this.products.filter((el) => el.id !== id);
+      const filterForStore = this.products.filter((el) => el.id === id)[0].id;
+      this.products = filter;
+      this.$store.commit("productos/removeProductsToList", filterForStore);
+      this.listennerOfListChange = id;
+    },
     newObject() {
       this.$router.push({ name: "stockForm", params: { id: 0 } });
     },
     editItem(itemId) {
       this.$router.push({ name: "stockForm", params: { id: itemId } });
-    },
-    deleteItem(itemId) {
-      this.$emit("deleteItem", itemId);
     },
     edit(id) {
       this.$router.push({ name: "stockForm", params: { id: id } });
@@ -353,11 +354,17 @@ export default {
     deleteConfirmation(result) {
       return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
-    deleteObject() {
+      deleteItem(id) {
+      this.idObject = id;
+      this.deleteDialogStatus = true;
+    },
+
+      deleteObject(id) {
+      this.idObject = id;
       this.dialog = true;
       this.deleteDialogStatus = false;
-      GenericService(this.tenant, this.service, this.token)
-        .delete(this.idObjet)
+      StocksService(this.tenant, this.service, this.token)
+        .deleteProduct(this.idObjet)
         .then(() => {
           this.filterObjects();
         })
@@ -367,6 +374,29 @@ export default {
           );
         });
     },
+
+    
+    reactivationOfProduct(object) {
+      this.$questionAlert(
+        "Atención, esta acción activará el producto en el sistema",
+        "Desea continuar"
+      ).then((result) => {
+        if (result.isConfirmed) {
+          this.loaded = false;
+          object.estado = 1;
+          GenericService(this.tenant, this.service, this.token)
+            .save(object)
+            .then(() => {
+              this.refreshPage();
+            });
+        }
+      });
+    },
+
+    refreshPage(){
+      window.location.reload();
+    },
+  
     applyMassiveStocksRestrictions() {
       this.$store.commit("stocks/dialogMutation");
       this.loaded = false;

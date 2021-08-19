@@ -21,28 +21,44 @@
         <Add :object="item" v-on:add="add" v-else />
       </template>
     </v-data-table>
+    <Pagination
+      :page="filterParams.page"
+      :totalPages="filterParams.totalPages"
+      :totalVisible="7"
+      v-on:changePage="filterObjects"
+    />
+    <Spinner v-if="!loaded"/>
   </v-container>
 </template>
 <script>
 import GenericService from "../../services/GenericService";
+import Spinner from "../../components/Graphics/Spinner";
+import Pagination from "../../components/Pagination";
 import Print from "../Buttons/Print";
 import Detail from "../Buttons/Detail";
 import Add from "../Buttons/Add";
 export default {
+  props:{
+    filter: Object,
+    listenner: Number
+  },
   data: () => ({
     devoluciones: [],
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     filterParams: {
-      sucursalId: "",
-      fecha:"",
       blackReceiptFilter: "",
+      sucursalId: "",
+      fechaEmision: "",
+      comprobanteCerrado: "",
+      numeroComprobante: "",
+      totalVenta: "",
       page: 1,
       size: 10,
       totalPages: 0,
     },
      headers: [
-      { text: "Fecha", value: "fecha" },
       { text: "Descripcion", value: "descripcion" },
+      { text: "Fecha", value: "fecha" },
       { text: "Producto Devueltos", value: "productos", sortable:false},
       { text: "Productos Cedidos", value: "productosSalientes", sortable:false},
       { text: "Comprobante", value: "nombreDocumento" },
@@ -58,12 +74,20 @@ export default {
     receiptDialogData: null,
     temporalObject: null,
   }),
+
   components: {
     Print,
     Detail,
     Add,
+    Spinner,
+    Pagination
   },
 
+  watch: {
+    listenner: function () {
+      this.filterObjects();
+    }
+  },
   mounted() {
     this.tenant = this.$route.params.tenant;
     if (this.loguedUser.perfil > 1) {
@@ -71,12 +95,16 @@ export default {
     }
     this.filterObjects();
   },
+
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
+      this.filterParams.blackReceiptFilter = this.filter.blackReceiptFilter;
+      this.filterParams.fechaEmision = this.filter.fechaEmision;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
+          console.log(data);
           this.devoluciones = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
@@ -85,7 +113,6 @@ export default {
           this.loaded = true;
         });
     },
-
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },

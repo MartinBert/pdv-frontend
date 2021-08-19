@@ -23,8 +23,8 @@
         </v-col>
         <v-col>
           <v-text-field
-            type="number"
-            v-model="filterParams.numeroComprobante"
+            type="text"
+            v-model="filterParams.barCode"
             v-on:input="filterObjects()"
             dense
             outlined
@@ -100,6 +100,8 @@ export default {
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
+      barCode:"",
+      numeroCbte:"",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
