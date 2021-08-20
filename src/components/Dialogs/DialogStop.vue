@@ -5,9 +5,12 @@
       dense
       prominent
       type="info"
-      icon="mdi-print"
+      icon="mdi-firework"
     >
-     <p style="text-align:center">Por favor espere</p>
+     <p style="text-align:center;
+      display:table-cell;
+      vertical-align:middle;"
+      >Por favor espere</p>
     </v-alert>
  </v-container>
 </template>
