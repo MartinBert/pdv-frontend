@@ -479,7 +479,7 @@ export default {
         size: 1,
         totalPages: 0,
       };
-      GenericService(this.tenant, "productos", this.token)
+      GenericService(this.tenant, "products", this.token)
         .filter(filterParams)
         .then((data) => {
           let databaseItem = data.data.content[0];
