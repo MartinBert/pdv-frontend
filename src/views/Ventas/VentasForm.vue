@@ -237,7 +237,7 @@
                       style="text-decoration: none"
                       href="https://www.zeitverschiebung.net/es/city/3435910"
                       ><span style="color: gray">Hora actual en</span
-                      ><br />argentina</a
+                      ><br />Argentina</a
                     >
                   </h3>
                   <iframe
