@@ -52,6 +52,7 @@
         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
+      <DialogStop v-if="!loaded"/>
       <DeleteDialog
         :status="deleteDialogStatus"
         v-on:deleteConfirmation="deleteConfirmation"
@@ -96,6 +97,7 @@
   </v-container>
 </template>
 <script>
+import DialogStop from "../../components/Dialogs/DialogStop";
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import Spinner from "../../components/Graphics/Spinner";
@@ -171,7 +173,8 @@ export default {
     Spinner,
     ProductosTable,
     DeleteDialog,
-    TabBar
+    TabBar,
+    DialogStop
   },
 
   mounted() {
