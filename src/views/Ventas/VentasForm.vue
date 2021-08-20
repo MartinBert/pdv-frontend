@@ -692,7 +692,7 @@ export default {
       let object = {};
       if (Math.sign(percent) === -1) {
         object = {
-          id: this.productos.length + 1,
+          id: this.products.length + 1,
           nombre: "DESCUENTO - " + this.renglon.nombre,
           codigoBarra: generateBarCode(),
           cantUnidades: 0,
@@ -707,7 +707,7 @@ export default {
         this.productsDescription.filter(
           (el) => el.barCode === this.renglon.codigoBarra
         )[0].discountPercent = Number(percent) * -1;
-        this.productosDescription.filter(
+        this.productsDescription.filter(
           (el) => el.barCode === this.renglon.codigoBarra
         )[0].discountAmount = Number(object.precioTotal) * -1;
       } else {
