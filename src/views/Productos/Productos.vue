@@ -603,6 +603,7 @@ export default {
       ];
       const data = await this.setDataToExcel();
       exportExcel(headers, data);
+      console.log(data);
       this.loaded = true;
     },
 
@@ -616,7 +617,7 @@ export default {
         productoPrimerAtributoName: "",
         productoSegundoAtributoName: "",
         productoTercerAtributoName: "",
-        productoEstado: "",
+        productoEstado: 1,
         page: 1,
         size: 100000,
         totalPages: 0,
@@ -665,7 +666,6 @@ export default {
       }
       product.ivaComprasObject = product.ivaComprasObject.porcentaje;
       product.ivaVentasObject = product.ivaVentasObject.porcentaje;
-      console.log(product);
       return product;
     },
 
