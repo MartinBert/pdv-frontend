@@ -1,10 +1,13 @@
 <template>
- <div>
-    <v-alert
+ <v-container>
+     <v-alert
+      elevation="10"
       dense
+      prominent
       type="info"
+      icon="mdi-print"
     >
-      Por favor <strong>espere</strong>
+     <p style="text-align:center">Por favor espere</p>
     </v-alert>
- </div>
+ </v-container>
 </template>
