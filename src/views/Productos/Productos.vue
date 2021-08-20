@@ -616,7 +616,6 @@ export default {
       ];
       const data = await this.setDataToExcel();
       exportExcel(headers, data);
-      console.log(data);
       this.loaded = true;
     },
 
