@@ -261,7 +261,7 @@
     />
     <SearchPresupuestoDialog v-on:selectPresupuesto="selectPresupuesto" :resetPresupuestSearch="resetPresupuestSearch"/>
     <v-dialog v-model="dialogIndividualPercent" width="600">
-      <v-card min-width: 100%>
+      <v-card>
         <v-card-title class="headline grey lighten-2">
           Modificar precio a renglón
         </v-card-title>
@@ -692,7 +692,7 @@ export default {
       let object = {};
       if (Math.sign(percent) === -1) {
         object = {
-          id: this.products.length + 1,
+          id: this.productos.length + 1,
           nombre: "DESCUENTO - " + this.renglon.nombre,
           codigoBarra: generateBarCode(),
           cantUnidades: 0,
@@ -707,7 +707,7 @@ export default {
         this.productsDescription.filter(
           (el) => el.barCode === this.renglon.codigoBarra
         )[0].discountPercent = Number(percent) * -1;
-        this.productsDescription.filter(
+        this.productosDescription.filter(
           (el) => el.barCode === this.renglon.codigoBarra
         )[0].discountAmount = Number(object.precioTotal) * -1;
       } else {
