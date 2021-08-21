@@ -261,7 +261,7 @@
     />
     <SearchPresupuestoDialog v-on:selectPresupuesto="selectPresupuesto" :resetPresupuestSearch="resetPresupuestSearch"/>
     <v-dialog v-model="dialogIndividualPercent" width="600">
-      <v-card min-width: 100%>
+      <v-card>
         <v-card-title class="headline grey lighten-2">
           Modificar precio a renglón
         </v-card-title>
@@ -487,6 +487,27 @@ export default {
             databaseItem.cantUnidades = 1;
             databaseItem.total = databaseItem.precioTotal;
             this.products.push(this.processProductsObject(databaseItem));
+            this.productsDescription.push(
+              {
+                name: databaseItem.nombre,
+                barCode: databaseItem.codigoBarra,
+                code: databaseItem.codigoProducto,
+                tradeMarkName: databaseItem.marca.nombre,
+                tradeMarkId: databaseItem.marca.id,
+                rubroName: databaseItem.rubro.nombre,
+                rubroId: databaseItem.rubro.id,
+                attributes: databaseItem.atributos,
+                properties: databaseItem.propiedades,
+                quantity: databaseItem.cantUnidades,
+                costPrice: databaseItem.precioCosto,
+                salePrice: databaseItem.precioTotal,
+                buyIvaPercent: databaseItem.ivaComprasObject.porcentaje,
+                saleIvaPercent: databaseItem.ivaVentasObject.porcentaje,
+                buyIvaAmount: databaseItem.ivaCompra,
+                saleIvaAmount: databaseItem.ivaVenta,
+                providerData: databaseItem.proveedores ? databaseItem.proveedores : [],
+              }
+            )
           } else {
             if (
               this.products.filter((el) => el.id === databaseItem.id).length > 0
@@ -500,14 +521,49 @@ export default {
                   .precioUnitario *
                 this.products.filter((el) => el.id === databaseItem.id)[0]
                   .cantUnidades;
+
+              this.productsDescription.filter(
+                (el) => el.barCode === databaseItem.codigoBarra
+              )[0].quantity++;
+              this.productsDescription.filter(
+                (el) => el.barCode === databaseItem.codigoBarra
+              )[0].precioTotal =
+                this.productsDescription.filter(
+                  (el) => el.barCode === databaseItem.codigoBarra
+                )[0]
+                  .precioUnitario *
+                this.productsDescription.filter((el) => el.barCode === databaseItem.codigoBarra)[0]
+                  .quantity;
             } else {
               databaseItem.cantUnidades = 1;
               databaseItem.total = databaseItem.precioTotal;
               this.products.push(this.processProductsObject(databaseItem));
+              this.productsDescription.push(
+                {
+                  name: databaseItem.nombre,
+                  barCode: databaseItem.codigoBarra,
+                  code: databaseItem.codigoProducto,
+                  tradeMarkName: databaseItem.marca.nombre,
+                  tradeMarkId: databaseItem.marca.id,
+                  rubroName: databaseItem.rubro.nombre,
+                  rubroId: databaseItem.rubro.id,
+                  attributes: databaseItem.atributos,
+                  properties: databaseItem.propiedades,
+                  quantity: databaseItem.cantUnidades,
+                  costPrice: databaseItem.precioCosto,
+                  salePrice: databaseItem.precioTotal,
+                  buyIvaPercent: databaseItem.ivaComprasObject.porcentaje,
+                  saleIvaPercent: databaseItem.ivaVentasObject.porcentaje,
+                  buyIvaAmount: databaseItem.ivaCompra,
+                  saleIvaAmount: databaseItem.ivaVenta,
+                  providerData: databaseItem.proveedores ? databaseItem.proveedores : [],
+                }
+              )
             }
           }
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log(err);
           this.$errorAlert("No existe un producto con ese código de barras");
         });
     },
