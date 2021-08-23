@@ -43,6 +43,7 @@
   </v-container>
 </template>
 <script>
+import ReportsService from "../../services/ReportsService" ;
 import Pagination from "../Pagination";
 import { formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
@@ -124,7 +125,15 @@ export default {
       this.$emit("seeDetails", object);
     },
     print(object) {
-      this.$emit("print", object);
+      ReportsService(this.tenant, "ventas", this.token)
+        .printZClosure(object)
+        .then((res) => {
+          let file = new Blob([res["data"]], {
+            type: "application/pdf",
+          });
+          let fileURL = URL.createObjectURL(file);
+          window.open(fileURL, "_blank");
+        });
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
