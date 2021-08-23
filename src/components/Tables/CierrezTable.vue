@@ -28,7 +28,7 @@
           :objectsArray="item.comprobantesFiscales"
           v-on:seeDetails="seeDetails"
         />
-        <Print :object="item" v-on:print="print" class="ml-1" />
+        <Print :object="item.comprobantesFiscales" v-on:print="print" class="ml-1" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" class="ml-1" />
       </template>
     </v-data-table>
@@ -43,6 +43,7 @@
   </v-container>
 </template>
 <script>
+import ReportsService from "../../services/ReportsService";
 import Pagination from "../Pagination";
 import { formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
@@ -123,6 +124,23 @@ export default {
       this.objectToPrint = object;
       this.printDialogStatus = true;
     },
+    
+     printSpecification(specification) {
+      return this.printZClosure(specification);
+    },
+
+    printZClosure(specification) {
+      ReportsService(this.tenant, "cierres_z", this.token)
+        .printZClosure(this.objectToPrint, specification)
+        .then((res) => {
+          let file = new Blob([res["data"]], {
+            type: "application/pdf",
+          });
+          let fileURL = URL.createObjectURL(file);
+          window.open(fileURL, "_blank");
+        });
+    },
+
     seeDetails(object) {
       this.$emit("seeDetails", object);
     },
