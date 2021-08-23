@@ -656,7 +656,7 @@ export default {
       return this.products.reduce((acc, el) => {
         if (el.id == id) {
           el.precioTotal = acc;
-          el.precioTotal = parseFloat(el.precioUnitario) * el.cantUnidades;
+          el.precioTotal = roundTwoDecimals(parseFloat(el.precioUnitario) * el.cantUnidades);
         }
       }, 0);
     },
@@ -992,6 +992,7 @@ export default {
             this.savePresupuesto();
           }else{
             this.saveNoFiscal();
+            window.location.reload();
           }
         }
       } else {
@@ -2143,15 +2144,7 @@ export default {
     /* CLEAR SALE FORM DATA ------------------------------------------------------------------------------*/
     /******************************************************************************************************/
     clear() {
-      this.object = {};
-      this.products = [];
-      this.modificator = "";
-      this.priceModificationPorcent = 0;
-      this.individualPercent = "";
-      this.listennerOfListChange = 999999999;
-      this.resetPresupuestSearch = true;
-      this.$store.commit("productos/resetStates");
-      this.loaded = true;
+      window.location.reload();
     },
 
     /******************************************************************************************************/
