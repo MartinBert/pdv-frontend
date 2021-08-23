@@ -125,7 +125,7 @@ export default {
       this.$emit("seeDetails", object);
     },
     print(object) {
-      ReportsService(this.tenant, "ventas", this.token)
+      ReportsService(this.tenant, this.service, this.token)
         .printZClosure(object)
         .then((res) => {
           let file = new Blob([res["data"]], {
