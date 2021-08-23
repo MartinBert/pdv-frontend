@@ -28,7 +28,7 @@
           :objectsArray="item.comprobantesFiscales"
           v-on:seeDetails="seeDetails"
         />
-        <Print :object="item" class="ml-1" />
+        <Print :object="item" v-on:print="print" class="ml-1" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" class="ml-1" />
       </template>
     </v-data-table>
@@ -119,7 +119,10 @@ export default {
       console.log(this.cierres);
     },
     
-
+      print(object) {
+      this.objectToPrint = object;
+      this.printDialogStatus = true;
+    },
     seeDetails(object) {
       this.$emit("seeDetails", object);
     },
