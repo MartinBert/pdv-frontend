@@ -226,7 +226,7 @@ export default {
       depositos:{
         perfilId: "",
         sucursalId: "",
-        depositoNme: "",
+        depositoName: "",
         page: 1,
         size: 100000
       }
