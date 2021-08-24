@@ -367,6 +367,7 @@ export default {
           }
         }
       }
+      window.location.reload();
     },
 
     back() {
