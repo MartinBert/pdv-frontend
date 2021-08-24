@@ -40,6 +40,7 @@
       v-on:add="add"
       v-on:print="print"
       v-on:seeDetails="seeDetails"
+      ref="table"
     />
     <DevolucionDetails/>
     <ReceiptDialog v-on:receipt="saveChanges"/>
@@ -93,9 +94,7 @@ export default {
   methods: {
     newObject() {
       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
-      setTimeout(() => {
-        window.location.reload();  
-      }, 10000);
+      this.$refs.table.refresh();
       
     },
     print(object){
