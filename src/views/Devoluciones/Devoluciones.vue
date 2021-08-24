@@ -93,8 +93,8 @@ export default {
   },
   methods: {
     newObject() {
-      this.$forceUpdate();
       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
+      this.$mount();
     },
     print(object){
       ReportsService(this.tenant, "ventas", this.token)
