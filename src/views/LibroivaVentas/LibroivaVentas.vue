@@ -257,12 +257,6 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
-          const filterInvoice = this.ventas.filter(
-            (el)=>el.nombreDocumento == "FACTURAS"
-          )
-          if(filterInvoice == "FACTURAS"){
-            return console.log(filterInvoice);
-          }
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
