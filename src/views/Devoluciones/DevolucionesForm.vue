@@ -825,10 +825,10 @@ export default {
         .then(() => {
           this.$successAlert("Devolución realizada").then((result) => {
             if (result.dismiss) {
-              this.$router.push({ name: "devoluciones" });
-              setTimeout(() => {
+               setTimeout(() => {
                 window.location.reload();
               }, 1000);
+              this.$router.push({ name: "devoluciones" });
             }
           });
         });
