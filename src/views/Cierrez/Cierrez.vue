@@ -390,7 +390,7 @@ export default {
     },
 
     printZClosure(specification) {
-      ReportsService(this.tenant, "cierres_z", this.token)
+      ReportsService(this.tenant, "ventas", this.token)
         .printZClosure(this.objectToPrint, specification)
         .then((res) => {
           let file = new Blob([res["data"]], {
