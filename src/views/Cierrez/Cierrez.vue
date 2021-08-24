@@ -5,7 +5,7 @@
     <v-card min-width="100%">
       <CierrezTable
         v-on:seeDetails="seeDetails"
-        v-on:print="print"
+        v-on:print="printZClosure"
         v-on:deleteItem="deleteItem"
         v-on:zClosure="generateZClosure"
         v-if="loaded"
