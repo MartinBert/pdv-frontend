@@ -95,7 +95,7 @@ export default {
       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
       setTimeout(() => {
         window.location.reload();  
-      }, 10000);
+      }, 1000);
       
     },
     print(object){
