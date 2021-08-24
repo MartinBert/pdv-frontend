@@ -24,7 +24,7 @@
                 <label>Productos devueltos</label>
               </v-col>
             </v-row>
-            <v-simple-table style="background-color: transparent" fixed-header>
+            <v-simple-table style="background-color: transparent" fixed-header ref="table">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -75,7 +75,7 @@
                 <label>Productos cedidos</label>
               </v-col>
             </v-row>
-            <v-simple-table style="background-color: transparent" fixed-header>
+            <v-simple-table style="background-color: transparent" fixed-header ref="table">
               <template v-slot:default>
                 <thead>
                   <tr>
