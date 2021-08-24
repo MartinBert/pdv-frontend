@@ -28,7 +28,7 @@
           :objectsArray="item.comprobantesFiscales"
           v-on:seeDetails="seeDetails"
         />
-        <Print :object="item.comprobantes" v-on:print="print" class="ml-1" />
+        <Print :object="item" v-on:print="print" class="ml-1" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" class="ml-1" />
       </template>
     </v-data-table>
