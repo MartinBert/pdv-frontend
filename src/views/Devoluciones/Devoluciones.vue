@@ -93,8 +93,8 @@ export default {
   },
   methods: {
     newObject() {
-      this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
        setTimeout(() => {
+         this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
         window.location.reload()
       }, 1000);
     },
