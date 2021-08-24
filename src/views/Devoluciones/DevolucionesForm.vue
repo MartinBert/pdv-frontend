@@ -354,6 +354,7 @@ export default {
           ).then((result) => {
             if (result.isConfirmed) {
               this.saveWithoutReceipt();
+               window.location.reload();
             } else {
               this.$store.commit("receipt/receiptDialogMutation");
               this.loaded = true;
@@ -367,7 +368,6 @@ export default {
           }
         }
       }
-      window.location.reload();
     },
 
     back() {
