@@ -825,8 +825,8 @@ export default {
         .then(() => {
           this.$successAlert("Devolución realizada").then((result) => {
             if (result.dismiss) {
+              this.$router.push({ name: "devoluciones" });
                setTimeout(() => {
-                this.$router.push({ name: "devoluciones" });
                 window.location.reload();
               }, 1000);
             }
