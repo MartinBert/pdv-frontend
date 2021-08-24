@@ -94,7 +94,10 @@ export default {
   methods: {
     newObject() {
       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
-      this.$refs.table.refresh();
+      setTimeout(() => {
+        this.$refs.table.refresh();
+        console.log("Se esta ejecutando")
+      }, 1000);
       
     },
     print(object){
