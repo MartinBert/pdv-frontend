@@ -93,7 +93,10 @@ export default {
   methods: {
     newObject() {
       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();  
+      }, 1000);
+      
     },
     print(object){
       ReportsService(this.tenant, "ventas", this.token)
