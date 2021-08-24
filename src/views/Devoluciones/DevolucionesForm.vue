@@ -410,6 +410,7 @@ export default {
         productoMarcaName: "",
         productoCodigoBarras: "",
         productoPrimerAtributoName: "",
+        productoEstad:1,
         page: 1,
         size: 100000
       }
@@ -775,6 +776,7 @@ export default {
         productoMarcaName: "",
         productoCodigoBarras: "",
         productoPrimerAtributoName: "",
+        productoEstado:1,
         page: 1,
         size: 100000
       }
