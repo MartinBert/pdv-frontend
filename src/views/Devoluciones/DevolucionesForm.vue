@@ -759,7 +759,6 @@ export default {
         });
       this.object = {};
       this.$store.commit("productos/resetStates");
-      window.location.reload();
     },
 
     saveWithoutReceipt() {
