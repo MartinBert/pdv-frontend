@@ -313,8 +313,8 @@ async exportGeneralExcel() {
       let dataForExcel = [];
       let filters = {
         fechaEmision: "",
-        sucursalId: "",
         nombreDocumento: "",
+        sucursalId: "",
         razonSocial: "",
         condicionIva: "",
         cuit: "",
