@@ -338,7 +338,7 @@ export default {
             }else if(el.nombreDocumento === "FACTURAS B") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
-            }else if(el.nombreDocumento === "FACTURAS C") {
+            }else if(el.nombreDocumento === "FACTURAS A") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
             }
