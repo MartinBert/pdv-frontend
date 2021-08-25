@@ -108,6 +108,7 @@ export default {
       totalVenta: "",
       page: 1,
       size: 1000,
+      totalPages:0,
     },
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
