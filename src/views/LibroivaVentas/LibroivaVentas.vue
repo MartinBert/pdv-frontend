@@ -332,13 +332,13 @@ export default {
         .then((data) => {
           let ventas = data.data.content;
           ventas.forEach((el) => {
-            if (el.nombreDocumento === "FACTURAS A") {
+            if (el.nombreDocumento === "FACTURAS C") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
-            }if(el.nombreDocumento === "Ticket X") {
+            }else if(el.nombreDocumento === "Ticket X") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
-            }if(el.nombreDocumento === "Presupuesto") {
+            }else if(el.nombreDocumento === "Presupuesto") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
             }
