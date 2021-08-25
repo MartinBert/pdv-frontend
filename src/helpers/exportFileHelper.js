@@ -64,8 +64,8 @@ export function exportExcelLibro(headers, data) {
     let ws_data = [headers];
     data.forEach(el => {
         ws_data.push([
-            el.fecha,
-            el.nombre,
+            el.fechaEmision,
+            el.nombreComprobante,
             el.numero,
             el.razonSocial,
             el.cuit,
