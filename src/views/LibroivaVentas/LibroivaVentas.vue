@@ -30,6 +30,11 @@
                 >
                 </v-text-field>
                 <v-btn
+                class="primary v-btn--block"
+                >
+                Buscar Comprobantes
+                </v-btn>
+                <v-btn
                   class="primary v-btn--block"
                   type="button"
                   @click="
