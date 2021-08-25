@@ -66,6 +66,7 @@ export function exportExcelLibro(headers, data) {
         ws_data.push([
             el.fechaEmision,
             el.nombreDocumento,
+            el.barCode,
             el.razonSocial,
             el.cuit,
             el.netoGrabado,

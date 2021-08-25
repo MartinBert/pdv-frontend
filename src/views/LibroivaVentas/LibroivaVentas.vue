@@ -314,7 +314,7 @@ async exportGeneralExcel() {
       let filters = {
         fechaEmision: "",
         nombreDocumento: "",
-        sucursalId: "",
+        barCode: "",
         razonSocial: "",
         condicionIva: "",
         cuit: "",
