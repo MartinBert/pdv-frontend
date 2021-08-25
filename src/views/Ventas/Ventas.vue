@@ -10,7 +10,7 @@
        :items="ventas"
         v-on:print="print"
         v-on:seeDetails="seeDetails"
-        v-if="activeTab === 1"
+         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
       <VentaDetails />
@@ -30,7 +30,7 @@ export default {
     ventas:[],
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    loaded: true,
+    loaded: false,
     token: localStorage.getItem("token"),
     tenant: "",
       filterParams: {
