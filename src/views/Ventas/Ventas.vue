@@ -63,7 +63,6 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.$store.commit("eventual/resetStates");
-    this.filterObjects();
   },
 
   methods: {
