@@ -339,6 +339,42 @@ async exportGeneralExcel() {
         });
       return dataForExcel;
     },
+
+    formatForExcel(product) {
+      if (product.marca) {
+        product.marca = product.marca.nombre;
+      }
+      if (product.rubro) {
+        product.rubro = product.rubro.nombre;
+      }
+      if (product.atributos) {
+        product.atributos = product.atributos.reduce((acc, el) => {
+          if (el.valor) {
+            acc = acc + el.valor + ",";
+            return acc;
+          } else {
+            acc = acc + el.valorNumerico + ",";
+            return acc;
+          }
+        }, "");
+      }
+      if (product.distribuidores) {
+        product.distribuidores = product.distribuidores.reduce(
+          (acc, el) => acc + el.razonSocial + ",",
+          ""
+        );
+      }
+      if (product.propiedades) {
+        product.propiedades = product.propiedades.reduce(
+          (acc, el) => acc + el.nombre + ",",
+          ""
+        );
+      }
+      product.ivaComprasObject = product.ivaComprasObject.porcentaje;
+      product.ivaVentasObject = product.ivaVentasObject.porcentaje;
+      return product;
+    },
+
     notPassSucursalValidations() {
       if (this.loguedUser.sucursal) return false;
       return true;
