@@ -30,7 +30,7 @@
                 >
                 </v-text-field>
                 <v-btn
-                class="primary v-btn--block"
+                  class="primary v-btn--block"
                   @click="
                     salesForDate1(
                       loguedUser.sucursal,
@@ -39,7 +39,7 @@
                     )
                   "
                 >
-                Buscar Comprobantes
+                  Buscar Comprobantes
                 </v-btn>
                 <v-btn
                   class="primary v-btn--block"
@@ -47,7 +47,7 @@
                   style="margin-left:400px;
                    margin-top:-100px;
                    "
-                   @click="exportGeneralExcel()"
+                  @click="exportGeneralExcel()"
                   >Imprimir libro</v-btn
                 >
               </div>
@@ -162,7 +162,7 @@ export default {
     FiscalCondicion: [],
     file: null,
     sucusal: [],
-    filterInvoice:[],
+    filterInvoice: [],
     empresa: [],
     ivas: [],
     object: {
@@ -205,7 +205,7 @@ export default {
       condicionIva: "",
       condicionVenta: "",
       barCode: "",
-      nombreDocumento:"",
+      nombreDocumento: "",
       documentoComercialName: "",
       page: 1,
       size: 10,
@@ -287,7 +287,7 @@ export default {
           console.log(res);
         });
     },
-async exportGeneralExcel() {
+    async exportGeneralExcel() {
       this.loaded = false;
       const headers = [
         "FECHA",
@@ -308,7 +308,7 @@ async exportGeneralExcel() {
       console.log(data);
     },
 
-     async setDataToExcel() {
+    async setDataToExcel() {
       let dataForExcel = [];
       let filters = {
         fechaEmision: "",
@@ -319,10 +319,10 @@ async exportGeneralExcel() {
         cuit: "",
         ingBrutos: "",
         totalIva27: "",
-        totalIva21:"",
-        totalIva10:"",
-        totalIva0:"",
-        totalVenta:"",
+        totalIva21: "",
+        totalIva10: "",
+        totalIva0: "",
+        totalVenta: "",
         page: 1,
         size: 100000,
         totalPages: 0,
@@ -332,18 +332,17 @@ async exportGeneralExcel() {
         .then((data) => {
           let ventas = data.data.content;
           ventas.forEach((el) => {
-            if(el.nombreDocumento === 'FACTURAS A'){
-                el = this.formatForExcel(el);
-                dataForExcel.push(el);
-                console.log(ventas);
-            }if(el.nombreDocumento === 'FACTURAS B'){
+            if (el.nombreDocumento === "FACTURAS A") {
               el = this.formatForExcel(el);
-                dataForExcel.push(el);
-                console.log(ventas);
-            }if(el.nombreDocumento === 'FACTURAS C'){
+              dataForExcel.push(el);
+            }
+            if (el.nombreDocumento === "TICKET X") {
               el = this.formatForExcel(el);
-                dataForExcel.push(el);
-                console.log(ventas);
+              dataForExcel.push(el);
+            }
+            if (el.nombreDocumento === "FACTURAS C") {
+              el = this.formatForExcel(el);
+              dataForExcel.push(el);
             }
           });
         });
