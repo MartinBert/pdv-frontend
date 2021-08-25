@@ -31,12 +31,6 @@
                 </v-text-field>
                 <v-btn
                 class="primary v-btn--block"
-                >
-                Buscar Comprobantes
-                </v-btn>
-                <v-btn
-                  class="primary v-btn--block"
-                  type="button"
                   @click="
                     salesForDate1(
                       loguedUser.sucursal,
@@ -44,9 +38,16 @@
                       object.fechaHasta
                     )
                   "
+                >
+                Buscar Comprobantes
+                </v-btn>
+                <v-btn
+                  class="primary v-btn--block"
+                  type="button"
                   style="margin-left:400px;
                    margin-top:-100px;
                    "
+                   @click="exportGeneralExcel()"
                   >Imprimir libro</v-btn
                 >
               </div>
