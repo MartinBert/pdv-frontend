@@ -679,8 +679,7 @@ export default {
           ""
         );
       }
-      product.ivaComprasObject = product.ivaComprasObject.porcentaje;
-      product.ivaVentasObject = product.ivaVentasObject.porcentaje;
+  
       return product;
     },
 
