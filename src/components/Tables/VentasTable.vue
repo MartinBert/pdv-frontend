@@ -76,6 +76,7 @@
       </template>
     </v-data-table>
     <Pagination
+
       :page="filterParams.page"
       :totalPages="filterParams.totalPages"
       :totalVisible="7"
