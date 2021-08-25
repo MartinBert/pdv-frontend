@@ -30,7 +30,7 @@ export default {
     ventas:[],
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    loaded: false,
+    loaded: true,
     token: localStorage.getItem("token"),
     tenant: "",
       filterParams: {
