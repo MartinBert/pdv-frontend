@@ -354,7 +354,7 @@ export default {
         .then((data) => {
           let ventas = data.data.content;
           ventas.forEach((el) => {
-            if (el.nombreDocumento === "FACTURAS C") {
+            if (el.nombreDocumento === "FACTURAS C" && el.fechaEmision ==="10/08/2021") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
             }else if(el.nombreDocumento === "FACTURAS B") {
