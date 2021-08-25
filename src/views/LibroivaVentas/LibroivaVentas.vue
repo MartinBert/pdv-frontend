@@ -69,6 +69,7 @@
                 "
                 label="Factura(B)"
               >
+              </v-checkbox>
             </v-col>
              <v-col cols="3">
               <v-checkbox
@@ -78,6 +79,7 @@
                 "
                 label="Factura(C)"
               >
+              </v-checkbox>
             </v-col>
 
           </form>
