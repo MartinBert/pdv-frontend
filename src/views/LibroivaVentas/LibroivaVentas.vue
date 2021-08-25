@@ -59,7 +59,6 @@
                 margin-top:-100px;
                 "
                 label="Facturas(A)"
-                v-on:input="filterObjects()"
               >
               </v-checkbox>
             </v-col>
@@ -70,7 +69,6 @@
                 margin-top:-100px;
                 "
                 label="Facturas(B)"
-                v-on:input="filterObjects()"
               >
               </v-checkbox>
             </v-col>
@@ -81,7 +79,6 @@
                 margin-top:-100px;
                 "
                 label="Facturas(C)"
-                v-on:input="filterObjects()"
               >
               </v-checkbox>
             </v-col>
@@ -288,17 +285,9 @@ export default {
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          let ventas = data.data.content;
-          let obj = {};
-          ventas.forEach((el) => {
-            if (el.nombreDocumento === "FACTURAS C") {
-                obj.push(el)              
-            }else if(el.nombreDocumento === "FACTURAS B") {
-                obj.push(el)
-            }else if(el.nombreDocumento === "FACTURAS A") {
-                obj.push(el)
-            }
-          });
+          this.ventas = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
         });
       console.log(this.ventas);
     },
