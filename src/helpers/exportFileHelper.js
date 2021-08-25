@@ -65,8 +65,7 @@ export function exportExcelLibro(headers, data) {
     data.forEach(el => {
         ws_data.push([
             el.fechaEmision,
-            el.nombreComprobante,
-            el.numero,
+            el.nombreDocumento,
             el.razonSocial,
             el.cuit,
             el.netoGrabado,
