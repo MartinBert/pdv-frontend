@@ -332,7 +332,7 @@ async exportGeneralExcel() {
         .then((data) => {
           let ventas = data.data.content;
           ventas.forEach((el) => {
-            if(this.ventas.nombreDocumento == 'FACTURA'){
+            if(this.ventas.nombreDocumento == 'FACTURAS C'){
                 el = this.formatForExcel(el);
                 dataForExcel.push(el);
                 console.log(ventas);
