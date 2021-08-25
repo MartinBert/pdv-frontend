@@ -52,7 +52,7 @@
                 >
               </div>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="6">
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
