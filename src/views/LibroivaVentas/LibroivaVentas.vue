@@ -131,7 +131,7 @@ import {
   getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
-import { exportExcelLibro } from "../../helpers/exportFileHelper";
+import { exportExcel } from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -262,6 +262,7 @@ export default {
         });
       console.log(this.ventas);
     },
+
     createDate(date, param) {
       const integerDate = generateIntegerDate(date);
       if (param === "fechaDesde") {
@@ -278,8 +279,59 @@ export default {
         .salesForDate(id, fechaDesde, fechaHasta)
         .then((res) => {
           console.log(res);
-          exportExcelLibro(res);
         });
+    },
+async exportGeneralExcel() {
+      this.loaded = false;
+      const headers = [
+        "FECHA",
+        "SUCURSAL",
+        "COMPROBANTE",
+        "NUMERO COMPROBANTE",
+        "RAZON SOCIAL",
+        "CONDICION IVA",
+        "CUIT",
+        "NETO GRABADO",
+        "IVA 27%",
+        "IVA 21%",
+        "IVA 10%",
+        "IVA 0",
+        "TOTAL FACTURADO",
+      ];
+      const data = await this.setDataToExcel();
+      exportExcel(headers, data);
+      this.loaded = true;
+    },
+
+     async setDataToExcel() {
+      let dataForExcel = [];
+      let filters = {
+        fechaEmision: "",
+        sucursalId: "",
+        nombreDocumento: "",
+        razonSocial: "",
+        condicionIva: "",
+        cuit: "",
+        ingBrutos: "",
+        totalIva27: "",
+        totalIva21:"",
+        totalIva10:"",
+        totalIva0:"",
+        totalVenta:"",
+        page: 1,
+        size: 100000,
+        totalPages: 0,
+      };
+      await GenericService(this.tenant, this.service, this.token)
+        .filter(filters)
+        .then((data) => {
+          let ventas = data.data.content;
+          ventas.forEach((el) => {
+            el = this.formatForExcel(el);
+            dataForExcel.push(el);
+          });
+        });
+      return dataForExcel;
     },
     notPassSucursalValidations() {
       if (this.loguedUser.sucursal) return false;
