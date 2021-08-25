@@ -137,7 +137,7 @@ import {
   getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
-import { exportExcel } from "../../helpers/exportFileHelper";
+import { exportExcelLibro } from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
   data: (vm) => ({
@@ -305,7 +305,7 @@ async exportGeneralExcel() {
         "TOTAL FACTURADO",
       ];
       const data = await this.setDataToExcel();
-      exportExcel(headers, data);
+      exportExcelLibro(headers, data);
       this.loaded = true;
     },
 
