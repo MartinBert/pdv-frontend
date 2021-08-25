@@ -19,6 +19,7 @@
   </v-container>
 </template>
 <script>
+import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
 import Spinner from "../../components/Graphics/Spinner";
@@ -32,6 +33,18 @@ export default {
     loaded: true,
     token: localStorage.getItem("token"),
     tenant: "",
+      filterParams: {
+      blackReceiptFilter: "",
+      sucursalId: "",
+      barCode:"",
+      numeroCbte:"",
+      fechaEmision: "",
+      comprobanteCerrado: "",
+      numeroComprobante: "",
+      totalVenta: "",
+      page: 1,
+      size: 10,
+    },
     tabs:[
       { id: 1, title: "Comprobantes", route: '/ventas/list' },
       { id: 2, title: "Presupuesto", route: '/ventas/presupuesto' },
@@ -51,9 +64,25 @@ export default {
   mounted() {
     this.tenant = this.$route.params.tenant;
     this.$store.commit("eventual/resetStates");
+    this.filterObjects();
   },
 
   methods: {
+
+     filterObjects(page) {
+      if (page) this.filterParams.page = page;
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.ventas = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
+          this.loaded = true;
+        });
+    },
+
     seeDetails(objects) {
       let title = "Productos";
       if (objects[0] && objects[0].cuotas) title = "Planes de pago";
