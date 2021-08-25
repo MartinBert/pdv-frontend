@@ -60,6 +60,7 @@
                 "
                 label="Factura(A)"
               >
+              </v-checkbox>
             </v-col>
              <v-col cols="3">
               <v-checkbox
