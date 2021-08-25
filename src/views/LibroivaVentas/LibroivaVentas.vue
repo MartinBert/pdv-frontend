@@ -306,6 +306,7 @@ async exportGeneralExcel() {
       const data = await this.setDataToExcel();
       exportExcelLibro(headers, data);
       this.loaded = true;
+      console.log(data);
     },
 
      async setDataToExcel() {
