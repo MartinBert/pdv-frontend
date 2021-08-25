@@ -332,8 +332,10 @@ async exportGeneralExcel() {
         .then((data) => {
           let ventas = data.data.content;
           ventas.forEach((el) => {
-            el = this.formatForExcel(el);
-            dataForExcel.push(el);
+            if(ventas.nombreDocumento === 'FACTURA'){
+                el = this.formatForExcel(el);
+                dataForExcel.push(el);
+            }
           });
         });
       return dataForExcel;
