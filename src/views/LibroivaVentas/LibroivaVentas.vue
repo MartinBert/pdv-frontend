@@ -291,8 +291,8 @@ async exportGeneralExcel() {
       this.loaded = false;
       const headers = [
         "FECHA",
-        "SUCURSAL",
         "COMPROBANTE",
+        "SUCURSAL",
         "NUMERO COMPROBANTE",
         "RAZON SOCIAL",
         "CONDICION IVA",
