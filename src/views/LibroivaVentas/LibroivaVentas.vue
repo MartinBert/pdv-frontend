@@ -354,16 +354,17 @@ export default {
         .then((data) => {
           let ventas = data.data.content;
           ventas.forEach((el) => {
-            if (el.nombreDocumento === "FACTURAS C" && el.fechaEmision ==="10/08/2021") {
-              el = this.formatForExcel(el);
-              dataForExcel.push(el);
-            }else if(el.nombreDocumento === "FACTURAS B") {
-              el = this.formatForExcel(el);
-              dataForExcel.push(el);
-            }else if(el.nombreDocumento === "FACTURAS A") {
-              el = this.formatForExcel(el);
-              dataForExcel.push(el);
-            }
+            if (el.nombreDocumento === "FACTURAS C" || el.nombreDocumento === "FACTURAS B" || el.nombreDocumento === "FACTURAS A") {
+              el.sort((a,b)=>{
+                if(a>b){
+                  el = this.formatForExcel(el);
+                  dataForExcel.push(el);
+                } if(a<b){
+                  el = this.formatForExcel(el);
+                  dataForExcel.push(el);
+                }
+              })
+            }  
           });
         });
       return dataForExcel;
