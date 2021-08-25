@@ -19,7 +19,6 @@
   </v-container>
 </template>
 <script>
-import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import VentasReportsDialog from "../../components/Dialogs/VentasReportsDialog";
 import Spinner from "../../components/Graphics/Spinner";
@@ -68,21 +67,6 @@ export default {
   },
 
   methods: {
-
-     filterObjects(page) {
-      if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
-        .filter(this.filterParams)
-        .then((data) => {
-          this.ventas = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
-          this.loaded = true;
-        });
-    },
-
     seeDetails(objects) {
       let title = "Productos";
       if (objects[0] && objects[0].cuotas) title = "Planes de pago";

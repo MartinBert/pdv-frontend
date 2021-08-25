@@ -108,7 +108,7 @@ export default {
       numeroComprobante: "",
       totalVenta: "",
       page: 1,
-      size: 10,
+      size: 1000,
     },
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
