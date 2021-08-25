@@ -300,7 +300,6 @@ async exportGeneralExcel() {
         "IVA 27%",
         "IVA 21%",
         "IVA 10%",
-        "IVA 0",
         "TOTAL FACTURADO",
       ];
       const data = await this.setDataToExcel();
