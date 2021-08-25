@@ -201,6 +201,7 @@ export default {
       totalIva21: "",
       totalIva27: "",
       totalIva10: "",
+      totalIva0:"",
       porcentaje: "",
       condicionIva: "",
       condicionVenta: "",
