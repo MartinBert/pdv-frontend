@@ -336,7 +336,7 @@ export default {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
             }
-            if (el.nombreDocumento === "TICKET X") {
+            if (el.nombreDocumento === "Ticket X") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
             }
