@@ -335,6 +335,7 @@ async exportGeneralExcel() {
             if(ventas.nombreDocumento === 'FACTURA'){
                 el = this.formatForExcel(el);
                 dataForExcel.push(el);
+                console.log(ventas);
             }
           });
         });
