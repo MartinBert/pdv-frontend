@@ -245,7 +245,7 @@ export default {
     headers: [
       { text: "Fecha", value: "fechaEmision" },
       { text: "Comprobante", value: "nombreDocumento" },
-      { text: "Numero Comprobantes", value: "barCode" },
+      { text: "Numero Comprobantes", value: "numeroCbte" },
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva" },
       { text: "N° Cuit", value: "cliente.cuit" },
@@ -253,7 +253,6 @@ export default {
       { text: "Iva 27%", value: "totalIva27" },
       { text: "Iva 21%", value: "totalIva21" },
       { text: "Iva 10,5%", value: "totalIva10" },
-      { text: "Iva 0 %", value: "Iva0" },
       { text: "Total Facturado", value: "totalVenta" },
     ],
   }),
@@ -336,7 +335,7 @@ export default {
       let filters = {
         fechaEmision: "",
         nombreDocumento: "",
-        barCode: "",
+        numeroCbte: "",
         razonSocial: "",
         condicionIva: "",
         cuit: "",
