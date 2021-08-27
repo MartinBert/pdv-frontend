@@ -183,7 +183,7 @@ export default {
     comprobantesComerciales: [],
     FiscalCondicion: [],
     file: null,
-    obj:[],
+    obj:{},
     sucusal: [],
     filterInvoice: [],
     empresa: [],
