@@ -136,7 +136,7 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="ventas"
+        :items="invoiceFilter"
         hide-default-footer
       >
       </v-data-table>
@@ -284,7 +284,7 @@ export default {
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          let ventas = data.data.content;
+            let ventas = data.data.content;
           let invoiceFilter = ventas.filter(
             (el) => el.nombreDocumento === "FACTURAS C");
             console.log(invoiceFilter);
