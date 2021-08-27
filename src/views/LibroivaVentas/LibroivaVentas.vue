@@ -62,7 +62,7 @@
               >
               </v-checkbox>
             </v-col>
-             <v-col cols="3">
+            <v-col cols="3">
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
@@ -72,7 +72,7 @@
               >
               </v-checkbox>
             </v-col>
-             <v-col cols="3">
+            <v-col cols="3">
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
@@ -82,7 +82,6 @@
               >
               </v-checkbox>
             </v-col>
-
           </form>
         </v-col>
       </v-row>
@@ -183,7 +182,7 @@ export default {
     comprobantesComerciales: [],
     FiscalCondicion: [],
     file: null,
-    obj:{},
+    obj: {},
     sucusal: [],
     filterInvoice: [],
     empresa: [],
@@ -224,7 +223,7 @@ export default {
       totalIva21: "",
       totalIva27: "",
       totalIva10: "",
-      totalIva0:"",
+      totalIva0: "",
       porcentaje: "",
       condicionIva: "",
       condicionVenta: "",
@@ -289,7 +288,7 @@ export default {
           let ventas = data.data.content;
           ventas.forEach((el)=>{
             if(el.nombreDocumento === "FACTURAS C"){
-              obj.push(el.nombreDocumento);
+              obj.push(el);
             }
           })
           this.filterParams.totalPages = data.data.totalPages;
@@ -364,10 +363,10 @@ export default {
             if (el.nombreDocumento === "FACTURAS C") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
-            }else if(el.nombreDocumento === "FACTURAS B") {
+            } else if (el.nombreDocumento === "FACTURAS B") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
-            }else if(el.nombreDocumento === "FACTURAS A") {
+            } else if (el.nombreDocumento === "FACTURAS A") {
               el = this.formatForExcel(el);
               dataForExcel.push(el);
             }
