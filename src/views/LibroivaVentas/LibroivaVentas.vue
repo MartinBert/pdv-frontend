@@ -280,17 +280,11 @@ export default {
 
   methods: {
    async filterObjects(page) {
-      let obj = [];
       if (page) this.filterParams.page = page;
      await GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          let ventas = data.data.content;
-          ventas.forEach((el)=>{
-            if(el.nombreDocumento == "FACTURAS C"){
-              obj.push(el);
-            }
-          })
+          this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
