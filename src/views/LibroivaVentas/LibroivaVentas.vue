@@ -286,7 +286,7 @@ export default {
         .then((data) => {
             let ventas = data.data.content;
             this.invoiceFilter = ventas.filter(
-            (el) => el.nombreDocumento == "FACTURAS");
+            (el) => el.nombreDocumento === "FACTURAS");
             
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
