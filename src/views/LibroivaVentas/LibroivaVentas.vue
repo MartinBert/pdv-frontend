@@ -281,7 +281,7 @@ export default {
 
   methods: {
     filterObjects(page) {
-      let obj = {};
+      let obj = [];
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
