@@ -50,6 +50,11 @@ export function promediar(array) {
     return roundTwoDecimals(total / array.length);
 }
 
+export function calculatePercentageCoefficient(value, fractionOfValue){
+    const result = Number(value) * Number(fractionOfValue) / 100;
+    return roundTwoDecimals(result);
+}
+
 export function roundTwoDecimals(number) {
     return Math.round((number) * 100) / 100;
 }

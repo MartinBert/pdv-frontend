@@ -74,10 +74,10 @@ module.exports = {
 
       /**** LOCAL ****/
       open: process.platform === 'darwin',
-       host: '66.97.42.123',
+       host: '192.168.0.16',
        port: 8001,
        https: false,
-       public: '66.97.42.123:8001',
+       public: '192.168.0.16:8001',
        disableHostCheck: true,
        hotOnly: false,
     },

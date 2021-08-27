@@ -59,6 +59,7 @@
                 margin-top:-100px;
                 "
                 label="Facturas(A)"
+                v-model="filterParams.facturaA"
               >
               </v-checkbox>
             </v-col>
@@ -69,6 +70,7 @@
                 margin-top:-100px;
                 "
                 label="Facturas(B)"
+                v-model="filterParams.facturaB"
               >
               </v-checkbox>
             </v-col>
@@ -79,6 +81,7 @@
                 margin-top:-100px;
                 "
                 label="Facturas(C)"
+                v-model="filterParams.facturaC"
               >
               </v-checkbox>
             </v-col>
@@ -136,7 +139,7 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="invoiceFilter"
+        :items="ventas"
         hide-default-footer
       >
       </v-data-table>
@@ -151,40 +154,22 @@
 </template>
 <script>
 import ReportsService from "../../services/ReportsService";
-//import Detail from "../../components/Buttons/Detail";
 import Pagination from "../../components/Pagination";
 import {
   generateIntegerDate,
-  getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
 import { exportExcelLibro } from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
-  data: (vm) => ({
-    date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-      .toISOString()
-      .substr(0, 10),
-    dateFormatted: vm.formatDate(
-      new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-        .toISOString()
-        .substr(0, 10)
-    ),
-    selectedInvoice: [],
-    years: getYearsList(),
-    sucursales: [],
+  data: () => ({
     checkbox1: false,
     checkbox2: false,
     checkbox3: false,
-    checkedInvoice: [],
     ventas: [],
-    comprobantesFiscales: [],
-    comprobantesComerciales: [],
-    FiscalCondicion: [],
     file: null,
     obj: {},
     sucusal: [],
-    invoiceFilter: [],
     empresa: [],
     ivas: [],
     object: {
@@ -198,41 +183,21 @@ export default {
     },
     fechaDesde: null,
     fechaHasta: null,
-    fechaDesde2: null,
-    fechaHasta2: null,
-    fechaDesde3: null,
-    fechaHasta3: null,
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
-      codigoDocumento: "",
+      barCode:"",
+      numeroCbte:"",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
-      validityStatus: false,
       totalVenta: "",
-      documentosComerciales: "",
-      cuit: "",
-      numeroCbte: "",
-      razonSocial: "",
-      fechaVto: "",
-      ingresosBrutos: "",
-      cae: "",
-      letra: "",
-      subTotal: "",
-      totalIva21: "",
-      totalIva27: "",
-      totalIva10: "",
-      totalIva0: "",
-      porcentaje: "",
-      condicionIva: "",
-      condicionVenta: "",
-      barCode: "",
-      nombreDocumento: "",
-      documentoComercialName: "",
+      facturaA: false,
+      facturaB: false,
+      facturaC: false,
       page: 1,
       size: 10,
-      totalPages: 0,
+      totalPages:0,
     },
     loaded: false,
     tenant: "",
@@ -259,7 +224,6 @@ export default {
 
   components: {
     Pagination,
-    //Detail,
   },
 
   computed: {
@@ -274,25 +238,23 @@ export default {
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id
     this.filterObjects();
     this.months = monthsList;
   },
 
   methods: {
     filterObjects(page) {
+      console.log(page)
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          let ventas = data.data.content;
-          this.invoiceFilter = ventas.filter(
-            (el) =>
-              el.nombreDocumento === "FACTURAS A" ||
-              el.nombreDocumento === "FACTURAS B" ||
-              el.nombreDocumento === "FACTURAS C"
-          );
-          console.log(this.invoiceFilter);
+          this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
           this.loaded = true;
         });
     },
