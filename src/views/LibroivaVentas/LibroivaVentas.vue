@@ -184,7 +184,7 @@ export default {
     file: null,
     obj: {},
     sucusal: [],
-    filterInvoice: [],
+    invoiceFilter: [],
     empresa: [],
     ivas: [],
     object: {
