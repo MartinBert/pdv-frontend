@@ -284,10 +284,13 @@ export default {
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-            let ventas = data.data.content;
-            this.invoiceFilter = ventas.filter(
-            (el) => el.nombreDocumento === "FACTURAS");
-            
+          let ventas = data.data.content;
+          this.invoiceFilter = ventas.filter(
+            (el) =>
+              el.nombreDocumento === "FACTURAS A" &&
+              el.nombreDocumento === "FACTURAS B" &&
+              el.nombreDocumento === "FACTURAS A"
+          );
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
