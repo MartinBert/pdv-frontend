@@ -137,7 +137,7 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="ventas"
+        :items="obj"
         hide-default-footer
       >
       </v-data-table>
