@@ -137,7 +137,7 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="ventas"
+        :items="obj"
         hide-default-footer
       >
       </v-data-table>
@@ -183,6 +183,7 @@ export default {
     comprobantesComerciales: [],
     FiscalCondicion: [],
     file: null,
+    obj:[],
     sucusal: [],
     filterInvoice: [],
     empresa: [],
@@ -284,7 +285,12 @@ export default {
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.ventas = data.data.content;
+          let ventas = data.data.content;
+          ventas.forEach((el)=>{
+            if(el.nombreDocumento === "FACTURAS C"){
+              this.obj.push(el.nombreDocumento);
+            }
+          })
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
