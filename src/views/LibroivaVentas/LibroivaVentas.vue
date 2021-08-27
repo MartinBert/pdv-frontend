@@ -279,10 +279,10 @@ export default {
   },
 
   methods: {
-    filterObjects(page) {
+   async filterObjects(page) {
       let obj = {};
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, "ventas", this.token)
+     await GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
           let ventas = data.data.content;
