@@ -136,7 +136,7 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="obj"
+        :items="ventas"
         hide-default-footer
       >
       </v-data-table>
@@ -279,9 +279,9 @@ export default {
   },
 
   methods: {
-   async filterObjects(page) {
+   filterObjects(page) {
       if (page) this.filterParams.page = page;
-     await GenericService(this.tenant, "ventas", this.token)
+       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
