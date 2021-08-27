@@ -289,8 +289,9 @@ export default {
             (el) =>
               el.nombreDocumento === "FACTURAS A" ||
               el.nombreDocumento === "FACTURAS B" ||
-              el.nombreDocumento === "FACTURAS A"
+              el.nombreDocumento === "FACTURAS C"
           );
+          console.log(this.invoiceFilter);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
