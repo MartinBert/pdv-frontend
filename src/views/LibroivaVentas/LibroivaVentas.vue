@@ -285,9 +285,9 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
             let ventas = data.data.content;
-          let invoiceFilter = ventas.filter(
+            this.invoiceFilter = ventas.filter(
             (el) => el.nombreDocumento === "FACTURAS C");
-            console.log(invoiceFilter);
+            console.log(this.invoiceFilter);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
