@@ -281,6 +281,7 @@ export default {
 
   methods: {
     filterObjects(page) {
+      let obj = {};
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
@@ -288,7 +289,7 @@ export default {
           let ventas = data.data.content;
           ventas.forEach((el)=>{
             if(el.nombreDocumento === "FACTURAS C"){
-              this.obj.push(el.nombreDocumento);
+              obj.push(el.nombreDocumento);
             }
           })
           this.filterParams.totalPages = data.data.totalPages;
