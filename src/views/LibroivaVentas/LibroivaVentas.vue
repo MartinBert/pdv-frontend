@@ -280,7 +280,7 @@ export default {
 
   methods: {
    async filterObjects(page) {
-      let obj = {};
+      let obj = [];
       if (page) this.filterParams.page = page;
      await GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
