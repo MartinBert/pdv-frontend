@@ -279,16 +279,18 @@ export default {
   },
 
   methods: {
-   filterObjects(page) {
+    filterObjects(page) {
       if (page) this.filterParams.page = page;
-       GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, "ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.ventas = data.data.content;
+          let ventas = data.data.content;
+          let invoiceFilter = ventas.filter(
+            (el) => el.nombreDocumento === "FACTURAS C");
+            console.log(invoiceFilter);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-      console.log(this.ventas);
     },
 
     createDate(date, param) {
