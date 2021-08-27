@@ -287,8 +287,8 @@ export default {
           let ventas = data.data.content;
           this.invoiceFilter = ventas.filter(
             (el) =>
-              el.nombreDocumento === "FACTURAS A" &&
-              el.nombreDocumento === "FACTURAS B" &&
+              el.nombreDocumento === "FACTURAS A" ||
+              el.nombreDocumento === "FACTURAS B" ||
               el.nombreDocumento === "FACTURAS A"
           );
           this.filterParams.totalPages = data.data.totalPages;
