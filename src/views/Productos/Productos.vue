@@ -437,6 +437,7 @@ export default {
             this.marcas.push(data.data);
             return data.data;
           });
+          
       }
     },
 
