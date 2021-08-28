@@ -33,7 +33,6 @@
                   class="primary v-btn--block"
                   @click="
                     salesForDate1(
-                      loguedUser.sucursal,
                       object.fechaDesde,
                       object.fechaHasta
                     )
@@ -153,7 +152,7 @@
   </v-container>
 </template>
 <script>
-import ReportsService from "../../services/ReportsService";
+import ComprobantesService from "../../services/ComprobantesService";
 import Pagination from "../../components/Pagination";
 import {
   generateIntegerDate,
@@ -212,7 +211,7 @@ export default {
       { text: "Comprobante", value: "nombreDocumento" },
       { text: "Numero Comprobantes", value: "numeroCbte" },
       { text: "Razon Social", value: "cliente.razonSocial" },
-      { text: "Condicion Iva", value: "cliente.condicionIva" },
+      { text: "Condicion Iva", value: "cliente.condicionIva.nombre" },
       { text: "N° Cuit", value: "cliente.cuit" },
       { text: "Neto Grabado", value: "sucursal.ingBruto" },
       { text: "Iva 27%", value: "totalIva27" },
@@ -245,7 +244,6 @@ export default {
 
   methods: {
     filterObjects(page) {
-      console.log(page)
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
@@ -267,17 +265,26 @@ export default {
         this.object.fechaHasta = integerDate;
       }
     },
-    salesForDate1(sucursal, fechaDesde, fechaHasta) {
-      if (this.notPassSucursalValidations()) return this.error("sucursal");
-      let id = sucursal.id;
 
-      ReportsService(this.tenant, this.service, this.token)
-        .salesForDate(id, fechaDesde, fechaHasta)
-        .then((res) => {
-          console.log(res);
-        });
+    salesForDate1(fechaDesde, fechaHasta) {
+      if (this.notPassSucursalValidations()) return this.error("sucursal");
+      if (this.notPassDateValidations()) return this.error("fechas");
+      let sucursalId = this.loguedUser.sucursal.id;
+      const filterParams = {
+        sucursalId,
+        fechaDesde,
+        fechaHasta
+      }
+      console.log(filterParams);
+      ComprobantesService(this.tenant, "comprobantesFiscales", this.token)
+      .getInvoicesForDateRange(filterParams)
+      .then(data => {
+        const invoices = data.data;
+        this.exportGeneralExcel(invoices)
+      })
     },
-    async exportGeneralExcel() {
+
+    async exportGeneralExcel(invoices) {
       this.loaded = false;
       const headers = [
         "FECHA",
@@ -292,10 +299,19 @@ export default {
         "IVA 10%",
         "TOTAL FACTURADO",
       ];
-      const data = await this.setDataToExcel();
-      exportExcelLibro(headers, data);
+      if(invoices){
+        let formatedInvoicesParam = [];
+        invoices.forEach(el => {
+          el = this.formatForExcel(el);
+          formatedInvoicesParam.push(el);
+        })
+        console.log(formatedInvoicesParam);
+        exportExcelLibro(headers, formatedInvoicesParam);
+      }else{
+        const data = await this.setDataToExcel();
+        exportExcelLibro(headers, data);
+      }
       this.loaded = true;
-      console.log(data);
     },
 
     async setDataToExcel() {
@@ -322,56 +338,24 @@ export default {
         .then((data) => {
           let ventas = data.data.content;
           ventas.forEach((el) => {
-            if (el.nombreDocumento === "FACTURAS C") {
-              el = this.formatForExcel(el);
-              dataForExcel.push(el);
-            } else if (el.nombreDocumento === "FACTURAS B") {
-              el = this.formatForExcel(el);
-              dataForExcel.push(el);
-            } else if (el.nombreDocumento === "FACTURAS A") {
-              el = this.formatForExcel(el);
-              dataForExcel.push(el);
-            }
+            el = this.formatForExcel(el);
+            dataForExcel.push(el);
           });
         });
       return dataForExcel;
     },
 
-    formatForExcel(product) {
-      if (product.marca) {
-        product.marca = product.marca.nombre;
-      }
-      if (product.rubro) {
-        product.rubro = product.rubro.nombre;
-      }
-      if (product.atributos) {
-        product.atributos = product.atributos.reduce((acc, el) => {
-          if (el.valor) {
-            acc = acc + el.valor + ",";
-            return acc;
-          } else {
-            acc = acc + el.valorNumerico + ",";
-            return acc;
-          }
-        }, "");
-      }
-      if (product.distribuidores) {
-        product.distribuidores = product.distribuidores.reduce(
-          (acc, el) => acc + el.razonSocial + ",",
-          ""
-        );
-      }
-      if (product.propiedades) {
-        product.propiedades = product.propiedades.reduce(
-          (acc, el) => acc + el.nombre + ",",
-          ""
-        );
-      }
-      return product;
+    formatForExcel(invoices) {
+      return invoices;
     },
 
     notPassSucursalValidations() {
       if (this.loguedUser.sucursal) return false;
+      return true;
+    },
+
+    notPassDateValidations(){
+      if(this.fechaDesde && this.fechaHasta) return false;
       return true;
     },
 
@@ -380,6 +364,9 @@ export default {
       switch (type) {
         case "products":
           error = "Debe seleccionar al menos un producto para este reporte";
+          break;
+        case "fechas":
+          error = "Debe seleccionar las dos fechas para obtener el reporte";
           break;
         default:
           error = "Debe seleccionar una sucursal para realizar el reporte";

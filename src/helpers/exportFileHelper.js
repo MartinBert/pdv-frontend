@@ -67,13 +67,13 @@ export function exportExcelLibro(headers, data) {
             el.fechaEmision,
             el.nombreDocumento,
             el.numeroCbte,
-            el.razonSocial,
-            el.cuit,
+            el.cliente.razonSocial,
+            el.cliente.condicionIva.nombre,
+            el.cliente.cuit,
             el.netoGrabado,
             el.totalIva27,
             el.totalIva21,
             el.totalIva10,
-            el.totalIva0,
             el.totalVenta,
         ])
     })
