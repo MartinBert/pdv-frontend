@@ -147,7 +147,7 @@ export default {
           let ventas = data.data.content;
           ventas.forEach((el) => {
             if(el.nombreDocumento === "FACTURAS C"){
-              obj.push(el);
+              this.obj.push(el);
             }
              this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
