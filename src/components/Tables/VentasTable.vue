@@ -158,7 +158,6 @@ export default {
           }
           this.loaded = true;
     },
-
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
     },
