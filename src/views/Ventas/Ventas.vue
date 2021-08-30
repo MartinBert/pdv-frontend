@@ -28,6 +28,7 @@ import VentaDetails from "../../components/Details/VentaDetails";
 export default {
   data: () => ({
     ventas:[],
+    obj:[],
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     loaded: true,

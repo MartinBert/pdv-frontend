@@ -92,6 +92,7 @@ export default {
   data: () => ({
     icon: "mdi-check-circle",
     ventas: [],
+    obj:[],
     loaded: false,
     tenant: "",
     service: "ventas",
@@ -139,7 +140,6 @@ export default {
 
   methods: {
     filterObjects(page) {
-      obj={}
       if (page) this.filterParams.page = page;
       GenericService(this.tenant,this.service, this.token)
         .filter(this.filterParams)
@@ -149,13 +149,12 @@ export default {
             if(el.nombreDocumento === "FACTURAS C"){
               obj.push(el);
             }
-
-          });
-        });
-          this.filterParams.totalPages = data.data.totalPages;
+             this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
           }
+          });
+        });
           this.loaded = true;
     },
     seeReports() {
