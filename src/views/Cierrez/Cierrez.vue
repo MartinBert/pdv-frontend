@@ -390,6 +390,7 @@ export default {
     },
 
     printZClosure(specification) {
+      this.objectToPrint.fecha = this.objectToPrint.notFormattedDate; 
       ReportsService(this.tenant,"cierres_z", this.token)
         .printZClosure(this.objectToPrint, specification)
         .then((res) => {
@@ -398,6 +399,7 @@ export default {
           });
           let fileURL = URL.createObjectURL(file);
           window.open(fileURL, "_blank");
+          this.objectToPrint.fecha = formatDate(this.objectToPrint.fecha)
         });
     },
 

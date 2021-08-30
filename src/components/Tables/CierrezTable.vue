@@ -110,6 +110,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           data.data.content.forEach((data) => {
+            data.notFormattedDate = data.fecha;
             data.fecha = formatDate(data.fecha);
           })
           this.cierres = data.data.content;
