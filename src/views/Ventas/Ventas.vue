@@ -44,7 +44,7 @@ export default {
       totalVenta: "",
       page: 1,
       size: 10,
-      totalPages:0,
+      totalPage:0
     },
     tabs:[
       { id: 1, title: "Comprobantes", route: '/ventas/list' },
@@ -63,6 +63,9 @@ export default {
   },
 
   mounted() {
+      if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
     this.tenant = this.$route.params.tenant;
     this.$store.commit("eventual/resetStates");
   },
