@@ -58,7 +58,7 @@
     </v-row>
     <v-data-table
       :headers="headers"
-      :items="obj"
+      :items="ventas"
       class="elevation-6"
       hide-default-footer
     >
