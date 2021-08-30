@@ -144,6 +144,12 @@ export default {
             title: "Lista",
             visible: false,
           },
+           {
+            path: "/ventas/ventasfast",
+            name: "ventasfast",
+            title: "ventasFast",
+            visible: false,
+          },
           {
             path: "/ventas/presupuesto",
             name: "presupuesto",

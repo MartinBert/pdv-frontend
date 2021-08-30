@@ -162,6 +162,12 @@ const routes = [
                 component: LibroivaVentas,
                 meta: { requiresAuth: true }
             },
+            {
+                path: 'ventasfast',
+                name: 'ventasfast',
+                component: ventasFast,
+                meta: { requiresAuth: true }
+            },
 
             {
                 path: 'calendar',
