@@ -35,7 +35,6 @@ export default {
     tenant: "",
       filterParams: {
       blackReceiptFilter: "",
-      sucursalId: "",
       barCode:"",
       numeroCbte:"",
       fechaEmision: "",
