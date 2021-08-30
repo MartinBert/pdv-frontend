@@ -44,7 +44,7 @@ export default {
       totalVenta: "",
       page: 1,
       size: 10,
-      totalPage:0,
+      totalPages:0,
     },
     tabs:[
       { id: 1, title: "Comprobantes", route: '/ventas/list' },
