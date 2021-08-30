@@ -92,7 +92,6 @@ export default {
   data: () => ({
     icon: "mdi-check-circle",
     ventas: [],
-    comprobantesFiscales:[],
     loaded: false,
     tenant: "",
     service: "ventas",
