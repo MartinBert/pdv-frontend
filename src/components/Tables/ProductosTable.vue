@@ -83,7 +83,7 @@
       style="background-color: transparent"
       hide-default-footer
     >
-      <template v-slot:[`item.acciones`]="{ item }">
+      <template v-slot:[`item.acciones`]="{ item }" v-if="perfil < 3">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" v-if="item.estado === 1"/>
         <Add :object="item" v-on:add="add" v-else/>
