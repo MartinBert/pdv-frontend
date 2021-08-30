@@ -62,9 +62,6 @@ export default {
   },
 
   mounted() {
-      if (this.loguedUser.perfil > 1) {
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
     this.tenant = this.$route.params.tenant;
     this.$store.commit("eventual/resetStates");
   },
