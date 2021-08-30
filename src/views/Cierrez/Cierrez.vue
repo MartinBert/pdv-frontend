@@ -339,12 +339,12 @@ export default {
               totalIva27: iva27,
               fecha: new Date(),
             };
-            CierrezService(this.tenant, this.service, this.token)
+            CierrezService(this.tenant, "cierres_z", this.token)
             .getPreviousCorrelativeNumber(this.loguedUser.sucursal.id)
             .then(data => {
               const correlativeNumber = data.data += 1;
               cierreZ.numeroCorrelativo = correlativeNumber;
-              GenericService(this.tenant, this.service, this.token)
+              GenericService(this.tenant, "cierres_z", this.token)
                 .save(cierreZ)
                 .then(() => {
                   this.filterObjects();
