@@ -150,7 +150,6 @@ export default {
             this.filterParams.page = 1;
           }
           });
-        });
           this.loaded = true;
     },
     seeReports() {
