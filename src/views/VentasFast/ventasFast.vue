@@ -1,5 +1,5 @@
 <template>
-    
+    <p>Hola puto</p>
 </template>
 <script>
 export default {
