@@ -6,6 +6,7 @@
   "
   >
     <TabBar
+     v-if="perfil < 3"
       :tabs="tabs"
       :activeTab="activeTab"
     />
