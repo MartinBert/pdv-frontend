@@ -119,7 +119,7 @@ export default (tenant, service, token) => {
         /* ALL FUNCTIONS FOR Z CLOSURE REPORTS ---------------------------------------------------------------*/
         /******************************************************************************************************/
         printZClosure(object) {
-            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/printZClosure/${tenant}`, object, {
+            return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/printZClosure/${specification}`,object,{
                 headers: { Authorization: "Bearer " + token },
                 responseType: 'arraybuffer',
                 dataType: 'blob'

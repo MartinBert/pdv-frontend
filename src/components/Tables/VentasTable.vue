@@ -92,6 +92,7 @@ export default {
   data: () => ({
     icon: "mdi-check-circle",
     ventas: [],
+    comprobantesFiscales:[],
     loaded: false,
     tenant: "",
     service: "ventas",
@@ -140,7 +141,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
+      GenericService(this.tenant,"comprobantesFiscales", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
