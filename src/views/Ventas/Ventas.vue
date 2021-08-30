@@ -43,6 +43,7 @@ export default {
       numeroComprobante: "",
       totalVenta: "",
       page: 1,
+      totalPage:1,
       size: 10,
     },
     tabs:[
