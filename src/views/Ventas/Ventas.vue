@@ -43,8 +43,8 @@ export default {
       numeroComprobante: "",
       totalVenta: "",
       page: 1,
-      totalPage:1,
       size: 10,
+      totalPage:0,
     },
     tabs:[
       { id: 1, title: "Comprobantes", route: '/ventas/list' },
