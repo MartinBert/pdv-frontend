@@ -144,11 +144,7 @@ export default {
       GenericService(this.tenant,this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          let ventas = data.data.content;
-          ventas.forEach((el) => {
-            if(el.nombreDocumento === "FACTURAS C"){
-              this.obj.push(el);
-            }
+          this.ventas = data.data.content;
              this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
