@@ -144,12 +144,6 @@ export default {
             title: "Lista",
             visible: false,
           },
-           {
-            path: "/ventas/ventasfast",
-            name: "ventasfast",
-            title: "ventasFast",
-            visible: false,
-          },
           {
             path: "/ventas/presupuesto",
             name: "presupuesto",
@@ -400,6 +394,20 @@ export default {
             path: "/libroivaventas",
             name: "libroivaventas",
             title: "LibroIvaVentas",
+            visible: false,
+          },
+        ],
+      },
+       {
+        name: "Ventasfast",
+        title: "Ventasfast",
+        visible: false,
+        icon: "/../images/icons/ventas.svg",
+        childs: [
+          {
+            path: "/ventasfast",
+            name: "ventasfast",
+            title: "Ventasfast",
             visible: false,
           },
         ],

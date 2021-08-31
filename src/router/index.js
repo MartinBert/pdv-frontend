@@ -62,7 +62,6 @@ import Calendar from "../views/Calendar/Calendar.vue";
 import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
 import Cierrez from "../views/Cierrez/Cierrez.vue";
 import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
-import ventasFast from "../views/VentasFast/ventasFast";
 import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 
 Vue.use(VueRouter)
@@ -163,13 +162,6 @@ const routes = [
                 component: LibroivaVentas,
                 meta: { requiresAuth: true }
             },
-            {
-                path: 'ventasfast',
-                name: 'ventasfast',
-                component: ventasFast,
-                meta: { requiresAuth: true }
-            },
-
             {
                 path: 'calendar',
                 name: 'calendar',
