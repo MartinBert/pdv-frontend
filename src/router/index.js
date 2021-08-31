@@ -62,7 +62,7 @@ import Calendar from "../views/Calendar/Calendar.vue";
 import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
 import Cierrez from "../views/Cierrez/Cierrez.vue";
 import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
-import VentasFast from "../views/VentasFast/VentasFast.vue";
+import Ventasfast from "../views/VentasFast/Ventasfast.vue";
 import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 
 Vue.use(VueRouter)
@@ -166,7 +166,7 @@ const routes = [
             {
                 path: 'ventasfast',
                 name: 'ventasfast',
-                component: VentasFast,
+                component: Ventasfast,
                 meta: { requiresAuth: true }
             },
 
