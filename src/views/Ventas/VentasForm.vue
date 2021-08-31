@@ -2058,6 +2058,7 @@ export default {
 
     calculateSubTotalOfSale(sumOfProductSalePrices, totalOfIvas, totalOfDiscounts, totalOfSurcharges){
       const total = sumOfProductSalePrices - totalOfIvas + totalOfDiscounts - totalOfSurcharges;
+      console.log(total);
       return roundTwoDecimals(total);
     },
 
