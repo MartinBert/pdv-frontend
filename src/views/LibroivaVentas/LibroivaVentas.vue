@@ -201,7 +201,7 @@ export default {
     },
     loaded: false,
     tenant: "",
-    service: "ventas",
+    service: "comprobantesFiscales",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
