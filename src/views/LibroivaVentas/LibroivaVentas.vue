@@ -169,6 +169,7 @@ export default {
     file: null,
     obj: {},
     sucusal: [],
+    invoices:[],
     empresa: [],
     ivas: [],
     object: {
