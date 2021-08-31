@@ -90,6 +90,9 @@ export default {
   
   mounted() {
     this.tenant = this.$route.params.tenant;
+       if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
   },
   methods: {
     newObject() {
