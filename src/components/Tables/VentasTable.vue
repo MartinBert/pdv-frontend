@@ -92,7 +92,7 @@ export default {
   data: () => ({
     icon: "mdi-check-circle",
     ventas: [],
-    obj:[],
+    obj: [],
     loaded: false,
     tenant: "",
     service: "ventas",
@@ -101,15 +101,15 @@ export default {
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
-      barCode:"",
-      numeroCbte:"",
+      barCode: "",
+      numeroCbte: "",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
       totalVenta: "",
       page: 1,
       size: 10,
-      totalPages:0,
+      totalPages: 0,
     },
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
@@ -141,21 +141,25 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant,this.service, this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-         let ventas = data.data.content;
-           ventas.forEach((el) => {
-            if(el.nombreDocumento === "FACTURAS A" || el.nombreDocumento === "FACTURAS B" || el.nombreDocumento === "FACTURAS C"){
+          let ventas = data.data.content;
+          ventas.forEach((el) => {
+            if (
+              el.nombreDocumento === "FACTURAS A" ||
+              el.nombreDocumento === "FACTURAS B" ||
+              el.nombreDocumento === "FACTURAS C"
+            ) {
               this.obj.push(el);
             }
+            this.filterParams.totalPages = data.data.totalPages;
+            if (this.filterParams.totalPages < this.filterParams.page) {
+              this.filterParams.page = 1;
+            }
+            this.loaded = true;
           });
-             this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
-          });
-          this.loaded = true;
+        });
     },
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
