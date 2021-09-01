@@ -58,7 +58,7 @@
     </v-row>
     <v-data-table
       :headers="headers"
-      :items="ventas"
+      :items="obj"
       class="elevation-6"
       hide-default-footer
     >
@@ -144,7 +144,18 @@ export default {
       GenericService(this.tenant,this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          this.ventas = data.data.content;
+         let ventas = data.data.content;
+           ventas.forEach((el) => {
+            if(el.nombreDocumento === "FACTURAS A"){
+              this.obj.push(el.nombreDocumento);
+            }
+            if(el.nombreDocumento === "FACTURAS B"){
+              this.obj.push(el.nombreDocumento);
+            }
+            if(el.nombreDocumento === "FACTURAS C"){
+              this.obj.push(el.nombreDocumento);
+            }
+          });
              this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
