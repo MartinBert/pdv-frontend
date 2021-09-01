@@ -144,6 +144,7 @@ export default {
       DocumentosService(this.tenant,"documentosComerciales", this.token)
         .getInvoices(this.filterParams)
         .then((data) => {
+          console.log(data);
           this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
