@@ -991,7 +991,7 @@ export default {
             this.loaded = true;
           }
         });
-      }
+      }      
     },
 
     save() {
@@ -1175,6 +1175,7 @@ export default {
             );
           }
         });
+        console.log(comprobante);
     },
 
     saveNoFiscal() {
@@ -1483,6 +1484,7 @@ export default {
           });
         }
       })
+
     },
 
     savePresupuesto(){

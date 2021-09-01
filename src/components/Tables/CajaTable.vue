@@ -75,7 +75,6 @@ export default {
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.sucursalId = this.loguedUser.sucursal.id
     this.filterObjects();
     this.getClientIpForFiscalController();
   },

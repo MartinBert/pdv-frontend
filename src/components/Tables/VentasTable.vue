@@ -84,7 +84,7 @@
   </v-container>
 </template>
 <script>
-import GenericService from "../../services/GenericService";
+import DocumentosService from "../../services/DocumentosService";
 import Pagination from "../../components/Pagination";
 import Detail from "../Buttons/Detail";
 import Print from "../Buttons/Print";
@@ -140,17 +140,15 @@ export default {
 
   methods: {
     filterObjects(page) {
+       console.log(page);
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant,this.service, this.token)
-        .filter(this.filterParams)
+      DocumentosService(this.tenant,"documentosComerciales", this.token)
+        .getInvoices(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
-             this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
-          });
+          this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
+          });  
     },
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
