@@ -141,7 +141,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      DocumentosService(this.tenant,this.service, this.token)
+      DocumentosService(this.tenant,"comprobantesFiscales", this.token)
         .getInvoices(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
