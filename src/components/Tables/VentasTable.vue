@@ -145,12 +145,10 @@ export default {
         .getInvoices(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
-             this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
-          });
+          this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
+          
+          });  
     },
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
