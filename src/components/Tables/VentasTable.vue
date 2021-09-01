@@ -147,7 +147,7 @@ export default {
           let ventas = data.data.content;
           ventas.forEach((el) => {
             if (
-              el.nombreDocumento === "FACTURAS C" 
+              el.nombreDocumento === "FACTURAS B" 
             ) {
               this.obj.push(el);
             }
