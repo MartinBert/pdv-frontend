@@ -416,7 +416,7 @@ export default {
       const comprobanteAsociadoDetalle = [{
         Tipo: comprobanteAsociado.documentoComercial.codigoDocumento,
         PtoVta: comprobanteAsociado.puntoVenta.idFiscal,
-        Nro: comprobanteAsociado.numeroCbte
+        Nro: comprobanteAsociado.numeroCbte.substring(comprobanteAsociado.numeroCbte.lastIndexOf('0'), comprobanteAsociado.numeroCbte.length)
       }];
       const detail = processDetailReceipt(
         documento.codigoDocumento,
@@ -460,6 +460,7 @@ export default {
         if (passPaymentsMethodsValidation(mediosPago)) {
           if (containProducts(productosEntrantes)) {
             /*** Send invoice to AFIP ***/
+              console.log(invoice)
               axios
               .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
               .then(data => {

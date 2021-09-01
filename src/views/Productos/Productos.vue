@@ -52,6 +52,7 @@
         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
+      <DialogStop v-if="!loaded"/>
       <DeleteDialog
         :status="deleteDialogStatus"
         v-on:deleteConfirmation="deleteConfirmation"
@@ -96,6 +97,7 @@
   </v-container>
 </template>
 <script>
+import DialogStop from "../../components/Dialogs/DialogStop";
 import GenericService from "../../services/GenericService";
 import ReportsService from "../../services/ReportsService";
 import Spinner from "../../components/Graphics/Spinner";
@@ -124,6 +126,19 @@ export default {
     file: null,
     object: null,
     stock: [],
+     filterParams: {
+        productoName: "",
+        productoCodigo: "",
+        productoCodigoBarras: "",
+        productoMarcaName: "",
+        productoPrimerAtributoName: "",
+        productoSegundoAtributoName: "",
+        productoTercerAtributoName: "",
+        productoEstado: 1,
+        page: 1,
+        size: 10,
+        totalPages: 0,
+      },
     productos: [],
     marcas: [],
     distribuidores: [],
@@ -158,7 +173,8 @@ export default {
     Spinner,
     ProductosTable,
     DeleteDialog,
-    TabBar
+    TabBar,
+    DialogStop
   },
 
   mounted() {
@@ -616,7 +632,7 @@ export default {
         productoPrimerAtributoName: "",
         productoSegundoAtributoName: "",
         productoTercerAtributoName: "",
-        productoEstado: "",
+        productoEstado: 1,
         page: 1,
         size: 100000,
         totalPages: 0,
@@ -665,7 +681,6 @@ export default {
       }
       product.ivaComprasObject = product.ivaComprasObject.porcentaje;
       product.ivaVentasObject = product.ivaVentasObject.porcentaje;
-      console.log(product);
       return product;
     },
 
