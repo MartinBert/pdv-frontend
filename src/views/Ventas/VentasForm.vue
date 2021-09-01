@@ -694,8 +694,9 @@ export default {
 
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
+        const total = this.productsDescription.reduce((acc, el) => acc + el.salePrice, 0);
         let percent = calculatePercentaje(
-          this.totalVenta,
+          total,
           priceModificationPorcent
         );
         if (modificator === "descuento") {
@@ -1060,16 +1061,17 @@ export default {
                   this.productsDescription = this.calculateAmountOfPriceVariations(this.productsDescription);
                   const totalOfDiscounts = this.calculateTotalOfDiscounts(this.productsDescription);
                   const totalOfSurcharges = this.calculateTotalOfSurcharges(this.productsDescription);
+                  const subTotal = this.calculateSumOfProductSalePrices(this.productsDescription);
+                  const planAmountDiscount = (planPercentDiscount > 0) ? subTotal * decimalPercent(planPercentDiscount) : 0;
+                  const planAmountSurcharge = (planPercentSurcharge > 0) ? subTotal * decimalPercent(planPercentSurcharge) : 0;
+                  const planPercentSurcharge = (planPago.porcentaje > 0) ? planPago.porcentaje : 0;
+                  const planPercentDiscount = (planPago.porcentaje < 0) ? transformPositive(planPago.porcentaje) : 0;
+                  this.productsDescription = this.correctSalePriceAndIvaAmountOfProducts(this.productsDescription);
                   const amountOfIva21 = this.calculateAmountOfIva21(this.productsDescription);
                   const amountOfIva10 = this.calculateAmountOfIva10(this.productsDescription);
                   const amountOfIva27 = this.calculateAmountOfIva27(this.productsDescription);
                   const totalOfIvas = sumarNumeros([amountOfIva21, amountOfIva10, amountOfIva27]);
-                  const sumOfProductSalePrices = this.calculateSumOfProductSalePrices(this.productsDescription);
-                  const subTotal = this.calculateSubTotalOfSale(sumOfProductSalePrices, totalOfIvas, totalOfDiscounts, totalOfSurcharges);
-                  const planPercentSurcharge = (planPago.porcentaje > 0) ? planPago.porcentaje : 0;
-                  const planPercentDiscount = (planPago.porcentaje < 0) ? transformPositive(planPago.porcentaje) : 0;
-                  const planAmountDiscount = (planPercentDiscount > 0) ? sumOfProductSalePrices * decimalPercent(planPercentDiscount) : 0;
-                  const planAmountSurcharge = (planPercentSurcharge > 0) ? sumOfProductSalePrices * decimalPercent(planPercentSurcharge) : 0;
+                  const total = subTotal - totalOfDiscounts + totalOfSurcharges;
 
 
                   // Create receipt
@@ -1094,7 +1096,7 @@ export default {
                     documentoComercial: documento,
                     empresa: empresa,
                     cliente: cliente,
-                    totalVenta: totalVenta,
+                    totalVenta: total,
                     subTotal: subTotal,
                     totalDescuentoGlobal: this.descuentoGlobal,
                     totalRecargoGlobal: this.recargoGlobal,
@@ -1103,6 +1105,7 @@ export default {
                     totalIva21: amountOfIva21,
                     totalIva10: amountOfIva10,
                     totalIva27: amountOfIva27,
+                    totalIvas: totalOfIvas,
                     totalDescuentos: totalOfDiscounts,
                     totalRecargos: totalOfSurcharges,
                     porcentajeRecargoPlan: planPercentSurcharge,
@@ -2033,6 +2036,23 @@ export default {
       return total;
     },
 
+    calculateSumOfProductSalePrices(productsDescription){
+      const total = productsDescription.reduce((acc, el) => acc + el.salePrice, 0);
+      return roundTwoDecimals(total);
+    },
+
+    correctSalePriceAndIvaAmountOfProducts(productsDescription){
+      productsDescription.forEach((product) => {
+        if(product.saleIvaPercent === 0) {
+          product.saleIvaPercent = 21;
+        }
+        product.salePrice = product.salePrice - product.discountAmount + product.surchargeAmount;
+        product.saleIvaAmount = product.salePrice - ((product.salePrice) / (1 + decimalPercent(product.saleIvaPercent)));
+      })
+      console.log(productsDescription);
+      return productsDescription;
+    },
+
     calculateAmountOfIva21(productsDescription){
       const productsWithIva21 = productsDescription.filter(el => el.saleIvaPercent === 21);
       const amountOfIva = productsWithIva21.reduce((acc, el) => acc + el.saleIvaAmount, 0);
@@ -2051,16 +2071,6 @@ export default {
       return roundTwoDecimals(amountOfIva);
     },
 
-    calculateSumOfProductSalePrices(productsDescription){
-      const total = productsDescription.reduce((acc, el) => acc + el.salePrice, 0);
-      return roundTwoDecimals(total);
-    },
-
-    calculateSubTotalOfSale(sumOfProductSalePrices, totalOfIvas, totalOfDiscounts, totalOfSurcharges){
-      const total = sumOfProductSalePrices - totalOfIvas + totalOfDiscounts - totalOfSurcharges;
-      console.log(total);
-      return roundTwoDecimals(total);
-    },
 
     /******************************************************************************************************/
     /* CLEAR SALE FORM DATA ------------------------------------------------------------------------------*/
