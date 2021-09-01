@@ -7,7 +7,7 @@
     <TabBar :tabs="tabs" :activeTab="activeTab" />
     <v-card min-width="100%">
       <VentasTable
-       :items="ventas"
+       :items="obj"
         v-on:print="print"
         v-on:seeDetails="seeDetails"
          v-if="loaded"
