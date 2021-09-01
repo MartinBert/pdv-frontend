@@ -140,15 +140,14 @@ export default {
 
   methods: {
     filterObjects(page) {
+       console.log(page);
       if (page) this.filterParams.page = page;
       DocumentosService(this.tenant,"documentosComerciales", this.token)
         .getInvoices(this.filterParams)
         .then((data) => {
-          console.log(data);
           this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
-          
           });  
     },
     seeReports() {
