@@ -84,7 +84,7 @@
   </v-container>
 </template>
 <script>
-import DocumentosService from "../../services/DocumentosService";
+import GenericService from "../../services/GenericService";
 import Pagination from "../../components/Pagination";
 import Detail from "../Buttons/Detail";
 import Print from "../Buttons/Print";
@@ -107,6 +107,9 @@ export default {
       comprobanteCerrado: "",
       numeroComprobante: "",
       totalVenta: "",
+      facturaA: false,
+      facturaB: false,
+      facturaC: false,
       page: 1,
       size: 10,
       totalPages:0,
@@ -129,6 +132,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     this.filterObjects();
   },
 
@@ -140,10 +144,9 @@ export default {
 
   methods: {
     filterObjects(page) {
-       console.log(page);
       if (page) this.filterParams.page = page;
-      DocumentosService(this.tenant,"documentosComerciales", this.token)
-        .getInvoices(this.filterParams)
+      GenericService(this.tenant,"ventas", this.token)
+        .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
