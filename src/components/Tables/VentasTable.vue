@@ -58,7 +58,7 @@
     </v-row>
     <v-data-table
       :headers="headers"
-      :items="obj"
+      :items="ventas"
       class="elevation-6"
       hide-default-footer
     >
@@ -84,7 +84,7 @@
   </v-container>
 </template>
 <script>
-import GenericService from "../../services/GenericService";
+import DocumentosService from "../../services/DocumentosService";
 import Pagination from "../../components/Pagination";
 import Detail from "../Buttons/Detail";
 import Print from "../Buttons/Print";
@@ -92,7 +92,7 @@ export default {
   data: () => ({
     icon: "mdi-check-circle",
     ventas: [],
-    obj: [],
+    obj:[],
     loaded: false,
     tenant: "",
     service: "ventas",
@@ -101,15 +101,15 @@ export default {
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
-      barCode: "",
-      numeroCbte: "",
+      barCode:"",
+      numeroCbte:"",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
       totalVenta: "",
       page: 1,
       size: 10,
-      totalPages: 0,
+      totalPages:0,
     },
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
@@ -141,23 +141,16 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
-        .filter(this.filterParams)
+      DocumentosService(this.tenant,this.service, this.token)
+        .getInvoices(this.filterParams)
         .then((data) => {
-          let ventas = data.data.content;
-          ventas.forEach((el) => {
-            if (
-              el.nombreDocumento === "FACTURAS B" && el.nombreDocumento=== "FACTURAS A" && el.nombreDocumento === "FACTURAS C"
-            ) {
-              this.obj.push(el);
-            }
-            this.filterParams.totalPages = data.data.totalPages;
-            if (this.filterParams.totalPages < this.filterParams.page) {
-              this.filterParams.page = 1;
-            }
-            this.loaded = true;
+          this.ventas = data.data.content;
+             this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
           });
-        });
+          this.loaded = true;
     },
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
