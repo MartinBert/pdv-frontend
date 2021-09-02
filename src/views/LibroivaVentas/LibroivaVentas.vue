@@ -238,6 +238,7 @@ export default {
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     this.filterObjects();
     this.months = monthsList;
   },
@@ -275,7 +276,6 @@ export default {
         fechaDesde,
         fechaHasta
       }
-      console.log(filterParams);
       ComprobantesService(this.tenant, "comprobantesFiscales", this.token)
       .getInvoicesForDateRange(filterParams)
       .then(data => {
@@ -305,7 +305,6 @@ export default {
           el = this.formatForExcel(el);
           formatedInvoicesParam.push(el);
         })
-        console.log(formatedInvoicesParam);
         exportExcelLibro(headers, formatedInvoicesParam);
       }else{
         const data = await this.setDataToExcel();
