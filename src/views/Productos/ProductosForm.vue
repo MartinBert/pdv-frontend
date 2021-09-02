@@ -52,7 +52,7 @@
                   label="Código de barras"
                   required
                   @keypress.enter="
-                    checkBarCode(filterParams, object.barcode)
+                    checkBarCode(filterParams, object.barras)
                   "
                   :rules="[(v) => !!v || 'Campo requerido...']"
                 ></v-text-field>
