@@ -1134,6 +1134,7 @@ export default {
                             });
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
+                            console.log("Si pasa por aca");
                           });
                       })
                       .then(() => {
