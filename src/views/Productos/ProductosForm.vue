@@ -52,7 +52,7 @@
                   label="Código de barras"
                   required
                   @keypress.enter="
-                    checkBarCode(filterParams, object.codigoBarra)
+                    checkBarCode(filterParams, object.barcode)
                   "
                   :rules="[(v) => !!v || 'Campo requerido...']"
                 ></v-text-field>
@@ -312,6 +312,7 @@ export default {
       estado: 1,
       ganancia: 0,
       codigoBarra: "",
+      barcode:"",
       ivaComprasObject: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
       editable: false,
