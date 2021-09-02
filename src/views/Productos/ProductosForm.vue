@@ -52,7 +52,7 @@
                   label="Código de barras"
                   required
                   @keypress.enter="
-                    checkBarCode(filterParams, object.barcode)
+                    checkBarCode(filterParams, object.codigoBarra)
                   "
                   :rules="[(v) => !!v || 'Campo requerido...']"
                 ></v-text-field>
@@ -333,7 +333,7 @@ export default {
       productoPrimerAtributoName: "",
       productoSegundoAtributoName: "",
       productoTercerAtributoName: "",
-      productoEstado: "",
+      productoEstado: 1,
       page: 1,
       size: 10,
       totalPages: 0,
