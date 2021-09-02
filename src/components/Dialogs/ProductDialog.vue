@@ -277,7 +277,6 @@ export default {
     loadProducts() {
       this.$emit("productList", this.$store.state.productos.products);
       this.$store.commit("productos/dialogProductosMutation");
-      this.$refs.pTable.refresh();
     },
 
     clearSelection() {

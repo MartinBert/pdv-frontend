@@ -1175,7 +1175,6 @@ export default {
             );
           }
         });
-        console.log(comprobante);
     },
 
     saveNoFiscal() {

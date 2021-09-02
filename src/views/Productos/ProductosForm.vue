@@ -51,7 +51,7 @@
                   :counter="50"
                   label="Código de barras"
                   required
-                  @keypress.enter="
+                  @blur="
                     checkBarCode(filterParams, object.codigoBarra)
                   "
                   :rules="[(v) => !!v || 'Campo requerido...']"
