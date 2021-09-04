@@ -1649,6 +1649,7 @@ export default {
     applyPaymentPlantPercentVariation(productsDescription, planPercent){
       if(planPercent < 0) return this.restPlanDiscount(productsDescription, transformPositive(planPercent));
       if(planPercent > 0) return this.sumPlanSurcharge(productsDescription, transformPositive(planPercent));
+      if(planPercent == 0) return productsDescription;
     },
 
     restPlanDiscount(productsDescription, planPercent) {
