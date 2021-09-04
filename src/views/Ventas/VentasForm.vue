@@ -301,9 +301,6 @@ import {
   decimalPercent,
   roundTwoDecimals,
   transformPositive,
-  calculateAmountMinusPercentaje,
-  calculateAmountPlusPercentaje,
-  calculatePercentReductionInAmount,
   sumarNumeros,
   calculatePositivePercentajeCoefficient
 } from "../../helpers/mathHelper";
@@ -980,7 +977,6 @@ export default {
             this.savePresupuesto();
           }else{
             this.saveNoFiscal();
-            window.location.reload();
           }
         }
       } else {
@@ -1003,11 +999,11 @@ export default {
       const empresa = this.loguedUser.empresa;
       const cliente = this.object.cliente;
       const mediosPago = this.object.mediosPago;
-      const planPago = this.object.planPago;
       const totalVenta = this.totalVenta;
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
+      const planPago = this.object.planPago;
       const condVenta = this.checkSaleCondition(planPago);
       let comprobante;
       let file;
@@ -1051,28 +1047,21 @@ export default {
                     addZerosInString("04", ptoVenta.idFiscal) +
                     cae +
                     formatDateWithoutSlash(dateOfCaeExpiration);
-
-
-                  this.productsDescription = this.restLineDiscounts(this.products, this.productsDescription);
-                  this.productsDescription = this.sumLineSurcharges(this.products, this.productsDescription);
-                  this.productsDescription = this.restGlobalDiscount(this.productsDescription, this.porcentajeDescuentoGlobal);
-                  this.productsDescription = this.sumGlobalSurcharge(this.productsDescription, this.porcentajeRecargoGlobal);
-                  this.productsDescription = this.applyPaymentPlantPercentVariation(this.productsDescription, planPago.porcentaje);
-                  this.productsDescription = this.calculateAmountOfPriceVariations(this.productsDescription);
-                  const totalOfDiscounts = this.calculateTotalOfDiscounts(this.productsDescription);
-                  const totalOfSurcharges = this.calculateTotalOfSurcharges(this.productsDescription);
-                  const subTotal = this.calculateSumOfProductSalePrices(this.productsDescription);
-                  const planAmountDiscount = (planPercentDiscount > 0) ? subTotal * decimalPercent(planPercentDiscount) : 0;
-                  const planAmountSurcharge = (planPercentSurcharge > 0) ? subTotal * decimalPercent(planPercentSurcharge) : 0;
-                  const planPercentSurcharge = (planPago.porcentaje > 0) ? planPago.porcentaje : 0;
-                  const planPercentDiscount = (planPago.porcentaje < 0) ? transformPositive(planPago.porcentaje) : 0;
-                  this.productsDescription = this.correctSalePriceAndIvaAmountOfProducts(this.productsDescription);
-                  const amountOfIva21 = this.calculateAmountOfIva21(this.productsDescription);
-                  const amountOfIva10 = this.calculateAmountOfIva10(this.productsDescription);
-                  const amountOfIva27 = this.calculateAmountOfIva27(this.productsDescription);
-                  const totalOfIvas = sumarNumeros([amountOfIva21, amountOfIva10, amountOfIva27]);
-                  const total = subTotal - totalOfDiscounts + totalOfSurcharges;
-
+                  
+                  const {
+                    total, 
+                    subTotal, 
+                    amountOfIva21, 
+                    amountOfIva10, 
+                    amountOfIva27, 
+                    totalOfIvas, 
+                    totalOfDiscounts, 
+                    totalOfSurcharges,
+                    planPercentSurcharge,
+                    planPercentDiscount,
+                    planAmountSurcharge, 
+                    planAmountDiscount
+                  } = this.calculateRelevantAmountsOfInvoice();
 
                   // Create receipt
                   comprobante = {
@@ -1181,7 +1170,6 @@ export default {
     saveNoFiscal() {
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
-      const totalVenta = this.totalVenta;
       const cliente = this.object.cliente;
       const empresa = this.loguedUser.empresa;
       const documento = this.object.documento;
@@ -1193,222 +1181,32 @@ export default {
       const fecha = this.fecha;
       const tenant = this.tenant;
       const token = this.token;
-      const service = this.service;
       const condVenta = this.checkSaleCondition(planesPago);
+      const service = this.service;
       let file;
       let fileURL;
       let comprobante;
-      let planPercentDiscount;
-      let planPercentSurcharge;
-      let planAmountDiscount = 0;
-      let planAmountSurcharge = 0;
-      const checkChangesInPrice = () => {
-        productsDescription.forEach((productDescription) => {
-          if (planesPago.porcentaje < 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.discountAmount =
-              productDescription.discountAmount +
-              (productDescription.salePrice -
-                calculateAmountMinusPercentaje(
-                  productDescription.salePrice,
-                  paymentPlanVariationPercent
-                ));
-            productDescription.discountPercent = sumarNumeros([
-              productDescription.discountPercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else if (planesPago.porcentaje > 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.surchargeAmount =
-              productDescription.surchargeAmount +
-              (calculateAmountPlusPercentaje(
-                productDescription.salePrice,
-                paymentPlanVariationPercent
-              ) -
-                productDescription.salePrice);
-            productDescription.surchargePercent = sumarNumeros([
-              productDescription.surchargePercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else {
-            console.log("Not price modifications detected");
-          }
-        });
-      };
-      checkChangesInPrice();
-
-      productsDescription.forEach((product) => {
-        if (!product.surchargeAmount) {
-          product.surchargeAmount = 0;
-          product.surchargePercent = 0;
-        }
-        if (!product.discountAmount) {
-          product.discountAmount = 0;
-          product.discountPercent = 0;
-        }
-      });
-
-      if (planesPago.porcentaje > 0) {
-        planPercentDiscount = 0;
-        planPercentSurcharge = planesPago.porcentaje;
-        const totalSumOfProductPrices = productsDescription.reduce(
-          (acc, product) => acc + product.salePrice,
-          0
-        );
-        planAmountSurcharge =
-          calculateAmountPlusPercentaje(
-            totalSumOfProductPrices,
-            planPercentSurcharge
-          ) - totalSumOfProductPrices;
-      } else {
-        planPercentDiscount = transformPositive(
-          planesPago.porcentaje
-        );
-        planPercentSurcharge = 0;
-        const totalSumOfProductPrices = productsDescription.reduce(
-          (acc, product) => acc + product.salePrice,
-          0
-        );
-        planAmountDiscount =
-          totalSumOfProductPrices -
-          calculateAmountMinusPercentaje(
-            totalSumOfProductPrices,
-            planPercentDiscount
-          );
-      }
-
-      const productsWithIva21 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 21
-      );
-      const productsWithIva10 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 10.5
-      );
-      const productsWithIva27 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 27
-      );
-
-      const amountOfIva21 = productsWithIva21.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              21
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-      const amountOfIva10 = productsWithIva10.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              10.5
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-      const amountOfIva27 = productsWithIva27.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              27
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-
-      const totalIvas = amountOfIva21 + amountOfIva10 + amountOfIva27;
-      const totalDiscounts = this.descuentoGlobal + planAmountDiscount;
-      const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
-      const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
-      const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
+      
       VentasService(tenant, "ventas", token)
       .getPreviousCorrelativeDocumentNumber(sucursal.id, documento.codigoDocumento)
       .then(data => {
         const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
+
+        const {
+          total, 
+          subTotal, 
+          amountOfIva21, 
+          amountOfIva10, 
+          amountOfIva27, 
+          totalOfIvas, 
+          totalOfDiscounts, 
+          totalOfSurcharges,
+          planPercentSurcharge,
+          planPercentDiscount,
+          planAmountSurcharge, 
+          planAmountDiscount
+        } = this.calculateRelevantAmountsOfInvoice();
+
         comprobante = {
           letra: "X",
           numeroCbte:
@@ -1430,15 +1228,18 @@ export default {
           documentoComercial: documento,
           empresa: empresa,
           cliente: cliente,
-          totalVenta: totalVenta,
-          subTotal: subTotal,
           totalDescuentoGlobal: this.descuentoGlobal,
           totalRecargoGlobal: this.recargoGlobal,
           porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
           porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+          totalVenta: total,
+          subTotal: subTotal,
           totalIva21: amountOfIva21,
           totalIva10: amountOfIva10,
           totalIva27: amountOfIva27,
+          totalIvas: totalOfIvas,
+          totalDescuentos: totalOfDiscounts,
+          totalRecargos: totalOfSurcharges,
           porcentajeRecargoPlan: planPercentSurcharge,
           porcentajeDescuentoPlan: planPercentDiscount,
           totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
@@ -1447,6 +1248,8 @@ export default {
           planesPago: [planesPago],
           nombreDocumento: documento.nombre,
         };
+
+        console.log(comprobante);
         /*** Evaluate required sale form data ***/
         if (comprobante.mediosPago[0] !== undefined) {
           if (Number(comprobante.totalVenta) !== 0) {
@@ -1484,13 +1287,11 @@ export default {
           });
         }
       })
-
     },
 
     savePresupuesto(){
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
-      const totalVenta = this.totalVenta;
       const cliente = this.object.cliente;
       const empresa = this.loguedUser.empresa;
       const documento = this.object.documento;
@@ -1508,218 +1309,27 @@ export default {
       let file;
       let fileURL;
       let comprobante;
-      let planPercentDiscount;
-      let planPercentSurcharge;
-      let planAmountDiscount = 0;
-      let planAmountSurcharge = 0;
-      const checkChangesInPrice = () => {
-        productsDescription.forEach((productDescription) => {
-          if (planesPago.porcentaje < 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.discountAmount =
-              productDescription.discountAmount +
-              (productDescription.salePrice -
-                calculateAmountMinusPercentaje(
-                  productDescription.salePrice,
-                  paymentPlanVariationPercent
-                ));
-            productDescription.discountPercent = sumarNumeros([
-              productDescription.discountPercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else if (planesPago.porcentaje > 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.surchargeAmount =
-              productDescription.surchargeAmount +
-              (calculateAmountPlusPercentaje(
-                productDescription.salePrice,
-                paymentPlanVariationPercent
-              ) -
-                productDescription.salePrice);
-            productDescription.surchargePercent = sumarNumeros([
-              productDescription.surchargePercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else {
-            console.log("Not price modifications detected");
-          }
-        });
-      };
-      checkChangesInPrice();
-
-      productsDescription.forEach((product) => {
-        if (!product.surchargeAmount) {
-          product.surchargeAmount = 0;
-          product.surchargePercent = 0;
-        }
-        if (!product.discountAmount) {
-          product.discountAmount = 0;
-          product.discountPercent = 0;
-        }
-      });
-
-      if (planesPago.porcentaje > 0) {
-        planPercentDiscount = 0;
-        planPercentSurcharge = planesPago.porcentaje;
-        const totalSumOfProductPrices = productsDescription.reduce(
-          (acc, product) => acc + product.salePrice,
-          0
-        );
-        planAmountSurcharge =
-          calculateAmountPlusPercentaje(
-            totalSumOfProductPrices,
-            planPercentSurcharge
-          ) - totalSumOfProductPrices;
-      } else {
-        planPercentDiscount = transformPositive(
-          planesPago.porcentaje
-        );
-        planPercentSurcharge = 0;
-        const totalSumOfProductPrices = productsDescription.reduce(
-          (acc, product) => acc + product.salePrice,
-          0
-        );
-        planAmountDiscount =
-          totalSumOfProductPrices -
-          calculateAmountMinusPercentaje(
-            totalSumOfProductPrices,
-            planPercentDiscount
-          );
-      }
-
-      const productsWithIva21 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 21
-      );
-      const productsWithIva10 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 10.5
-      );
-      const productsWithIva27 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 27
-      );
-
-      const amountOfIva21 = productsWithIva21.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              21
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-      const amountOfIva10 = productsWithIva10.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              10.5
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-      const amountOfIva27 = productsWithIva27.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              27
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-
-      const totalIvas = amountOfIva21 + amountOfIva10 + amountOfIva27;
-      const totalDiscounts = this.descuentoGlobal + planAmountDiscount;
-      const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
-      const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
-      const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
 
       VentasService(tenant, "ventas", token)
       .getPreviousCorrelativeDocumentNumber(sucursal.id, documento.codigoDocumento)
       .then(data => {
         const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
+
+        const {
+          total, 
+          subTotal, 
+          amountOfIva21, 
+          amountOfIva10, 
+          amountOfIva27, 
+          totalOfIvas, 
+          totalOfDiscounts, 
+          totalOfSurcharges,
+          planPercentSurcharge,
+          planPercentDiscount,
+          planAmountSurcharge, 
+          planAmountDiscount
+        } = this.calculateRelevantAmountsOfInvoice();
+
         comprobante = {
           letra: "P",
           numeroCbte:
@@ -1743,15 +1353,18 @@ export default {
           documentoComercial: documento,
           empresa: empresa,
           cliente: cliente,
-          totalVenta: totalVenta,
-          subTotal: subTotal,
           totalDescuentoGlobal: this.descuentoGlobal,
           totalRecargoGlobal: this.recargoGlobal,
           porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
           porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+          totalVenta: total,
+          subTotal: subTotal,
           totalIva21: amountOfIva21,
           totalIva10: amountOfIva10,
           totalIva27: amountOfIva27,
+          totalIvas: totalOfIvas,
+          totalDescuentos: totalOfDiscounts,
+          totalRecargos: totalOfSurcharges,
           porcentajeRecargoPlan: planPercentSurcharge,
           porcentajeDescuentoPlan: planPercentDiscount,
           totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
@@ -1803,6 +1416,9 @@ export default {
       })
     },
 
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS TO CALCULATE STATUS OF STOCKS IN SALE -----------------------------------------------*/
+    /******************************************************************************************************/
     applyStockModifications(comprobante) {
       comprobante.productos.forEach((product) => {
         StocksService(this.tenant, "stock", this.token)
@@ -1930,27 +1546,48 @@ export default {
       }
     },
 
-    checkSaleCondition(paymentPlan) {
-      let saleCondition;
-      if (paymentPlan) {
-        if (paymentPlan.length < 2) {
-          if (paymentPlan[0].cuotas > 1) {
-            saleCondition = true;
-          } else {
-            saleCondition = false;
-          }
-        } else {
-          saleCondition = false;
-        }
-      } else {
-        saleCondition = true;
-      }
-      return saleCondition;
-    },
-
     /******************************************************************************************************/
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
+    calculateRelevantAmountsOfInvoice(){
+      console.log("Resultado funcion")
+      const planPago = this.object.planPago;
+      this.productsDescription = this.restLineDiscounts(this.products, this.productsDescription);
+      this.productsDescription = this.sumLineSurcharges(this.products, this.productsDescription);
+      this.productsDescription = this.restGlobalDiscount(this.productsDescription, this.porcentajeDescuentoGlobal);
+      this.productsDescription = this.sumGlobalSurcharge(this.productsDescription, this.porcentajeRecargoGlobal);
+      this.productsDescription = this.applyPaymentPlantPercentVariation(this.productsDescription, planPago.porcentaje);
+      this.productsDescription = this.calculateAmountOfPriceVariations(this.productsDescription);
+      const totalOfDiscounts = this.calculateTotalOfDiscounts(this.productsDescription);
+      const totalOfSurcharges = this.calculateTotalOfSurcharges(this.productsDescription);
+      const subTotal = this.calculateSumOfProductSalePrices(this.productsDescription);
+      const planAmountDiscount = (planPercentDiscount > 0) ? subTotal * decimalPercent(planPercentDiscount) : 0;
+      const planAmountSurcharge = (planPercentSurcharge > 0) ? subTotal * decimalPercent(planPercentSurcharge) : 0;
+      const planPercentSurcharge = (planPago.porcentaje > 0) ? planPago.porcentaje : 0;
+      const planPercentDiscount = (planPago.porcentaje < 0) ? transformPositive(planPago.porcentaje) : 0;
+      this.productsDescription = this.correctSalePriceAndIvaAmountOfProducts(this.productsDescription);
+      const amountOfIva21 = this.calculateAmountOfIva21(this.productsDescription);
+      const amountOfIva10 = this.calculateAmountOfIva10(this.productsDescription);
+      const amountOfIva27 = this.calculateAmountOfIva27(this.productsDescription);
+      const totalOfIvas = sumarNumeros([amountOfIva21, amountOfIva10, amountOfIva27]);
+      const total = subTotal - totalOfDiscounts + totalOfSurcharges;
+
+      return {
+        total, 
+        subTotal, 
+        amountOfIva21, 
+        amountOfIva10, 
+        amountOfIva27, 
+        totalOfIvas, 
+        totalOfDiscounts, 
+        totalOfSurcharges,
+        planPercentSurcharge,
+        planPercentDiscount,
+        planAmountSurcharge,
+        planAmountDiscount
+      }
+    },
+
     restLineDiscounts(products, productDescriptions){
       const discounts = products.filter(el => el.nombre.includes('DESCUENTO - '));
       discounts.forEach(discount => {
@@ -2073,12 +1710,32 @@ export default {
       return roundTwoDecimals(amountOfIva);
     },
 
-
     /******************************************************************************************************/
     /* CLEAR SALE FORM DATA ------------------------------------------------------------------------------*/
     /******************************************************************************************************/
     clear() {
       window.location.reload();
+    },
+
+    /******************************************************************************************************/
+    /* CHECK IF SALE CONDITION IS EFFECTIVE --------------------------------------------------------------*/
+    /******************************************************************************************************/
+    checkSaleCondition(paymentPlan) {
+      let saleCondition;
+      if (paymentPlan) {
+        if (paymentPlan.length < 2) {
+          if (paymentPlan[0].cuotas > 1) {
+            saleCondition = true;
+          } else {
+            saleCondition = false;
+          }
+        } else {
+          saleCondition = false;
+        }
+      } else {
+        saleCondition = true;
+      }
+      return saleCondition;
     },
 
     /******************************************************************************************************/
