@@ -1047,8 +1047,9 @@ export default {
                     addZerosInString("04", ptoVenta.idFiscal) +
                     cae +
                     formatDateWithoutSlash(dateOfCaeExpiration);
-                  
-                  const {
+
+                  this.calculateRelevantAmountsOfInvoice()
+                  .then(({
                     total, 
                     subTotal, 
                     amountOfIva21, 
@@ -1061,83 +1062,87 @@ export default {
                     planPercentDiscount,
                     planAmountSurcharge, 
                     planAmountDiscount
-                  } = this.calculateRelevantAmountsOfInvoice();
+                  }) => {
+                    // Create receipt
+                    comprobante = {
+                      letra: documento.letra,
+                      numeroCbte:
+                        addZerosInString("04", ptoVenta.idFiscal) +
+                        "-" +
+                        addZerosInString("08", numberOfReceipt),
+                      fechaEmision: formatDate(getCurrentDate()),
+                      fechaVto: formatDate(dateOfCaeExpiration),
+                      correlativoComprobante: numberOfReceipt,
+                      condicionVenta: condVenta,
+                      productos: products,
+                      productosDetalle: productsDetail,
+                      productoDescription: this.productsDescription,
+                      barCode: barCode,
+                      cae: cae,
+                      logoUrl: this.loguedUser.sucursal.logo,
+                      puntoVenta: ptoVenta,
+                      sucursal: sucursal,
+                      documentoComercial: documento,
+                      empresa: empresa,
+                      cliente: cliente,
+                      totalVenta: total,
+                      subTotal: subTotal,
+                      totalDescuentoGlobal: this.descuentoGlobal,
+                      totalRecargoGlobal: this.recargoGlobal,
+                      porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+                      porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                      totalIva21: amountOfIva21,
+                      totalIva10: amountOfIva10,
+                      totalIva27: amountOfIva27,
+                      totalIvas: totalOfIvas,
+                      totalDescuentos: totalOfDiscounts,
+                      totalRecargos: totalOfSurcharges,
+                      porcentajeRecargoPlan: planPercentSurcharge,
+                      porcentajeDescuentoPlan: planPercentDiscount,
+                      totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+                      totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+                      mediosPago: [mediosPago],
+                      planesPago: [planPago],
+                      nombreDocumento: documento.nombre,
+                    };
 
-                  // Create receipt
-                  comprobante = {
-                    letra: documento.letra,
-                    numeroCbte:
-                      addZerosInString("04", ptoVenta.idFiscal) +
-                      "-" +
-                      addZerosInString("08", numberOfReceipt),
-                    fechaEmision: formatDate(getCurrentDate()),
-                    fechaVto: formatDate(dateOfCaeExpiration),
-                    correlativoComprobante: numberOfReceipt,
-                    condicionVenta: condVenta,
-                    productos: products,
-                    productosDetalle: productsDetail,
-                    productoDescription: this.productsDescription,
-                    barCode: barCode,
-                    cae: cae,
-                    logoUrl: this.loguedUser.sucursal.logo,
-                    puntoVenta: ptoVenta,
-                    sucursal: sucursal,
-                    documentoComercial: documento,
-                    empresa: empresa,
-                    cliente: cliente,
-                    totalVenta: total,
-                    subTotal: subTotal,
-                    totalDescuentoGlobal: this.descuentoGlobal,
-                    totalRecargoGlobal: this.recargoGlobal,
-                    porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-                    porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-                    totalIva21: amountOfIva21,
-                    totalIva10: amountOfIva10,
-                    totalIva27: amountOfIva27,
-                    totalIvas: totalOfIvas,
-                    totalDescuentos: totalOfDiscounts,
-                    totalRecargos: totalOfSurcharges,
-                    porcentajeRecargoPlan: planPercentSurcharge,
-                    porcentajeDescuentoPlan: planPercentDiscount,
-                    totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-                    totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-                    mediosPago: [mediosPago],
-                    planesPago: [planPago],
-                    nombreDocumento: documento.nombre,
-                  };
+                    if(this.object.id){
+                      comprobante.id = this.object.id;
+                    }
 
-                  if(this.object.id){
-                    comprobante.id = this.object.id;
-                  }
+                    console.log(comprobante)
 
-                  /*** Save receipt in database and print invoice ***/
-                  if (comprobante.cae) {
-                    GenericService(tenant, "comprobantesFiscales", token)
-                      .save(comprobante)
-                      .then(() => {
-                        ReportsService(tenant, service, token)
-                          .onCloseSaleReport(comprobante)
-                          .then((res) => {
-                            file = new Blob([res["data"]], {
-                              type: "application/pdf",
+                    /*** Save receipt in database and print invoice ***/
+                    if (comprobante.cae) {
+                      GenericService(tenant, "comprobantesFiscales", token)
+                        .save(comprobante)
+                        .then(() => {
+                          ReportsService(tenant, service, token)
+                            .onCloseSaleReport(comprobante)
+                            .then((res) => {
+                              file = new Blob([res["data"]], {
+                                type: "application/pdf",
+                              });
+                              fileURL = URL.createObjectURL(file);
+                              window.open(fileURL, "_blank");
+                              console.log("Si pasa por aca");
                             });
-                            fileURL = URL.createObjectURL(file);
-                            window.open(fileURL, "_blank");
-                            console.log("Si pasa por aca");
-                          });
-                      })
-                      .then(() => {
-                        this.applyStockModifications(comprobante)
-                      });
-                  } else {
-                    this.$errorAlert("Tipo de comprobante no disponible").then(
-                      (result) => {
-                        if (result.isDismissed) {
-                          this.loaded = true;
+                        })
+                        .then(() => {
+                          this.applyStockModifications(comprobante)
+                        });
+                    } else {
+                      this.$errorAlert("Tipo de comprobante no disponible").then(
+                        (result) => {
+                          if (result.isDismissed) {
+                            this.loaded = true;
+                          }
                         }
-                      }
-                    );
-                  }
+                      );
+                    }
+                  })
+
+                  
                 })
                 .catch((err) => {
                   console.log(
@@ -1191,101 +1196,100 @@ export default {
       .getPreviousCorrelativeDocumentNumber(sucursal.id, documento.codigoDocumento)
       .then(data => {
         const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
-
-        const {
-          total, 
-          subTotal, 
-          amountOfIva21, 
-          amountOfIva10, 
-          amountOfIva27, 
-          totalOfIvas, 
-          totalOfDiscounts, 
-          totalOfSurcharges,
-          planPercentSurcharge,
-          planPercentDiscount,
-          planAmountSurcharge, 
-          planAmountDiscount
-        } = this.calculateRelevantAmountsOfInvoice();
-
-        comprobante = {
-          letra: "X",
-          numeroCbte:
-            addZerosInString("04", ptoVenta.idFiscal) +
-            "-" +
-            addZerosInString("08", numeroCorrelativoDeComprobante),
-          correlativoComprobante: numeroCorrelativoDeComprobante,
-          fechaEmision: formatDate(fecha),
-          fechaVto: formatDate(fecha),
-          condicionVenta: condVenta,
-          productos: products,
-          productosDetalle: productsDetail,
-          productoDescription: productsDescription,
-          barCode: generateBarCode(),
-          cae: "",
-          logoUrl: this.loguedUser.sucursal.logo,
-          puntoVenta: ptoVenta,
-          sucursal: sucursal,
-          documentoComercial: documento,
-          empresa: empresa,
-          cliente: cliente,
-          totalDescuentoGlobal: this.descuentoGlobal,
-          totalRecargoGlobal: this.recargoGlobal,
-          porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-          porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-          totalVenta: total,
-          subTotal: subTotal,
-          totalIva21: amountOfIva21,
-          totalIva10: amountOfIva10,
-          totalIva27: amountOfIva27,
-          totalIvas: totalOfIvas,
-          totalDescuentos: totalOfDiscounts,
-          totalRecargos: totalOfSurcharges,
-          porcentajeRecargoPlan: planPercentSurcharge,
-          porcentajeDescuentoPlan: planPercentDiscount,
-          totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-          totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-          mediosPago: [mediosPago],
-          planesPago: [planesPago],
-          nombreDocumento: documento.nombre,
-        };
-
-        console.log(comprobante);
-        /*** Evaluate required sale form data ***/
-        if (comprobante.mediosPago[0] !== undefined) {
-          if (Number(comprobante.totalVenta) !== 0) {
-            /*** Save receipt in database and print ticket ***/
-            GenericService(tenant, "comprobantesFiscales", token)
-              .save(comprobante)
-              .then(() => {
-                ReportsService(tenant, service, token)
-                  .onCloseSaleReport(comprobante)
-                  .then((res) => {
-                    file = new Blob([res["data"]], {
-                      type: "application/pdf",
+        this.calculateRelevantAmountsOfInvoice()
+        .then(({
+            total, 
+            subTotal, 
+            amountOfIva21, 
+            amountOfIva10, 
+            amountOfIva27, 
+            totalOfIvas, 
+            totalOfDiscounts, 
+            totalOfSurcharges,
+            planPercentSurcharge,
+            planPercentDiscount,
+            planAmountSurcharge, 
+            planAmountDiscount
+        }) => {
+          comprobante = {
+            letra: "X",
+            numeroCbte:
+              addZerosInString("04", ptoVenta.idFiscal) +
+              "-" +
+              addZerosInString("08", numeroCorrelativoDeComprobante),
+            correlativoComprobante: numeroCorrelativoDeComprobante,
+            fechaEmision: formatDate(fecha),
+            fechaVto: formatDate(fecha),
+            condicionVenta: condVenta,
+            productos: products,
+            productosDetalle: productsDetail,
+            productoDescription: productsDescription,
+            barCode: generateBarCode(),
+            cae: "",
+            logoUrl: this.loguedUser.sucursal.logo,
+            puntoVenta: ptoVenta,
+            sucursal: sucursal,
+            documentoComercial: documento,
+            empresa: empresa,
+            cliente: cliente,
+            totalDescuentoGlobal: this.descuentoGlobal,
+            totalRecargoGlobal: this.recargoGlobal,
+            porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+            porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+            totalVenta: total,
+            subTotal: subTotal,
+            totalIva21: amountOfIva21,
+            totalIva10: amountOfIva10,
+            totalIva27: amountOfIva27,
+            totalIvas: totalOfIvas,
+            totalDescuentos: totalOfDiscounts,
+            totalRecargos: totalOfSurcharges,
+            porcentajeRecargoPlan: planPercentSurcharge,
+            porcentajeDescuentoPlan: planPercentDiscount,
+            totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+            totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+            mediosPago: [mediosPago],
+            planesPago: [planesPago],
+            nombreDocumento: documento.nombre,
+          };
+  
+          /*** Evaluate required sale form data ***/
+          if (comprobante.mediosPago[0] !== undefined) {
+            if (Number(comprobante.totalVenta) !== 0) {
+              /*** Save receipt in database and print ticket ***/
+              GenericService(tenant, "comprobantesFiscales", token)
+                .save(comprobante)
+                .then(() => {
+                  ReportsService(tenant, service, token)
+                    .onCloseSaleReport(comprobante)
+                    .then((res) => {
+                      file = new Blob([res["data"]], {
+                        type: "application/pdf",
+                      });
+                      fileURL = URL.createObjectURL(file);
+                      window.open(fileURL, "_blank");
+                    })
+                    .then(() => {
+                      this.applyStockModifications(comprobante)
                     });
-                    fileURL = URL.createObjectURL(file);
-                    window.open(fileURL, "_blank");
-                  })
-                  .then(() => {
-                    this.applyStockModifications(comprobante)
-                  });
-              });
-          } else {
-            this.$errorAlert("No hay productos seleccionados en la venta").then(
-              (result) => {
-                if (result.isDismissed) {
-                  this.loaded = true;
+                });
+            } else {
+              this.$errorAlert("No hay productos seleccionados en la venta").then(
+                (result) => {
+                  if (result.isDismissed) {
+                    this.loaded = true;
+                  }
                 }
-              }
-            );
-          }
-        } else {
-          this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
-            if (result.isDismissed) {
-              this.loaded = true;
+              );
             }
-          });
-        }
+          } else {
+            this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
+              if (result.isDismissed) {
+                this.loaded = true;
+              }
+            });
+          }
+        })
       })
     },
 
@@ -1315,7 +1319,8 @@ export default {
       .then(data => {
         const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
 
-        const {
+        this.calculateRelevantAmountsOfInvoice()
+        .then(({
           total, 
           subTotal, 
           amountOfIva21, 
@@ -1328,91 +1333,91 @@ export default {
           planPercentDiscount,
           planAmountSurcharge, 
           planAmountDiscount
-        } = this.calculateRelevantAmountsOfInvoice();
-
-        comprobante = {
+        }) => {
+          comprobante = {
           letra: "P",
           numeroCbte:
             addZerosInString("04", ptoVenta.idFiscal) +
             "-" +
             addZerosInString("08", numeroCorrelativoDeComprobante),
-          correlativoComprobante: numeroCorrelativoDeComprobante,
-          fechaEmision: formatDate(fecha),
-          fechaVto: formatDate(fecha),
-          fechaVencimiento,
-          condicionVenta: condVenta,
-          vencido: 'vigente',
-          productos: products,
-          productosDetalle: productsDetail,
-          productoDescription: productsDescription,
-          barCode: generateBarCode(),
-          cae: "",
-          logoUrl: this.loguedUser.sucursal.logo,
-          puntoVenta: ptoVenta,
-          sucursal: sucursal,
-          documentoComercial: documento,
-          empresa: empresa,
-          cliente: cliente,
-          totalDescuentoGlobal: this.descuentoGlobal,
-          totalRecargoGlobal: this.recargoGlobal,
-          porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-          porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-          totalVenta: total,
-          subTotal: subTotal,
-          totalIva21: amountOfIva21,
-          totalIva10: amountOfIva10,
-          totalIva27: amountOfIva27,
-          totalIvas: totalOfIvas,
-          totalDescuentos: totalOfDiscounts,
-          totalRecargos: totalOfSurcharges,
-          porcentajeRecargoPlan: planPercentSurcharge,
-          porcentajeDescuentoPlan: planPercentDiscount,
-          totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-          totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-          mediosPago: [mediosPago],
-          planesPago: [planesPago],
-          nombreDocumento: documento.nombre,
-        };
-        /*** Evaluate required sale form data ***/
-        if (comprobante.mediosPago[0] !== undefined) {
-          if (Number(comprobante.totalVenta) !== 0) {
-            /*** Save receipt in database and print ticket ***/
-            GenericService(tenant, "comprobantesFiscales", token)
-              .save(comprobante)
-              .then(() => {
-                ReportsService(tenant, service, token)
-                  .onCloseSaleReport(comprobante)
-                  .then((res) => {
-                    file = new Blob([res["data"]], {
-                      type: "application/pdf",
-                    });
-                    fileURL = URL.createObjectURL(file);
-                    window.open(fileURL, "_blank");
-                  })
-                  .then(() => {
-                    this.$successAlert("Presupuesto generado")
-                    .then(()=>{
-                      this.clear();
-                      this.loaded = true;
+            correlativoComprobante: numeroCorrelativoDeComprobante,
+            fechaEmision: formatDate(fecha),
+            fechaVto: formatDate(fecha),
+            fechaVencimiento,
+            condicionVenta: condVenta,
+            vencido: 'vigente',
+            productos: products,
+            productosDetalle: productsDetail,
+            productoDescription: productsDescription,
+            barCode: generateBarCode(),
+            cae: "",
+            logoUrl: this.loguedUser.sucursal.logo,
+            puntoVenta: ptoVenta,
+            sucursal: sucursal,
+            documentoComercial: documento,
+            empresa: empresa,
+            cliente: cliente,
+            totalDescuentoGlobal: this.descuentoGlobal,
+            totalRecargoGlobal: this.recargoGlobal,
+            porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+            porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+            totalVenta: total,
+            subTotal: subTotal,
+            totalIva21: amountOfIva21,
+            totalIva10: amountOfIva10,
+            totalIva27: amountOfIva27,
+            totalIvas: totalOfIvas,
+            totalDescuentos: totalOfDiscounts,
+            totalRecargos: totalOfSurcharges,
+            porcentajeRecargoPlan: planPercentSurcharge,
+            porcentajeDescuentoPlan: planPercentDiscount,
+            totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+            totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+            mediosPago: [mediosPago],
+            planesPago: [planesPago],
+            nombreDocumento: documento.nombre,
+          };
+          /*** Evaluate required sale form data ***/
+          if (comprobante.mediosPago[0] !== undefined) {
+            if (Number(comprobante.totalVenta) !== 0) {
+              /*** Save receipt in database and print ticket ***/
+              GenericService(tenant, "comprobantesFiscales", token)
+                .save(comprobante)
+                .then(() => {
+                  ReportsService(tenant, service, token)
+                    .onCloseSaleReport(comprobante)
+                    .then((res) => {
+                      file = new Blob([res["data"]], {
+                        type: "application/pdf",
+                      });
+                      fileURL = URL.createObjectURL(file);
+                      window.open(fileURL, "_blank");
                     })
-                  });
-              });
-          } else {
-            this.$errorAlert("No hay productos seleccionados en la venta").then(
-              (result) => {
-                if (result.isDismissed) {
-                  this.loaded = true;
+                    .then(() => {
+                      this.$successAlert("Presupuesto generado")
+                      .then(()=>{
+                        this.clear();
+                        this.loaded = true;
+                      })
+                    });
+                });
+            } else {
+              this.$errorAlert("No hay productos seleccionados en la venta").then(
+                (result) => {
+                  if (result.isDismissed) {
+                    this.loaded = true;
+                  }
                 }
-              }
-            );
-          }
-        } else {
-          this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
-            if (result.isDismissed) {
-              this.loaded = true;
+              );
             }
-          });
-        }
+          } else {
+            this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
+              if (result.isDismissed) {
+                this.loaded = true;
+              }
+            });
+          }
+        })
       })
     },
 
@@ -1549,26 +1554,25 @@ export default {
     /******************************************************************************************************/
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
-    calculateRelevantAmountsOfInvoice(){
-      console.log("Resultado funcion")
+    async calculateRelevantAmountsOfInvoice(){
       const planPago = this.object.planPago;
-      this.productsDescription = this.restLineDiscounts(this.products, this.productsDescription);
-      this.productsDescription = this.sumLineSurcharges(this.products, this.productsDescription);
-      this.productsDescription = this.restGlobalDiscount(this.productsDescription, this.porcentajeDescuentoGlobal);
-      this.productsDescription = this.sumGlobalSurcharge(this.productsDescription, this.porcentajeRecargoGlobal);
-      this.productsDescription = this.applyPaymentPlantPercentVariation(this.productsDescription, planPago.porcentaje);
-      this.productsDescription = this.calculateAmountOfPriceVariations(this.productsDescription);
-      const totalOfDiscounts = this.calculateTotalOfDiscounts(this.productsDescription);
-      const totalOfSurcharges = this.calculateTotalOfSurcharges(this.productsDescription);
-      const subTotal = this.calculateSumOfProductSalePrices(this.productsDescription);
+      this.productsDescription = await this.restLineDiscounts(this.products, this.productsDescription);
+      this.productsDescription = await this.sumLineSurcharges(this.products, this.productsDescription);
+      this.productsDescription = await this.restGlobalDiscount(this.productsDescription, this.porcentajeDescuentoGlobal);
+      this.productsDescription = await this.sumGlobalSurcharge(this.productsDescription, this.porcentajeRecargoGlobal);
+      this.productsDescription = await this.applyPaymentPlantPercentVariation(this.productsDescription, planPago.porcentaje);
+      this.productsDescription = await this.calculateAmountOfPriceVariations(this.productsDescription);
+      const totalOfDiscounts = await this.calculateTotalOfDiscounts(this.productsDescription);
+      const totalOfSurcharges = await this.calculateTotalOfSurcharges(this.productsDescription);
+      const subTotal = await this.calculateSumOfProductSalePrices(this.productsDescription);
       const planAmountDiscount = (planPercentDiscount > 0) ? subTotal * decimalPercent(planPercentDiscount) : 0;
       const planAmountSurcharge = (planPercentSurcharge > 0) ? subTotal * decimalPercent(planPercentSurcharge) : 0;
       const planPercentSurcharge = (planPago.porcentaje > 0) ? planPago.porcentaje : 0;
       const planPercentDiscount = (planPago.porcentaje < 0) ? transformPositive(planPago.porcentaje) : 0;
-      this.productsDescription = this.correctSalePriceAndIvaAmountOfProducts(this.productsDescription);
-      const amountOfIva21 = this.calculateAmountOfIva21(this.productsDescription);
-      const amountOfIva10 = this.calculateAmountOfIva10(this.productsDescription);
-      const amountOfIva27 = this.calculateAmountOfIva27(this.productsDescription);
+      this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(this.productsDescription);
+      const amountOfIva21 = await this.calculateAmountOfIva21(this.productsDescription);
+      const amountOfIva10 = await this.calculateAmountOfIva10(this.productsDescription);
+      const amountOfIva27 = await this.calculateAmountOfIva27(this.productsDescription);
       const totalOfIvas = sumarNumeros([amountOfIva21, amountOfIva10, amountOfIva27]);
       const total = subTotal - totalOfDiscounts + totalOfSurcharges;
 
@@ -1688,7 +1692,6 @@ export default {
         product.salePrice = product.salePrice - product.discountAmount + product.surchargeAmount;
         product.saleIvaAmount = product.salePrice - ((product.salePrice) / (1 + decimalPercent(product.saleIvaPercent)));
       })
-      console.log(productsDescription);
       return productsDescription;
     },
 
