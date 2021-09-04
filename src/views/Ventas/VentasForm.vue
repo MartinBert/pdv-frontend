@@ -1557,10 +1557,15 @@ export default {
     async calculateRelevantAmountsOfInvoice(){
       const planPago = this.object.planPago;
       this.productsDescription = await this.restLineDiscounts(this.products, this.productsDescription);
+      console.log("1", this.productsDescription);
       this.productsDescription = await this.sumLineSurcharges(this.products, this.productsDescription);
+      console.log("2", this.productsDescription);
       this.productsDescription = await this.restGlobalDiscount(this.productsDescription, this.porcentajeDescuentoGlobal);
+      console.log("3", this.productsDescription);
       this.productsDescription = await this.sumGlobalSurcharge(this.productsDescription, this.porcentajeRecargoGlobal);
+      console.log("4", this.productsDescription);
       this.productsDescription = await this.applyPaymentPlantPercentVariation(this.productsDescription, planPago.porcentaje);
+      console.log("5", this.productsDescription);
       this.productsDescription = await this.calculateAmountOfPriceVariations(this.productsDescription);
       const totalOfDiscounts = await this.calculateTotalOfDiscounts(this.productsDescription);
       const totalOfSurcharges = await this.calculateTotalOfSurcharges(this.productsDescription);
@@ -1570,6 +1575,7 @@ export default {
       const planPercentSurcharge = (planPago.porcentaje > 0) ? planPago.porcentaje : 0;
       const planPercentDiscount = (planPago.porcentaje < 0) ? transformPositive(planPago.porcentaje) : 0;
       this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(this.productsDescription);
+      console.log("6", this.productsDescription);
       const amountOfIva21 = await this.calculateAmountOfIva21(this.productsDescription);
       const amountOfIva10 = await this.calculateAmountOfIva10(this.productsDescription);
       const amountOfIva27 = await this.calculateAmountOfIva27(this.productsDescription);
