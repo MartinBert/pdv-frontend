@@ -112,7 +112,7 @@
                         placeholder="Seleccione un plan de pago"
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" v-if="object.documento && object.documento.nombre === 'Presupuesto'">
+                    <v-col cols="6" v-if="object.documento && object.documento.nombre === 'Presupuesto' && perfil < 4">
                       <label for="date_input">Fecha de vencimiento de presupuesto</label>
                       <v-text-field 
                         id="date_input" 
@@ -229,7 +229,7 @@
               <v-col cols="1">
                 <div class="verticalSeparator"></div>
               </v-col>
-              <v-col cols="10">
+              <v-col cols="10" v-if="perfil < 4">
                 <Calculator class="mt-2" />
                 <div style="text-align: center; padding: 1em 0">
                   <h3>
