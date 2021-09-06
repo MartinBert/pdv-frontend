@@ -54,13 +54,13 @@
       <br />
       <div class="horizontalSeparator"></div>
       <v-card style="min-width: 100%">
-        <v-row v-if="perfil < 4">
+        <v-row>
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
                 <v-col cols="8">
                   <v-row>
-                    <v-col cols="6">
+                    <v-col cols="6" v-if="perfil < 4">
                       <v-autocomplete
                         @change="
                           getComercialDocuments(
