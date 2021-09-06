@@ -76,7 +76,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="6" v-if="perfil < 4">
                       <v-autocomplete
                         ref="documents"
                         class="button-ventas comprobante"
@@ -88,7 +88,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="6" v-if="perfil < 4">
                       <v-autocomplete
                         ref="paymentMethods"
                         class="button-ventas medio-pago"
@@ -101,7 +101,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="6" v-if="perfil < 4">
                       <v-autocomplete
                         ref="paymentPlans"
                         class="button-ventas plan-pago"
