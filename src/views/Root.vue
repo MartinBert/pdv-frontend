@@ -7,7 +7,6 @@
       class="main_navigation"
       style="background-color: #d2d2ff"
       width="17%"
-      v-if="perfil <= 4"
     >
       <v-list nav dense>
         <div v-for="m in modulosVisibles" :key="m.name">

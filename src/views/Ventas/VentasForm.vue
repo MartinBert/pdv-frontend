@@ -1,7 +1,7 @@
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
-      <v-row class="mb-1" v-if="perfil < 4">
+      <v-row class="mb-1">
         <v-col cols="6">
           <div class="d-flex text-left">
             <v-btn
@@ -60,12 +60,7 @@
               <v-row>
                 <v-col cols="8">
                   <v-row>
-                    <v-btn
-                      v-if="perfil <= 4"
-                      class="primary ml-3"
-                      >Terminar turno</v-btn
-                    >
-                    <v-col cols="6" v-if="perfil < 4">
+                    <v-col cols="6" >
                       <v-autocomplete
                         @change="
                           getComercialDocuments(
@@ -81,7 +76,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" v-if="perfil < 4">
+                    <v-col cols="6" >
                       <v-autocomplete
                         ref="documents"
                         class="button-ventas comprobante"
@@ -93,7 +88,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" v-if="perfil < 4">
+                    <v-col cols="6" >
                       <v-autocomplete
                         ref="paymentMethods"
                         class="button-ventas medio-pago"
@@ -106,7 +101,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" v-if="perfil < 4">
+                    <v-col cols="6" >
                       <v-autocomplete
                         ref="paymentPlans"
                         class="button-ventas plan-pago"
@@ -121,8 +116,7 @@
                       cols="6"
                       v-if="
                         object.documento &&
-                          object.documento.nombre === 'Presupuesto' &&
-                          perfil < 4
+                          object.documento.nombre === 'Presupuesto'
                       "
                     >
                       <label for="date_input"
@@ -216,7 +210,7 @@
                             <button type="button">
                               <img
                                 src="/../../images/icons/delete.svg"
-                                @click="deleteLine(p.id)"
+                                @click="deleteLine(p)"
                                 width="30"
                                 height="30"
                               />
@@ -243,7 +237,7 @@
               <v-col cols="1">
                 <div class="verticalSeparator"></div>
               </v-col>
-              <v-col cols="10" v-if="perfil < 4">
+              <v-col cols="10" >
                 <Calculator class="mt-2" />
                 <div style="text-align: center; padding: 1em 0">
                   <h3>
@@ -364,6 +358,7 @@ export default {
     productsWithoutStock: [],
     productsInOtherDeposits: [],
     lowStock: [],
+    perfil: null
   }),
 
   components: {
@@ -412,6 +407,7 @@ export default {
   },
 
   mounted() {
+    this.perfil = this.loguedUser.perfil;
     this.$store.commit("productos/resetStates");
     this.tenant = this.$route.params.tenant;
     this.getObjects();
@@ -703,10 +699,15 @@ export default {
       return object;
     },
 
-    deleteLine(id) {
+    deleteLine(product) {
+      const {id, codigoBarra} = product;
       const filter = this.products.filter((el) => el.id !== id);
       const filterForStore = this.products.filter((el) => el.id === id)[0].id;
+      const filterForProductsDescription = this.productsDescription.filter(el => el.barCode !== codigoBarra);
+      const filterForProductsDetail = this.productsDetail.filter(el => el.id !== id);
       this.products = filter;
+      this.productsDescription = filterForProductsDescription;
+      this.productsDetail = filterForProductsDetail;
       this.$store.commit("productos/removeProductsToList", filterForStore);
       this.listennerOfListChange = id;
     },
@@ -1134,8 +1135,6 @@ export default {
                         comprobante.id = this.object.id;
                       }
 
-                      console.log(comprobante);
-
                       /*** Save receipt in database and print invoice ***/
                       if (comprobante.cae) {
                         GenericService(tenant, "comprobantesFiscales", token)
@@ -1149,7 +1148,6 @@ export default {
                                 });
                                 fileURL = URL.createObjectURL(file);
                                 window.open(fileURL, "_blank");
-                                console.log("Si pasa por aca");
                               });
                           })
                           .then(() => {
@@ -1627,27 +1625,22 @@ export default {
         this.products,
         this.productsDescription
       );
-      console.log("1", this.productsDescription);
       this.productsDescription = await this.sumLineSurcharges(
         this.products,
         this.productsDescription
       );
-      console.log("2", this.productsDescription);
       this.productsDescription = await this.restGlobalDiscount(
         this.productsDescription,
         this.porcentajeDescuentoGlobal
       );
-      console.log("3", this.productsDescription);
       this.productsDescription = await this.sumGlobalSurcharge(
         this.productsDescription,
         this.porcentajeRecargoGlobal
       );
-      console.log("4", this.productsDescription);
       this.productsDescription = await this.applyPaymentPlantPercentVariation(
         this.productsDescription,
         planPago.porcentaje
       );
-      console.log("5", this.productsDescription);
       this.productsDescription = await this.calculateAmountOfPriceVariations(
         this.productsDescription
       );
@@ -1675,7 +1668,6 @@ export default {
       this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
         this.productsDescription
       );
-      console.log("6", this.productsDescription);
       const amountOfIva21 = await this.calculateAmountOfIva21(
         this.productsDescription
       );
