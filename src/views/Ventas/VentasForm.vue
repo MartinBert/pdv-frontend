@@ -61,7 +61,7 @@
                 <v-col cols="8">
                   <v-row>
                     <v-btn
-                      v-if="perfil === 4"
+                      v-if="perfil <= 4"
                       class="primary ml-3"
                       >Terminar turno</v-btn
                     >
