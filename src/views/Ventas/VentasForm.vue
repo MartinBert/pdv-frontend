@@ -54,7 +54,7 @@
       <br />
       <div class="horizontalSeparator"></div>
       <v-card style="min-width: 100%">
-        <v-row>
+        <v-row v-if="perfil < 4">
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
