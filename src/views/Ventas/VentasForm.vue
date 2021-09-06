@@ -1,7 +1,7 @@
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
-      <v-row class="mb-1">
+      <v-row class="mb-1" v-if="perfil < 4">
         <v-col cols="6">
           <div class="d-flex text-left">
             <v-btn
