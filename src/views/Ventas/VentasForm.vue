@@ -705,6 +705,15 @@ export default {
       const filterForStore = this.products.filter((el) => el.id === id)[0].id;
       const filterForProductsDescription = this.productsDescription.filter(el => el.barCode !== codigoBarra);
       const filterForProductsDetail = this.productsDetail.filter(el => el.id !== id);
+
+      if(product.nombre.includes("DESCUENTO - ")) {
+        this.descuentoGlobal = 0;
+      }
+
+      if(product.nombre.includes("RECARGO - ")) {
+        this.recargoGlobal = 0;
+      }
+
       this.products = filter;
       this.productsDescription = filterForProductsDescription;
       this.productsDetail = filterForProductsDetail;
@@ -1111,8 +1120,7 @@ export default {
                         subTotal: subTotal,
                         totalDescuentoGlobal: this.descuentoGlobal,
                         totalRecargoGlobal: this.recargoGlobal,
-                        porcentajeDescuentoGlobal: this
-                          .porcentajeDescuentoGlobal,
+                        porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
                         porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
                         totalIva21: amountOfIva21,
                         totalIva10: amountOfIva10,
@@ -1710,7 +1718,7 @@ export default {
           if (prodDescription.name === discountCleanName) {
             prodDescription.discountPercent = calculatePositivePercentajeCoefficient(
               discount.precioTotal,
-              prodDescription.salePrice
+              (prodDescription.salePrice * Number(prodDescription.quantity))
             );
           }
         });
@@ -1728,7 +1736,7 @@ export default {
           if (prodDescription.name === surchargeCleanName) {
             prodDescription.surchargePercent = calculatePositivePercentajeCoefficient(
               surcharge.precioTotal,
-              prodDescription.salePrice
+              (prodDescription.salePrice * Number(prodDescription.quantity)) 
             );
           }
         });
@@ -1776,6 +1784,7 @@ export default {
       productsDescription.forEach((prodDescription) => {
         prodDescription.discountPercent += planPercent;
       });
+      console.log(productsDescription);
       return productsDescription;
     },
 
@@ -1789,10 +1798,10 @@ export default {
     calculateAmountOfPriceVariations(productsDescription) {
       productsDescription.forEach((prodDescription) => {
         prodDescription.discountAmount =
-          prodDescription.salePrice *
+          (prodDescription.salePrice * Number(prodDescription.quantity)) *
           decimalPercent(prodDescription.discountPercent);
         prodDescription.surchargeAmount =
-          prodDescription.salePrice *
+          (prodDescription.salePrice * Number(prodDescription.quantity)) *
           decimalPercent(prodDescription.surchargePercent);
       });
       return productsDescription;
@@ -1816,7 +1825,7 @@ export default {
 
     calculateSumOfProductSalePrices(productsDescription) {
       const total = productsDescription.reduce(
-        (acc, el) => acc + el.salePrice,
+        (acc, el) => acc + (el.salePrice * Number(el.quantity)),
         0
       );
       return roundTwoDecimals(total);
@@ -1828,10 +1837,10 @@ export default {
           product.saleIvaPercent = 21;
         }
         product.salePrice =
-          product.salePrice - product.discountAmount + product.surchargeAmount;
+          product.salePrice - (product.discountAmount / Number(product.quantity)) + (product.surchargeAmount / (product.quantity));
         product.saleIvaAmount =
-          product.salePrice -
-          product.salePrice / (1 + decimalPercent(product.saleIvaPercent));
+          (product.salePrice * Number(product.quantity)) -
+          (product.salePrice * Number(product.quantity)) / (1 + decimalPercent(product.saleIvaPercent));
       });
       return productsDescription;
     },
