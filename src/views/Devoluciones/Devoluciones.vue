@@ -40,6 +40,7 @@
       v-on:add="add"
       v-on:print="print"
       v-on:seeDetails="seeDetails"
+      ref="table"
     />
     <DevolucionDetails/>
     <ReceiptDialog v-on:receipt="saveChanges"/>
@@ -89,10 +90,13 @@ export default {
   
   mounted() {
     this.tenant = this.$route.params.tenant;
+       if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
   },
   methods: {
     newObject() {
-      this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
+       this.$router.push({ name: "devolucionesForm", params: { id: 0 } });
     },
     print(object){
       ReportsService(this.tenant, "ventas", this.token)

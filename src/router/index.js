@@ -162,7 +162,6 @@ const routes = [
                 component: LibroivaVentas,
                 meta: { requiresAuth: true }
             },
-
             {
                 path: 'calendar',
                 name: 'calendar',

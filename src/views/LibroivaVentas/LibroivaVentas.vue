@@ -31,17 +31,22 @@
                 </v-text-field>
                 <v-btn
                   class="primary v-btn--block"
-                  type="button"
                   @click="
                     salesForDate1(
-                      loguedUser.sucursal,
                       object.fechaDesde,
                       object.fechaHasta
                     )
                   "
+                >
+                  Buscar Comprobantes
+                </v-btn>
+                <v-btn
+                  class="primary v-btn--block"
+                  type="button"
                   style="margin-left:400px;
                    margin-top:-100px;
                    "
+                  @click="exportGeneralExcel()"
                   >Imprimir libro</v-btn
                 >
               </div>
@@ -52,8 +57,32 @@
                 style="margin-left:900px;
                 margin-top:-100px;
                 "
-                label="Factura(A)"
-              ></v-checkbox>
+                label="Facturas(A)"
+                v-model="filterParams.facturaA"
+              >
+              </v-checkbox>
+            </v-col>
+            <v-col cols="3">
+              <v-checkbox
+                v-on:change="filterObjects()"
+                style="margin-left:900px;
+                margin-top:-100px;
+                "
+                label="Facturas(B)"
+                v-model="filterParams.facturaB"
+              >
+              </v-checkbox>
+            </v-col>
+            <v-col cols="3">
+              <v-checkbox
+                v-on:change="filterObjects()"
+                style="margin-left:900px;
+                margin-top:-100px;
+                "
+                label="Facturas(C)"
+                v-model="filterParams.facturaC"
+              >
+              </v-checkbox>
             </v-col>
           </form>
         </v-col>
@@ -109,7 +138,7 @@
       <v-data-table
         :headers="headers"
         class="elevation-6"
-        :items="filterInvoice"
+        :items="ventas"
         hide-default-footer
       >
       </v-data-table>
@@ -123,40 +152,24 @@
   </v-container>
 </template>
 <script>
-import ReportsService from "../../services/ReportsService";
-//import Detail from "../../components/Buttons/Detail";
+import ComprobantesService from "../../services/ComprobantesService";
 import Pagination from "../../components/Pagination";
 import {
   generateIntegerDate,
-  getYearsList,
   monthsList,
 } from "../../helpers/dateHelper";
 import { exportExcelLibro } from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
-  data: (vm) => ({
-    date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-      .toISOString()
-      .substr(0, 10),
-    dateFormatted: vm.formatDate(
-      new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-        .toISOString()
-        .substr(0, 10)
-    ),
-    selectedInvoice: [],
-    years: getYearsList(),
-    sucursales: [],
+  data: () => ({
     checkbox1: false,
     checkbox2: false,
     checkbox3: false,
-    checkedInvoice: [],
     ventas: [],
-    comprobantesFiscales: [],
-    comprobantesComerciales: [],
-    FiscalCondicion: [],
     file: null,
+    obj: {},
     sucusal: [],
-    filterInvoice:[],
+    invoices:[],
     empresa: [],
     ivas: [],
     object: {
@@ -170,40 +183,21 @@ export default {
     },
     fechaDesde: null,
     fechaHasta: null,
-    fechaDesde2: null,
-    fechaHasta2: null,
-    fechaDesde3: null,
-    fechaHasta3: null,
     filterParams: {
       blackReceiptFilter: "",
       sucursalId: "",
-      codigoDocumento: "",
+      barCode:"",
+      numeroCbte:"",
       fechaEmision: "",
       comprobanteCerrado: "",
       numeroComprobante: "",
-      validityStatus: false,
       totalVenta: "",
-      documentosComerciales: "",
-      cuit: "",
-      numeroCbte: "",
-      razonSocial: "",
-      fechaVto: "",
-      ingresosBrutos: "",
-      cae: "",
-      letra: "",
-      subTotal: "",
-      totalIva21: "",
-      totalIva27: "",
-      totalIva10: "",
-      porcentaje: "",
-      condicionIva: "",
-      condicionVenta: "",
-      barCode: "",
-      nombreDocumento:"",
-      documentoComercialName: "",
+      facturaA: false,
+      facturaB: false,
+      facturaC: false,
       page: 1,
       size: 10,
-      totalPages: 0,
+      totalPages:0,
     },
     loaded: false,
     tenant: "",
@@ -216,22 +210,20 @@ export default {
     headers: [
       { text: "Fecha", value: "fechaEmision" },
       { text: "Comprobante", value: "nombreDocumento" },
-      { text: "Numero Comprobantes", value: "barCode" },
+      { text: "Numero Comprobantes", value: "numeroCbte" },
       { text: "Razon Social", value: "cliente.razonSocial" },
-      { text: "Condicion Iva", value: "cliente.condicionIva" },
+      { text: "Condicion Iva", value: "cliente.condicionIva.nombre" },
       { text: "N° Cuit", value: "cliente.cuit" },
       { text: "Neto Grabado", value: "sucursal.ingBruto" },
       { text: "Iva 27%", value: "totalIva27" },
       { text: "Iva 21%", value: "totalIva21" },
       { text: "Iva 10,5%", value: "totalIva10" },
-      { text: "Iva 0 %", value: "Iva0" },
       { text: "Total Facturado", value: "totalVenta" },
     ],
   }),
 
   components: {
     Pagination,
-    //Detail,
   },
 
   computed: {
@@ -246,6 +238,7 @@ export default {
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     this.filterObjects();
     this.months = monthsList;
   },
@@ -253,21 +246,18 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, "ventas", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
-          const filterInvoice = this.ventas.filter(
-            (el)=>el.nombreDocumento == "FACTURAS"
-          )
-          if(filterInvoice == "FACTURAS"){
-            return console.log(filterInvoice);
-          }
           this.filterParams.totalPages = data.data.totalPages;
+          if (this.filterParams.totalPages < this.filterParams.page) {
+            this.filterParams.page = 1;
+          }
           this.loaded = true;
         });
-      console.log(this.ventas);
     },
+
     createDate(date, param) {
       const integerDate = generateIntegerDate(date);
       if (param === "fechaDesde") {
@@ -276,19 +266,95 @@ export default {
         this.object.fechaHasta = integerDate;
       }
     },
-    salesForDate1(sucursal, fechaDesde, fechaHasta) {
-      if (this.notPassSucursalValidations()) return this.error("sucursal");
-      let id = sucursal.id;
 
-      ReportsService(this.tenant, this.service, this.token)
-        .salesForDate(id, fechaDesde, fechaHasta)
-        .then((res) => {
-          console.log(res);
-          exportExcelLibro(res);
-        });
+    salesForDate1(fechaDesde, fechaHasta) {
+      if (this.notPassSucursalValidations()) return this.error("sucursal");
+      if (this.notPassDateValidations()) return this.error("fechas");
+      let sucursalId = this.loguedUser.sucursal.id;
+      const filterParams = {
+        sucursalId,
+        fechaDesde,
+        fechaHasta
+      }
+      ComprobantesService(this.tenant, "comprobantesFiscales", this.token)
+      .getInvoicesForDateRange(filterParams)
+      .then(data => {
+        const invoices = data.data;
+        this.exportGeneralExcel(invoices)
+      })
     },
+
+    async exportGeneralExcel(invoices) {
+      this.loaded = false;
+      const headers = [
+        "FECHA",
+        "COMPROBANTE",
+        "NUMERO COMPROBANTE",
+        "RAZON SOCIAL",
+        "CONDICION IVA",
+        "CUIT",
+        "NETO GRABADO",
+        "IVA 27%",
+        "IVA 21%",
+        "IVA 10%",
+        "TOTAL FACTURADO",
+      ];
+      if(invoices){
+        let formatedInvoicesParam = [];
+        invoices.forEach(el => {
+          el = this.formatForExcel(el);
+          formatedInvoicesParam.push(el);
+        })
+        exportExcelLibro(headers, formatedInvoicesParam);
+      }else{
+        const data = await this.setDataToExcel();
+        exportExcelLibro(headers, data);
+      }
+      this.loaded = true;
+    },
+
+    async setDataToExcel() {
+      let dataForExcel = [];
+      let filters = {
+        fechaEmision: "",
+        nombreDocumento: "",
+        numeroCbte: "",
+        razonSocial: "",
+        condicionIva: "",
+        cuit: "",
+        ingBrutos: "",
+        totalIva27: "",
+        totalIva21: "",
+        totalIva10: "",
+        totalIva0: "",
+        totalVenta: "",
+        page: 1,
+        size: 100000,
+        totalPages: 0,
+      };
+      await GenericService(this.tenant, this.service, this.token)
+        .filter(filters)
+        .then((data) => {
+          let ventas = data.data.content;
+          ventas.forEach((el) => {
+            el = this.formatForExcel(el);
+            dataForExcel.push(el);
+          });
+        });
+      return dataForExcel;
+    },
+
+    formatForExcel(invoices) {
+      return invoices;
+    },
+
     notPassSucursalValidations() {
       if (this.loguedUser.sucursal) return false;
+      return true;
+    },
+
+    notPassDateValidations(){
+      if(this.fechaDesde && this.fechaHasta) return false;
       return true;
     },
 
@@ -297,6 +363,9 @@ export default {
       switch (type) {
         case "products":
           error = "Debe seleccionar al menos un producto para este reporte";
+          break;
+        case "fechas":
+          error = "Debe seleccionar las dos fechas para obtener el reporte";
           break;
         default:
           error = "Debe seleccionar una sucursal para realizar el reporte";

@@ -50,6 +50,14 @@ export function promediar(array) {
     return roundTwoDecimals(total / array.length);
 }
 
+export function calculatePositivePercentajeCoefficient(fractionOfValue, value){
+    let result = Number(fractionOfValue) / Number(value) * 100;
+    if(result < 0){
+        result = result * -1;
+    }
+    return roundTwoDecimals(result);
+}
+
 export function roundTwoDecimals(number) {
     return Math.round((number) * 100) / 100;
 }

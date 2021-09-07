@@ -6,6 +6,7 @@
   "
   >
     <TabBar
+     v-if="perfil < 3"
       :tabs="tabs"
       :activeTab="activeTab"
     />
@@ -437,6 +438,7 @@ export default {
             this.marcas.push(data.data);
             return data.data;
           });
+          
       }
     },
 

@@ -398,6 +398,20 @@ export default {
           },
         ],
       },
+       {
+        name: "Ventasfast",
+        title: "Ventasfast",
+        visible: false,
+        icon: "/../images/icons/ventas.svg",
+        childs: [
+          {
+            path: "/ventasfast",
+            name: "ventasfast",
+            title: "Ventasfast",
+            visible: false,
+          },
+        ],
+      },
       {
         name: "calendar",
         title: "Calendar",

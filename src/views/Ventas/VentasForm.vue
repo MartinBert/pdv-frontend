@@ -60,7 +60,7 @@
               <v-row>
                 <v-col cols="8">
                   <v-row>
-                    <v-col cols="6">
+                    <v-col cols="6" >
                       <v-autocomplete
                         @change="
                           getComercialDocuments(
@@ -76,7 +76,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="6" >
                       <v-autocomplete
                         ref="documents"
                         class="button-ventas comprobante"
@@ -88,7 +88,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="6" >
                       <v-autocomplete
                         ref="paymentMethods"
                         class="button-ventas medio-pago"
@@ -101,7 +101,7 @@
                         required
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="6" >
                       <v-autocomplete
                         ref="paymentPlans"
                         class="button-ventas plan-pago"
@@ -112,13 +112,21 @@
                         placeholder="Seleccione un plan de pago"
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" v-if="object.documento && object.documento.nombre === 'Presupuesto'">
-                      <label for="date_input">Fecha de vencimiento de presupuesto</label>
-                      <v-text-field 
-                        id="date_input" 
-                        type="date" 
-                        outlined 
-                        filled 
+                    <v-col
+                      cols="6"
+                      v-if="
+                        object.documento &&
+                          object.documento.nombre === 'Presupuesto'
+                      "
+                    >
+                      <label for="date_input"
+                        >Fecha de vencimiento de presupuesto</label
+                      >
+                      <v-text-field
+                        id="date_input"
+                        type="date"
+                        outlined
+                        filled
                         dense
                         v-model="object.fechaVencimiento"
                       />
@@ -202,7 +210,7 @@
                             <button type="button">
                               <img
                                 src="/../../images/icons/delete.svg"
-                                @click="deleteLine(p.id)"
+                                @click="deleteLine(p)"
                                 width="30"
                                 height="30"
                               />
@@ -229,7 +237,7 @@
               <v-col cols="1">
                 <div class="verticalSeparator"></div>
               </v-col>
-              <v-col cols="10">
+              <v-col cols="10" >
                 <Calculator class="mt-2" />
                 <div style="text-align: center; padding: 1em 0">
                   <h3>
@@ -259,7 +267,10 @@
       v-on:resetListStatus="resetListOfDialog"
       :refreshListStatus="listennerOfListChange"
     />
-    <SearchPresupuestoDialog v-on:selectPresupuesto="selectPresupuesto" :resetPresupuestSearch="resetPresupuestSearch"/>
+    <SearchPresupuestoDialog
+      v-on:selectPresupuesto="selectPresupuesto"
+      :resetPresupuestSearch="resetPresupuestSearch"
+    />
     <v-dialog v-model="dialogIndividualPercent" width="600">
       <v-card>
         <v-card-title class="headline grey lighten-2">
@@ -301,10 +312,8 @@ import {
   decimalPercent,
   roundTwoDecimals,
   transformPositive,
-  calculateAmountMinusPercentaje,
-  calculateAmountPlusPercentaje,
-  calculatePercentReductionInAmount,
   sumarNumeros,
+  calculatePositivePercentajeCoefficient,
 } from "../../helpers/mathHelper";
 import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
@@ -348,14 +357,15 @@ export default {
     processStockResult: [],
     productsWithoutStock: [],
     productsInOtherDeposits: [],
-    lowStock: []
+    lowStock: [],
+    perfil: null
   }),
 
   components: {
     Calculator,
     ProductDialog,
     Spinner,
-    SearchPresupuestoDialog
+    SearchPresupuestoDialog,
   },
 
   created() {
@@ -397,6 +407,7 @@ export default {
   },
 
   mounted() {
+    this.perfil = this.loguedUser.perfil;
     this.$store.commit("productos/resetStates");
     this.tenant = this.$route.params.tenant;
     this.getObjects();
@@ -487,27 +498,27 @@ export default {
             databaseItem.cantUnidades = 1;
             databaseItem.total = databaseItem.precioTotal;
             this.products.push(this.processProductsObject(databaseItem));
-            this.productsDescription.push(
-              {
-                name: databaseItem.nombre,
-                barCode: databaseItem.codigoBarra,
-                code: databaseItem.codigoProducto,
-                tradeMarkName: databaseItem.marca.nombre,
-                tradeMarkId: databaseItem.marca.id,
-                rubroName: databaseItem.rubro.nombre,
-                rubroId: databaseItem.rubro.id,
-                attributes: databaseItem.atributos,
-                properties: databaseItem.propiedades,
-                quantity: databaseItem.cantUnidades,
-                costPrice: databaseItem.precioCosto,
-                salePrice: databaseItem.precioTotal,
-                buyIvaPercent: databaseItem.ivaComprasObject.porcentaje,
-                saleIvaPercent: databaseItem.ivaVentasObject.porcentaje,
-                buyIvaAmount: databaseItem.ivaCompra,
-                saleIvaAmount: databaseItem.ivaVenta,
-                providerData: databaseItem.proveedores ? databaseItem.proveedores : [],
-              }
-            )
+            this.productsDescription.push({
+              name: databaseItem.nombre,
+              barCode: databaseItem.codigoBarra,
+              code: databaseItem.codigoProducto,
+              tradeMarkName: databaseItem.marca.nombre,
+              tradeMarkId: databaseItem.marca.id,
+              rubroName: databaseItem.rubro.nombre,
+              rubroId: databaseItem.rubro.id,
+              attributes: databaseItem.atributos,
+              properties: databaseItem.propiedades,
+              quantity: databaseItem.cantUnidades,
+              costPrice: databaseItem.precioCosto,
+              salePrice: databaseItem.precioTotal,
+              buyIvaPercent: databaseItem.ivaComprasObject.porcentaje,
+              saleIvaPercent: databaseItem.ivaVentasObject.porcentaje,
+              buyIvaAmount: databaseItem.ivaCompra,
+              saleIvaAmount: databaseItem.ivaVenta,
+              providerData: databaseItem.proveedores
+                ? databaseItem.proveedores
+                : [],
+            });
           } else {
             if (
               this.products.filter((el) => el.id === databaseItem.id).length > 0
@@ -530,35 +541,35 @@ export default {
               )[0].precioTotal =
                 this.productsDescription.filter(
                   (el) => el.barCode === databaseItem.codigoBarra
-                )[0]
-                  .precioUnitario *
-                this.productsDescription.filter((el) => el.barCode === databaseItem.codigoBarra)[0]
-                  .quantity;
+                )[0].precioUnitario *
+                this.productsDescription.filter(
+                  (el) => el.barCode === databaseItem.codigoBarra
+                )[0].quantity;
             } else {
               databaseItem.cantUnidades = 1;
               databaseItem.total = databaseItem.precioTotal;
               this.products.push(this.processProductsObject(databaseItem));
-              this.productsDescription.push(
-                {
-                  name: databaseItem.nombre,
-                  barCode: databaseItem.codigoBarra,
-                  code: databaseItem.codigoProducto,
-                  tradeMarkName: databaseItem.marca.nombre,
-                  tradeMarkId: databaseItem.marca.id,
-                  rubroName: databaseItem.rubro.nombre,
-                  rubroId: databaseItem.rubro.id,
-                  attributes: databaseItem.atributos,
-                  properties: databaseItem.propiedades,
-                  quantity: databaseItem.cantUnidades,
-                  costPrice: databaseItem.precioCosto,
-                  salePrice: databaseItem.precioTotal,
-                  buyIvaPercent: databaseItem.ivaComprasObject.porcentaje,
-                  saleIvaPercent: databaseItem.ivaVentasObject.porcentaje,
-                  buyIvaAmount: databaseItem.ivaCompra,
-                  saleIvaAmount: databaseItem.ivaVenta,
-                  providerData: databaseItem.proveedores ? databaseItem.proveedores : [],
-                }
-              )
+              this.productsDescription.push({
+                name: databaseItem.nombre,
+                barCode: databaseItem.codigoBarra,
+                code: databaseItem.codigoProducto,
+                tradeMarkName: databaseItem.marca.nombre,
+                tradeMarkId: databaseItem.marca.id,
+                rubroName: databaseItem.rubro.nombre,
+                rubroId: databaseItem.rubro.id,
+                attributes: databaseItem.atributos,
+                properties: databaseItem.propiedades,
+                quantity: databaseItem.cantUnidades,
+                costPrice: databaseItem.precioCosto,
+                salePrice: databaseItem.precioTotal,
+                buyIvaPercent: databaseItem.ivaComprasObject.porcentaje,
+                saleIvaPercent: databaseItem.ivaVentasObject.porcentaje,
+                buyIvaAmount: databaseItem.ivaCompra,
+                saleIvaAmount: databaseItem.ivaVenta,
+                providerData: databaseItem.proveedores
+                  ? databaseItem.proveedores
+                  : [],
+              });
             }
           }
         })
@@ -624,22 +635,23 @@ export default {
     },
 
     getPaymentPlans(paymentMethod) {
-      console.log(paymentMethod.planPago);
       this.databaseItems.planes = paymentMethod.planPago;
     },
 
     selectPresupuesto(presupuesto) {
-      presupuesto.productos.forEach(el => {
+      presupuesto.productos.forEach((el) => {
         el.total = el.precioTotal;
         el.editable = true;
-      })
-      this.getComercialDocuments(presupuesto.cliente.condicionIva.documentos, this.loguedUser.sucursal.condicionIva.documentos);
+      });
+      this.getComercialDocuments(
+        presupuesto.cliente.condicionIva.documentos,
+        this.loguedUser.sucursal.condicionIva.documentos
+      );
       this.getPaymentPlans(presupuesto.mediosPago[0]);
       this.object = presupuesto;
       this.object.mediosPago = presupuesto.mediosPago[0];
       this.object.planPago = presupuesto.planesPago[0];
       this.products = presupuesto.productos;
-      console.log(this.object)
     },
 
     /******************************************************************************************************/
@@ -656,7 +668,9 @@ export default {
       return this.products.reduce((acc, el) => {
         if (el.id == id) {
           el.precioTotal = acc;
-          el.precioTotal = parseFloat(el.precioUnitario) * el.cantUnidades;
+          el.precioTotal = roundTwoDecimals(
+            parseFloat(el.precioUnitario) * el.cantUnidades
+          );
         }
       }, 0);
     },
@@ -685,20 +699,26 @@ export default {
       return object;
     },
 
-    deleteLine(id) {
+    deleteLine(product) {
+      const {id, codigoBarra} = product;
       const filter = this.products.filter((el) => el.id !== id);
       const filterForStore = this.products.filter((el) => el.id === id)[0].id;
+      const filterForProductsDescription = this.productsDescription.filter(el => el.barCode !== codigoBarra);
+      const filterForProductsDetail = this.productsDetail.filter(el => el.id !== id);
       this.products = filter;
+      this.productsDescription = filterForProductsDescription;
+      this.productsDetail = filterForProductsDetail;
       this.$store.commit("productos/removeProductsToList", filterForStore);
       this.listennerOfListChange = id;
     },
 
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
-        let percent = calculatePercentaje(
-          this.totalVenta,
-          priceModificationPorcent
+        const total = this.productsDescription.reduce(
+          (acc, el) => acc + el.salePrice,
+          0
         );
+        let percent = calculatePercentaje(total, priceModificationPorcent);
         if (modificator === "descuento") {
           if (Math.sign(percent) === 1) {
             percent = percent * -1;
@@ -760,12 +780,6 @@ export default {
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
           editable: false,
         };
-        this.productsDescription.filter(
-          (el) => el.barCode === this.renglon.codigoBarra
-        )[0].discountPercent = Number(percent) * -1;
-        this.productsDescription.filter(
-          (el) => el.barCode === this.renglon.codigoBarra
-        )[0].discountAmount = Number(object.precioTotal) * -1;
       } else {
         object = {
           id: this.products.length + 1,
@@ -780,12 +794,6 @@ export default {
           precioTotal: calculatePercentaje(this.renglon.precioTotal, percent),
           editable: false,
         };
-        this.productsDescription.filter(
-          (el) => el.barCode === this.renglon.codigoBarra
-        )[0].surchargePercent = Number(percent);
-        this.productsDescription.filter(
-          (el) => el.barCode === this.renglon.codigoBarra
-        )[0].surchargeAmount = Number(object.precioTotal);
       }
       this.products.push(object);
       this.dialogIndividualPercent = false;
@@ -988,9 +996,9 @@ export default {
             this.save();
           }
         } else {
-          if(documento.presupuesto === true){
+          if (documento.presupuesto === true) {
             this.savePresupuesto();
-          }else{
+          } else {
             this.saveNoFiscal();
           }
         }
@@ -1010,25 +1018,21 @@ export default {
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
       const productsDetail = this.productsDetail;
-      const productsDescription = this.productsDescription;
       const documento = this.object.documento;
       const empresa = this.loguedUser.empresa;
       const cliente = this.object.cliente;
       const mediosPago = this.object.mediosPago;
-      const planesPago = this.object.planPago;
       const totalVenta = this.totalVenta;
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
-      const condVenta = this.checkSaleCondition(planesPago);
+      const planPago = this.object.planPago;
+      const condVenta = this.checkSaleCondition(planPago);
       let comprobante;
       let file;
       let fileURL;
       let invoice;
-      let planPercentDiscount;
-      let planPercentSurcharge;
-      let planAmountDiscount = 0;
-      let planAmountSurcharge = 0;
+
       /*** Get last invoice emmited number ***/
       axios
         .get(
@@ -1050,8 +1054,6 @@ export default {
           /*** Evaluate required sale form data ***/
           if (mediosPago !== undefined) {
             if (products.length > 0) {
-              checkChangesInPrice();
-
               /*** Send invoice to AFIP ***/
               axios
                 .post(
@@ -1068,241 +1070,100 @@ export default {
                     cae +
                     formatDateWithoutSlash(dateOfCaeExpiration);
 
-                  productsDescription.forEach((product) => {
-                    if (!product.surchargeAmount) {
-                      product.surchargeAmount = 0;
-                      product.surchargePercent = 0;
-                    }
-                    if (!product.discountAmount) {
-                      product.discountAmount = 0;
-                      product.discountPercent = 0;
-                    }
-                  });
+                  this.calculateRelevantAmountsOfInvoice().then(
+                    ({
+                      total,
+                      subTotal,
+                      amountOfIva21,
+                      amountOfIva10,
+                      amountOfIva27,
+                      totalOfIvas,
+                      totalOfDiscounts,
+                      totalOfSurcharges,
+                      planPercentSurcharge,
+                      planPercentDiscount,
+                      planAmountSurcharge,
+                      planAmountDiscount,
+                    }) => {
+                      // Create receipt
+                      comprobante = {
+                        letra: documento.letra,
+                        numeroCbte:
+                          addZerosInString("04", ptoVenta.idFiscal) +
+                          "-" +
+                          addZerosInString("08", numberOfReceipt),
+                        fechaEmision: formatDate(getCurrentDate()),
+                        fechaVto: formatDate(dateOfCaeExpiration),
+                        correlativoComprobante: numberOfReceipt,
+                        condicionVenta: condVenta,
+                        productos: products,
+                        productosDetalle: productsDetail,
+                        productoDescription: this.productsDescription,
+                        barCode: barCode,
+                        cae: cae,
+                        logoUrl: this.loguedUser.sucursal.logo,
+                        puntoVenta: ptoVenta,
+                        sucursal: sucursal,
+                        documentoComercial: documento,
+                        empresa: empresa,
+                        cliente: cliente,
+                        totalVenta: total,
+                        subTotal: subTotal,
+                        totalDescuentoGlobal: this.descuentoGlobal,
+                        totalRecargoGlobal: this.recargoGlobal,
+                        porcentajeDescuentoGlobal: this
+                          .porcentajeDescuentoGlobal,
+                        porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                        totalIva21: amountOfIva21,
+                        totalIva10: amountOfIva10,
+                        totalIva27: amountOfIva27,
+                        totalIvas: totalOfIvas,
+                        totalDescuentos: totalOfDiscounts,
+                        totalRecargos: totalOfSurcharges,
+                        porcentajeRecargoPlan: planPercentSurcharge,
+                        porcentajeDescuentoPlan: planPercentDiscount,
+                        totalDescuentoPlan: roundTwoDecimals(
+                          planAmountDiscount
+                        ),
+                        totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+                        mediosPago: [mediosPago],
+                        planesPago: [planPago],
+                        nombreDocumento: documento.nombre,
+                      };
 
-                  if (planesPago.porcentaje > 0) {
-                    planPercentDiscount = 0;
-                    planPercentSurcharge = planesPago.porcentaje;
-                    const totalSumOfProductPrices = productsDescription.reduce(
-                      (acc, product) => acc + product.salePrice,
-                      0
-                    );
-                    planAmountSurcharge =
-                      calculateAmountPlusPercentaje(
-                        totalSumOfProductPrices,
-                        planPercentSurcharge
-                      ) - totalSumOfProductPrices;
-                  } else {
-                    planPercentDiscount = transformPositive(
-                      planesPago.porcentaje
-                    );
-                    planPercentSurcharge = 0;
-                    const totalSumOfProductPrices = productsDescription.reduce(
-                      (acc, product) => acc + product.salePrice,
-                      0
-                    );
-                    planAmountDiscount =
-                      totalSumOfProductPrices -
-                      calculateAmountMinusPercentaje(
-                        totalSumOfProductPrices,
-                        planPercentDiscount
-                      );
-                  }
-
-                  const productsWithIva21 = productsDescription.filter(
-                    (el) => el.saleIvaPercent === 21
-                  );
-                  const productsWithIva10 = productsDescription.filter(
-                    (el) => el.saleIvaPercent === 10.5
-                  );
-                  const productsWithIva27 = productsDescription.filter(
-                    (el) => el.saleIvaPercent === 27
-                  );
-
-                  const amountOfIva21 = productsWithIva21.reduce(
-                    (acc, product) => {
-                      const salePriceWithPlanDiscountAndSurcharge =
-                        calculateAmountPlusPercentaje(
-                          product.salePrice,
-                          planPercentSurcharge
-                        ) -
-                        (product.salePrice -
-                        calculateAmountMinusPercentaje(
-                          product.salePrice,
-                          planPercentDiscount
-                        ));
-                      const salePriceWithLineDiscountAndSurcharge =
-                        salePriceWithPlanDiscountAndSurcharge +
-                        product.surchargeAmount -
-                        product.discountAmount;
-                      const salePriceWithDiscountAndSurcharge =
-                        calculateAmountMinusPercentaje(
-                          salePriceWithLineDiscountAndSurcharge,
-                          this.porcentajeRecargoGlobal
-                        ) -
-                        (salePriceWithLineDiscountAndSurcharge -
-                          calculateAmountMinusPercentaje(
-                            salePriceWithLineDiscountAndSurcharge,
-                            this.porcentajeDescuentoGlobal
-                          ));
-                      acc +=
-                        salePriceWithDiscountAndSurcharge -
-                        calculatePercentReductionInAmount(
-                          salePriceWithDiscountAndSurcharge,
-                          21
-                        );
-                      return roundTwoDecimals(acc);
-                    },
-                    0
-                  );
-                  const amountOfIva10 = productsWithIva10.reduce(
-                    (acc, product) => {
-                      const salePriceWithPlanDiscountAndSurcharge =
-                        calculateAmountPlusPercentaje(
-                          product.salePrice,
-                          planPercentSurcharge
-                        ) -
-                        (product.salePrice -
-                        calculateAmountMinusPercentaje(
-                          product.salePrice,
-                          planPercentDiscount
-                        ));
-                      const salePriceWithLineDiscountAndSurcharge =
-                        salePriceWithPlanDiscountAndSurcharge +
-                        product.surchargeAmount -
-                        product.discountAmount;
-                      const salePriceWithDiscountAndSurcharge =
-                        calculateAmountMinusPercentaje(
-                          salePriceWithLineDiscountAndSurcharge,
-                          this.porcentajeRecargoGlobal
-                        ) -
-                        (salePriceWithLineDiscountAndSurcharge -
-                          calculateAmountMinusPercentaje(
-                            salePriceWithLineDiscountAndSurcharge,
-                            this.porcentajeDescuentoGlobal
-                          ));
-                      acc +=
-                        salePriceWithDiscountAndSurcharge -
-                        calculatePercentReductionInAmount(
-                          salePriceWithDiscountAndSurcharge,
-                          10.5
-                        );
-                      return roundTwoDecimals(acc);
-                    },
-                    0
-                  );
-                  const amountOfIva27 = productsWithIva27.reduce(
-                    (acc, product) => {
-                      const salePriceWithPlanDiscountAndSurcharge =
-                        calculateAmountPlusPercentaje(
-                          product.salePrice,
-                          planPercentSurcharge
-                        ) -
-                        (product.salePrice -
-                        calculateAmountMinusPercentaje(
-                          product.salePrice,
-                          planPercentDiscount
-                        ));
-                      const salePriceWithLineDiscountAndSurcharge =
-                        salePriceWithPlanDiscountAndSurcharge +
-                        product.surchargeAmount -
-                        product.discountAmount;
-                      const salePriceWithDiscountAndSurcharge =
-                        calculateAmountMinusPercentaje(
-                          salePriceWithLineDiscountAndSurcharge,
-                          this.porcentajeRecargoGlobal
-                        ) -
-                        (salePriceWithLineDiscountAndSurcharge -
-                          calculateAmountMinusPercentaje(
-                            salePriceWithLineDiscountAndSurcharge,
-                            this.porcentajeDescuentoGlobal
-                          ));
-                      acc +=
-                        salePriceWithDiscountAndSurcharge -
-                        calculatePercentReductionInAmount(
-                          salePriceWithDiscountAndSurcharge,
-                          27
-                        );
-                      return roundTwoDecimals(acc);
-                    },
-                    0
-                  );
-
-                  const totalIvas = amountOfIva21 + amountOfIva10 + amountOfIva27;
-                  const totalDiscounts = this.descuentoGlobal + planAmountDiscount;
-                  const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
-                  const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
-                  const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
-
-                  // Create receipt
-                  comprobante = {
-                    letra: documento.letra,
-                    numeroCbte:
-                      addZerosInString("04", ptoVenta.idFiscal) +
-                      "-" +
-                      addZerosInString("08", numberOfReceipt),
-                    fechaEmision: formatDate(getCurrentDate()),
-                    fechaVto: formatDate(dateOfCaeExpiration),
-                    correlativoComprobante: numberOfReceipt,
-                    condicionVenta: condVenta,
-                    productos: products,
-                    productosDetalle: productsDetail,
-                    productoDescription: productsDescription,
-                    barCode: barCode,
-                    cae: cae,
-                    logoUrl: this.loguedUser.sucursal.logo,
-                    puntoVenta: ptoVenta,
-                    sucursal: sucursal,
-                    documentoComercial: documento,
-                    empresa: empresa,
-                    cliente: cliente,
-                    totalVenta: totalVenta,
-                    subTotal: subTotal,
-                    totalDescuentoGlobal: this.descuentoGlobal,
-                    totalRecargoGlobal: this.recargoGlobal,
-                    porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-                    porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-                    totalIva21: amountOfIva21,
-                    totalIva10: amountOfIva10,
-                    totalIva27: amountOfIva27,
-                    porcentajeRecargoPlan: planPercentSurcharge,
-                    porcentajeDescuentoPlan: planPercentDiscount,
-                    totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-                    totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-                    mediosPago: [mediosPago],
-                    planesPago: [planesPago],
-                    nombreDocumento: documento.nombre,
-                  };
-                  if(this.object.id){
-                    comprobante.id = this.object.id;
-                  }
-
-                  /*** Save receipt in database and print invoice ***/
-                  if (comprobante.cae) {
-                    GenericService(tenant, "comprobantesFiscales", token)
-                      .save(comprobante)
-                      .then(() => {
-                        ReportsService(tenant, service, token)
-                          .onCloseSaleReport(comprobante)
-                          .then((res) => {
-                            file = new Blob([res["data"]], {
-                              type: "application/pdf",
-                            });
-                            fileURL = URL.createObjectURL(file);
-                            window.open(fileURL, "_blank");
-                          });
-                      })
-                      .then(() => {
-                        this.applyStockModifications(comprobante)
-                      });
-                  } else {
-                    this.$errorAlert("Tipo de comprobante no disponible").then(
-                      (result) => {
-                        if (result.isDismissed) {
-                          this.loaded = true;
-                        }
+                      if (this.object.id) {
+                        comprobante.id = this.object.id;
                       }
-                    );
-                  }
+
+                      /*** Save receipt in database and print invoice ***/
+                      if (comprobante.cae) {
+                        GenericService(tenant, "comprobantesFiscales", token)
+                          .save(comprobante)
+                          .then(() => {
+                            ReportsService(tenant, service, token)
+                              .onCloseSaleReport(comprobante)
+                              .then((res) => {
+                                file = new Blob([res["data"]], {
+                                  type: "application/pdf",
+                                });
+                                fileURL = URL.createObjectURL(file);
+                                window.open(fileURL, "_blank");
+                              });
+                          })
+                          .then(() => {
+                            this.applyStockModifications(comprobante);
+                          });
+                      } else {
+                        this.$errorAlert(
+                          "Tipo de comprobante no disponible"
+                        ).then((result) => {
+                          if (result.isDismissed) {
+                            this.loaded = true;
+                          }
+                        });
+                      }
+                    }
+                  );
                 })
                 .catch((err) => {
                   console.log(
@@ -1330,50 +1191,11 @@ export default {
             );
           }
         });
-
-      const checkChangesInPrice = () => {
-        productsDescription.forEach((productDescription) => {
-          if (planesPago.porcentaje < 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.discountAmount =
-              productDescription.discountAmount +
-              (productDescription.salePrice -
-                calculateAmountMinusPercentaje(
-                  productDescription.salePrice,
-                  paymentPlanVariationPercent
-                ));
-            productDescription.discountPercent = sumarNumeros([
-              productDescription.discountPercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else if (planesPago.porcentaje > 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.surchargeAmount =
-              productDescription.surchargeAmount +
-              (calculateAmountPlusPercentaje(
-                productDescription.salePrice,
-                paymentPlanVariationPercent
-              ) -
-                productDescription.salePrice);
-            productDescription.surchargePercent = sumarNumeros([
-              productDescription.surchargePercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else {
-            console.log("Not price modifications detected");
-          }
-        });
-      };
     },
 
     saveNoFiscal() {
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
-      const totalVenta = this.totalVenta;
       const cliente = this.object.cliente;
       const empresa = this.loguedUser.empresa;
       const documento = this.object.documento;
@@ -1385,303 +1207,122 @@ export default {
       const fecha = this.fecha;
       const tenant = this.tenant;
       const token = this.token;
-      const service = this.service;
       const condVenta = this.checkSaleCondition(planesPago);
+      const service = this.service;
       let file;
       let fileURL;
       let comprobante;
-      let planPercentDiscount;
-      let planPercentSurcharge;
-      let planAmountDiscount = 0;
-      let planAmountSurcharge = 0;
-      const checkChangesInPrice = () => {
-        productsDescription.forEach((productDescription) => {
-          if (planesPago.porcentaje < 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.discountAmount =
-              productDescription.discountAmount +
-              (productDescription.salePrice -
-                calculateAmountMinusPercentaje(
-                  productDescription.salePrice,
-                  paymentPlanVariationPercent
-                ));
-            productDescription.discountPercent = sumarNumeros([
-              productDescription.discountPercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else if (planesPago.porcentaje > 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.surchargeAmount =
-              productDescription.surchargeAmount +
-              (calculateAmountPlusPercentaje(
-                productDescription.salePrice,
-                paymentPlanVariationPercent
-              ) -
-                productDescription.salePrice);
-            productDescription.surchargePercent = sumarNumeros([
-              productDescription.surchargePercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else {
-            console.log("Not price modifications detected");
-          }
-        });
-      };
-      checkChangesInPrice();
 
-      productsDescription.forEach((product) => {
-        if (!product.surchargeAmount) {
-          product.surchargeAmount = 0;
-          product.surchargePercent = 0;
-        }
-        if (!product.discountAmount) {
-          product.discountAmount = 0;
-          product.discountPercent = 0;
-        }
-      });
-
-      if (planesPago.porcentaje > 0) {
-        planPercentDiscount = 0;
-        planPercentSurcharge = planesPago.porcentaje;
-        const totalSumOfProductPrices = productsDescription.reduce(
-          (acc, product) => acc + product.salePrice,
-          0
-        );
-        planAmountSurcharge =
-          calculateAmountPlusPercentaje(
-            totalSumOfProductPrices,
-            planPercentSurcharge
-          ) - totalSumOfProductPrices;
-      } else {
-        planPercentDiscount = transformPositive(
-          planesPago.porcentaje
-        );
-        planPercentSurcharge = 0;
-        const totalSumOfProductPrices = productsDescription.reduce(
-          (acc, product) => acc + product.salePrice,
-          0
-        );
-        planAmountDiscount =
-          totalSumOfProductPrices -
-          calculateAmountMinusPercentaje(
-            totalSumOfProductPrices,
-            planPercentDiscount
-          );
-      }
-
-      const productsWithIva21 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 21
-      );
-      const productsWithIva10 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 10.5
-      );
-      const productsWithIva27 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 27
-      );
-
-      const amountOfIva21 = productsWithIva21.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              21
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-      const amountOfIva10 = productsWithIva10.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              10.5
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-      const amountOfIva27 = productsWithIva27.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              27
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-
-      const totalIvas = amountOfIva21 + amountOfIva10 + amountOfIva27;
-      const totalDiscounts = this.descuentoGlobal + planAmountDiscount;
-      const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
-      const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
-      const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
       VentasService(tenant, "ventas", token)
-      .getPreviousCorrelativeDocumentNumber(sucursal.id, documento.codigoDocumento)
-      .then(data => {
-        const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
-        comprobante = {
-          letra: "X",
-          numeroCbte:
-            addZerosInString("04", ptoVenta.idFiscal) +
-            "-" +
-            addZerosInString("08", numeroCorrelativoDeComprobante),
-          correlativoComprobante: numeroCorrelativoDeComprobante,
-          fechaEmision: formatDate(fecha),
-          fechaVto: formatDate(fecha),
-          condicionVenta: condVenta,
-          productos: products,
-          productosDetalle: productsDetail,
-          productoDescription: productsDescription,
-          barCode: generateBarCode(),
-          cae: "",
-          logoUrl: this.loguedUser.sucursal.logo,
-          puntoVenta: ptoVenta,
-          sucursal: sucursal,
-          documentoComercial: documento,
-          empresa: empresa,
-          cliente: cliente,
-          totalVenta: totalVenta,
-          subTotal: subTotal,
-          totalDescuentoGlobal: this.descuentoGlobal,
-          totalRecargoGlobal: this.recargoGlobal,
-          porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-          porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-          totalIva21: amountOfIva21,
-          totalIva10: amountOfIva10,
-          totalIva27: amountOfIva27,
-          porcentajeRecargoPlan: planPercentSurcharge,
-          porcentajeDescuentoPlan: planPercentDiscount,
-          totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-          totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-          mediosPago: [mediosPago],
-          planesPago: [planesPago],
-          nombreDocumento: documento.nombre,
-        };
-        /*** Evaluate required sale form data ***/
-        if (comprobante.mediosPago[0] !== undefined) {
-          if (Number(comprobante.totalVenta) !== 0) {
-            /*** Save receipt in database and print ticket ***/
-            GenericService(tenant, "comprobantesFiscales", token)
-              .save(comprobante)
-              .then(() => {
-                ReportsService(tenant, service, token)
-                  .onCloseSaleReport(comprobante)
-                  .then((res) => {
-                    file = new Blob([res["data"]], {
-                      type: "application/pdf",
+        .getPreviousCorrelativeDocumentNumber(
+          sucursal.id,
+          documento.codigoDocumento
+        )
+        .then((data) => {
+          const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
+          this.calculateRelevantAmountsOfInvoice().then(
+            ({
+              total,
+              subTotal,
+              amountOfIva21,
+              amountOfIva10,
+              amountOfIva27,
+              totalOfIvas,
+              totalOfDiscounts,
+              totalOfSurcharges,
+              planPercentSurcharge,
+              planPercentDiscount,
+              planAmountSurcharge,
+              planAmountDiscount,
+            }) => {
+              comprobante = {
+                letra: "X",
+                numeroCbte:
+                  addZerosInString("04", ptoVenta.idFiscal) +
+                  "-" +
+                  addZerosInString("08", numeroCorrelativoDeComprobante),
+                correlativoComprobante: numeroCorrelativoDeComprobante,
+                fechaEmision: formatDate(fecha),
+                fechaVto: formatDate(fecha),
+                condicionVenta: condVenta,
+                productos: products,
+                productosDetalle: productsDetail,
+                productoDescription: productsDescription,
+                barCode: generateBarCode(),
+                cae: "",
+                logoUrl: this.loguedUser.sucursal.logo,
+                puntoVenta: ptoVenta,
+                sucursal: sucursal,
+                documentoComercial: documento,
+                empresa: empresa,
+                cliente: cliente,
+                totalDescuentoGlobal: this.descuentoGlobal,
+                totalRecargoGlobal: this.recargoGlobal,
+                porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+                porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                totalVenta: total,
+                subTotal: subTotal,
+                totalIva21: amountOfIva21,
+                totalIva10: amountOfIva10,
+                totalIva27: amountOfIva27,
+                totalIvas: totalOfIvas,
+                totalDescuentos: totalOfDiscounts,
+                totalRecargos: totalOfSurcharges,
+                porcentajeRecargoPlan: planPercentSurcharge,
+                porcentajeDescuentoPlan: planPercentDiscount,
+                totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+                totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+                mediosPago: [mediosPago],
+                planesPago: [planesPago],
+                nombreDocumento: documento.nombre,
+              };
+
+              /*** Evaluate required sale form data ***/
+              if (comprobante.mediosPago[0] !== undefined) {
+                if (Number(comprobante.totalVenta) !== 0) {
+                  /*** Save receipt in database and print ticket ***/
+                  GenericService(tenant, "comprobantesFiscales", token)
+                    .save(comprobante)
+                    .then(() => {
+                      ReportsService(tenant, service, token)
+                        .onCloseSaleReport(comprobante)
+                        .then((res) => {
+                          file = new Blob([res["data"]], {
+                            type: "application/pdf",
+                          });
+                          fileURL = URL.createObjectURL(file);
+                          window.open(fileURL, "_blank");
+                        })
+                        .then(() => {
+                          this.applyStockModifications(comprobante);
+                        });
                     });
-                    fileURL = URL.createObjectURL(file);
-                    window.open(fileURL, "_blank");
-                  })
-                  .then(() => {
-                    this.applyStockModifications(comprobante)
+                } else {
+                  this.$errorAlert(
+                    "No hay productos seleccionados en la venta"
+                  ).then((result) => {
+                    if (result.isDismissed) {
+                      this.loaded = true;
+                    }
                   });
-              });
-          } else {
-            this.$errorAlert("No hay productos seleccionados en la venta").then(
-              (result) => {
-                if (result.isDismissed) {
-                  this.loaded = true;
                 }
+              } else {
+                this.$errorAlert("Debe seleccionar un medio de pago").then(
+                  (result) => {
+                    if (result.isDismissed) {
+                      this.loaded = true;
+                    }
+                  }
+                );
               }
-            );
-          }
-        } else {
-          this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
-            if (result.isDismissed) {
-              this.loaded = true;
             }
-          });
-        }
-      })
+          );
+        });
     },
 
-    savePresupuesto(){
+    savePresupuesto() {
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
-      const totalVenta = this.totalVenta;
       const cliente = this.object.cliente;
       const empresa = this.loguedUser.empresa;
       const documento = this.object.documento;
@@ -1699,428 +1340,545 @@ export default {
       let file;
       let fileURL;
       let comprobante;
-      let planPercentDiscount;
-      let planPercentSurcharge;
-      let planAmountDiscount = 0;
-      let planAmountSurcharge = 0;
-      const checkChangesInPrice = () => {
-        productsDescription.forEach((productDescription) => {
-          if (planesPago.porcentaje < 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.discountAmount =
-              productDescription.discountAmount +
-              (productDescription.salePrice -
-                calculateAmountMinusPercentaje(
-                  productDescription.salePrice,
-                  paymentPlanVariationPercent
-                ));
-            productDescription.discountPercent = sumarNumeros([
-              productDescription.discountPercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else if (planesPago.porcentaje > 0) {
-            const paymentPlanVariationPercent = transformPositive(
-              planesPago.porcentaje
-            );
-            productDescription.surchargeAmount =
-              productDescription.surchargeAmount +
-              (calculateAmountPlusPercentaje(
-                productDescription.salePrice,
-                paymentPlanVariationPercent
-              ) -
-                productDescription.salePrice);
-            productDescription.surchargePercent = sumarNumeros([
-              productDescription.surchargePercent,
-              paymentPlanVariationPercent,
-            ]);
-          } else {
-            console.log("Not price modifications detected");
-          }
-        });
-      };
-      checkChangesInPrice();
-
-      productsDescription.forEach((product) => {
-        if (!product.surchargeAmount) {
-          product.surchargeAmount = 0;
-          product.surchargePercent = 0;
-        }
-        if (!product.discountAmount) {
-          product.discountAmount = 0;
-          product.discountPercent = 0;
-        }
-      });
-
-      if (planesPago.porcentaje > 0) {
-        planPercentDiscount = 0;
-        planPercentSurcharge = planesPago.porcentaje;
-        const totalSumOfProductPrices = productsDescription.reduce(
-          (acc, product) => acc + product.salePrice,
-          0
-        );
-        planAmountSurcharge =
-          calculateAmountPlusPercentaje(
-            totalSumOfProductPrices,
-            planPercentSurcharge
-          ) - totalSumOfProductPrices;
-      } else {
-        planPercentDiscount = transformPositive(
-          planesPago.porcentaje
-        );
-        planPercentSurcharge = 0;
-        const totalSumOfProductPrices = productsDescription.reduce(
-          (acc, product) => acc + product.salePrice,
-          0
-        );
-        planAmountDiscount =
-          totalSumOfProductPrices -
-          calculateAmountMinusPercentaje(
-            totalSumOfProductPrices,
-            planPercentDiscount
-          );
-      }
-
-      const productsWithIva21 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 21
-      );
-      const productsWithIva10 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 10.5
-      );
-      const productsWithIva27 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 27
-      );
-
-      const amountOfIva21 = productsWithIva21.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              21
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-      const amountOfIva10 = productsWithIva10.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              10.5
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-      const amountOfIva27 = productsWithIva27.reduce(
-        (acc, product) => {
-          const salePriceWithPlanDiscountAndSurcharge =
-            calculateAmountPlusPercentaje(
-              product.salePrice,
-              planPercentSurcharge
-            ) -
-            (product.salePrice -
-            calculateAmountMinusPercentaje(
-              product.salePrice,
-              planPercentDiscount
-            ));
-          const salePriceWithLineDiscountAndSurcharge =
-            salePriceWithPlanDiscountAndSurcharge +
-            product.surchargeAmount -
-            product.discountAmount;
-          const salePriceWithDiscountAndSurcharge =
-            calculateAmountMinusPercentaje(
-              salePriceWithLineDiscountAndSurcharge,
-              this.porcentajeRecargoGlobal
-            ) -
-            (salePriceWithLineDiscountAndSurcharge -
-              calculateAmountMinusPercentaje(
-                salePriceWithLineDiscountAndSurcharge,
-                this.porcentajeDescuentoGlobal
-              ));
-          acc +=
-            salePriceWithDiscountAndSurcharge -
-            calculatePercentReductionInAmount(
-              salePriceWithDiscountAndSurcharge,
-              27
-            );
-          return roundTwoDecimals(acc);
-        },
-        0
-      );
-
-      const totalIvas = amountOfIva21 + amountOfIva10 + amountOfIva27;
-      const totalDiscounts = this.descuentoGlobal + planAmountDiscount;
-      const totalSurcharges = this.recargoGlobal + planAmountSurcharge;
-      const sumOfProductPrices = productsDescription.reduce((acc, product) => acc + product.salePrice, 0);
-      const subTotal = sumOfProductPrices + totalSurcharges - totalIvas - totalDiscounts;
 
       VentasService(tenant, "ventas", token)
-      .getPreviousCorrelativeDocumentNumber(sucursal.id, documento.codigoDocumento)
-      .then(data => {
-        const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
-        comprobante = {
-          letra: "P",
-          numeroCbte:
-            addZerosInString("04", ptoVenta.idFiscal) +
-            "-" +
-            addZerosInString("08", numeroCorrelativoDeComprobante),
-          correlativoComprobante: numeroCorrelativoDeComprobante,
-          fechaEmision: formatDate(fecha),
-          fechaVto: formatDate(fecha),
-          fechaVencimiento,
-          condicionVenta: condVenta,
-          vencido: 'vigente',
-          productos: products,
-          productosDetalle: productsDetail,
-          productoDescription: productsDescription,
-          barCode: generateBarCode(),
-          cae: "",
-          logoUrl: this.loguedUser.sucursal.logo,
-          puntoVenta: ptoVenta,
-          sucursal: sucursal,
-          documentoComercial: documento,
-          empresa: empresa,
-          cliente: cliente,
-          totalVenta: totalVenta,
-          subTotal: subTotal,
-          totalDescuentoGlobal: this.descuentoGlobal,
-          totalRecargoGlobal: this.recargoGlobal,
-          porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-          porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-          totalIva21: amountOfIva21,
-          totalIva10: amountOfIva10,
-          totalIva27: amountOfIva27,
-          porcentajeRecargoPlan: planPercentSurcharge,
-          porcentajeDescuentoPlan: planPercentDiscount,
-          totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-          totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-          mediosPago: [mediosPago],
-          planesPago: [planesPago],
-          nombreDocumento: documento.nombre,
-        };
-        /*** Evaluate required sale form data ***/
-        if (comprobante.mediosPago[0] !== undefined) {
-          if (Number(comprobante.totalVenta) !== 0) {
-            /*** Save receipt in database and print ticket ***/
-            GenericService(tenant, "comprobantesFiscales", token)
-              .save(comprobante)
-              .then(() => {
-                ReportsService(tenant, service, token)
-                  .onCloseSaleReport(comprobante)
-                  .then((res) => {
-                    file = new Blob([res["data"]], {
-                      type: "application/pdf",
+        .getPreviousCorrelativeDocumentNumber(
+          sucursal.id,
+          documento.codigoDocumento
+        )
+        .then((data) => {
+          const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
+
+          this.calculateRelevantAmountsOfInvoice().then(
+            ({
+              total,
+              subTotal,
+              amountOfIva21,
+              amountOfIva10,
+              amountOfIva27,
+              totalOfIvas,
+              totalOfDiscounts,
+              totalOfSurcharges,
+              planPercentSurcharge,
+              planPercentDiscount,
+              planAmountSurcharge,
+              planAmountDiscount,
+            }) => {
+              comprobante = {
+                letra: "P",
+                numeroCbte:
+                  addZerosInString("04", ptoVenta.idFiscal) +
+                  "-" +
+                  addZerosInString("08", numeroCorrelativoDeComprobante),
+                correlativoComprobante: numeroCorrelativoDeComprobante,
+                fechaEmision: formatDate(fecha),
+                fechaVto: formatDate(fecha),
+                fechaVencimiento,
+                condicionVenta: condVenta,
+                vencido: "vigente",
+                productos: products,
+                productosDetalle: productsDetail,
+                productoDescription: productsDescription,
+                barCode: generateBarCode(),
+                cae: "",
+                logoUrl: this.loguedUser.sucursal.logo,
+                puntoVenta: ptoVenta,
+                sucursal: sucursal,
+                documentoComercial: documento,
+                empresa: empresa,
+                cliente: cliente,
+                totalDescuentoGlobal: this.descuentoGlobal,
+                totalRecargoGlobal: this.recargoGlobal,
+                porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+                porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                totalVenta: total,
+                subTotal: subTotal,
+                totalIva21: amountOfIva21,
+                totalIva10: amountOfIva10,
+                totalIva27: amountOfIva27,
+                totalIvas: totalOfIvas,
+                totalDescuentos: totalOfDiscounts,
+                totalRecargos: totalOfSurcharges,
+                porcentajeRecargoPlan: planPercentSurcharge,
+                porcentajeDescuentoPlan: planPercentDiscount,
+                totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+                totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+                mediosPago: [mediosPago],
+                planesPago: [planesPago],
+                nombreDocumento: documento.nombre,
+              };
+              /*** Evaluate required sale form data ***/
+              if (comprobante.mediosPago[0] !== undefined) {
+                if (Number(comprobante.totalVenta) !== 0) {
+                  /*** Save receipt in database and print ticket ***/
+                  GenericService(tenant, "comprobantesFiscales", token)
+                    .save(comprobante)
+                    .then(() => {
+                      ReportsService(tenant, service, token)
+                        .onCloseSaleReport(comprobante)
+                        .then((res) => {
+                          file = new Blob([res["data"]], {
+                            type: "application/pdf",
+                          });
+                          fileURL = URL.createObjectURL(file);
+                          window.open(fileURL, "_blank");
+                        })
+                        .then(() => {
+                          this.$successAlert("Presupuesto generado").then(
+                            () => {
+                              this.clear();
+                              this.loaded = true;
+                            }
+                          );
+                        });
                     });
-                    fileURL = URL.createObjectURL(file);
-                    window.open(fileURL, "_blank");
-                  })
-                  .then(() => {
-                    this.$successAlert("Presupuesto generado")
-                    .then(()=>{
-                      this.clear();
+                } else {
+                  this.$errorAlert(
+                    "No hay productos seleccionados en la venta"
+                  ).then((result) => {
+                    if (result.isDismissed) {
                       this.loaded = true;
-                    })
+                    }
                   });
-              });
-          } else {
-            this.$errorAlert("No hay productos seleccionados en la venta").then(
-              (result) => {
-                if (result.isDismissed) {
-                  this.loaded = true;
                 }
+              } else {
+                this.$errorAlert("Debe seleccionar un medio de pago").then(
+                  (result) => {
+                    if (result.isDismissed) {
+                      this.loaded = true;
+                    }
+                  }
+                );
               }
-            );
-          }
-        } else {
-          this.$errorAlert("Debe seleccionar un medio de pago").then((result) => {
-            if (result.isDismissed) {
-              this.loaded = true;
             }
-          });
-        }
-      })
+          );
+        });
     },
 
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS TO CALCULATE STATUS OF STOCKS IN SALE -----------------------------------------------*/
+    /******************************************************************************************************/
     applyStockModifications(comprobante) {
       comprobante.productos.forEach((product) => {
         StocksService(this.tenant, "stock", this.token)
-        .getStockByProductCodeBarInDefaultDeposit(product.codigoBarra, comprobante.sucursal.id)
-        .then(data => {
-          let stock = data.data;
-          if(stock){
-            stock.cantidad = stock.cantidad - Number(product.cantUnidades);
-            this.saveStockModifications(stock, comprobante.productos.length);
-          }else{
-            StocksService(this.tenant, "stock", this.token)
-            .getStockByProductCodeBarInAnyDeposit(product.codigoBarra, comprobante.sucursal.id)
-            .then(data => {
-              let firstStockDetected = data.data[0];
-              if(firstStockDetected){
-                firstStockDetected.cantidad = firstStockDetected.cantidad - Number(product.cantUnidades);
-                this.saveStockModifications(firstStockDetected, comprobante.productos.length);
-              }else{
-                this.saveStockModifications(product.nombre, comprobante.productos.length);
-              }
-            })
-          }
-        })
-      })
+          .getStockByProductCodeBarInDefaultDeposit(
+            product.codigoBarra,
+            comprobante.sucursal.id
+          )
+          .then((data) => {
+            let stock = data.data;
+            if (stock) {
+              stock.cantidad = stock.cantidad - Number(product.cantUnidades);
+              this.saveStockModifications(stock, comprobante.productos.length);
+            } else {
+              StocksService(this.tenant, "stock", this.token)
+                .getStockByProductCodeBarInAnyDeposit(
+                  product.codigoBarra,
+                  comprobante.sucursal.id
+                )
+                .then((data) => {
+                  let firstStockDetected = data.data[0];
+                  if (firstStockDetected) {
+                    firstStockDetected.cantidad =
+                      firstStockDetected.cantidad -
+                      Number(product.cantUnidades);
+                    this.saveStockModifications(
+                      firstStockDetected,
+                      comprobante.productos.length
+                    );
+                  } else {
+                    this.saveStockModifications(
+                      product.nombre,
+                      comprobante.productos.length
+                    );
+                  }
+                });
+            }
+          });
+      });
     },
 
-    saveStockModifications(stock, processProductsLength){
-        if(typeof(stock) === 'string'){
-          this.productsWithoutStock.push(stock);
-          this.processStockResult.push("success");
-          if(this.processStockResult.length === processProductsLength) {
-            this.endSaleProcess()
-          }
-        }else{
-          if(stock.cantidadMinima && !stock.cantidadMinima.includes("asign") && stock.cantidad < parseFloat(stock.cantidadMinima)){
-            this.lowStock.push(stock.producto.nombre);
-          }
-          if(!stock.deposito.defaultDeposit){
-            this.productsInOtherDeposits.push(stock.producto.nombre)
-          }
-          GenericService(this.tenant, "stock", this.token)
+    saveStockModifications(stock, processProductsLength) {
+      if (typeof stock === "string") {
+        this.productsWithoutStock.push(stock);
+        this.processStockResult.push("success");
+        if (this.processStockResult.length === processProductsLength) {
+          this.endSaleProcess();
+        }
+      } else {
+        if (
+          stock.cantidadMinima &&
+          !stock.cantidadMinima.includes("asign") &&
+          stock.cantidad < parseFloat(stock.cantidadMinima)
+        ) {
+          this.lowStock.push(stock.producto.nombre);
+        }
+        if (!stock.deposito.defaultDeposit) {
+          this.productsInOtherDeposits.push(stock.producto.nombre);
+        }
+        GenericService(this.tenant, "stock", this.token)
           .save(stock)
           .then(() => {
             this.processStockResult.push("success");
-            if(this.processStockResult.length === processProductsLength) {
-              this.endSaleProcess()
+            if (this.processStockResult.length === processProductsLength) {
+              this.endSaleProcess();
             }
           })
-          .catch(err => {
+          .catch((err) => {
             this.$errorAlert("Error al procesar stock");
             this.loaded = true;
             console.error(err);
-          })
-        }
-    },
-
-    endSaleProcess(){
-      if(this.productsWithoutStock.length > 0){
-        this.$infoAlert2(`No existo un registro de stock de estos productos: ${this.productsWithoutStock.reduce((acc, el)=> acc + ', ' + el)}.`)
-        .then(() => {
-          if(this.lowStock.length > 0){
-            this.$infoAlert2(`Productos bajos de stock: ${this.lowStock.reduce((acc, el)=> acc + ', ' + el)}`)
-            .then(() => {
-              if(this.productsInOtherDeposits.length > 0){
-                this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce((acc, el)=> acc + ', ' + el)}. Sus unidades fueron descontadas de otros depósitos.`)
-                .then(() => {
-                  this.$successAlert("Facturación realizada")
-                  .then(()=>{
-                    this.clear()
-                  })
-                })
-              }else{
-                this.$successAlert("Facturación realizada")
-                .then(()=>{
-                  this.clear()
-                })
-              }
-            })
-          }else if(this.productsInOtherDeposits.length > 0){
-            this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce((acc, el)=> acc + ', ' + el)}. Sus unidades fueron descontadas de otros depósitos.`)
-            .then(() => {
-              this.$successAlert("Facturación realizada")
-              .then(()=>{
-                this.clear()
-              })
-            })
-          }else{
-            this.$successAlert("Facturación realizada")
-            .then(()=>{
-              this.clear()
-            })
-          }
-        })
-      }else if(this.lowStock.length > 0){
-        this.$infoAlert2(`Productos bajos de stock: ${this.lowStock.reduce((acc, el)=> acc + ', ' + el)}`)
-        .then(() => {
-          if(this.productsInOtherDeposits.length > 0){
-            this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce((acc, el)=> acc + ', ' + el)}. Sus unidades fueron descontadas de otros depósitos.`)
-            .then(() => {
-              this.$successAlert("Facturación realizada")
-              .then(()=>{
-                this.clear()
-              })
-            })
-          }else{
-            this.$successAlert("Facturación realizada")
-            .then(()=>{
-              this.clear()
-            })
-          }
-        })
-      }else if(this.productsInOtherDeposits.length > 0){
-        this.$infoAlert2(`Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce((acc, el)=> acc + ', ' + el)}. Sus unidades fueron descontadas de otros depósitos.`)
-        .then(() => {
-          this.$successAlert("Facturación realizada")
-          .then(()=>{
-            this.clear()
-          })
-        })
-      }else{
-        this.$successAlert("Facturación realizada")
-        .then(()=>{
-          this.clear()
-        })
+          });
       }
     },
 
+    endSaleProcess() {
+      if (this.productsWithoutStock.length > 0) {
+        this.$infoAlert2(
+          `No existo un registro de stock de estos productos: ${this.productsWithoutStock.reduce(
+            (acc, el) => acc + ", " + el
+          )}.`
+        ).then(() => {
+          if (this.lowStock.length > 0) {
+            this.$infoAlert2(
+              `Productos bajos de stock: ${this.lowStock.reduce(
+                (acc, el) => acc + ", " + el
+              )}`
+            ).then(() => {
+              if (this.productsInOtherDeposits.length > 0) {
+                this.$infoAlert2(
+                  `Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce(
+                    (acc, el) => acc + ", " + el
+                  )}. Sus unidades fueron descontadas de otros depósitos.`
+                ).then(() => {
+                  this.$successAlert("Facturación realizada").then(() => {
+                    this.clear();
+                  });
+                });
+              } else {
+                this.$successAlert("Facturación realizada").then(() => {
+                  this.clear();
+                });
+              }
+            });
+          } else if (this.productsInOtherDeposits.length > 0) {
+            this.$infoAlert2(
+              `Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce(
+                (acc, el) => acc + ", " + el
+              )}. Sus unidades fueron descontadas de otros depósitos.`
+            ).then(() => {
+              this.$successAlert("Facturación realizada").then(() => {
+                this.clear();
+              });
+            });
+          } else {
+            this.$successAlert("Facturación realizada").then(() => {
+              this.clear();
+            });
+          }
+        });
+      } else if (this.lowStock.length > 0) {
+        this.$infoAlert2(
+          `Productos bajos de stock: ${this.lowStock.reduce(
+            (acc, el) => acc + ", " + el
+          )}`
+        ).then(() => {
+          if (this.productsInOtherDeposits.length > 0) {
+            this.$infoAlert2(
+              `Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce(
+                (acc, el) => acc + ", " + el
+              )}. Sus unidades fueron descontadas de otros depósitos.`
+            ).then(() => {
+              this.$successAlert("Facturación realizada").then(() => {
+                this.clear();
+              });
+            });
+          } else {
+            this.$successAlert("Facturación realizada").then(() => {
+              this.clear();
+            });
+          }
+        });
+      } else if (this.productsInOtherDeposits.length > 0) {
+        this.$infoAlert2(
+          `Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce(
+            (acc, el) => acc + ", " + el
+          )}. Sus unidades fueron descontadas de otros depósitos.`
+        ).then(() => {
+          this.$successAlert("Facturación realizada").then(() => {
+            this.clear();
+          });
+        });
+      } else {
+        this.$successAlert("Facturación realizada").then(() => {
+          this.clear();
+        });
+      }
+    },
+
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
+    /******************************************************************************************************/
+    async calculateRelevantAmountsOfInvoice() {
+      const planPago = this.object.planPago;
+      this.productsDescription = await this.restLineDiscounts(
+        this.products,
+        this.productsDescription
+      );
+      this.productsDescription = await this.sumLineSurcharges(
+        this.products,
+        this.productsDescription
+      );
+      this.productsDescription = await this.restGlobalDiscount(
+        this.productsDescription,
+        this.porcentajeDescuentoGlobal
+      );
+      this.productsDescription = await this.sumGlobalSurcharge(
+        this.productsDescription,
+        this.porcentajeRecargoGlobal
+      );
+      this.productsDescription = await this.applyPaymentPlantPercentVariation(
+        this.productsDescription,
+        planPago.porcentaje
+      );
+      this.productsDescription = await this.calculateAmountOfPriceVariations(
+        this.productsDescription
+      );
+      const totalOfDiscounts = await this.calculateTotalOfDiscounts(
+        this.productsDescription
+      );
+      const totalOfSurcharges = await this.calculateTotalOfSurcharges(
+        this.productsDescription
+      );
+      const subTotal = await this.calculateSumOfProductSalePrices(
+        this.productsDescription
+      );
+      const planAmountDiscount =
+        planPercentDiscount > 0
+          ? subTotal * decimalPercent(planPercentDiscount)
+          : 0;
+      const planAmountSurcharge =
+        planPercentSurcharge > 0
+          ? subTotal * decimalPercent(planPercentSurcharge)
+          : 0;
+      const planPercentSurcharge =
+        planPago.porcentaje > 0 ? planPago.porcentaje : 0;
+      const planPercentDiscount =
+        planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
+      this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
+        this.productsDescription
+      );
+      const amountOfIva21 = await this.calculateAmountOfIva21(
+        this.productsDescription
+      );
+      const amountOfIva10 = await this.calculateAmountOfIva10(
+        this.productsDescription
+      );
+      const amountOfIva27 = await this.calculateAmountOfIva27(
+        this.productsDescription
+      );
+      const totalOfIvas = sumarNumeros([
+        amountOfIva21,
+        amountOfIva10,
+        amountOfIva27,
+      ]);
+      const total = subTotal - totalOfDiscounts + totalOfSurcharges;
+
+      return {
+        total,
+        subTotal,
+        amountOfIva21,
+        amountOfIva10,
+        amountOfIva27,
+        totalOfIvas,
+        totalOfDiscounts,
+        totalOfSurcharges,
+        planPercentSurcharge,
+        planPercentDiscount,
+        planAmountSurcharge,
+        planAmountDiscount,
+      };
+    },
+
+    restLineDiscounts(products, productDescriptions) {
+      const discounts = products.filter((el) =>
+        el.nombre.includes("DESCUENTO - ")
+      );
+      discounts.forEach((discount) => {
+        const discountCleanName = discount.nombre.replace("DESCUENTO - ", "");
+        productDescriptions.forEach((prodDescription) => {
+          if (prodDescription.name === discountCleanName) {
+            prodDescription.discountPercent = calculatePositivePercentajeCoefficient(
+              discount.precioTotal,
+              prodDescription.salePrice
+            );
+          }
+        });
+      });
+      return productDescriptions;
+    },
+
+    sumLineSurcharges(products, productDescriptions) {
+      const surcharges = products.filter((el) =>
+        el.nombre.includes("RECARGO - ")
+      );
+      surcharges.forEach((surcharge) => {
+        const surchargeCleanName = surcharge.nombre.replace("RECARGO - ", "");
+        productDescriptions.forEach((prodDescription) => {
+          if (prodDescription.name === surchargeCleanName) {
+            prodDescription.surchargePercent = calculatePositivePercentajeCoefficient(
+              surcharge.precioTotal,
+              prodDescription.salePrice
+            );
+          }
+        });
+      });
+      return productDescriptions;
+    },
+
+    restGlobalDiscount(productsDescription, globalDiscountPercent) {
+      productsDescription.forEach((product) => {
+        if (product.discountPercent) {
+          product.discountPercent += globalDiscountPercent;
+        } else {
+          product.discountPercent = globalDiscountPercent;
+        }
+      });
+      return productsDescription;
+    },
+
+    sumGlobalSurcharge(productsDescription, globalSurchargePercent) {
+      productsDescription.forEach((product) => {
+        if (product.surchargePercent) {
+          product.surchargePercent += globalSurchargePercent;
+        } else {
+          product.surchargePercent = globalSurchargePercent;
+        }
+      });
+      return productsDescription;
+    },
+
+    applyPaymentPlantPercentVariation(productsDescription, planPercent) {
+      if (planPercent < 0)
+        return this.restPlanDiscount(
+          productsDescription,
+          transformPositive(planPercent)
+        );
+      if (planPercent > 0)
+        return this.sumPlanSurcharge(
+          productsDescription,
+          transformPositive(planPercent)
+        );
+      if (planPercent == 0) return productsDescription;
+    },
+
+    restPlanDiscount(productsDescription, planPercent) {
+      productsDescription.forEach((prodDescription) => {
+        prodDescription.discountPercent += planPercent;
+      });
+      return productsDescription;
+    },
+
+    sumPlanSurcharge(productsDescription, planPercent) {
+      productsDescription.forEach((prodDescription) => {
+        prodDescription.surchargePercent += planPercent;
+      });
+      return productsDescription;
+    },
+
+    calculateAmountOfPriceVariations(productsDescription) {
+      productsDescription.forEach((prodDescription) => {
+        prodDescription.discountAmount =
+          prodDescription.salePrice *
+          decimalPercent(prodDescription.discountPercent);
+        prodDescription.surchargeAmount =
+          prodDescription.salePrice *
+          decimalPercent(prodDescription.surchargePercent);
+      });
+      return productsDescription;
+    },
+
+    calculateTotalOfDiscounts(productsDescription) {
+      const discounts = productsDescription.map((el) =>
+        el.discountAmount ? el.discountAmount : 0
+      );
+      const total = sumarNumeros(discounts);
+      return total;
+    },
+
+    calculateTotalOfSurcharges(productsDescription) {
+      const surcharges = productsDescription.map((el) =>
+        el.surchargeAmount ? el.surchargeAmount : 0
+      );
+      const total = sumarNumeros(surcharges);
+      return total;
+    },
+
+    calculateSumOfProductSalePrices(productsDescription) {
+      const total = productsDescription.reduce(
+        (acc, el) => acc + el.salePrice,
+        0
+      );
+      return roundTwoDecimals(total);
+    },
+
+    correctSalePriceAndIvaAmountOfProducts(productsDescription) {
+      productsDescription.forEach((product) => {
+        if (product.saleIvaPercent === 0) {
+          product.saleIvaPercent = 21;
+        }
+        product.salePrice =
+          product.salePrice - product.discountAmount + product.surchargeAmount;
+        product.saleIvaAmount =
+          product.salePrice -
+          product.salePrice / (1 + decimalPercent(product.saleIvaPercent));
+      });
+      return productsDescription;
+    },
+
+    calculateAmountOfIva21(productsDescription) {
+      const productsWithIva21 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 21
+      );
+      const amountOfIva = productsWithIva21.reduce(
+        (acc, el) => acc + el.saleIvaAmount,
+        0
+      );
+      return roundTwoDecimals(amountOfIva);
+    },
+
+    calculateAmountOfIva10(productsDescription) {
+      const productsWithIva10 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 10.5
+      );
+      const amountOfIva = productsWithIva10.reduce(
+        (acc, el) => acc + el.saleIvaAmount,
+        0
+      );
+      return roundTwoDecimals(amountOfIva);
+    },
+
+    calculateAmountOfIva27(productsDescription) {
+      const productsWithIva27 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 27
+      );
+      const amountOfIva = productsWithIva27.reduce(
+        (acc, el) => acc + el.saleIvaAmount,
+        0
+      );
+      return roundTwoDecimals(amountOfIva);
+    },
+
+    /******************************************************************************************************/
+    /* CLEAR SALE FORM DATA ------------------------------------------------------------------------------*/
+    /******************************************************************************************************/
+    clear() {
+      window.location.reload();
+    },
+
+    /******************************************************************************************************/
+    /* CHECK IF SALE CONDITION IS EFFECTIVE --------------------------------------------------------------*/
+    /******************************************************************************************************/
     checkSaleCondition(paymentPlan) {
       let saleCondition;
       if (paymentPlan) {
@@ -2137,21 +1895,6 @@ export default {
         saleCondition = true;
       }
       return saleCondition;
-    },
-
-    /******************************************************************************************************/
-    /* CLEAR SALE FORM DATA ------------------------------------------------------------------------------*/
-    /******************************************************************************************************/
-    clear() {
-      this.object = {};
-      this.products = [];
-      this.modificator = "";
-      this.priceModificationPorcent = 0;
-      this.individualPercent = "";
-      this.listennerOfListChange = 999999999;
-      this.resetPresupuestSearch = true;
-      this.$store.commit("productos/resetStates");
-      this.loaded = true;
     },
 
     /******************************************************************************************************/

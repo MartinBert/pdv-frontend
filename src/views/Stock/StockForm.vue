@@ -276,6 +276,7 @@ import StockReportsDialog from "../../components/Dialogs/StockReportsDialog.vue"
 import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
+import StocksService from '../../services/StocksService';
 //import Error from "../../components/Error";
 export default {
   data: () => ({
@@ -437,7 +438,7 @@ export default {
       }
     },
 
-    save() {
+    async save() {
       this.loaded = false;
       if (this.object.producto.length < 1) {
         this.$errorAlert("No ha seleccionado productos");
@@ -460,31 +461,46 @@ export default {
               this.$router.push({ name: "stock" });
             });
         } else {
-          var stocks = [];
-          this.object.deposito.forEach((ele) => {
-            this.object.producto.forEach((el) => {
-              let obj = {
-                producto: el,
-                deposito: ele,
-                cantidad: this.object.cantidad,
-                cantidadMinima: this.object.cantidadMinima,
-                sucursal: this.loguedUser.sucursal,
-                algorim: el.codigoBarra + ele.id,
-              };
-              stocks.push(obj);
-            });
-          });
+            var stocks = [];
+            for (let ele of this.object.deposito){
+              for (let el of this.object.producto) {
+                const algorim = el.codigoBarra + ele.id;
+                const result = await StocksService(this.tenant, this.service, this.token).getByAlgorim(this.loguedUser.sucursal.id, algorim);
+                let obj;
+                if(result.data){
+                  obj = result.data;
+                  obj.cantidad = this.object.cantidad;
+                  obj.cantidadMinima = this.object.cantidadMinima;
+                  obj.activo = true;
+                  }else{
+                  obj = {
+                    producto: el,
+                    deposito: ele,
+                    cantidad: this.object.cantidad,
+                    cantidadMinima: this.object.cantidadMinima,
+                    sucursal: this.loguedUser.sucursal,
+                    algorim: algorim,
+                    activo: true
+                  };
+                }
+                console.log(obj)
+                stocks.push(obj);
+              }
+            }
+           
+           setTimeout(() => {
+             GenericService(this.tenant, this.service, this.token)
+             .saveAll(stocks)
+             .then(() => {
+               this.saveHistorial(stocks, `Carga de stock`);
+               this.$router.push({ name: "stock" });
+             })
+             .catch(() => {
+               this.errorStatus = true;
+               this.$router.push({ name: "stock" });
+             });
+           }, 500)
 
-          GenericService(this.tenant, this.service, this.token)
-            .saveAll(stocks)
-            .then(() => {
-              this.saveHistorial(stocks, `Carga de stock`);
-              this.$router.push({ name: "stock" });
-            })
-            .catch(() => {
-              this.errorStatus = true;
-              this.$router.push({ name: "stock" });
-            });
         }
       }
     },

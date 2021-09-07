@@ -7,9 +7,10 @@
     <TabBar :tabs="tabs" :activeTab="activeTab" />
     <v-card min-width="100%">
       <VentasTable
+       :items="ventas"
         v-on:print="print"
         v-on:seeDetails="seeDetails"
-        v-if="activeTab === 1"
+         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
       <VentaDetails />
@@ -26,11 +27,25 @@ import VentasTable from "../../components/Tables/VentasTable";
 import VentaDetails from "../../components/Details/VentaDetails";
 export default {
   data: () => ({
+    ventas:[],
+    obj:[],
     icon: "mdi-check-circle",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     loaded: true,
     token: localStorage.getItem("token"),
     tenant: "",
+      filterParams: {
+      blackReceiptFilter: "",
+      barCode:"",
+      numeroCbte:"",
+      fechaEmision: "",
+      comprobanteCerrado: "",
+      numeroComprobante: "",
+      totalVenta: "",
+      page: 1,
+      size: 10,
+      totalPages:0
+    },
     tabs:[
       { id: 1, title: "Comprobantes", route: '/ventas/list' },
       { id: 2, title: "Presupuesto", route: '/ventas/presupuesto' },
@@ -46,8 +61,10 @@ export default {
     VentaDetails,
     TabBar,
   },
-
   mounted() {
+      if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
     this.tenant = this.$route.params.tenant;
     this.$store.commit("eventual/resetStates");
   },
