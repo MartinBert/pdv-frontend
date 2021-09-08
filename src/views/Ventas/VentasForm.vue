@@ -730,7 +730,7 @@ export default {
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
         const total = this.productsDescription.reduce(
-          (acc, el) => acc + el.salePrice,
+          (acc, el) => acc + (el.salePrice * Number(el.quantity)),
           0
         );
         let percent = calculatePercentaje(total, priceModificationPorcent);
