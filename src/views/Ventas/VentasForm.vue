@@ -202,7 +202,7 @@
                               v-if="p.editable === true"
                             >
                               <p class="mt-4">$</p>
-                              <input type="number" v-model="p.precioTotal" />
+                              <input type="number" v-model="p.precioTotal" @input="detectPriceEdition(p)"/>
                             </div>
                           </td>
 
@@ -657,6 +657,10 @@ export default {
     /******************************************************************************************************/
     /* ALL FUNCTIONS FOR PROCESS SALE DATA ---------------------------------------------------------------*/
     /******************************************************************************************************/
+    detectPriceEdition(p){
+      this.productsDescription.filter(el => el.barCode === p.codigoBarra)[0].salePrice = Number(p.precioTotal);
+    },
+
     updateTotal(id) {
       this.products.forEach((el) => {
         this.productsDescription.forEach((e) => {
@@ -706,12 +710,14 @@ export default {
       const filterForProductsDescription = this.productsDescription.filter(el => el.barCode !== codigoBarra);
       const filterForProductsDetail = this.productsDetail.filter(el => el.id !== id);
 
-      if(product.nombre.includes("DESCUENTO - ")) {
+      if(product.nombre === "DESCUENTO") {
         this.descuentoGlobal = 0;
+        this.porcentajeDescuentoGlobal = 0;
       }
 
-      if(product.nombre.includes("RECARGO - ")) {
+      if(product.nombre === "RECARGO") {
         this.recargoGlobal = 0;
+        this.porcentajeRecargoGlobal = 0;
       }
 
       this.products = filter;
@@ -1142,6 +1148,8 @@ export default {
                       if (this.object.id) {
                         comprobante.id = this.object.id;
                       }
+
+                      console.log(comprobante);
 
                       /*** Save receipt in database and print invoice ***/
                       if (comprobante.cae) {
@@ -1629,67 +1637,87 @@ export default {
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
       const planPago = this.object.planPago;
+
       this.productsDescription = await this.restLineDiscounts(
         this.products,
         this.productsDescription
       );
+
       this.productsDescription = await this.sumLineSurcharges(
         this.products,
         this.productsDescription
       );
+
       this.productsDescription = await this.restGlobalDiscount(
         this.productsDescription,
         this.porcentajeDescuentoGlobal
       );
+
+      console.log(this.productsDescription);
+
       this.productsDescription = await this.sumGlobalSurcharge(
         this.productsDescription,
         this.porcentajeRecargoGlobal
       );
+
       this.productsDescription = await this.applyPaymentPlantPercentVariation(
         this.productsDescription,
         planPago.porcentaje
       );
+
       this.productsDescription = await this.calculateAmountOfPriceVariations(
         this.productsDescription
       );
+
       const totalOfDiscounts = await this.calculateTotalOfDiscounts(
         this.productsDescription
       );
+
       const totalOfSurcharges = await this.calculateTotalOfSurcharges(
         this.productsDescription
       );
+
       const subTotal = await this.calculateSumOfProductSalePrices(
         this.productsDescription
       );
+
       const planAmountDiscount =
         planPercentDiscount > 0
           ? subTotal * decimalPercent(planPercentDiscount)
           : 0;
+
       const planAmountSurcharge =
         planPercentSurcharge > 0
           ? subTotal * decimalPercent(planPercentSurcharge)
           : 0;
+
       const planPercentSurcharge =
         planPago.porcentaje > 0 ? planPago.porcentaje : 0;
       const planPercentDiscount =
         planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
+
       this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
         this.productsDescription
       );
+
       const amountOfIva21 = await this.calculateAmountOfIva21(
         this.productsDescription
       );
+
       const amountOfIva10 = await this.calculateAmountOfIva10(
         this.productsDescription
       );
+
       const amountOfIva27 = await this.calculateAmountOfIva27(
         this.productsDescription
       );
+
       const totalOfIvas = sumarNumeros([
         amountOfIva21,
         amountOfIva10,
         amountOfIva27,
       ]);
+
       const total = subTotal - totalOfDiscounts + totalOfSurcharges;
 
       return {
@@ -1784,7 +1812,6 @@ export default {
       productsDescription.forEach((prodDescription) => {
         prodDescription.discountPercent += planPercent;
       });
-      console.log(productsDescription);
       return productsDescription;
     },
 
