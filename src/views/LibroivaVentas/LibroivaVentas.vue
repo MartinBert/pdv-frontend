@@ -16,6 +16,7 @@
                   v-model="fechaDesde"
                   label="Fecha desde"
                   @input="createDate(fechaDesde, 'fechaDesde')"
+                  @change="createDate(fechaDesde,'fechaDesde')"
                   required
                 >
                 </v-text-field>
@@ -31,9 +32,15 @@
                 </v-text-field>
                 <v-btn
                   class="primary v-btn--block"
-                  @click="salesForDate1(object.fechaDesde, object.fechaHasta)"
                 >
                   Buscar Comprobantes
+                </v-btn>
+                <br>
+                 <v-btn
+                  class="primary v-btn--block"
+                  @click="salesForDate1(object.fechaDesde, object.fechaHasta)"
+                >
+                  Imprimir libro iva
                 </v-btn>
               </div>
             </v-col>
