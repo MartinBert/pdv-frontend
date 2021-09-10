@@ -614,7 +614,7 @@ export default {
            this.productsDescription.push(objectForProductsDescription);
            }
           });
-        console.log(this.productsDescription);
+  
 
       let processPorducts = [];
       data.forEach((el) => {
