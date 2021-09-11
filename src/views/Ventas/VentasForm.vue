@@ -519,6 +519,7 @@ export default {
                 ? databaseItem.proveedores
                 : [],
             });
+            console.log(this.productsDescription);
           } else {
             if (
               this.products.filter((el) => el.id === databaseItem.id).length > 0
@@ -580,31 +581,40 @@ export default {
     },
 
     addProduct(data) {
-      this.productsDescription = [];
+      let existe = false;
       data = [...new Set(data)];
       this.productsDetail = data;
       data.forEach((product) => {
-        const objectForProductsDescription = {
-          name: product.nombre,
-          barCode: product.codigoBarra,
-          code: product.codigoProducto,
-          tradeMarkName: product.marca.nombre,
-          tradeMarkId: product.marca.id,
-          rubroName: product.rubro.nombre,
-          rubroId: product.rubro.id,
-          attributes: product.atributos,
-          properties: product.propiedades,
-          quantity: product.cantUnidades,
-          costPrice: product.precioCosto,
-          salePrice: product.precioTotal,
-          buyIvaPercent: product.ivaComprasObject.porcentaje,
-          saleIvaPercent: product.ivaVentasObject.porcentaje,
-          buyIvaAmount: product.ivaCompra,
-          saleIvaAmount: product.ivaVenta,
-          providerData: product.proveedores ? product.proveedores : [],
-        };
-        this.productsDescription.push(objectForProductsDescription);
-      });
+          existe = false;
+          this.productsDescription.forEach((product2)=>{
+             if(product.codigoBarra === product2.barCode){
+               existe=true; 
+             }
+           });
+          if(!existe){
+              const objectForProductsDescription = {
+              name: product.nombre,
+              barCode: product.codigoBarra,
+              code: product.codigoProducto,
+              tradeMarkName: product.marca.nombre,
+              tradeMarkId: product.marca.id,
+              rubroName: product.rubro.nombre,
+              rubroId: product.rubro.id,
+              attributes: product.atributos,
+              properties: product.propiedades,
+              quantity: product.cantUnidades,
+              costPrice: product.precioCosto,
+              salePrice: product.precioTotal,
+              buyIvaPercent: product.ivaComprasObject.porcentaje,
+              saleIvaPercent: product.ivaVentasObject.porcentaje,
+              buyIvaAmount: product.ivaCompra,
+              saleIvaAmount: product.ivaVenta,
+              providerData: product.proveedores ? product.proveedores : [],
+            };
+           this.productsDescription.push(objectForProductsDescription);
+           }
+          });
+  
 
       let processPorducts = [];
       data.forEach((el) => {
