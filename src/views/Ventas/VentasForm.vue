@@ -581,7 +581,7 @@ export default {
     },
 
     addProduct(data) {
-      let existe=false;
+      let existe = false;
       data = [...new Set(data)];
       this.productsDetail = data;
       data.forEach((product) => {

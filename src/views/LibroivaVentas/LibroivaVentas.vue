@@ -15,8 +15,7 @@
                   type="date"
                   v-model="fechaDesde"
                   label="Fecha desde"
-                  @input="createDate(fechaDesde, 'fechaDesde')"
-                  @change="createDate(fechaDesde,'fechaDesde')"
+                  @input="filterObjects()"
                   required
                 >
                 </v-text-field>
@@ -26,7 +25,7 @@
                   type="date"
                   label="Fecha hasta"
                   v-model="fechaHasta"
-                  @input="createDate(fechaHasta, 'fechaHasta')"
+                  @input="filterObjects()"
                   required
                 >
                 </v-text-field>
@@ -38,7 +37,7 @@
                 <br>
                  <v-btn
                   class="primary v-btn--block"
-                  @click="salesForDate1(object.fechaDesde, object.fechaHasta)"
+                  @click="salesForDate1()"
                 >
                   Imprimir libro iva
                 </v-btn>
@@ -110,7 +109,7 @@
 <script>
 import ComprobantesService from "../../services/ComprobantesService";
 import Pagination from "../../components/Pagination";
-import { generateIntegerDate, monthsList } from "../../helpers/dateHelper";
+import { generateIntegerDate, monthsList, formatDate } from "../../helpers/dateHelper";
 import { exportExcelLibro } from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
@@ -137,14 +136,9 @@ export default {
     fechaDesde: null,
     fechaHasta: null,
     filterParams: {
-      blackReceiptFilter: "",
       sucursalId: "",
-      barCode: "",
-      numeroCbte: "",
-      fechaEmision: "",
-      comprobanteCerrado: "",
-      numeroComprobante: "",
-      totalVenta: "",
+      fechaDesdeString: "",
+      fechaHastaString: "",
       facturaA: false,
       facturaB: false,
       facturaC: false,
@@ -154,7 +148,7 @@ export default {
     },
     loaded: false,
     tenant: "",
-    service: "ventas",
+    service: "librosDeIva",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -167,7 +161,7 @@ export default {
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva.nombre" },
       { text: "N° Cuit", value: "cliente.cuit" },
-      { text: "Neto Grabado", value: "sucursal.ingBruto" },
+      { text: "Neto Grabado", value: "netoGrabado" },
       { text: "Iva 27%", value: "totalIva27" },
       { text: "Iva 21%", value: "totalIva21" },
       { text: "Iva 10,5%", value: "totalIva10" },
@@ -199,9 +193,16 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
+      if(this.fechaDesde && this.fechaHasta){
+        this.filterParams.fechaDesdeString = formatDate(this.fechaDesde);
+        this.filterParams.fechaHastaString = formatDate(this.fechaHasta);
+      }
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
+          data.data.content.forEach((data) => {
+            data.netoGrabado = Number(data.totalVenta) - Number(data.totalIvas);
+          })
           this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
@@ -211,23 +212,14 @@ export default {
         });
     },
 
-    createDate(date, param) {
-      const integerDate = generateIntegerDate(date);
-      if (param === "fechaDesde") {
-        this.object.fechaDesde = integerDate;
-      } else {
-        this.object.fechaHasta = integerDate;
-      }
-    },
-
-    salesForDate1(fechaDesde, fechaHasta) {
+    salesForDate1() {
       if (this.notPassSucursalValidations()) return this.error("sucursal");
       if (this.notPassDateValidations()) return this.error("fechas");
       let sucursalId = this.loguedUser.sucursal.id;
       const filterParams = {
         sucursalId,
-        fechaDesde,
-        fechaHasta,
+        fechaDesde: generateIntegerDate(this.fechaDesde),
+        fechaHasta: generateIntegerDate(this.fechaHasta),
       };
       ComprobantesService(this.tenant, "comprobantesFiscales", this.token)
         .getInvoicesForDateRange(filterParams)
@@ -285,7 +277,7 @@ export default {
         size: 100000,
         totalPages: 0,
       };
-      await GenericService(this.tenant, this.service, this.token)
+      await GenericService(this.tenant, "ventas", this.token)
         .filter(filters)
         .then((data) => {
           let ventas = data.data.content;
