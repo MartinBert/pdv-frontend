@@ -322,7 +322,7 @@ export default {
           error = "Debe seleccionar una sucursal para realizar el reporte";
           break;
         case "facturas":
-          error = "Debe seleccionar la factura que desea imprimir"
+          error = "Debe seleccionar el tipo de factura que desea imprimir"
           break;
       }
       this.$errorAlert(error);
