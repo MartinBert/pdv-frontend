@@ -215,6 +215,7 @@ export default {
     salesForDate1() {
       if (this.notPassSucursalValidations()) return this.error("sucursal");
       if (this.notPassDateValidations()) return this.error("fechas");
+      if(this.notPassInvoiceValidations()) return this.error("facturas");
       let sucursalId = this.loguedUser.sucursal.id;
       const filterParams = {
         sucursalId,
@@ -303,6 +304,11 @@ export default {
       return true;
     },
 
+     notPassInvoiceValidations() {
+      if (this.facturaA && this.facturaB && this.facturaC) return false;
+      return true;
+    },
+
     error(type) {
       let error = "";
       switch (type) {
@@ -314,6 +320,9 @@ export default {
           break;
         default:
           error = "Debe seleccionar una sucursal para realizar el reporte";
+          break;
+        case "facturas":
+          error = "Debe seleccionar la factura que desea imprimir"
           break;
       }
       this.$errorAlert(error);
