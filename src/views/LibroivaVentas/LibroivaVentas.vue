@@ -29,25 +29,24 @@
                   required
                 >
                 </v-text-field>
-                <v-btn
+              </div>
+            </v-col>
+            <v-col cols="2">
+                    <v-btn
                   class="primary v-btn--block"
-                >
-                  Buscar Comprobantes
-                </v-btn>
-                <br>
-                 <v-btn
-                  class="primary v-btn--block"
+                   style="margin-left:400px;
+                margin-top:-150px;
+                "
                   @click="salesForDate1()"
                 >
                   Imprimir libro iva
                 </v-btn>
-              </div>
             </v-col>
             <v-col cols="3">
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
-                margin-top:-100px;
+                margin-top:-180px;
                 "
                 label="Facturas(A)"
                 v-model="filterParams.facturaA"
@@ -58,7 +57,7 @@
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
-                margin-top:-100px;
+                margin-top:-150px;
                 "
                 label="Facturas(B)"
                 v-model="filterParams.facturaB"
@@ -69,7 +68,7 @@
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
-                margin-top:-100px;
+                margin-top:-200px;
                 "
                 label="Facturas(C)"
                 v-model="filterParams.facturaC"
@@ -215,7 +214,6 @@ export default {
     salesForDate1() {
       if (this.notPassSucursalValidations()) return this.error("sucursal");
       if (this.notPassDateValidations()) return this.error("fechas");
-      if(this.notPassInvoiceValidations()) return this.error("facturas");
       let sucursalId = this.loguedUser.sucursal.id;
       const filterParams = {
         sucursalId,
@@ -225,7 +223,16 @@ export default {
       ComprobantesService(this.tenant, "comprobantesFiscales", this.token)
         .getInvoicesForDateRange(filterParams)
         .then((data) => {
-          const invoices = data.data;
+          let invoices = data.data;
+          if(this.filterParams.facturaA){
+            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS A");
+          }else if(this.filterParams.facturaB){
+            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS B");
+          }else if(this.filterParams.facturaC){
+            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS C");
+          }else{
+            console.log("Selecciono mas de un tipo de comprobante o ninguno");
+          }
           this.exportGeneralExcel(invoices);
         });
     },
@@ -304,8 +311,16 @@ export default {
       return true;
     },
 
-     notPassInvoiceValidations() {
-      if (this.facturaA && this.facturaB && this.facturaC) return false;
+     notPassInvoiceAValidations() {
+      if (this.facturaA) return false;
+      return true;
+    },
+      notPassInvoiceBValidations() {
+      if (this.facturaB) return false;
+      return true;
+    },
+      notPassInvoiceCValidations() {
+      if (this.facturaC) return false;
       return true;
     },
 
