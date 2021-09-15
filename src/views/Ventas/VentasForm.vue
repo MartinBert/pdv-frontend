@@ -130,6 +130,7 @@
                         filled
                         dense
                         v-model="object.fechaVencimiento"
+                        required
                       />
                     </v-col>
                   </v-row>
