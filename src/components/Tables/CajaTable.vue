@@ -23,6 +23,18 @@
         </v-col>
       </v-row>
     </v-form>
+    <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.fecha"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+    </v-col>
     <v-data-table
       class="elevation-6"
       :headers="headers"
@@ -51,6 +63,7 @@ export default {
     objects: [],
     filterParams: {
       sucursalId: "",
+      fecha:"",
       page: 1,
       size: 10,
       totalPages: 0,
