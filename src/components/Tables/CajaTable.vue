@@ -63,12 +63,7 @@ export default {
     objects: [],
     filterParams: {
       sucursalId: "",
-      diferencia:"",
-      existenciaInicial:"",
-      existenciaFisica:"",
-      salidasNoContabilizadas:"",
-      montoFacturado:"",
-      numeroCorrelativo:"",
+      fecha:"",
       page: 1,
       size: 10,
       totalPages: 0,
