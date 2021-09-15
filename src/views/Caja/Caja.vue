@@ -1,6 +1,18 @@
 <template>
   <v-container style="min-width: 100%;">
     <v-card>
+       <v-col cols="3">
+          <v-text-field
+            v-model="filterParams.fecha"
+            v-on:input="filterObjects()"
+            dense
+            outlined
+            rounded
+            class="text-left"
+            placeholder="Búsqueda por fecha"
+            append-icon="mdi-magnify"
+          ></v-text-field>
+    </v-col>
       <CajaTable :items="objects" v-on:seeDetails="seeDetails" v-if="loaded" />
       <Spinner v-if="!loaded" />
       <CajaDetails />
@@ -18,6 +30,7 @@ export default {
     objects: [],
      filterParams: {
       page: 1,
+      fecha:"",
       size: 10,
       totalPages: 0,
     },
