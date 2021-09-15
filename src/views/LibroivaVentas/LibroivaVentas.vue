@@ -230,7 +230,7 @@ export default {
             invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS B");
           }else if(this.filterParams.facturaC){
             invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS C");
-          }else if(this.filterParams.facturaA || this.filterParams.facturaB ){
+          }else if(this.filterParams){
             invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS A" || el.nombreDocumento === "FACTURAS B" );
           }
           this.exportGeneralExcel(invoices);
