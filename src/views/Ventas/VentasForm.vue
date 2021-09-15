@@ -1367,6 +1367,7 @@ export default {
     },
 
     savePresupuesto() {
+      if (this.notPassSucursalValidations()) return this.error("medioPagos");
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
       const cliente = this.object.cliente;
@@ -1654,6 +1655,21 @@ export default {
       }
     },
 
+    notPassvalidationmediospagos(){
+      if(this.cliente)return false;
+      return true
+    },
+
+    error(type) {
+      let error = "";
+      switch (type) {
+        case "medioPagos":
+          error = "Debe seleccionar un medio de pago";
+          break;
+    }
+      this.$errorAlert(error);
+      return;
+    },
     /******************************************************************************************************/
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
