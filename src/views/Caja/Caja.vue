@@ -18,6 +18,7 @@ export default {
     objects: [],
      filterParams: {
       sucursalId: "",
+      fecha:"",
       page: 1,
       size: 10,
       totalPages: 0,
