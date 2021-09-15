@@ -110,6 +110,7 @@
                         item-text="nombre"
                         :return-object="true"
                         placeholder="Seleccione un plan de pago"
+                        required
                       ></v-autocomplete>
                     </v-col>
                     <v-col
