@@ -230,8 +230,8 @@ export default {
             invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS B");
           }else if(this.filterParams.facturaC){
             invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS C");
-          }else{
-            console.log("Selecciono mas de un tipo de comprobante o ninguno");
+          }else if(this.filterParams.facturaA || this.filterParams.facturaB ){
+            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS A" || el.nombreDocumento === "FACTURAS B" );
           }
           this.exportGeneralExcel(invoices);
         });
