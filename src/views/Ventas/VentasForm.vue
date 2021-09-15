@@ -60,7 +60,7 @@
               <v-row>
                 <v-col cols="8">
                   <v-row>
-                    <v-col cols="6" >
+                    <v-col cols="6">
                       <v-autocomplete
                         @change="
                           getComercialDocuments(
@@ -74,10 +74,10 @@
                         :return-object="true"
                         placeholder="Seleccione un cliente"
                         required
-                        :roles="clienteRules"  
+                        :roles="clienteRules"
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" >
+                    <v-col cols="6">
                       <v-autocomplete
                         ref="documents"
                         class="button-ventas comprobante"
@@ -87,10 +87,10 @@
                         :return-object="true"
                         placeholder="Seleccione un tipo de comprobante"
                         required
-                        :roles="comprobantesRules"  
+                        :roles="comprobantesRules"
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" >
+                    <v-col cols="6">
                       <v-autocomplete
                         ref="paymentMethods"
                         class="button-ventas medio-pago"
@@ -101,10 +101,10 @@
                         :return-object="true"
                         placeholder="Seleccione un medio de pago"
                         required
-                        :roles="medioPagoRules"  
+                        :roles="medioPagoRules"
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" >
+                    <v-col cols="6">
                       <v-autocomplete
                         ref="paymentPlans"
                         class="button-ventas plan-pago"
@@ -114,7 +114,7 @@
                         :return-object="true"
                         placeholder="Seleccione un plan de pago"
                         required
-                        :roles="medioPagoRules"  
+                        :roles="plandePagoRules"
                       ></v-autocomplete>
                     </v-col>
                     <v-col
@@ -208,7 +208,11 @@
                               v-if="p.editable === true"
                             >
                               <p class="mt-4">$</p>
-                              <input type="number" v-model="p.precioTotal" @input="detectPriceEdition(p)"/>
+                              <input
+                                type="number"
+                                v-model="p.precioTotal"
+                                @input="detectPriceEdition(p)"
+                              />
                             </div>
                           </td>
 
@@ -243,7 +247,7 @@
               <v-col cols="1">
                 <div class="verticalSeparator"></div>
               </v-col>
-              <v-col cols="10" >
+              <v-col cols="10">
                 <Calculator class="mt-2" />
                 <div style="text-align: center; padding: 1em 0">
                   <h3>
@@ -339,18 +343,10 @@ export default {
       medios_de_pago: [],
       documentos: [],
     },
-    comprobantesRules:[
-      v => !!v || 'Comprobante es requerido',
-    ],
-    medioPagoRules:[
-      v => !!v || 'medios de pago es requerido',
-    ],
-    plandePagoRules:[
-      v => !!v || 'Plan de pago es requerido',
-    ],
-    clienteRules:[
-      v => !!v || 'Cliente es requerido',
-    ],
+    comprobantesRules: [(v) => !!v || "Comprobante es requerido"],
+    medioPagoRules: [(v) => !!v || "medios de pago es requerido"],
+    plandePagoRules: [(v) => !!v || "Plan de pago es requerido"],
+    clienteRules: [(v) => !!v || "Cliente es requerido"],
     productos: [],
     products: [],
     productsDetail: [],
@@ -376,7 +372,7 @@ export default {
     productsWithoutStock: [],
     productsInOtherDeposits: [],
     lowStock: [],
-    perfil: null
+    perfil: null,
   }),
 
   components: {
@@ -603,36 +599,35 @@ export default {
       data = [...new Set(data)];
       this.productsDetail = data;
       data.forEach((product) => {
-          existe = false;
-          this.productsDescription.forEach((product2)=>{
-             if(product.codigoBarra === product2.barCode){
-               existe=true; 
-             }
-           });
-          if(!existe){
-              const objectForProductsDescription = {
-              name: product.nombre,
-              barCode: product.codigoBarra,
-              code: product.codigoProducto,
-              tradeMarkName: product.marca.nombre,
-              tradeMarkId: product.marca.id,
-              rubroName: product.rubro.nombre,
-              rubroId: product.rubro.id,
-              attributes: product.atributos,
-              properties: product.propiedades,
-              quantity: product.cantUnidades,
-              costPrice: product.precioCosto,
-              salePrice: product.precioTotal,
-              buyIvaPercent: product.ivaComprasObject.porcentaje,
-              saleIvaPercent: product.ivaVentasObject.porcentaje,
-              buyIvaAmount: product.ivaCompra,
-              saleIvaAmount: product.ivaVenta,
-              providerData: product.proveedores ? product.proveedores : [],
-            };
-           this.productsDescription.push(objectForProductsDescription);
-           }
-          });
-  
+        existe = false;
+        this.productsDescription.forEach((product2) => {
+          if (product.codigoBarra === product2.barCode) {
+            existe = true;
+          }
+        });
+        if (!existe) {
+          const objectForProductsDescription = {
+            name: product.nombre,
+            barCode: product.codigoBarra,
+            code: product.codigoProducto,
+            tradeMarkName: product.marca.nombre,
+            tradeMarkId: product.marca.id,
+            rubroName: product.rubro.nombre,
+            rubroId: product.rubro.id,
+            attributes: product.atributos,
+            properties: product.propiedades,
+            quantity: product.cantUnidades,
+            costPrice: product.precioCosto,
+            salePrice: product.precioTotal,
+            buyIvaPercent: product.ivaComprasObject.porcentaje,
+            saleIvaPercent: product.ivaVentasObject.porcentaje,
+            buyIvaAmount: product.ivaCompra,
+            saleIvaAmount: product.ivaVenta,
+            providerData: product.proveedores ? product.proveedores : [],
+          };
+          this.productsDescription.push(objectForProductsDescription);
+        }
+      });
 
       let processPorducts = [];
       data.forEach((el) => {
@@ -685,8 +680,10 @@ export default {
     /******************************************************************************************************/
     /* ALL FUNCTIONS FOR PROCESS SALE DATA ---------------------------------------------------------------*/
     /******************************************************************************************************/
-    detectPriceEdition(p){
-      this.productsDescription.filter(el => el.barCode === p.codigoBarra)[0].salePrice = Number(p.precioTotal);
+    detectPriceEdition(p) {
+      this.productsDescription.filter(
+        (el) => el.barCode === p.codigoBarra
+      )[0].salePrice = Number(p.precioTotal);
     },
 
     updateTotal(id) {
@@ -732,18 +729,22 @@ export default {
     },
 
     deleteLine(product) {
-      const {id, codigoBarra} = product;
+      const { id, codigoBarra } = product;
       const filter = this.products.filter((el) => el.id !== id);
       const filterForStore = this.products.filter((el) => el.id === id)[0].id;
-      const filterForProductsDescription = this.productsDescription.filter(el => el.barCode !== codigoBarra);
-      const filterForProductsDetail = this.productsDetail.filter(el => el.id !== id);
+      const filterForProductsDescription = this.productsDescription.filter(
+        (el) => el.barCode !== codigoBarra
+      );
+      const filterForProductsDetail = this.productsDetail.filter(
+        (el) => el.id !== id
+      );
 
-      if(product.nombre === "DESCUENTO") {
+      if (product.nombre === "DESCUENTO") {
         this.descuentoGlobal = 0;
         this.porcentajeDescuentoGlobal = 0;
       }
 
-      if(product.nombre === "RECARGO") {
+      if (product.nombre === "RECARGO") {
         this.recargoGlobal = 0;
         this.porcentajeRecargoGlobal = 0;
       }
@@ -758,7 +759,7 @@ export default {
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
         const total = this.productsDescription.reduce(
-          (acc, el) => acc + (el.salePrice * Number(el.quantity)),
+          (acc, el) => acc + el.salePrice * Number(el.quantity),
           0
         );
         let percent = calculatePercentaje(total, priceModificationPorcent);
@@ -1154,7 +1155,8 @@ export default {
                         subTotal: subTotal,
                         totalDescuentoGlobal: this.descuentoGlobal,
                         totalRecargoGlobal: this.recargoGlobal,
-                        porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+                        porcentajeDescuentoGlobal: this
+                          .porcentajeDescuentoGlobal,
                         porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
                         totalIva21: amountOfIva21,
                         totalIva10: amountOfIva10,
@@ -1478,21 +1480,13 @@ export default {
                     });
                 } else {
                   this.$errorAlert(
-                    "No hay productos seleccionados en la venta"
+                    "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
                   ).then((result) => {
                     if (result.isDismissed) {
                       this.loaded = true;
                     }
                   });
                 }
-              } else {
-                this.$errorAlert("Debe seleccionar un medio de pago").then(
-                  (result) => {
-                    if (result.isDismissed) {
-                      this.loaded = true;
-                    }
-                  }
-                );
               }
             }
           );
@@ -1774,7 +1768,7 @@ export default {
           if (prodDescription.name === discountCleanName) {
             prodDescription.discountPercent = calculatePositivePercentajeCoefficient(
               discount.precioTotal,
-              (prodDescription.salePrice * Number(prodDescription.quantity))
+              prodDescription.salePrice * Number(prodDescription.quantity)
             );
           }
         });
@@ -1792,7 +1786,7 @@ export default {
           if (prodDescription.name === surchargeCleanName) {
             prodDescription.surchargePercent = calculatePositivePercentajeCoefficient(
               surcharge.precioTotal,
-              (prodDescription.salePrice * Number(prodDescription.quantity)) 
+              prodDescription.salePrice * Number(prodDescription.quantity)
             );
           }
         });
@@ -1853,10 +1847,12 @@ export default {
     calculateAmountOfPriceVariations(productsDescription) {
       productsDescription.forEach((prodDescription) => {
         prodDescription.discountAmount =
-          (prodDescription.salePrice * Number(prodDescription.quantity)) *
+          prodDescription.salePrice *
+          Number(prodDescription.quantity) *
           decimalPercent(prodDescription.discountPercent);
         prodDescription.surchargeAmount =
-          (prodDescription.salePrice * Number(prodDescription.quantity)) *
+          prodDescription.salePrice *
+          Number(prodDescription.quantity) *
           decimalPercent(prodDescription.surchargePercent);
       });
       return productsDescription;
@@ -1880,7 +1876,7 @@ export default {
 
     calculateSumOfProductSalePrices(productsDescription) {
       const total = productsDescription.reduce(
-        (acc, el) => acc + (el.salePrice * Number(el.quantity)),
+        (acc, el) => acc + el.salePrice * Number(el.quantity),
         0
       );
       return roundTwoDecimals(total);
@@ -1892,10 +1888,13 @@ export default {
           product.saleIvaPercent = 21;
         }
         product.salePrice =
-          product.salePrice - (product.discountAmount / Number(product.quantity)) + (product.surchargeAmount / (product.quantity));
+          product.salePrice -
+          product.discountAmount / Number(product.quantity) +
+          product.surchargeAmount / product.quantity;
         product.saleIvaAmount =
-          (product.salePrice * Number(product.quantity)) -
-          (product.salePrice * Number(product.quantity)) / (1 + decimalPercent(product.saleIvaPercent));
+          product.salePrice * Number(product.quantity) -
+          (product.salePrice * Number(product.quantity)) /
+            (1 + decimalPercent(product.saleIvaPercent));
       });
       return productsDescription;
     },
