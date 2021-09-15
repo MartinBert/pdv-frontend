@@ -16,6 +16,11 @@ import axios from "axios";
 export default {
   data: () => ({
     objects: [],
+     filterParams: {
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
     loaded: false,
     tenant: "",
     service: "caja",
