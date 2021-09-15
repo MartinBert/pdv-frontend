@@ -74,6 +74,7 @@
                         :return-object="true"
                         placeholder="Seleccione un cliente"
                         required
+                        :roles="clienteRules"  
                       ></v-autocomplete>
                     </v-col>
                     <v-col cols="6" >
@@ -86,6 +87,7 @@
                         :return-object="true"
                         placeholder="Seleccione un tipo de comprobante"
                         required
+                        :roles="comprobantesRules"  
                       ></v-autocomplete>
                     </v-col>
                     <v-col cols="6" >
@@ -99,6 +101,7 @@
                         :return-object="true"
                         placeholder="Seleccione un medio de pago"
                         required
+                        :roles="medioPagoRules"  
                       ></v-autocomplete>
                     </v-col>
                     <v-col cols="6" >
@@ -111,6 +114,7 @@
                         :return-object="true"
                         placeholder="Seleccione un plan de pago"
                         required
+                        :roles="medioPagoRules"  
                       ></v-autocomplete>
                     </v-col>
                     <v-col
@@ -335,6 +339,18 @@ export default {
       medios_de_pago: [],
       documentos: [],
     },
+    comprobantesRules:[
+      v => !!v || 'Comprobante es requerido',
+    ],
+    medioPagoRules:[
+      v => !!v || 'medios de pago es requerido',
+    ],
+    plandePagoRules:[
+      v => !!v || 'Plan de pago es requerido',
+    ],
+    clienteRules:[
+      v => !!v || 'Cliente es requerido',
+    ],
     productos: [],
     products: [],
     productsDetail: [],
