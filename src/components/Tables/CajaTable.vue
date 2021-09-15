@@ -69,7 +69,6 @@ export default {
       salidasNoContabilizadas:"",
       montoFacturado:"",
       numeroCorrelativo:"",
-      fecha:"",
       page: 1,
       size: 10,
       totalPages: 0,
