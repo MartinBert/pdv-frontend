@@ -25,13 +25,13 @@
     </v-form>
     <v-col cols="3">
           <v-text-field
-            v-model="filterParams.fechaEmision"
+            v-model="filterParams.fecha"
             v-on:input="filterObjects()"
             dense
             outlined
             rounded
             class="text-left"
-            placeholder="Búsqueda"
+            placeholder="Búsqueda por fecha"
             append-icon="mdi-magnify"
           ></v-text-field>
     </v-col>
@@ -63,7 +63,7 @@ export default {
     objects: [],
     filterParams: {
       sucursalId: "",
-      fechaEmision:"",
+      fecha:"",
       page: 1,
       size: 10,
       totalPages: 0,
