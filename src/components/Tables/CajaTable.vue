@@ -23,6 +23,18 @@
         </v-col>
       </v-row>
     </v-form>
+    <v-col cols="3">
+      <v-text-field
+        v-model="filterParams.fecha"
+        v-on:input="filterObjects()"
+        dense
+        outlined
+        rounded
+        class="text-left"
+        placeholder="Búsqueda por fecha"
+        append-icon="mdi-magnify"
+      ></v-text-field>
+    </v-col>
     <v-data-table
       class="elevation-6"
       :headers="headers"
@@ -51,7 +63,7 @@ export default {
     objects: [],
     filterParams: {
       sucursalId: "",
-      fecha:"",
+      fecha: "",
       page: 1,
       size: 10,
       totalPages: 0,
@@ -105,7 +117,7 @@ export default {
           console.error(err);
         });
     },
-    
+
     getClientIpForFiscalController() {
       axios.get("https://api.ipify.org?format=json").then((data) => {
         this.clientIp = data.data.ip;
@@ -114,7 +126,6 @@ export default {
     seeDetails(object) {
       this.$emit("seeDetails", object);
     },
-
   },
 };
 </script>
