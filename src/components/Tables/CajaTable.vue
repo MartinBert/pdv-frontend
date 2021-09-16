@@ -66,7 +66,7 @@ export default {
       descripcion:"",
       page: 1,
       size: 10,
-      totalPages: 1,
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
