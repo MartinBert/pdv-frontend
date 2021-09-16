@@ -1038,13 +1038,12 @@ export default {
           } else {
             this.save();
           }
-        } else {
-          if (documento.presupuesto === true) {
-            this.savePresupuesto();
-          } else {
+        } else if (documento.presupuesto === true) {
+          this.savePresupuesto();
+        }else {
             this.saveNoFiscal();
           }
-        }
+        
       } else {
         this.$errorAlert(
           "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
@@ -1481,7 +1480,7 @@ export default {
                     "No hay productos seleccionados en la venta"
                   ).then((result) => {
                     if (result.isDismissed) {
-                      this.loaded = false;
+                      this.loaded = true;
                     }
                   });
                 }
@@ -1489,7 +1488,7 @@ export default {
                 this.$errorAlert("Debe seleccionar un medio de pago").then(
                   (result) => {
                     if (result.isDismissed) {
-                      this.loaded = false;
+                      this.loaded = true;
                     }
                   }
                 );
