@@ -25,7 +25,7 @@
     </v-form>
     <v-col cols="3">
       <v-text-field
-        v-model="filterParams.descripcion"
+        v-model="filterParams.fecha"
         v-on:input="filterObjects()"
         dense
         outlined
@@ -66,7 +66,7 @@ export default {
       descripcion:"",
       page: 1,
       size: 10,
-      totalPages: 0,
+      totalPages: 1,
     },
     loaded: false,
     tenant: "",
