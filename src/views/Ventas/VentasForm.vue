@@ -1483,9 +1483,11 @@ export default {
                 ).then((result) => {
                   if (result.isDismissed) {
                     this.loaded = true;
+                    console.log(result);
                   }
                 });
               }
+
             }
           );
         });
