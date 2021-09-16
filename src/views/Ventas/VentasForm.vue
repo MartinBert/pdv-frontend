@@ -1476,12 +1476,12 @@ export default {
                           );
                         });
                     });
-                } else {
+                } else{
                   this.$errorAlert(
                     "No hay productos seleccionados en la venta"
                   ).then((result) => {
                     if (result.isDismissed) {
-                      this.loaded = true;
+                      this.loaded = false;
                     }
                   });
                 }
@@ -1489,7 +1489,7 @@ export default {
                 this.$errorAlert("Debe seleccionar un medio de pago").then(
                   (result) => {
                     if (result.isDismissed) {
-                      this.loaded = true;
+                      this.loaded = false;
                     }
                   }
                 );
