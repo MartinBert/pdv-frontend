@@ -62,6 +62,7 @@ export default {
   data: () => ({
     objects: [],
     filterParams: {
+      sucursalId: "",
       fecha: "",
       descripcion:"",
       page: 1,
