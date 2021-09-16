@@ -90,6 +90,7 @@ export default {
     this.tenant = this.$route.params.tenant;
     this.filterObjects();
     this.getClientIpForFiscalController();
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
   },
   methods: {
     filterObjects(page) {
