@@ -1452,7 +1452,7 @@ export default {
                 nombreDocumento: documento.nombre,
               };
               /*** Evaluate required sale form data ***/
-              if (comprobante.mediosPago[0] !== undefined) {
+              if (comprobante.mediosPago[0] !== 0) {
                 if (Number(comprobante.totalVenta) !== 0) {
                   /*** Save receipt in database and print ticket ***/
                   GenericService(tenant, "comprobantesFiscales", token)
@@ -1483,7 +1483,6 @@ export default {
                 ).then((result) => {
                   if (result.isDismissed) {
                     this.loaded = true;
-                    console.log(result);
                   }
                 });
               }
