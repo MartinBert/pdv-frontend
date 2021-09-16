@@ -25,7 +25,7 @@
     </v-form>
     <v-col cols="3">
       <v-text-field
-        v-model="filterParams.numeroCorrelativo"
+        v-model="filterParams.fecha"
         v-on:input="filterObjects()"
         dense
         outlined
