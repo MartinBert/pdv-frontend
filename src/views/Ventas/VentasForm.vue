@@ -164,6 +164,23 @@
                         />
                       </v-col>
                     </v-row>
+                    <v-row>
+                      <v-col class="text-right">
+                        <label class="mr-3 align-center">TOTAL DE DESCUENTOS Y RECARGOS POR LÍNEA</label>
+                        <input
+                          disabled
+                          class="totalInput mr-1"
+                          type="text"
+                          v-model="totalLineDiscounts"
+                        />
+                        <input
+                          disabled
+                          class="totalInput"
+                          type="text"
+                          v-model="totalLineSurchages"
+                        />
+                      </v-col>
+                    </v-row>
                   </v-container>
                 </v-col>
               </v-row>
@@ -392,22 +409,23 @@ export default {
 
   computed: {
     totalVenta() {
-      let total = this.products.reduce((acc, el) => {
-        if (this.object.planPago) {
-          const cleanPorcent = decimalPercent(this.object.planPago.porcentaje);
-          const impPorcent = el.precioTotal * cleanPorcent;
-          const totalValue =
-            Math.round(
-              (acc + Number(el.precioTotal) + Number(impPorcent)) * 100
-            ) / 100;
-          return totalValue;
-        } else {
-          return acc + Number(el.precioTotal);
-        }
-      }, 0);
-      if (this.object.cliente && this.object.cliente.alicIngBrutos > 0) {
-        total = total + (total * this.object.cliente.alicIngBrutos) / 100;
+      let planDiscountPercent = 0;
+      let planSurchagePercent = 0;
+      if(this.object.planPago){
+        planDiscountPercent = (this.object.planPago.porcentaje < 0) ? this.object.planPago.porcentaje : 0;
+        planSurchagePercent = (this.object.planPago.porcentaje > 0) ? this.object.planPago.porcentaje : 0;
       }
+      const sumOfProductPrices = this.products.reduce((acc, el) =>  {
+        if(!el.nombre.includes("DESCUENTO") && !el.nombre.includes("RECARGO")){
+          acc += Number(el.precioTotal)
+        }
+        return acc;
+      }, 0);
+      const totalOfPlanDiscount =  sumOfProductPrices * decimalPercent(planDiscountPercent);
+      const totalOfPlanSurcharge = sumOfProductPrices * decimalPercent(planSurchagePercent);
+      const globalDiscount = (sumOfProductPrices * decimalPercent(this.porcentajeDescuentoGlobal)) * -1;
+      const globalSurcharge = sumOfProductPrices * decimalPercent(this.porcentajeRecargoGlobal);
+      const total = sumOfProductPrices + totalOfPlanDiscount + totalOfPlanSurcharge + globalDiscount + globalSurcharge;
       return roundTwoDecimals(total);
     },
 
@@ -418,6 +436,26 @@ export default {
       );
       return totItems;
     },
+
+    totalLineDiscounts(){
+      const total = this.products.reduce((acc, el) => {
+        if(el.nombre.includes("DESCUENTO - ")){
+          acc += el.precioTotal;
+        }
+        return acc;
+      }, 0)
+      return total;
+    },
+
+    totalLineSurchages(){
+      const total = this.products.reduce((acc, el) => {
+        if(el.nombre.includes("RECARGO - ")){
+          acc += el.precioTotal;
+        }
+        return acc;
+      }, 0)
+      return total;
+    }
   },
 
   mounted() {
@@ -533,7 +571,6 @@ export default {
                 ? databaseItem.proveedores
                 : [],
             });
-            console.log(this.productsDescription);
           } else {
             if (
               this.products.filter((el) => el.id === databaseItem.id).length > 0
@@ -671,10 +708,14 @@ export default {
         this.loguedUser.sucursal.condicionIva.documentos
       );
       this.getPaymentPlans(presupuesto.mediosPago[0]);
+      console.log(presupuesto);
       this.object = presupuesto;
+      console.log(this.object);
       this.object.mediosPago = presupuesto.mediosPago[0];
       this.object.planPago = presupuesto.planesPago[0];
       this.products = presupuesto.productos;
+      this.porcentajeDescuentoGlobal = this.object.porcentajeDescuentoGlobal;
+      this.porcentajeRecargoGlobal = this.object.porcentajeRecargoGlobal;
     },
 
     /******************************************************************************************************/
@@ -1128,6 +1169,20 @@ export default {
                       planAmountDiscount,
                     }) => {
                       // Create receipt
+
+                      console.log(total,
+                      subTotal,
+                      amountOfIva21,
+                      amountOfIva10,
+                      amountOfIva27,
+                      totalOfIvas,
+                      totalOfDiscounts,
+                      totalOfSurcharges,
+                      planPercentSurcharge,
+                      planPercentDiscount,
+                      planAmountSurcharge,
+                      planAmountDiscount)
+
                       comprobante = {
                         letra: documento.letra,
                         numeroCbte:
@@ -1177,7 +1232,7 @@ export default {
                         comprobante.id = this.object.id;
                       }
 
-                      console.log(comprobante);
+                      console.log(comprobante)
 
                       /*** Save receipt in database and print invoice ***/
                       if (comprobante.cae) {
@@ -1673,8 +1728,6 @@ export default {
         this.productsDescription,
         this.porcentajeDescuentoGlobal
       );
-
-      console.log(this.productsDescription);
 
       this.productsDescription = await this.sumGlobalSurcharge(
         this.productsDescription,
