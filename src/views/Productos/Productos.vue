@@ -365,7 +365,8 @@ export default {
           element.atributos &&
           element.distribuidores &&
           element.precioCosto &&
-          element.precioTotal
+          element.precioTotal &&
+          element.estado
         ) {
           if (element.codigoBarra == 1) {
             element.codigoBarra = generateBarCode();
@@ -421,11 +422,11 @@ export default {
                 )
             ),
             precioTotal: element.precioTotal,
-            estado: 1,
+            estado: element.estado,
           };
           importacion.data.push(obj);
         } else {
-          importacion.status = true;
+          importacion.status = false;
           importacion.message = "Faltan datos en el renglón " + (index + 1);
         }
       });
