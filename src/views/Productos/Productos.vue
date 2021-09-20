@@ -328,9 +328,8 @@ export default {
         let prod = this.validateImport(excel);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
-            .saveAll(prod.data)
+            .saveAll(data)
             .then(() => {
-              console.log(prod.data);
               this.$successAlert("Importación exitosa").then(() => {
                 if (this.checkImportStatus > 0) {
                   this.$infoAlert(
