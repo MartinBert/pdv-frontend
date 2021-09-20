@@ -359,18 +359,10 @@ export default {
       productos.forEach((element) => {
         if (
           element.nombre &&
-          element.codigoProducto &&
           element.codigoBarra &&
-          element.rubro &&
-          element.marca &&
-          element.propiedades &&
-          element.atributos &&
-          element.distribuidores &&
-          element.depositos &&
+          element.codigoProducto &&
           element.ganancia &&
-          element.precioTotal &&
-          element.ivaVentasObject &&
-          element.ivaComprasObject
+          element.precioTotal
         ) {
           if (element.codigoBarra == 1) {
             element.codigoBarra = generateBarCode();
