@@ -331,7 +331,7 @@ export default {
         console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
-            .save(prod.data)
+            .saveAll(prod.data)
             .then(() => {
               console.log(prod.data);
               this.$successAlert("Importación exitosa").then(() => {
@@ -363,6 +363,7 @@ export default {
           element.codigoProducto &&
           element.marca &&
           element.ganancia &&
+          element.precioCosto &&
           element.precioTotal
         ) {
           if (element.codigoBarra == 1) {
