@@ -326,6 +326,7 @@ export default {
           }
         });
         let prod = this.validateImport(excel);
+        console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
@@ -430,6 +431,7 @@ export default {
           importacion.message = "Faltan datos en el renglón " + (index + 2);
         }
       });
+      console.log(productos);
       return importacion;
     },
 
