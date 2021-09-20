@@ -361,9 +361,7 @@ export default {
           element.nombre &&
           element.codigoBarra &&
           element.codigoProducto &&
-          element.marca &&
-          element.ganancia &&
-          element.precioCosto &&
+          element.marca.nombre &&
           element.precioTotal
         ) {
           if (element.codigoBarra == 1) {
