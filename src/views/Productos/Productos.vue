@@ -422,7 +422,7 @@ export default {
                 )
             ),
             precioTotal: element.precioTotal,
-            estado: element.estado,
+            estado: 0
           };
           importacion.data.push(obj);
         } else {
