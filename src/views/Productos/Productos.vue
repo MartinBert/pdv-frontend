@@ -426,7 +426,6 @@ export default {
                 )
             ),
             precioTotal: element.precioTotal,
-            estado: 0
           };
           importacion.data.push(obj);
         } else {
