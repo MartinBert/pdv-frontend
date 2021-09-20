@@ -319,13 +319,14 @@ export default {
         let sheet_name_list = workbook.SheetNames;
         sheet_name_list.forEach(function(y) {
           let exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+          console.log(exceljson);
           if (exceljson.length > 0) {
             for (let i = 0; i < exceljson.length; i++) {
               excel.push(exceljson[i]);
             }
           }
         });
-        console.log(excel);
+
         let prod = this.validateImport(excel);
         console.log(prod);
         if (prod.status) {
