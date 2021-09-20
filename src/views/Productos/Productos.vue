@@ -429,7 +429,7 @@ export default {
           importacion.data.push(obj);
         } else {
           importacion.status = false;
-          importacion.message = "Faltan datos en el renglón " + (index + 2);
+          importacion.message = "Faltan datos en el renglón " + (index);
         }
       });
       console.log(productos);
