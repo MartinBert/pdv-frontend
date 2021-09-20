@@ -356,7 +356,7 @@ export default {
         data: [],
         message: "",
       };
-      productos.forEach((element, index) => {
+      productos.forEach((element) => {
         if (
           element.nombre &&
           element.codigoProducto &&
@@ -431,7 +431,7 @@ export default {
           importacion.data.push(obj);
         } else {
           importacion.status = false;
-          importacion.message = "Faltan datos en el renglón " + (index);
+          importacion.message = "Faltan datos en el renglón ";
         }
       });
       console.log(productos);
