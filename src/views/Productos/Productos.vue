@@ -435,7 +435,9 @@ export default {
         }
       });
       console.log(productos);
+      console.log(importacion);
       return importacion;
+      
     },
 
     getMarca(str) {
