@@ -1032,7 +1032,7 @@ export default {
     saveSale() {
       this.loaded = false;
       const documento = this.object.documento;
-      if (documento !== undefined) {
+      if (documento !== undefined || this.object.mediosPago !== undefined || this.object.planesPago !== undefined) {
         if (documento.tipo === true) {
           if (documento.ticket === true) {
             this.saveTicket(documento.nombre);

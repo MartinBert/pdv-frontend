@@ -115,7 +115,7 @@ export default {
       blackReceiptFilter: "",
       sucursalId: "",
       fechaEmision: "",
-      comprobanteCerrado: "",
+      comprobanteCerrado: null,
       numeroComprobante: "",
       totalVenta: "",
       page: 1,

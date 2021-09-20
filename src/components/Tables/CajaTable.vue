@@ -95,6 +95,9 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
+      if(this.loguedUser.perfil > 1){
+        this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+      }
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
