@@ -386,7 +386,7 @@ export default {
             marca: this.getMarca(element.marca),
             rubro: this.getRubro(element.rubro),
             propiedades: this.getPropiedades(element.propiedades),
-            atributos: this.getAtributos(element.atributos),
+            atributos: this.getAtributos(element),
             distribuidores: this.getDistribuidores(element.idDistribuidores),
             ivaComprasObject: this.getIva(element.idIvaCompras),
             ivaVentasObject: this.getIva(element.idIvaVentas),
@@ -426,7 +426,7 @@ export default {
                 )
             ),
             precioTotal: element.precioTotal,
-            estado: 1
+            estado: 0
           };
           importacion.data.push(obj);
         } else {
