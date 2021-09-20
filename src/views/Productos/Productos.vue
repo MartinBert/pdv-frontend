@@ -330,6 +330,7 @@ export default {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(() => {
+              console.log(prod.data);
               this.$successAlert("Importación exitosa").then(() => {
                 if (this.checkImportStatus > 0) {
                   this.$infoAlert(
