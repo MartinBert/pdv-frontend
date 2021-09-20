@@ -357,11 +357,11 @@ export default {
           element.nombre &&
           element.codigoBarra &&
           element.codigoProducto &&
-          element.distribuidores &&
           element.marca &&
           element.rubro &&
           element.propiedades &&
           element.atributos &&
+          element.distribuidores &&
           element.ivaComprasObject &&
           element.ivaVentasObject &&
           element.precioCosto &&
