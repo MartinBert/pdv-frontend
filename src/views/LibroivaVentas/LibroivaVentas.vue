@@ -208,7 +208,7 @@ export default {
             this.filterParams.page = 1;
           }
           this.loaded = true;
-        });
+        }); 
     },
 
     salesForDate1() {
@@ -298,6 +298,7 @@ export default {
     },
 
     formatForExcel(invoices) {
+      
       return invoices;
     },
 

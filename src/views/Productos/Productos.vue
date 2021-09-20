@@ -326,10 +326,12 @@ export default {
           }
         });
         let prod = this.validateImport(excel);
+        console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(() => {
+              console.log(prod.data);
               this.$successAlert("Importación exitosa").then(() => {
                 if (this.checkImportStatus > 0) {
                   this.$infoAlert(
@@ -348,17 +350,25 @@ export default {
 
     validateImport(productos) {
       let importacion = {
-        status: true,
+        status: false,
         data: [],
         message: "",
       };
       productos.forEach((element, index) => {
         if (
           element.nombre &&
-          element.codigoBarra &&
           element.codigoProducto &&
+          element.codigoBarra &&
+          element.rubro &&
+          element.marca &&
+          element.propiedades &&
+          element.atributos &&
+          element.distribuidores &&
+          element.depositos &&
           element.ganancia &&
-          element.precioTotal
+          element.precioTotal &&
+          element.ivaVentasObject &&
+          element.ivaComprasObject
         ) {
           if (element.codigoBarra == 1) {
             element.codigoBarra = generateBarCode();
@@ -374,7 +384,7 @@ export default {
             marca: this.getMarca(element.marca),
             rubro: this.getRubro(element.rubro),
             propiedades: this.getPropiedades(element.propiedades),
-            atributos: this.getAtributos(element),
+            atributos: this.getAtributos(element.atributos),
             distribuidores: this.getDistribuidores(element.idDistribuidores),
             ivaComprasObject: this.getIva(element.idIvaCompras),
             ivaVentasObject: this.getIva(element.idIvaVentas),
@@ -414,14 +424,15 @@ export default {
                 )
             ),
             precioTotal: element.precioTotal,
-            estado: 1,
+            estado: 1
           };
           importacion.data.push(obj);
         } else {
           importacion.status = false;
-          importacion.message = "Faltan datos en el renglón " + (index + 2);
+          importacion.message = "Faltan datos en el renglón " + (index + 1);
         }
       });
+      console.log(productos);
       return importacion;
     },
 
