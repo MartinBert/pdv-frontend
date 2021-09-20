@@ -331,7 +331,7 @@ export default {
         console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
-            .saveAll(prod.data)
+            .save(prod.data)
             .then(() => {
               console.log(prod.data);
               this.$successAlert("Importación exitosa").then(() => {
