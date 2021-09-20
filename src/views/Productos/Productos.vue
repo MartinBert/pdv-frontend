@@ -359,14 +359,7 @@ export default {
           element.nombre &&
           element.codigoBarra &&
           element.codigoProducto &&
-          element.marca &&
-          element.rubro &&
-          element.propiedades &&
-          element.atributos &&
-          element.distribuidores &&
-          element.ivaComprasObject &&
-          element.ivaVentasObject &&
-          element.precioCosto &&
+          element.ganancia &&
           element.precioTotal
         ) {
           if (element.codigoBarra == 1) {
