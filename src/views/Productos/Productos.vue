@@ -359,7 +359,14 @@ export default {
           element.nombre &&
           element.codigoBarra &&
           element.codigoProducto &&
-          element.ganancia &&
+          element.marca &&
+          element.rubro &&
+          element.propiedades &&
+          element.atributos &&
+          element.distribuidores &&
+          element.ivaComprasObject &&
+          element.ivaVentasObject &&
+          element.precioCosto &&
           element.precioTotal
         ) {
           if (element.codigoBarra == 1) {
@@ -376,7 +383,7 @@ export default {
             marca: this.getMarca(element.marca),
             rubro: this.getRubro(element.rubro),
             propiedades: this.getPropiedades(element.propiedades),
-            atributos: this.getAtributos(element.atributos),
+            atributos: this.getAtributos(element),
             distribuidores: this.getDistribuidores(element.idDistribuidores),
             ivaComprasObject: this.getIva(element.idIvaCompras),
             ivaVentasObject: this.getIva(element.idIvaVentas),
