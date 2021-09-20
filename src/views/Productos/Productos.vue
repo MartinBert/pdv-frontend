@@ -325,6 +325,7 @@ export default {
             }
           }
         });
+        console.log(excel);
         let prod = this.validateImport(excel);
         console.log(prod);
         if (prod.status) {
@@ -350,7 +351,7 @@ export default {
 
     validateImport(productos) {
       let importacion = {
-        status: false,
+        status: true,
         data: [],
         message: "",
       };
