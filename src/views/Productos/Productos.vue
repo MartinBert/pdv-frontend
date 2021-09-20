@@ -381,7 +381,7 @@ export default {
             marca: this.getMarca(element.marca),
             rubro: this.getRubro(element.rubro),
             propiedades: this.getPropiedades(element.propiedades),
-            atributos: this.getAtributos(element),
+            atributos: this.getAtributos(element.atributos),
             distribuidores: this.getDistribuidores(element.idDistribuidores),
             ivaComprasObject: this.getIva(element.idIvaCompras),
             ivaVentasObject: this.getIva(element.idIvaVentas),
