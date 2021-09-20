@@ -363,8 +363,9 @@ export default {
           element.propiedades &&
           element.atributos &&
           element.distribuidores &&
+          element.ivaComprasObject &&
+          element.ivaVentasObject &&
           element.precioCosto &&
-          element.ganancia &&
           element.precioTotal
         ) {
           if (element.codigoBarra == 1) {
