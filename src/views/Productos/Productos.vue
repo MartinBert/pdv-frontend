@@ -425,7 +425,7 @@ export default {
           };
           importacion.data.push(obj);
         } else {
-          importacion.status = false;
+          importacion.status = true;
           importacion.message = "Faltan datos en el renglón " + (index + 1);
         }
       });
