@@ -60,7 +60,7 @@
               <v-row>
                 <v-col cols="8">
                   <v-row>
-                    <v-col cols="6" >
+                    <v-col cols="6">
                       <v-autocomplete
                         @change="
                           getComercialDocuments(
@@ -74,9 +74,10 @@
                         :return-object="true"
                         placeholder="Seleccione un cliente"
                         required
+                        :roles="clienteRules"
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" >
+                    <v-col cols="6">
                       <v-autocomplete
                         ref="documents"
                         class="button-ventas comprobante"
@@ -86,9 +87,10 @@
                         :return-object="true"
                         placeholder="Seleccione un tipo de comprobante"
                         required
+                        :roles="comprobantesRules"
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" >
+                    <v-col cols="6">
                       <v-autocomplete
                         ref="paymentMethods"
                         class="button-ventas medio-pago"
@@ -99,9 +101,10 @@
                         :return-object="true"
                         placeholder="Seleccione un medio de pago"
                         required
+                        :roles="medioPagoRules"
                       ></v-autocomplete>
                     </v-col>
-                    <v-col cols="6" >
+                    <v-col cols="6">
                       <v-autocomplete
                         ref="paymentPlans"
                         class="button-ventas plan-pago"
@@ -110,6 +113,8 @@
                         item-text="nombre"
                         :return-object="true"
                         placeholder="Seleccione un plan de pago"
+                        required
+                        :roles="plandePagoRules"
                       ></v-autocomplete>
                     </v-col>
                     <v-col
@@ -129,6 +134,7 @@
                         filled
                         dense
                         v-model="object.fechaVencimiento"
+                        required
                       />
                     </v-col>
                   </v-row>
@@ -155,6 +161,23 @@
                           class="totalInput"
                           type="text"
                           v-model="totalItems"
+                        />
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col class="text-right">
+                        <label class="mr-3 align-center">TOTAL DE DESCUENTOS Y RECARGOS POR LÍNEA</label>
+                        <input
+                          disabled
+                          class="totalInput mr-1"
+                          type="text"
+                          v-model="totalLineDiscounts"
+                        />
+                        <input
+                          disabled
+                          class="totalInput"
+                          type="text"
+                          v-model="totalLineSurchages"
                         />
                       </v-col>
                     </v-row>
@@ -202,7 +225,11 @@
                               v-if="p.editable === true"
                             >
                               <p class="mt-4">$</p>
-                              <input type="number" v-model="p.precioTotal" @input="detectPriceEdition(p)"/>
+                              <input
+                                type="number"
+                                v-model="p.precioTotal"
+                                @input="detectPriceEdition(p)"
+                              />
                             </div>
                           </td>
 
@@ -237,7 +264,7 @@
               <v-col cols="1">
                 <div class="verticalSeparator"></div>
               </v-col>
-              <v-col cols="10" >
+              <v-col cols="10">
                 <Calculator class="mt-2" />
                 <div style="text-align: center; padding: 1em 0">
                   <h3>
@@ -333,6 +360,10 @@ export default {
       medios_de_pago: [],
       documentos: [],
     },
+    comprobantesRules: [(v) => !!v || "Comprobante es requerido"],
+    medioPagoRules: [(v) => !!v || "medios de pago es requerido"],
+    plandePagoRules: [(v) => !!v || "Plan de pago es requerido"],
+    clienteRules: [(v) => !!v || "Cliente es requerido"],
     productos: [],
     products: [],
     productsDetail: [],
@@ -358,7 +389,7 @@ export default {
     productsWithoutStock: [],
     productsInOtherDeposits: [],
     lowStock: [],
-    perfil: null
+    perfil: null,
   }),
 
   components: {
@@ -378,22 +409,23 @@ export default {
 
   computed: {
     totalVenta() {
-      let total = this.products.reduce((acc, el) => {
-        if (this.object.planPago) {
-          const cleanPorcent = decimalPercent(this.object.planPago.porcentaje);
-          const impPorcent = el.precioTotal * cleanPorcent;
-          const totalValue =
-            Math.round(
-              (acc + Number(el.precioTotal) + Number(impPorcent)) * 100
-            ) / 100;
-          return totalValue;
-        } else {
-          return acc + Number(el.precioTotal);
-        }
-      }, 0);
-      if (this.object.cliente && this.object.cliente.alicIngBrutos > 0) {
-        total = total + (total * this.object.cliente.alicIngBrutos) / 100;
+      let planDiscountPercent = 0;
+      let planSurchagePercent = 0;
+      if(this.object.planPago){
+        planDiscountPercent = (this.object.planPago.porcentaje < 0) ? this.object.planPago.porcentaje : 0;
+        planSurchagePercent = (this.object.planPago.porcentaje > 0) ? this.object.planPago.porcentaje : 0;
       }
+      const sumOfProductPrices = this.products.reduce((acc, el) =>  {
+        if(!el.nombre.includes("DESCUENTO") && !el.nombre.includes("RECARGO")){
+          acc += Number(el.precioTotal)
+        }
+        return acc;
+      }, 0);
+      const totalOfPlanDiscount =  sumOfProductPrices * decimalPercent(planDiscountPercent);
+      const totalOfPlanSurcharge = sumOfProductPrices * decimalPercent(planSurchagePercent);
+      const globalDiscount = (sumOfProductPrices * decimalPercent(this.porcentajeDescuentoGlobal)) * -1;
+      const globalSurcharge = sumOfProductPrices * decimalPercent(this.porcentajeRecargoGlobal);
+      const total = sumOfProductPrices + totalOfPlanDiscount + totalOfPlanSurcharge + globalDiscount + globalSurcharge;
       return roundTwoDecimals(total);
     },
 
@@ -404,6 +436,26 @@ export default {
       );
       return totItems;
     },
+
+    totalLineDiscounts(){
+      const total = this.products.reduce((acc, el) => {
+        if(el.nombre.includes("DESCUENTO - ")){
+          acc += el.precioTotal;
+        }
+        return acc;
+      }, 0)
+      return total;
+    },
+
+    totalLineSurchages(){
+      const total = this.products.reduce((acc, el) => {
+        if(el.nombre.includes("RECARGO - ")){
+          acc += el.precioTotal;
+        }
+        return acc;
+      }, 0)
+      return total;
+    }
   },
 
   mounted() {
@@ -580,30 +632,38 @@ export default {
     },
 
     addProduct(data) {
-      this.productsDescription = [];
+      let existe = false;
       data = [...new Set(data)];
       this.productsDetail = data;
       data.forEach((product) => {
-        const objectForProductsDescription = {
-          name: product.nombre,
-          barCode: product.codigoBarra,
-          code: product.codigoProducto,
-          tradeMarkName: product.marca.nombre,
-          tradeMarkId: product.marca.id,
-          rubroName: product.rubro.nombre,
-          rubroId: product.rubro.id,
-          attributes: product.atributos,
-          properties: product.propiedades,
-          quantity: product.cantUnidades,
-          costPrice: product.precioCosto,
-          salePrice: product.precioTotal,
-          buyIvaPercent: product.ivaComprasObject.porcentaje,
-          saleIvaPercent: product.ivaVentasObject.porcentaje,
-          buyIvaAmount: product.ivaCompra,
-          saleIvaAmount: product.ivaVenta,
-          providerData: product.proveedores ? product.proveedores : [],
-        };
-        this.productsDescription.push(objectForProductsDescription);
+        existe = false;
+        this.productsDescription.forEach((product2) => {
+          if (product.codigoBarra === product2.barCode) {
+            existe = true;
+          }
+        });
+        if (!existe) {
+          const objectForProductsDescription = {
+            name: product.nombre,
+            barCode: product.codigoBarra,
+            code: product.codigoProducto,
+            tradeMarkName: product.marca.nombre,
+            tradeMarkId: product.marca.id,
+            rubroName: product.rubro.nombre,
+            rubroId: product.rubro.id,
+            attributes: product.atributos,
+            properties: product.propiedades,
+            quantity: product.cantUnidades,
+            costPrice: product.precioCosto,
+            salePrice: product.precioTotal,
+            buyIvaPercent: product.ivaComprasObject.porcentaje,
+            saleIvaPercent: product.ivaVentasObject.porcentaje,
+            buyIvaAmount: product.ivaCompra,
+            saleIvaAmount: product.ivaVenta,
+            providerData: product.proveedores ? product.proveedores : [],
+          };
+          this.productsDescription.push(objectForProductsDescription);
+        }
       });
 
       let processPorducts = [];
@@ -648,17 +708,23 @@ export default {
         this.loguedUser.sucursal.condicionIva.documentos
       );
       this.getPaymentPlans(presupuesto.mediosPago[0]);
+      console.log(presupuesto);
       this.object = presupuesto;
+      console.log(this.object);
       this.object.mediosPago = presupuesto.mediosPago[0];
       this.object.planPago = presupuesto.planesPago[0];
       this.products = presupuesto.productos;
+      this.porcentajeDescuentoGlobal = this.object.porcentajeDescuentoGlobal;
+      this.porcentajeRecargoGlobal = this.object.porcentajeRecargoGlobal;
     },
 
     /******************************************************************************************************/
     /* ALL FUNCTIONS FOR PROCESS SALE DATA ---------------------------------------------------------------*/
     /******************************************************************************************************/
-    detectPriceEdition(p){
-      this.productsDescription.filter(el => el.barCode === p.codigoBarra)[0].salePrice = Number(p.precioTotal);
+    detectPriceEdition(p) {
+      this.productsDescription.filter(
+        (el) => el.barCode === p.codigoBarra
+      )[0].salePrice = Number(p.precioTotal);
     },
 
     updateTotal(id) {
@@ -704,18 +770,22 @@ export default {
     },
 
     deleteLine(product) {
-      const {id, codigoBarra} = product;
+      const { id, codigoBarra } = product;
       const filter = this.products.filter((el) => el.id !== id);
       const filterForStore = this.products.filter((el) => el.id === id)[0].id;
-      const filterForProductsDescription = this.productsDescription.filter(el => el.barCode !== codigoBarra);
-      const filterForProductsDetail = this.productsDetail.filter(el => el.id !== id);
+      const filterForProductsDescription = this.productsDescription.filter(
+        (el) => el.barCode !== codigoBarra
+      );
+      const filterForProductsDetail = this.productsDetail.filter(
+        (el) => el.id !== id
+      );
 
-      if(product.nombre === "DESCUENTO") {
+      if (product.nombre === "DESCUENTO") {
         this.descuentoGlobal = 0;
         this.porcentajeDescuentoGlobal = 0;
       }
 
-      if(product.nombre === "RECARGO") {
+      if (product.nombre === "RECARGO") {
         this.recargoGlobal = 0;
         this.porcentajeRecargoGlobal = 0;
       }
@@ -730,7 +800,7 @@ export default {
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
         const total = this.productsDescription.reduce(
-          (acc, el) => acc + el.salePrice,
+          (acc, el) => acc + el.salePrice * Number(el.quantity),
           0
         );
         let percent = calculatePercentaje(total, priceModificationPorcent);
@@ -1010,12 +1080,10 @@ export default {
           } else {
             this.save();
           }
+        } else if (documento.presupuesto === true) {
+          this.savePresupuesto();
         } else {
-          if (documento.presupuesto === true) {
-            this.savePresupuesto();
-          } else {
-            this.saveNoFiscal();
-          }
+          this.saveNoFiscal();
         }
       } else {
         this.$errorAlert(
@@ -1101,6 +1169,20 @@ export default {
                       planAmountDiscount,
                     }) => {
                       // Create receipt
+
+                      console.log(total,
+                      subTotal,
+                      amountOfIva21,
+                      amountOfIva10,
+                      amountOfIva27,
+                      totalOfIvas,
+                      totalOfDiscounts,
+                      totalOfSurcharges,
+                      planPercentSurcharge,
+                      planPercentDiscount,
+                      planAmountSurcharge,
+                      planAmountDiscount)
+
                       comprobante = {
                         letra: documento.letra,
                         numeroCbte:
@@ -1126,7 +1208,8 @@ export default {
                         subTotal: subTotal,
                         totalDescuentoGlobal: this.descuentoGlobal,
                         totalRecargoGlobal: this.recargoGlobal,
-                        porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+                        porcentajeDescuentoGlobal: this
+                          .porcentajeDescuentoGlobal,
                         porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
                         totalIva21: amountOfIva21,
                         totalIva10: amountOfIva10,
@@ -1149,7 +1232,7 @@ export default {
                         comprobante.id = this.object.id;
                       }
 
-                      console.log(comprobante);
+                      console.log(comprobante)
 
                       /*** Save receipt in database and print invoice ***/
                       if (comprobante.cae) {
@@ -1424,7 +1507,7 @@ export default {
                 nombreDocumento: documento.nombre,
               };
               /*** Evaluate required sale form data ***/
-              if (comprobante.mediosPago[0] !== undefined) {
+              if (comprobante.mediosPago[0] !== 0) {
                 if (Number(comprobante.totalVenta) !== 0) {
                   /*** Save receipt in database and print ticket ***/
                   GenericService(tenant, "comprobantesFiscales", token)
@@ -1448,24 +1531,17 @@ export default {
                           );
                         });
                     });
-                } else {
-                  this.$errorAlert(
-                    "No hay productos seleccionados en la venta"
-                  ).then((result) => {
-                    if (result.isDismissed) {
-                      this.loaded = true;
-                    }
-                  });
                 }
               } else {
-                this.$errorAlert("Debe seleccionar un medio de pago").then(
-                  (result) => {
-                    if (result.isDismissed) {
-                      this.loaded = true;
-                    }
+                this.$errorAlert(
+                  "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
+                ).then((result) => {
+                  if (result.isDismissed) {
+                    this.loaded = true;
                   }
-                );
+                });
               }
+
             }
           );
         });
@@ -1653,8 +1729,6 @@ export default {
         this.porcentajeDescuentoGlobal
       );
 
-      console.log(this.productsDescription);
-
       this.productsDescription = await this.sumGlobalSurcharge(
         this.productsDescription,
         this.porcentajeRecargoGlobal
@@ -1746,7 +1820,7 @@ export default {
           if (prodDescription.name === discountCleanName) {
             prodDescription.discountPercent = calculatePositivePercentajeCoefficient(
               discount.precioTotal,
-              (prodDescription.salePrice * Number(prodDescription.quantity))
+              prodDescription.salePrice * Number(prodDescription.quantity)
             );
           }
         });
@@ -1764,7 +1838,7 @@ export default {
           if (prodDescription.name === surchargeCleanName) {
             prodDescription.surchargePercent = calculatePositivePercentajeCoefficient(
               surcharge.precioTotal,
-              (prodDescription.salePrice * Number(prodDescription.quantity)) 
+              prodDescription.salePrice * Number(prodDescription.quantity)
             );
           }
         });
@@ -1825,10 +1899,12 @@ export default {
     calculateAmountOfPriceVariations(productsDescription) {
       productsDescription.forEach((prodDescription) => {
         prodDescription.discountAmount =
-          (prodDescription.salePrice * Number(prodDescription.quantity)) *
+          prodDescription.salePrice *
+          Number(prodDescription.quantity) *
           decimalPercent(prodDescription.discountPercent);
         prodDescription.surchargeAmount =
-          (prodDescription.salePrice * Number(prodDescription.quantity)) *
+          prodDescription.salePrice *
+          Number(prodDescription.quantity) *
           decimalPercent(prodDescription.surchargePercent);
       });
       return productsDescription;
@@ -1852,7 +1928,7 @@ export default {
 
     calculateSumOfProductSalePrices(productsDescription) {
       const total = productsDescription.reduce(
-        (acc, el) => acc + (el.salePrice * Number(el.quantity)),
+        (acc, el) => acc + el.salePrice * Number(el.quantity),
         0
       );
       return roundTwoDecimals(total);
@@ -1864,10 +1940,13 @@ export default {
           product.saleIvaPercent = 21;
         }
         product.salePrice =
-          product.salePrice - (product.discountAmount / Number(product.quantity)) + (product.surchargeAmount / (product.quantity));
+          product.salePrice -
+          product.discountAmount / Number(product.quantity) +
+          product.surchargeAmount / product.quantity;
         product.saleIvaAmount =
-          (product.salePrice * Number(product.quantity)) -
-          (product.salePrice * Number(product.quantity)) / (1 + decimalPercent(product.saleIvaPercent));
+          product.salePrice * Number(product.quantity) -
+          (product.salePrice * Number(product.quantity)) /
+            (1 + decimalPercent(product.saleIvaPercent));
       });
       return productsDescription;
     },

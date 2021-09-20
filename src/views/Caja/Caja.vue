@@ -17,8 +17,8 @@ export default {
   data: () => ({
     objects: [],
      filterParams: {
-      sucursalId: "",
       page: 1,
+      fecha:"",
       size: 10,
       totalPages: 0,
     },
@@ -39,6 +39,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     this.filterObjects();
     this.getClientIpForFiscalController();
   },

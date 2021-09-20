@@ -15,7 +15,7 @@
                   type="date"
                   v-model="fechaDesde"
                   label="Fecha desde"
-                  @input="createDate(fechaDesde, 'fechaDesde')"
+                  @input="filterObjects()"
                   required
                 >
                 </v-text-field>
@@ -25,37 +25,28 @@
                   type="date"
                   label="Fecha hasta"
                   v-model="fechaHasta"
-                  @input="createDate(fechaHasta, 'fechaHasta')"
+                  @input="filterObjects()"
                   required
                 >
                 </v-text-field>
-                <v-btn
-                  class="primary v-btn--block"
-                  @click="
-                    salesForDate1(
-                      object.fechaDesde,
-                      object.fechaHasta
-                    )
-                  "
-                >
-                  Buscar Comprobantes
-                </v-btn>
-                <v-btn
-                  class="primary v-btn--block"
-                  type="button"
-                  style="margin-left:400px;
-                   margin-top:-100px;
-                   "
-                  @click="exportGeneralExcel()"
-                  >Imprimir libro</v-btn
-                >
               </div>
+            </v-col>
+            <v-col cols="2">
+                    <v-btn
+                  class="primary v-btn--block"
+                   style="margin-left:400px;
+                margin-top:-150px;
+                "
+                  @click="salesForDate1()"
+                >
+                  Imprimir libro iva
+                </v-btn>
             </v-col>
             <v-col cols="3">
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
-                margin-top:-100px;
+                margin-top:-180px;
                 "
                 label="Facturas(A)"
                 v-model="filterParams.facturaA"
@@ -66,7 +57,7 @@
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
-                margin-top:-100px;
+                margin-top:-150px;
                 "
                 label="Facturas(B)"
                 v-model="filterParams.facturaB"
@@ -77,7 +68,7 @@
               <v-checkbox
                 v-on:change="filterObjects()"
                 style="margin-left:900px;
-                margin-top:-100px;
+                margin-top:-200px;
                 "
                 label="Facturas(C)"
                 v-model="filterParams.facturaC"
@@ -97,43 +88,6 @@
        margin-top:-5px;
       "
       >
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.fechaEmision"
-            dense
-            outlined
-            rounded
-            label="Busqueda por Fecha Emision"
-            class="text-left"
-            v-on:input="filterObjects()"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.numeroComprobante"
-            dense
-            outlined
-            rounded
-            type="number"
-            label="Busqueda por numero de comprobante"
-            class="text-left"
-            append-icon="mdi-magnify"
-            v-on:input="filterObjects()"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="2">
-          <v-text-field
-            v-model="filterParams.blackReceiptFilter"
-            dense
-            outlined
-            rounded
-            label="Busqueda especial"
-            class="text-left"
-            v-on:input="filterObjects()"
-            append-icon="mdi-magnify"
-          ></v-text-field>
-        </v-col>
       </v-row>
       <v-data-table
         :headers="headers"
@@ -154,10 +108,7 @@
 <script>
 import ComprobantesService from "../../services/ComprobantesService";
 import Pagination from "../../components/Pagination";
-import {
-  generateIntegerDate,
-  monthsList,
-} from "../../helpers/dateHelper";
+import { generateIntegerDate, monthsList, formatDate } from "../../helpers/dateHelper";
 import { exportExcelLibro } from "../../helpers/exportFileHelper";
 import GenericService from "../../services/GenericService";
 export default {
@@ -169,7 +120,7 @@ export default {
     file: null,
     obj: {},
     sucusal: [],
-    invoices:[],
+    invoices: [],
     empresa: [],
     ivas: [],
     object: {
@@ -184,24 +135,19 @@ export default {
     fechaDesde: null,
     fechaHasta: null,
     filterParams: {
-      blackReceiptFilter: "",
       sucursalId: "",
-      barCode:"",
-      numeroCbte:"",
-      fechaEmision: "",
-      comprobanteCerrado: "",
-      numeroComprobante: "",
-      totalVenta: "",
+      fechaDesdeString: "",
+      fechaHastaString: "",
       facturaA: false,
       facturaB: false,
       facturaC: false,
       page: 1,
       size: 10,
-      totalPages:0,
+      totalPages: 0,
     },
     loaded: false,
     tenant: "",
-    service: "ventas",
+    service: "librosDeIva",
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -214,7 +160,7 @@ export default {
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva.nombre" },
       { text: "N° Cuit", value: "cliente.cuit" },
-      { text: "Neto Grabado", value: "sucursal.ingBruto" },
+      { text: "Neto Grabado", value: "netoGrabado" },
       { text: "Iva 27%", value: "totalIva27" },
       { text: "Iva 21%", value: "totalIva21" },
       { text: "Iva 10,5%", value: "totalIva10" },
@@ -246,9 +192,16 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
+      if(this.fechaDesde && this.fechaHasta){
+        this.filterParams.fechaDesdeString = formatDate(this.fechaDesde);
+        this.filterParams.fechaHastaString = formatDate(this.fechaHasta);
+      }
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
+          data.data.content.forEach((data) => {
+            data.netoGrabado = Number(data.totalVenta) - Number(data.totalIvas);
+          })
           this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
@@ -258,30 +211,30 @@ export default {
         }); 
     },
 
-    createDate(date, param) {
-      const integerDate = generateIntegerDate(date);
-      if (param === "fechaDesde") {
-        this.object.fechaDesde = integerDate;
-      } else {
-        this.object.fechaHasta = integerDate;
-      }
-    },
-
-    salesForDate1(fechaDesde, fechaHasta) {
+    salesForDate1() {
       if (this.notPassSucursalValidations()) return this.error("sucursal");
       if (this.notPassDateValidations()) return this.error("fechas");
       let sucursalId = this.loguedUser.sucursal.id;
       const filterParams = {
         sucursalId,
-        fechaDesde,
-        fechaHasta
-      }
+        fechaDesde: generateIntegerDate(this.fechaDesde),
+        fechaHasta: generateIntegerDate(this.fechaHasta),
+      };
       ComprobantesService(this.tenant, "comprobantesFiscales", this.token)
-      .getInvoicesForDateRange(filterParams)
-      .then(data => {
-        const invoices = data.data;
-        this.exportGeneralExcel(invoices)
-      })
+        .getInvoicesForDateRange(filterParams)
+        .then((data) => {
+          let invoices = data.data;
+          if(this.filterParams.facturaA){
+            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS A");
+          }else if(this.filterParams.facturaB){
+            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS B");
+          }else if(this.filterParams.facturaC){
+            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS C");
+          }else if(this.filterParams){
+            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS A" || el.nombreDocumento === "FACTURAS B" );
+          }
+          this.exportGeneralExcel(invoices);
+        });
     },
 
     async exportGeneralExcel(invoices) {
@@ -299,14 +252,14 @@ export default {
         "IVA 10%",
         "TOTAL FACTURADO",
       ];
-      if(invoices){
+      if (invoices) {
         let formatedInvoicesParam = [];
-        invoices.forEach(el => {
+        invoices.forEach((el) => {
           el = this.formatForExcel(el);
           formatedInvoicesParam.push(el);
-        })
+        });
         exportExcelLibro(headers, formatedInvoicesParam);
-      }else{
+      } else {
         const data = await this.setDataToExcel();
         exportExcelLibro(headers, data);
       }
@@ -332,7 +285,7 @@ export default {
         size: 100000,
         totalPages: 0,
       };
-      await GenericService(this.tenant, this.service, this.token)
+      await GenericService(this.tenant, "ventas", this.token)
         .filter(filters)
         .then((data) => {
           let ventas = data.data.content;
@@ -354,8 +307,21 @@ export default {
       return true;
     },
 
-    notPassDateValidations(){
-      if(this.fechaDesde && this.fechaHasta) return false;
+    notPassDateValidations() {
+      if (this.fechaDesde && this.fechaHasta) return false;
+      return true;
+    },
+
+     notPassInvoiceAValidations() {
+      if (this.facturaA) return false;
+      return true;
+    },
+      notPassInvoiceBValidations() {
+      if (this.facturaB) return false;
+      return true;
+    },
+      notPassInvoiceCValidations() {
+      if (this.facturaC) return false;
       return true;
     },
 
@@ -370,6 +336,9 @@ export default {
           break;
         default:
           error = "Debe seleccionar una sucursal para realizar el reporte";
+          break;
+        case "facturas":
+          error = "Debe seleccionar el tipo de factura que desea imprimir"
           break;
       }
       this.$errorAlert(error);
