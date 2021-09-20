@@ -359,14 +359,8 @@ export default {
           element.nombre &&
           element.codigoBarra &&
           element.codigoProducto &&
-          element.marca &&
-          element.rubro &&
-          element.propiedades &&
-          element.atributos &&
-          element.distribuidores &&
-          element.precioCosto &&
-          element.precioTotal &&
-          element.estado
+          element.ganancia &&
+          element.precioTotal
         ) {
           if (element.codigoBarra == 1) {
             element.codigoBarra = generateBarCode();
