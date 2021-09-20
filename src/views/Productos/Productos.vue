@@ -361,6 +361,7 @@ export default {
           element.nombre &&
           element.codigoBarra &&
           element.codigoProducto &&
+          element.marca &&
           element.ganancia &&
           element.precioTotal
         ) {
@@ -418,6 +419,7 @@ export default {
                 )
             ),
             precioTotal: element.precioTotal,
+            estado: 1
           };
           importacion.data.push(obj);
         } else {
