@@ -350,7 +350,7 @@ export default {
 
     validateImport(productos) {
       let importacion = {
-        status: true,
+        status: false,
         data: [],
         message: "",
       };
@@ -422,7 +422,7 @@ export default {
                 )
             ),
             precioTotal: element.precioTotal,
-            estado: 0
+            estado: 1
           };
           importacion.data.push(obj);
         } else {
