@@ -33,7 +33,7 @@
           del artículo y no de de su precio final de venta.
           -->
           </v-col>
-          <v-col cols="3" v-if="perfil < 3">2
+          <v-col cols="3" v-if="perfil < 3">
             <v-file-input
               class="mt-2"
               dense
