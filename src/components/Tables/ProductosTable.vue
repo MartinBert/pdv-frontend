@@ -164,6 +164,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.productos = data.data.content;
+          console.log(this.productos);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
