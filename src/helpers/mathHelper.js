@@ -34,7 +34,6 @@ export function calculatePercentReductionInAmount(number, percent) {
 }
 
 export function sumarNumeros(array) {
-    console.log(array);
     return roundTwoDecimals(array.reduce((acc, el) => acc + Number(el), 0));
 }
 
