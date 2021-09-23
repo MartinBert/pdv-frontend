@@ -1175,7 +1175,7 @@ export default {
                   planAmountDiscount,
                 }) => {
                   // Create receipt
-                  if(total && subTotal && amountOfIva21){
+                  if(total && subTotal && amountOfIva21 && totalOfDiscounts && totalOfSurcharges){
                     comprobante = {
                       letra: documento.letra,
                       numeroCbte:
