@@ -1232,7 +1232,7 @@ export default {
                         comprobante.id = this.object.id;
                       }
 
-                      console.log(comprobante)
+                      console.log(comprobante);
 
                       /*** Save receipt in database and print invoice ***/
                       if (comprobante.cae) {

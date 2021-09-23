@@ -443,6 +443,7 @@ export default {
       axios
       .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`)
       .then(data => {
+        console.log(data);
         const lastInvoiceNumber = data.data.responseOfAfip;
         const numberOfCurrentInvoice = getNextInvoiceNumber(lastInvoiceNumber)
         const dataForCreateInvoice = {
