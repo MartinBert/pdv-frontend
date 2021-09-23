@@ -164,7 +164,7 @@
                         />
                       </v-col>
                     </v-row>
-                    <v-row>
+                    <!-- <v-row>
                       <v-col class="text-right">
                         <label class="mr-3 align-center">TOTAL DE DESCUENTOS Y RECARGOS POR LÍNEA</label>
                         <input
@@ -180,7 +180,7 @@
                           v-model="totalLineSurchages"
                         />
                       </v-col>
-                    </v-row>
+                    </v-row> -->
                   </v-container>
                 </v-col>
               </v-row>
@@ -390,6 +390,7 @@ export default {
     productsInOtherDeposits: [],
     lowStock: [],
     perfil: null,
+    processPresupuesto: false
   }),
 
   components: {
@@ -708,14 +709,11 @@ export default {
         this.loguedUser.sucursal.condicionIva.documentos
       );
       this.getPaymentPlans(presupuesto.mediosPago[0]);
-      console.log(presupuesto);
       this.object = presupuesto;
-      console.log(this.object);
       this.object.mediosPago = presupuesto.mediosPago[0];
       this.object.planPago = presupuesto.planesPago[0];
       this.products = presupuesto.productos;
-      this.porcentajeDescuentoGlobal = this.object.porcentajeDescuentoGlobal;
-      this.porcentajeRecargoGlobal = this.object.porcentajeRecargoGlobal;
+      this.processPresupuesto = true;
     },
 
     /******************************************************************************************************/
@@ -1073,7 +1071,7 @@ export default {
     saveSale() {
       this.loaded = false;
       const documento = this.object.documento;
-      if (documento !== undefined || this.object.mediosPago !== undefined || this.object.planesPago !== undefined) {
+      if (documento !== undefined && this.object.mediosPago !== undefined && this.object.planPago !== undefined) {
         if (documento.tipo === true) {
           if (documento.ticket === true) {
             this.saveTicket(documento.nombre);
@@ -1081,7 +1079,17 @@ export default {
             this.save();
           }
         } else if (documento.presupuesto === true) {
-          this.savePresupuesto();
+          if(this.object.fechaVencimiento){
+            this.savePresupuesto();
+          }else{
+            this.$errorAlert(
+            "Debe indicar una fecha de vencimiento en el presupuesto"
+            ).then((result) => {
+              if (result.isDismissed) {
+                this.loaded = true;
+              }
+            });
+          }
         } else {
           this.saveNoFiscal();
         }
@@ -1134,103 +1142,6 @@ export default {
             totalVenta: totalVenta,
           };
           invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice);
-          /*** Evaluate required sale form data ***/
-          if (mediosPago !== undefined) {
-            if (products.length > 0) {
-              /*** Send invoice to AFIP ***/
-              axios
-                .post(
-                  `${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`,
-                  invoice
-                )
-                .then((data) => {
-                  const cae = data.data.CAE;
-                  const dateOfCaeExpiration = data.data.CAEFchVto;
-                  const barCode =
-                    sucursal.cuit +
-                    addZerosInString("02", documento.codigoDocumento) +
-                    addZerosInString("04", ptoVenta.idFiscal) +
-                    cae +
-                    formatDateWithoutSlash(dateOfCaeExpiration);
-
-                  this.calculateRelevantAmountsOfInvoice().then(
-                    ({
-                      total,
-                      subTotal,
-                      amountOfIva21,
-                      amountOfIva10,
-                      amountOfIva27,
-                      totalOfIvas,
-                      totalOfDiscounts,
-                      totalOfSurcharges,
-                      planPercentSurcharge,
-                      planPercentDiscount,
-                      planAmountSurcharge,
-                      planAmountDiscount,
-                    }) => {
-                      // Create receipt
-
-                      console.log(total,
-                      subTotal,
-                      amountOfIva21,
-                      amountOfIva10,
-                      amountOfIva27,
-                      totalOfIvas,
-                      totalOfDiscounts,
-                      totalOfSurcharges,
-                      planPercentSurcharge,
-                      planPercentDiscount,
-                      planAmountSurcharge,
-                      planAmountDiscount)
-
-                      comprobante = {
-                        letra: documento.letra,
-                        numeroCbte:
-                          addZerosInString("04", ptoVenta.idFiscal) +
-                          "-" +
-                          addZerosInString("08", numberOfReceipt),
-                        fechaEmision: formatDate(getCurrentDate()),
-                        fechaVto: formatDate(dateOfCaeExpiration),
-                        correlativoComprobante: numberOfReceipt,
-                        condicionVenta: condVenta,
-                        productos: products,
-                        productosDetalle: productsDetail,
-                        productoDescription: this.productsDescription,
-                        barCode: barCode,
-                        cae: cae,
-                        logoUrl: this.loguedUser.sucursal.logo,
-                        puntoVenta: ptoVenta,
-                        sucursal: sucursal,
-                        documentoComercial: documento,
-                        empresa: empresa,
-                        cliente: cliente,
-                        totalVenta: total,
-                        subTotal: subTotal,
-                        totalDescuentoGlobal: this.descuentoGlobal,
-                        totalRecargoGlobal: this.recargoGlobal,
-                        porcentajeDescuentoGlobal: this
-                          .porcentajeDescuentoGlobal,
-                        porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-                        totalIva21: amountOfIva21,
-                        totalIva10: amountOfIva10,
-                        totalIva27: amountOfIva27,
-                        totalIvas: totalOfIvas,
-                        totalDescuentos: totalOfDiscounts,
-                        totalRecargos: totalOfSurcharges,
-                        porcentajeRecargoPlan: planPercentSurcharge,
-                        porcentajeDescuentoPlan: planPercentDiscount,
-                        totalDescuentoPlan: roundTwoDecimals(
-                          planAmountDiscount
-                        ),
-                        totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-                        mediosPago: [mediosPago],
-                        planesPago: [planPago],
-                        nombreDocumento: documento.nombre,
-                      };
-
-                      if (this.object.id) {
-                        comprobante.id = this.object.id;
-                      }
 
                       console.log(comprobante);
 
@@ -1251,44 +1162,143 @@ export default {
                           })
                           .then(() => {
                             this.applyStockModifications(comprobante);
+          /*** Send invoice to AFIP ***/
+          axios
+            .post(
+              `${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`,
+              invoice
+            )
+            .then((data) => {
+              const cae = data.data.CAE;
+              const dateOfCaeExpiration = data.data.CAEFchVto;
+              const barCode =
+                sucursal.cuit +
+                addZerosInString("02", documento.codigoDocumento) +
+                addZerosInString("04", ptoVenta.idFiscal) +
+                cae +
+                formatDateWithoutSlash(dateOfCaeExpiration);
+
+              this.calculateRelevantAmountsOfInvoice().then(
+                ({
+                  total,
+                  subTotal,
+                  amountOfIva21,
+                  amountOfIva10,
+                  amountOfIva27,
+                  totalOfIvas,
+                  totalOfDiscounts,
+                  totalOfSurcharges,
+                  planPercentSurcharge,
+                  planPercentDiscount,
+                  planAmountSurcharge,
+                  planAmountDiscount,
+                }) => {
+                  // Create receipt
+                  if(total && subTotal && amountOfIva21){
+                    comprobante = {
+                      letra: documento.letra,
+                      numeroCbte:
+                        addZerosInString("04", ptoVenta.idFiscal) +
+                        "-" +
+                        addZerosInString("08", numberOfReceipt),
+                      fechaEmision: formatDate(getCurrentDate()),
+                      fechaVto: formatDate(dateOfCaeExpiration),
+                      correlativoComprobante: numberOfReceipt,
+                      condicionVenta: condVenta,
+                      productos: products,
+                      productosDetalle: productsDetail,
+                      productoDescription: this.productsDescription,
+                      barCode: barCode,
+                      cae: cae,
+                      logoUrl: this.loguedUser.sucursal.logo,
+                      puntoVenta: ptoVenta,
+                      sucursal: sucursal,
+                      documentoComercial: documento,
+                      empresa: empresa,
+                      cliente: cliente,
+                      totalVenta: total,
+                      subTotal: subTotal,
+                      totalDescuentoGlobal: this.descuentoGlobal,
+                      totalRecargoGlobal: this.recargoGlobal,
+                      porcentajeDescuentoGlobal: this
+                        .porcentajeDescuentoGlobal,
+                      porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                      totalIva21: amountOfIva21,
+                      totalIva10: amountOfIva10,
+                      totalIva27: amountOfIva27,
+                      totalIvas: totalOfIvas,
+                      totalDescuentos: totalOfDiscounts,
+                      totalRecargos: totalOfSurcharges,
+                      porcentajeRecargoPlan: planPercentSurcharge,
+                      porcentajeDescuentoPlan: planPercentDiscount,
+                      totalDescuentoPlan: roundTwoDecimals(
+                        planAmountDiscount
+                      ),
+                      totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+                      mediosPago: [mediosPago],
+                      planesPago: [planPago],
+                      nombreDocumento: documento.nombre,
+                    } 
+                  } else {
+                    comprobante = this.object;
+                    comprobante.letra = documento.letra;
+                    comprobante.numeroCbte =
+                      addZerosInString("04", ptoVenta.idFiscal) +
+                      "-" +
+                      addZerosInString("08", numberOfReceipt);
+                    comprobante.fechaEmision = formatDate(getCurrentDate());
+                    comprobante.fechaVto = formatDate(dateOfCaeExpiration);
+                    comprobante.correlativoComprobante = numberOfReceipt;
+                    comprobante.condicionVenta = condVenta;
+                    comprobante.barCode = barCode;
+                    comprobante.cae = cae;
+                    comprobante.mediosPago = [this.object.mediosPago];
+                    comprobante.planesPago = this.object.planesPago;
+                    comprobante.nombreDocumento = documento.nombre;
+                    comprobante.documentoComercial = documento;
+                  }
+
+                  if (this.object.id) {
+                    comprobante.id = this.object.id;
+                  }
+                  console.log(comprobante);
+                  /*** Save receipt in database and print invoice ***/
+                  if (comprobante.cae) {
+                    GenericService(tenant, "comprobantesFiscales", token)
+                      .save(comprobante)
+                      .then(() => {
+                        ReportsService(tenant, service, token)
+                          .onCloseSaleReport(comprobante)
+                          .then((res) => {
+                            file = new Blob([res["data"]], {
+                              type: "application/pdf",
+                            });
+                            fileURL = URL.createObjectURL(file);
+                            window.open(fileURL, "_blank");
                           });
-                      } else {
-                        this.$errorAlert(
-                          "Tipo de comprobante no disponible"
-                        ).then((result) => {
-                          if (result.isDismissed) {
-                            this.loaded = true;
-                          }
-                        });
+                      })
+                      .then(() => {
+                        this.applyStockModifications(comprobante);
+                      });
+                  } else {
+                    this.$errorAlert(
+                      "Tipo de comprobante no disponible"
+                    ).then((result) => {
+                      if (result.isDismissed) {
+                        this.loaded = true;
                       }
-                    }
-                  );
-                })
-                .catch((err) => {
-                  console.log(
-                    "---------------- ERROR IN AFIP RESPONSE ----------------"
-                  );
-                  console.log(err);
-                  this.loaded = true;
-                });
-            } else {
-              this.$errorAlert(
-                "No hay productos seleccionados en la venta"
-              ).then((result) => {
-                if (result.isDismissed) {
-                  this.loaded = true;
+                    });
+                  }
                 }
-              });
-            }
-          } else {
-            this.$errorAlert("Debe seleccionar un medio de pago").then(
-              (result) => {
-                if (result.isDismissed) {
-                  this.loaded = true;
-                }
-              }
-            );
-          }
+              );
+            })
+            .catch((err) => {
+              console.log(
+                "---------------- ERROR IN AFIP RESPONSE ----------------"
+              );
+              console.log(err);
+              this.loaded = true;
+            });
         });
     },
 
@@ -1334,86 +1344,83 @@ export default {
               planAmountSurcharge,
               planAmountDiscount,
             }) => {
-              comprobante = {
-                letra: "X",
-                numeroCbte:
+              if(total && subTotal && amountOfIva21){
+                comprobante = {
+                  letra: "X",
+                  numeroCbte:
+                    addZerosInString("04", ptoVenta.idFiscal) +
+                    "-" +
+                    addZerosInString("08", numeroCorrelativoDeComprobante),
+                  correlativoComprobante: numeroCorrelativoDeComprobante,
+                  fechaEmision: formatDate(fecha),
+                  fechaVto: formatDate(fecha),
+                  condicionVenta: condVenta,
+                  productos: products,
+                  productosDetalle: productsDetail,
+                  productoDescription: productsDescription,
+                  barCode: generateBarCode(),
+                  cae: "",
+                  logoUrl: this.loguedUser.sucursal.logo,
+                  puntoVenta: ptoVenta,
+                  sucursal: sucursal,
+                  documentoComercial: documento,
+                  empresa: empresa,
+                  cliente: cliente,
+                  totalDescuentoGlobal: this.descuentoGlobal,
+                  totalRecargoGlobal: this.recargoGlobal,
+                  porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+                  porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                  totalVenta: total,
+                  subTotal: subTotal,
+                  totalIva21: amountOfIva21,
+                  totalIva10: amountOfIva10,
+                  totalIva27: amountOfIva27,
+                  totalIvas: totalOfIvas,
+                  totalDescuentos: totalOfDiscounts,
+                  totalRecargos: totalOfSurcharges,
+                  porcentajeRecargoPlan: planPercentSurcharge,
+                  porcentajeDescuentoPlan: planPercentDiscount,
+                  totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+                  totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+                  mediosPago: [mediosPago],
+                  planesPago: [planesPago],
+                  nombreDocumento: documento.nombre,
+                };
+              }else{
+                comprobante = this.object;
+                comprobante.letra = documento.letra;
+                comprobante.numeroCbte =
                   addZerosInString("04", ptoVenta.idFiscal) +
                   "-" +
-                  addZerosInString("08", numeroCorrelativoDeComprobante),
-                correlativoComprobante: numeroCorrelativoDeComprobante,
-                fechaEmision: formatDate(fecha),
-                fechaVto: formatDate(fecha),
-                condicionVenta: condVenta,
-                productos: products,
-                productosDetalle: productsDetail,
-                productoDescription: productsDescription,
-                barCode: generateBarCode(),
-                cae: "",
-                logoUrl: this.loguedUser.sucursal.logo,
-                puntoVenta: ptoVenta,
-                sucursal: sucursal,
-                documentoComercial: documento,
-                empresa: empresa,
-                cliente: cliente,
-                totalDescuentoGlobal: this.descuentoGlobal,
-                totalRecargoGlobal: this.recargoGlobal,
-                porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-                porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-                totalVenta: total,
-                subTotal: subTotal,
-                totalIva21: amountOfIva21,
-                totalIva10: amountOfIva10,
-                totalIva27: amountOfIva27,
-                totalIvas: totalOfIvas,
-                totalDescuentos: totalOfDiscounts,
-                totalRecargos: totalOfSurcharges,
-                porcentajeRecargoPlan: planPercentSurcharge,
-                porcentajeDescuentoPlan: planPercentDiscount,
-                totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-                totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-                mediosPago: [mediosPago],
-                planesPago: [planesPago],
-                nombreDocumento: documento.nombre,
-              };
-
-              /*** Evaluate required sale form data ***/
-              if (comprobante.mediosPago[0] !== undefined) {
-                if (Number(comprobante.totalVenta) !== 0) {
-                  /*** Save receipt in database and print ticket ***/
-                  GenericService(tenant, "comprobantesFiscales", token)
-                    .save(comprobante)
-                    .then(() => {
-                      ReportsService(tenant, service, token)
-                        .onCloseSaleReport(comprobante)
-                        .then((res) => {
-                          file = new Blob([res["data"]], {
-                            type: "application/pdf",
-                          });
-                          fileURL = URL.createObjectURL(file);
-                          window.open(fileURL, "_blank");
-                        })
-                        .then(() => {
-                          this.applyStockModifications(comprobante);
-                        });
-                    });
-                } else {
-                  this.$errorAlert(
-                    "No hay productos seleccionados en la venta"
-                  ).then((result) => {
-                    if (result.isDismissed) {
-                      this.loaded = true;
-                    }
-                  });
-                }
-              } else {
-                this.$errorAlert("Debe seleccionar un medio de pago").then(
-                  (result) => {
-                    if (result.isDismissed) {
-                      this.loaded = true;
-                    }
-                  }
-                );
+                  addZerosInString("08", numeroCorrelativoDeComprobante);
+                comprobante.fechaEmision = formatDate(getCurrentDate());
+                comprobante.fechaVto = formatDate(fecha);
+                comprobante.correlativoComprobante = numeroCorrelativoDeComprobante;
+                comprobante.condicionVenta = condVenta;
+                comprobante.barCode = generateBarCode();
+                comprobante.mediosPago = [this.object.mediosPago];
+                comprobante.planesPago = this.object.planesPago;
+                comprobante.nombreDocumento = documento.nombre;
+                comprobante.documentoComercial = documento;
               }
+              console.log(comprobante);
+              /*** Save receipt in database and print ticket ***/
+              GenericService(tenant, "comprobantesFiscales", token)
+                .save(comprobante)
+                .then(() => {
+                  ReportsService(tenant, service, token)
+                    .onCloseSaleReport(comprobante)
+                    .then((res) => {
+                      file = new Blob([res["data"]], {
+                        type: "application/pdf",
+                      });
+                      fileURL = URL.createObjectURL(file);
+                      window.open(fileURL, "_blank");
+                    })
+                    .then(() => {
+                      this.applyStockModifications(comprobante);
+                    });
+                });
             }
           );
         });
@@ -1506,42 +1513,29 @@ export default {
                 planesPago: [planesPago],
                 nombreDocumento: documento.nombre,
               };
-              /*** Evaluate required sale form data ***/
-              if (comprobante.mediosPago[0] !== 0) {
-                if (Number(comprobante.totalVenta) !== 0) {
-                  /*** Save receipt in database and print ticket ***/
-                  GenericService(tenant, "comprobantesFiscales", token)
-                    .save(comprobante)
-                    .then(() => {
-                      ReportsService(tenant, service, token)
-                        .onCloseSaleReport(comprobante)
-                        .then((res) => {
-                          file = new Blob([res["data"]], {
-                            type: "application/pdf",
-                          });
-                          fileURL = URL.createObjectURL(file);
-                          window.open(fileURL, "_blank");
-                        })
-                        .then(() => {
-                          this.$successAlert("Presupuesto generado").then(
-                            () => {
-                              this.clear();
-                              this.loaded = true;
-                            }
-                          );
-                        });
-                    });
-                }
-              } else {
-                this.$errorAlert(
-                  "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
-                ).then((result) => {
-                  if (result.isDismissed) {
-                    this.loaded = true;
-                  }
-                });
-              }
 
+              /*** Save receipt in database and print ticket ***/
+              GenericService(tenant, "comprobantesFiscales", token)
+                .save(comprobante)
+                .then(() => {
+                  ReportsService(tenant, service, token)
+                    .onCloseSaleReport(comprobante)
+                    .then((res) => {
+                      file = new Blob([res["data"]], {
+                        type: "application/pdf",
+                      });
+                      fileURL = URL.createObjectURL(file);
+                      window.open(fileURL, "_blank");
+                    })
+                    .then(() => {
+                      this.$successAlert("Presupuesto generado").then(
+                        () => {
+                          this.clear();
+                          this.loaded = true;
+                        }
+                      );
+                    });
+                });
             }
           );
         });
@@ -1712,102 +1706,106 @@ export default {
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
-      const planPago = this.object.planPago;
-
-      this.productsDescription = await this.restLineDiscounts(
-        this.products,
-        this.productsDescription
-      );
-
-      this.productsDescription = await this.sumLineSurcharges(
-        this.products,
-        this.productsDescription
-      );
-
-      this.productsDescription = await this.restGlobalDiscount(
-        this.productsDescription,
-        this.porcentajeDescuentoGlobal
-      );
-
-      this.productsDescription = await this.sumGlobalSurcharge(
-        this.productsDescription,
-        this.porcentajeRecargoGlobal
-      );
-
-      this.productsDescription = await this.applyPaymentPlantPercentVariation(
-        this.productsDescription,
-        planPago.porcentaje
-      );
-
-      this.productsDescription = await this.calculateAmountOfPriceVariations(
-        this.productsDescription
-      );
-
-      const totalOfDiscounts = await this.calculateTotalOfDiscounts(
-        this.productsDescription
-      );
-
-      const totalOfSurcharges = await this.calculateTotalOfSurcharges(
-        this.productsDescription
-      );
-
-      const subTotal = await this.calculateSumOfProductSalePrices(
-        this.productsDescription
-      );
-
-      const planAmountDiscount =
-        planPercentDiscount > 0
-          ? subTotal * decimalPercent(planPercentDiscount)
-          : 0;
-
-      const planAmountSurcharge =
-        planPercentSurcharge > 0
-          ? subTotal * decimalPercent(planPercentSurcharge)
-          : 0;
-
-      const planPercentSurcharge =
-        planPago.porcentaje > 0 ? planPago.porcentaje : 0;
-      const planPercentDiscount =
-        planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
-
-      this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
-        this.productsDescription
-      );
-
-      const amountOfIva21 = await this.calculateAmountOfIva21(
-        this.productsDescription
-      );
-
-      const amountOfIva10 = await this.calculateAmountOfIva10(
-        this.productsDescription
-      );
-
-      const amountOfIva27 = await this.calculateAmountOfIva27(
-        this.productsDescription
-      );
-
-      const totalOfIvas = sumarNumeros([
-        amountOfIva21,
-        amountOfIva10,
-        amountOfIva27,
-      ]);
-
-      const total = subTotal - totalOfDiscounts + totalOfSurcharges;
-
-      return {
-        total,
-        subTotal,
-        amountOfIva21,
-        amountOfIva10,
-        amountOfIva27,
-        totalOfIvas,
-        totalOfDiscounts,
-        totalOfSurcharges,
-        planPercentSurcharge,
-        planPercentDiscount,
-        planAmountSurcharge,
-        planAmountDiscount,
-      };
+      if(this.processPresupuesto){
+        return this.object;
+      }else{
+        const planPago = this.object.planPago;
+  
+        this.productsDescription = await this.restLineDiscounts(
+          this.products,
+          this.productsDescription
+        );
+  
+        this.productsDescription = await this.sumLineSurcharges(
+          this.products,
+          this.productsDescription
+        );
+  
+        this.productsDescription = await this.restGlobalDiscount(
+          this.productsDescription,
+          this.porcentajeDescuentoGlobal
+        );
+  
+        this.productsDescription = await this.sumGlobalSurcharge(
+          this.productsDescription,
+          this.porcentajeRecargoGlobal
+        );
+  
+        this.productsDescription = await this.applyPaymentPlantPercentVariation(
+          this.productsDescription,
+          planPago.porcentaje
+        );
+  
+        this.productsDescription = await this.calculateAmountOfPriceVariations(
+          this.productsDescription
+        );
+  
+        const totalOfDiscounts = await this.calculateTotalOfDiscounts(
+          this.productsDescription
+        );
+  
+        const totalOfSurcharges = await this.calculateTotalOfSurcharges(
+          this.productsDescription
+        );
+  
+        const subTotal = await this.calculateSumOfProductSalePrices(
+          this.productsDescription
+        );
+  
+        const planAmountDiscount =
+          planPercentDiscount > 0
+            ? subTotal * decimalPercent(planPercentDiscount)
+            : 0;
+  
+        const planAmountSurcharge =
+          planPercentSurcharge > 0
+            ? subTotal * decimalPercent(planPercentSurcharge)
+            : 0;
+  
+        const planPercentSurcharge =
+          planPago.porcentaje > 0 ? planPago.porcentaje : 0;
+        const planPercentDiscount =
+          planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
+  
+        this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
+          this.productsDescription
+        );
+  
+        const amountOfIva21 = await this.calculateAmountOfIva21(
+          this.productsDescription
+        );
+  
+        const amountOfIva10 = await this.calculateAmountOfIva10(
+          this.productsDescription
+        );
+  
+        const amountOfIva27 = await this.calculateAmountOfIva27(
+          this.productsDescription
+        );
+  
+        const totalOfIvas = sumarNumeros([
+          amountOfIva21,
+          amountOfIva10,
+          amountOfIva27,
+        ]);
+  
+        const total = subTotal - totalOfDiscounts + totalOfSurcharges;
+  
+        return {
+          total,
+          subTotal,
+          amountOfIva21,
+          amountOfIva10,
+          amountOfIva27,
+          totalOfIvas,
+          totalOfDiscounts,
+          totalOfSurcharges,
+          planPercentSurcharge,
+          planPercentDiscount,
+          planAmountSurcharge,
+          planAmountDiscount,
+        };
+      }
     },
 
     restLineDiscounts(products, productDescriptions) {
