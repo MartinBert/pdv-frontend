@@ -443,7 +443,7 @@ export default {
       axios
       .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`)
       .then(data => {
-        console.log(data);
+        console.log(this.data);
         const lastInvoiceNumber = data.data.responseOfAfip;
         const numberOfCurrentInvoice = getNextInvoiceNumber(lastInvoiceNumber)
         const dataForCreateInvoice = {
@@ -466,6 +466,7 @@ export default {
               axios
               .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
               .then(data => {
+                console.log(data);
                 const cae = data.data.CAE;
                 const dateOfCaeExpiration = data.data.CAEFchVto;
                 const barCode = sucursal.cuit + addZerosInString("02", documento.codigoDocumento) + addZerosInString("04", ptoVenta.idFiscal) + cae + formatDateWithoutSlash(dateOfCaeExpiration);
@@ -510,6 +511,7 @@ export default {
                   GenericService(tenant, "comprobantesFiscales", token)
                   .save(comprobante)
                   .then((data) => {
+                    console.log(data);
                     let comprobanteGenerado = data.data;
                     GenericService(tenant, "stock", token)
                       .filter(filterParam)
