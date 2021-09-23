@@ -362,8 +362,10 @@ export default {
         } else {
           if (this.receiptDialogData.documento.tipo === true) {
             this.saveFiscalNote();
+            console.log(saveFiscalNote());
           } else {
             this.saveNoFiscalNote();
+            console.log(saveNoFiscalNote());
           }
         }
       }
