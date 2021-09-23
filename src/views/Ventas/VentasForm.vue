@@ -1237,7 +1237,6 @@ export default {
                     comprobante.planesPago = this.object.planesPago;
                     comprobante.nombreDocumento = documento.nombre;
                     comprobante.documentoComercial = documento;
-                    comprobante.totalDescuentoGlobal = this.object.descuentoGlobal;
                   }
 
                   if (this.object.id) {
