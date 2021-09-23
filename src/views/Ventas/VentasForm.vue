@@ -1143,25 +1143,6 @@ export default {
           };
           invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice);
 
-                      console.log(comprobante);
-
-                      /*** Save receipt in database and print invoice ***/
-                      if (comprobante.cae) {
-                        GenericService(tenant, "comprobantesFiscales", token)
-                          .save(comprobante)
-                          .then(() => {
-                            ReportsService(tenant, service, token)
-                              .onCloseSaleReport(comprobante)
-                              .then((res) => {
-                                file = new Blob([res["data"]], {
-                                  type: "application/pdf",
-                                });
-                                fileURL = URL.createObjectURL(file);
-                                window.open(fileURL, "_blank");
-                              });
-                          })
-                          .then(() => {
-                            this.applyStockModifications(comprobante);
           /*** Send invoice to AFIP ***/
           axios
             .post(
