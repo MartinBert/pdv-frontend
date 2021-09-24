@@ -426,6 +426,20 @@ export default {
           },
         ],
       },
+      {
+        name: "impresora",
+        title: "Impresoras",
+        visible: false,
+        icon: "/../images/icons/calendar.svg",
+        childs: [
+          {
+            path: "/impresora",
+            name: "Impresora",
+            title: "Impresora",
+            visible: false,
+          },
+        ],
+      },
     ],
     modulosVisibles: [],
   }),

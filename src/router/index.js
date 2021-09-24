@@ -63,6 +63,7 @@ import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
 import Cierrez from "../views/Cierrez/Cierrez.vue";
 import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
 import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
+import Impresora from "../views/Impresora/Impresora";
 
 Vue.use(VueRouter)
 
@@ -412,6 +413,12 @@ const routes = [
                 path: 'manuales',
                 name: 'manuales',
                 component: Manuales,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'impresora',
+                name: 'impresora',
+                component:Impresora,
                 meta: { requiresAuth: true }
             },
             {
