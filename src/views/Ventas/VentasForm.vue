@@ -390,7 +390,7 @@ export default {
     productsInOtherDeposits: [],
     lowStock: [],
     perfil: null,
-    processPresupuesto: false
+    processPresupuesto: false,
   }),
 
   components: {
@@ -412,21 +412,41 @@ export default {
     totalVenta() {
       let planDiscountPercent = 0;
       let planSurchagePercent = 0;
-      if(this.object.planPago){
-        planDiscountPercent = (this.object.planPago.porcentaje < 0) ? this.object.planPago.porcentaje : 0;
-        planSurchagePercent = (this.object.planPago.porcentaje > 0) ? this.object.planPago.porcentaje : 0;
+      if (this.object.planPago) {
+        planDiscountPercent =
+          this.object.planPago.porcentaje < 0
+            ? this.object.planPago.porcentaje
+            : 0;
+        planSurchagePercent =
+          this.object.planPago.porcentaje > 0
+            ? this.object.planPago.porcentaje
+            : 0;
       }
-      const sumOfProductPrices = this.products.reduce((acc, el) =>  {
-        if(!el.nombre.includes("DESCUENTO") && !el.nombre.includes("RECARGO")){
-          acc += Number(el.precioTotal)
+      const sumOfProductPrices = this.products.reduce((acc, el) => {
+        if (
+          !el.nombre.includes("DESCUENTO") &&
+          !el.nombre.includes("RECARGO")
+        ) {
+          acc += Number(el.precioTotal);
         }
         return acc;
       }, 0);
-      const totalOfPlanDiscount =  sumOfProductPrices * decimalPercent(planDiscountPercent);
-      const totalOfPlanSurcharge = sumOfProductPrices * decimalPercent(planSurchagePercent);
-      const globalDiscount = (sumOfProductPrices * decimalPercent(this.porcentajeDescuentoGlobal)) * -1;
-      const globalSurcharge = sumOfProductPrices * decimalPercent(this.porcentajeRecargoGlobal);
-      const total = sumOfProductPrices + totalOfPlanDiscount + totalOfPlanSurcharge + globalDiscount + globalSurcharge;
+      const totalOfPlanDiscount =
+        sumOfProductPrices * decimalPercent(planDiscountPercent);
+      const totalOfPlanSurcharge =
+        sumOfProductPrices * decimalPercent(planSurchagePercent);
+      const globalDiscount =
+        sumOfProductPrices *
+        decimalPercent(this.porcentajeDescuentoGlobal) *
+        -1;
+      const globalSurcharge =
+        sumOfProductPrices * decimalPercent(this.porcentajeRecargoGlobal);
+      const total =
+        sumOfProductPrices +
+        totalOfPlanDiscount +
+        totalOfPlanSurcharge +
+        globalDiscount +
+        globalSurcharge;
       return roundTwoDecimals(total);
     },
 
@@ -438,25 +458,25 @@ export default {
       return totItems;
     },
 
-    totalLineDiscounts(){
+    totalLineDiscounts() {
       const total = this.products.reduce((acc, el) => {
-        if(el.nombre.includes("DESCUENTO - ")){
+        if (el.nombre.includes("DESCUENTO - ")) {
           acc += el.precioTotal;
         }
         return acc;
-      }, 0)
+      }, 0);
       return total;
     },
 
-    totalLineSurchages(){
+    totalLineSurchages() {
       const total = this.products.reduce((acc, el) => {
-        if(el.nombre.includes("RECARGO - ")){
+        if (el.nombre.includes("RECARGO - ")) {
           acc += el.precioTotal;
         }
         return acc;
-      }, 0)
+      }, 0);
       return total;
-    }
+    },
   },
 
   mounted() {
@@ -1071,7 +1091,11 @@ export default {
     saveSale() {
       this.loaded = false;
       const documento = this.object.documento;
-      if (documento !== undefined && this.object.mediosPago !== undefined && this.object.planPago !== undefined) {
+      if (
+        documento !== undefined &&
+        this.object.mediosPago !== undefined &&
+        this.object.planPago !== undefined
+      ) {
         if (documento.tipo === true) {
           if (documento.ticket === true) {
             this.saveTicket(documento.nombre);
@@ -1079,11 +1103,11 @@ export default {
             this.save();
           }
         } else if (documento.presupuesto === true) {
-          if(this.object.fechaVencimiento){
+          if (this.object.fechaVencimiento) {
             this.savePresupuesto();
-          }else{
+          } else {
             this.$errorAlert(
-            "Debe indicar una fecha de vencimiento en el presupuesto"
+              "Debe indicar una fecha de vencimiento en el presupuesto"
             ).then((result) => {
               if (result.isDismissed) {
                 this.loaded = true;
@@ -1175,7 +1199,7 @@ export default {
                   planAmountDiscount,
                 }) => {
                   // Create receipt
-                  if(total && subTotal && amountOfIva21){
+                  if (total && subTotal && amountOfIva21) {
                     comprobante = {
                       letra: documento.letra,
                       numeroCbte:
@@ -1201,8 +1225,7 @@ export default {
                       subTotal: subTotal,
                       totalDescuentoGlobal: this.descuentoGlobal,
                       totalRecargoGlobal: this.recargoGlobal,
-                      porcentajeDescuentoGlobal: this
-                        .porcentajeDescuentoGlobal,
+                      porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
                       porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
                       totalIva21: amountOfIva21,
                       totalIva10: amountOfIva10,
@@ -1212,14 +1235,12 @@ export default {
                       totalRecargos: totalOfSurcharges,
                       porcentajeRecargoPlan: planPercentSurcharge,
                       porcentajeDescuentoPlan: planPercentDiscount,
-                      totalDescuentoPlan: roundTwoDecimals(
-                        planAmountDiscount
-                      ),
+                      totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
                       totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
                       mediosPago: [mediosPago],
                       planesPago: [planPago],
                       nombreDocumento: documento.nombre,
-                    } 
+                    };
                   } else {
                     comprobante = this.object;
                     comprobante.letra = documento.letra;
@@ -1243,6 +1264,10 @@ export default {
                     comprobante.id = this.object.id;
                   }
                   console.log(comprobante);
+                  axios.post(
+                    `http://localhost:3500/api/impresora/factura`,
+                    comprobante
+                  );
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1262,13 +1287,13 @@ export default {
                         this.applyStockModifications(comprobante);
                       });
                   } else {
-                    this.$errorAlert(
-                      "Tipo de comprobante no disponible"
-                    ).then((result) => {
-                      if (result.isDismissed) {
-                        this.loaded = true;
+                    this.$errorAlert("Tipo de comprobante no disponible").then(
+                      (result) => {
+                        if (result.isDismissed) {
+                          this.loaded = true;
+                        }
                       }
-                    });
+                    );
                   }
                 }
               );
@@ -1325,7 +1350,7 @@ export default {
               planAmountSurcharge,
               planAmountDiscount,
             }) => {
-              if(total && subTotal && amountOfIva21){
+              if (total && subTotal && amountOfIva21) {
                 comprobante = {
                   letra: "X",
                   numeroCbte:
@@ -1367,7 +1392,7 @@ export default {
                   planesPago: [planesPago],
                   nombreDocumento: documento.nombre,
                 };
-              }else{
+              } else {
                 comprobante = this.object;
                 comprobante.letra = documento.letra;
                 comprobante.numeroCbte =
@@ -1384,13 +1409,12 @@ export default {
                 comprobante.nombreDocumento = documento.nombre;
                 comprobante.documentoComercial = documento;
               }
-              
+
               console.log(comprobante);
-              axios
-              .post(
-              `http://localhost:3500/api/impresora/factura`,
-              comprobante
-            )
+              axios.post(
+                `http://localhost:3500/api/impresora/factura`,
+                comprobante
+              );
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
@@ -1515,12 +1539,10 @@ export default {
                       window.open(fileURL, "_blank");
                     })
                     .then(() => {
-                      this.$successAlert("Presupuesto generado").then(
-                        () => {
-                          this.clear();
-                          this.loaded = true;
-                        }
-                      );
+                      this.$successAlert("Presupuesto generado").then(() => {
+                        this.clear();
+                        this.loaded = true;
+                      });
                     });
                 });
             }
@@ -1693,91 +1715,91 @@ export default {
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
-      if(this.processPresupuesto){
+      if (this.processPresupuesto) {
         return this.object;
-      }else{
+      } else {
         const planPago = this.object.planPago;
-  
+
         this.productsDescription = await this.restLineDiscounts(
           this.products,
           this.productsDescription
         );
-  
+
         this.productsDescription = await this.sumLineSurcharges(
           this.products,
           this.productsDescription
         );
-  
+
         this.productsDescription = await this.restGlobalDiscount(
           this.productsDescription,
           this.porcentajeDescuentoGlobal
         );
-  
+
         this.productsDescription = await this.sumGlobalSurcharge(
           this.productsDescription,
           this.porcentajeRecargoGlobal
         );
-  
+
         this.productsDescription = await this.applyPaymentPlantPercentVariation(
           this.productsDescription,
           planPago.porcentaje
         );
-  
+
         this.productsDescription = await this.calculateAmountOfPriceVariations(
           this.productsDescription
         );
-  
+
         const totalOfDiscounts = await this.calculateTotalOfDiscounts(
           this.productsDescription
         );
-  
+
         const totalOfSurcharges = await this.calculateTotalOfSurcharges(
           this.productsDescription
         );
-  
+
         const subTotal = await this.calculateSumOfProductSalePrices(
           this.productsDescription
         );
-  
+
         const planAmountDiscount =
           planPercentDiscount > 0
             ? subTotal * decimalPercent(planPercentDiscount)
             : 0;
-  
+
         const planAmountSurcharge =
           planPercentSurcharge > 0
             ? subTotal * decimalPercent(planPercentSurcharge)
             : 0;
-  
+
         const planPercentSurcharge =
           planPago.porcentaje > 0 ? planPago.porcentaje : 0;
         const planPercentDiscount =
           planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
-  
+
         this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
           this.productsDescription
         );
-  
+
         const amountOfIva21 = await this.calculateAmountOfIva21(
           this.productsDescription
         );
-  
+
         const amountOfIva10 = await this.calculateAmountOfIva10(
           this.productsDescription
         );
-  
+
         const amountOfIva27 = await this.calculateAmountOfIva27(
           this.productsDescription
         );
-  
+
         const totalOfIvas = sumarNumeros([
           amountOfIva21,
           amountOfIva10,
           amountOfIva27,
         ]);
-  
+
         const total = subTotal - totalOfDiscounts + totalOfSurcharges;
-  
+
         return {
           total,
           subTotal,
