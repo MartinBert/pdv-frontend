@@ -99,6 +99,7 @@
       </v-card-text>
     </v-card>
     <Spinner v-if="!loaded" />
+    <DialogStop v-if="!loaded"/>
   </v-container>
 </template>
 <script>
@@ -113,6 +114,7 @@ import {
 import Spinner from "../../components/Graphics/Spinner";
 import GenericService from "../../services/GenericService";
 import TabBar from "../../components/Generics/TabBar.vue";
+import DialogStop from "../../components/Dialogs/DialogStop.vue";
 export default {
   data: () => ({
     loaded: false,
@@ -183,7 +185,8 @@ export default {
 
   components: {
     TabBar,
-    Spinner
+    Spinner,
+    DialogStop
   },
 
   mounted() {
