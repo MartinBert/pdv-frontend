@@ -854,7 +854,7 @@ export default {
           };
           this.products.push(obj);
           this.descuentoGlobal = obj.precioTotal * -1;
-          this.porcentajeDescuentoGlobal = Number(priceModificationPorcent);
+          this.porcentajeDescuentoGlobal += Number(priceModificationPorcent);
         } else {
           if (Math.sign(percent) === -1) {
             percent = percent * -1;
@@ -871,7 +871,7 @@ export default {
           };
           this.products.push(obj);
           this.recargoGlobal = obj.precioTotal;
-          this.porcentajeRecargoGlobal = Number(priceModificationPorcent);
+          this.porcentajeRecargoGlobal += Number(priceModificationPorcent);
         }
       } else {
         this.$errorAlert("No hay productos seleccionados en la venta");
