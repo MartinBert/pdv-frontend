@@ -732,8 +732,24 @@ export default {
       this.object = presupuesto;
       this.object.mediosPago = presupuesto.mediosPago[0];
       this.object.planPago = presupuesto.planesPago[0];
+      presupuesto.productos.forEach((product, index) => {
+        product.id = index;
+      })
       this.products = presupuesto.productos;
+      this.porcentajeDescuentoGlobal = this.object.porcentajeDescuentoGlobal;
+      this.porcentajeRecargoGlobal = this.object.porcentajeRecargoGlobal;
       this.processPresupuesto = true;
+      this.object.productoDescription.forEach((product) => {
+        product.salePrice = product.salePrice + product.discountAmount - product.surchargeAmount;
+        product.discountPercent = 0;
+        product.discountAmount = 0;
+      })
+      this.object.porcentajeDescuentoGlobal = 0;
+      this.object.porcentajeRecargoGlobal = 0;
+      this.object.totalDescuentoGlobal = 0;
+      this.object.totalRecargoGlobal = 0;
+      this.productsDescription = this.object.productoDescription;
+      console.log(this.object);
     },
 
     /******************************************************************************************************/
@@ -1715,106 +1731,103 @@ export default {
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
-      if (this.processPresupuesto) {
-        return this.object;
-      } else {
-        const planPago = this.object.planPago;
+      const planPago = this.object.planPago;
+      console.log(this.porcentajeDescuentoGlobal);
 
-        this.productsDescription = await this.restLineDiscounts(
-          this.products,
-          this.productsDescription
-        );
+      this.productsDescription = await this.restLineDiscounts(
+        this.products,
+        this.productsDescription
+      );
 
-        this.productsDescription = await this.sumLineSurcharges(
-          this.products,
-          this.productsDescription
-        );
+      this.productsDescription = await this.sumLineSurcharges(
+        this.products,
+        this.productsDescription
+      );
 
-        this.productsDescription = await this.restGlobalDiscount(
-          this.productsDescription,
-          this.porcentajeDescuentoGlobal
-        );
+      this.productsDescription = await this.restGlobalDiscount(
+        this.productsDescription,
+        this.porcentajeDescuentoGlobal
+      );
 
-        this.productsDescription = await this.sumGlobalSurcharge(
-          this.productsDescription,
-          this.porcentajeRecargoGlobal
-        );
+      this.productsDescription = await this.sumGlobalSurcharge(
+        this.productsDescription,
+        this.porcentajeRecargoGlobal
+      );
 
-        this.productsDescription = await this.applyPaymentPlantPercentVariation(
-          this.productsDescription,
-          planPago.porcentaje
-        );
+      this.productsDescription = await this.applyPaymentPlantPercentVariation(
+        this.productsDescription,
+        planPago.porcentaje
+      );
 
-        this.productsDescription = await this.calculateAmountOfPriceVariations(
-          this.productsDescription
-        );
+      this.productsDescription = await this.calculateAmountOfPriceVariations(
+        this.productsDescription
+      );
 
-        const totalOfDiscounts = await this.calculateTotalOfDiscounts(
-          this.productsDescription
-        );
+      const totalOfDiscounts = await this.calculateTotalOfDiscounts(
+        this.productsDescription
+      );
 
-        const totalOfSurcharges = await this.calculateTotalOfSurcharges(
-          this.productsDescription
-        );
+      const totalOfSurcharges = await this.calculateTotalOfSurcharges(
+        this.productsDescription
+      );
 
-        const subTotal = await this.calculateSumOfProductSalePrices(
-          this.productsDescription
-        );
+      const subTotal = await this.calculateSumOfProductSalePrices(
+        this.productsDescription
+      );
 
-        const planAmountDiscount =
-          planPercentDiscount > 0
-            ? subTotal * decimalPercent(planPercentDiscount)
-            : 0;
+      const planAmountDiscount =
+        planPercentDiscount > 0
+          ? subTotal * decimalPercent(planPercentDiscount)
+          : 0;
 
-        const planAmountSurcharge =
-          planPercentSurcharge > 0
-            ? subTotal * decimalPercent(planPercentSurcharge)
-            : 0;
+      const planAmountSurcharge =
+        planPercentSurcharge > 0
+          ? subTotal * decimalPercent(planPercentSurcharge)
+          : 0;
 
-        const planPercentSurcharge =
-          planPago.porcentaje > 0 ? planPago.porcentaje : 0;
-        const planPercentDiscount =
-          planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
+      const planPercentSurcharge =
+        planPago.porcentaje > 0 ? planPago.porcentaje : 0;
+      const planPercentDiscount =
+        planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
 
-        this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
-          this.productsDescription
-        );
+      this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
+        this.productsDescription
+      );
 
-        const amountOfIva21 = await this.calculateAmountOfIva21(
-          this.productsDescription
-        );
+      const amountOfIva21 = await this.calculateAmountOfIva21(
+        this.productsDescription
+      );
 
-        const amountOfIva10 = await this.calculateAmountOfIva10(
-          this.productsDescription
-        );
+      const amountOfIva10 = await this.calculateAmountOfIva10(
+        this.productsDescription
+      );
 
-        const amountOfIva27 = await this.calculateAmountOfIva27(
-          this.productsDescription
-        );
+      const amountOfIva27 = await this.calculateAmountOfIva27(
+        this.productsDescription
+      );
 
-        const totalOfIvas = sumarNumeros([
-          amountOfIva21,
-          amountOfIva10,
-          amountOfIva27,
-        ]);
+      const totalOfIvas = sumarNumeros([
+        amountOfIva21,
+        amountOfIva10,
+        amountOfIva27,
+      ]);
 
-        const total = subTotal - totalOfDiscounts + totalOfSurcharges;
+      const total = subTotal - totalOfDiscounts + totalOfSurcharges;
 
-        return {
-          total,
-          subTotal,
-          amountOfIva21,
-          amountOfIva10,
-          amountOfIva27,
-          totalOfIvas,
-          totalOfDiscounts,
-          totalOfSurcharges,
-          planPercentSurcharge,
-          planPercentDiscount,
-          planAmountSurcharge,
-          planAmountDiscount,
-        };
-      }
+      return {
+        total,
+        subTotal,
+        amountOfIva21,
+        amountOfIva10,
+        amountOfIva27,
+        totalOfIvas,
+        totalOfDiscounts,
+        totalOfSurcharges,
+        planPercentSurcharge,
+        planPercentDiscount,
+        planAmountSurcharge,
+        planAmountDiscount,
+      };
     },
 
     restLineDiscounts(products, productDescriptions) {
