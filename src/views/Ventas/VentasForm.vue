@@ -1425,8 +1425,6 @@ export default {
                 comprobante.nombreDocumento = documento.nombre;
                 comprobante.documentoComercial = documento;
               }
-
-              console.log(comprobante);
               axios.post(
                 `http://localhost:3500/api/impresora/factura`,
                 comprobante
