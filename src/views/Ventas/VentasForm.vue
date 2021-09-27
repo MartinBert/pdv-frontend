@@ -795,9 +795,9 @@ export default {
         nombre: nombre,
         codigoBarra: codigoBarra,
         cantUnidades: cantUnidades,
-        precioUnitario: parseFloat(precioTotal).toFixed(2),
+        precioUnitario: parseFloat(precioTotal),
         ivaVentas: ivaVentasObject.porcentaje,
-        precioTotal: parseFloat(total).toFixed(2),
+        precioTotal: parseFloat(total),
         editable: editable,
       };
       return object;
@@ -1153,7 +1153,7 @@ export default {
       const empresa = this.loguedUser.empresa;
       const cliente = this.object.cliente;
       const mediosPago = this.object.mediosPago;
-      const totalVenta = this.totalVenta.toFixed(2);
+      const totalVenta = this.totalVenta;
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
@@ -1237,7 +1237,7 @@ export default {
                       documentoComercial: documento,
                       empresa: empresa,
                       cliente: cliente,
-                      totalVenta: total.toFixed(2),
+                      totalVenta: total,
                       subTotal: subTotal,
                       totalDescuentoGlobal: this.descuentoGlobal,
                       totalRecargoGlobal: this.recargoGlobal,
@@ -1392,7 +1392,7 @@ export default {
                   totalRecargoGlobal: this.recargoGlobal,
                   porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
                   porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
-                  totalVenta: total.toFixed(2),
+                  totalVenta: total,
                   subTotal: subTotal,
                   totalIva21: amountOfIva21,
                   totalIva10: amountOfIva10,
@@ -1812,7 +1812,7 @@ export default {
         amountOfIva27,
       ]);
 
-      const total = (subTotal - totalOfDiscounts + totalOfSurcharges).toFixed(2);
+      const total = subTotal - totalOfDiscounts + totalOfSurcharges;
 
       return {
         total,
