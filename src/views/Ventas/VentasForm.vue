@@ -1280,8 +1280,8 @@ export default {
                     comprobante.id = this.object.id;
                   }
                   console.log(comprobante);    
-                  axios.get(
-                    `http://192.168.1.100:3000/api/impresora/factura`,
+                  axios.post(
+                    `http://192.168.1.100:3500/api/impresora/factura`,
                     comprobante
                   );
                   /*** Save receipt in database and print invoice ***/
@@ -1427,8 +1427,8 @@ export default {
               }
 
               console.log(comprobante);
-              axios.get(
-                `http://192.168.1.100:3000/api/impresora/factura`,
+              axios.post(
+                `http://192.168.1.100:3500/api/impresora/factura`,
                 comprobante
               );
               /*** Save receipt in database and print ticket ***/
