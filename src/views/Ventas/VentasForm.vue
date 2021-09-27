@@ -1281,7 +1281,7 @@ export default {
                   }
                   console.log(comprobante);    
                   axios.post(
-                    `${VUE_APP_IMPRESORA}/api/impresora/factura`,
+                    `${process.env.VUE_APP_IMPRESORA}/api/impresora/factura`,
                     comprobante
                   );
                   /*** Save receipt in database and print invoice ***/
