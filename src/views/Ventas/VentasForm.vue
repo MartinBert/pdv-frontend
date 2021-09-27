@@ -1279,9 +1279,9 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-                  console.log(comprobante);
+                  console.log(comprobante);    
                   axios.post(
-                    `http://localhost:3500/api/impresora/factura`,
+                    `${VUE_APP_IMPRESORA}/api/impresora/factura`,
                     comprobante
                   );
                   /*** Save receipt in database and print invoice ***/
