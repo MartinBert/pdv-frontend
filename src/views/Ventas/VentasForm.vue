@@ -1428,7 +1428,11 @@ export default {
 
               console.log(comprobante);
               axios.post(
+<<<<<<< HEAD
                 `http://192.168.1.12:3500/api/impresora/factura`,
+=======
+                `http://192.168.1.44:3000/api/impresora/factura`,
+>>>>>>> adeaee672eb06b061138bb8c9bb46a4345f2f3db
                 comprobante
               );
               /*** Save receipt in database and print ticket ***/
