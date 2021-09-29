@@ -443,7 +443,6 @@ export default {
       axios
       .get(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`)
       .then(data => {
-        console.log(this.data);
         const lastInvoiceNumber = data.data.responseOfAfip;
         const numberOfCurrentInvoice = getNextInvoiceNumber(lastInvoiceNumber)
         const dataForCreateInvoice = {
@@ -462,7 +461,6 @@ export default {
         if (passPaymentsMethodsValidation(mediosPago)) {
           if (containProducts(productosEntrantes)) {
             /*** Send invoice to AFIP ***/
-              console.log(invoice)
               axios
               .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
               .then(data => {
@@ -505,13 +503,12 @@ export default {
                   planesPago: [planesPago],
                   nombreDocumento: documento.nombre,
                 };
-                
+                console.log(comprobante);
                 /*** Save receipt in database ***/
                 if (invoiceContainCAE(comprobante)) {
                   GenericService(tenant, "comprobantesFiscales", token)
                   .save(comprobante)
                   .then((data) => {
-                    console.log(data);
                     let comprobanteGenerado = data.data;
                     GenericService(tenant, "stock", token)
                       .filter(filterParam)
@@ -700,7 +697,7 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-
+      console.log(comprobante);
       GenericService(tenant, "comprobantesFiscales", token)
         .save(comprobante)
         .then((data) => {
