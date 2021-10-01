@@ -1,3 +1,4 @@
+
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
@@ -322,6 +323,7 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
+import printReceipt from "../../services/ImpresionService";
 import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
@@ -1279,11 +1281,7 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-                  console.log(comprobante);    
-                  axios.post(
-                    `http://localhost:3500/api/impresora/factura`,
-                    comprobante
-                  );
+                  printReceipt(comprobante);
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1427,10 +1425,8 @@ export default {
               }
 
               console.log(comprobante);
-              axios.post(
-                `http://192.168.1.44:3000/api/impresora/factura`,
-                comprobante
-              );
+              printReceipt(comprobante);
+
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
