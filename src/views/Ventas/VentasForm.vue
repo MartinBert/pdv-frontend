@@ -575,6 +575,7 @@ export default {
             this.products.push(this.processProductsObject(databaseItem));
             this.productsDescription.push({
               name: databaseItem.nombre,
+              editable: databaseItem.editable,
               barCode: databaseItem.codigoBarra,
               code: databaseItem.codigoProducto,
               tradeMarkName: databaseItem.marca.nombre,
@@ -626,6 +627,7 @@ export default {
               this.products.push(this.processProductsObject(databaseItem));
               this.productsDescription.push({
                 name: databaseItem.nombre,
+                editable: databaseItem.editable,
                 barCode: databaseItem.codigoBarra,
                 code: databaseItem.codigoProducto,
                 tradeMarkName: databaseItem.marca.nombre,
@@ -668,6 +670,7 @@ export default {
         if (!existe) {
           const objectForProductsDescription = {
             name: product.nombre,
+            editable: product.editable,
             barCode: product.codigoBarra,
             code: product.codigoProducto,
             tradeMarkName: product.marca.nombre,
@@ -751,7 +754,6 @@ export default {
       this.object.totalDescuentoGlobal = 0;
       this.object.totalRecargoGlobal = 0;
       this.productsDescription = this.object.productoDescription;
-      console.log(this.object);
     },
 
     /******************************************************************************************************/
@@ -836,9 +838,13 @@ export default {
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
         const total = this.productsDescription.reduce(
-          (acc, el) => acc + el.salePrice * Number(el.quantity),
-          0
-        );
+          (acc, el) => {
+            if(!el.editable){
+              acc = acc + el.salePrice * Number(el.quantity)
+            }else{
+              acc = acc + el.salePrice;
+            }
+          },0);
         let percent = calculatePercentaje(total, priceModificationPorcent);
         if (modificator === "descuento") {
           if (Math.sign(percent) === 1) {
@@ -1424,9 +1430,16 @@ export default {
                 comprobante.documentoComercial = documento;
               }
 
+<<<<<<< HEAD
               console.log(comprobante);
               printReceipt(comprobante);
 
+=======
+              axios.post(
+                `http://192.168.1.44:3000/api/impresora/factura`,
+                comprobante
+              );
+>>>>>>> 8b15f73dd173912c3ca2c980e79476a0228b2e79
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
@@ -1728,7 +1741,6 @@ export default {
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
       const planPago = this.object.planPago;
-      console.log(this.porcentajeDescuentoGlobal);
 
       this.productsDescription = await this.restLineDiscounts(
         this.products,
@@ -1914,14 +1926,23 @@ export default {
 
     calculateAmountOfPriceVariations(productsDescription) {
       productsDescription.forEach((prodDescription) => {
-        prodDescription.discountAmount =
-          prodDescription.salePrice *
-          Number(prodDescription.quantity) *
-          decimalPercent(prodDescription.discountPercent);
-        prodDescription.surchargeAmount =
-          prodDescription.salePrice *
-          Number(prodDescription.quantity) *
-          decimalPercent(prodDescription.surchargePercent);
+        if(!prodDescription.editable){
+          prodDescription.discountAmount =
+            prodDescription.salePrice *
+            Number(prodDescription.quantity) *
+            decimalPercent(prodDescription.discountPercent);
+          prodDescription.surchargeAmount =
+            prodDescription.salePrice *
+            Number(prodDescription.quantity) *
+            decimalPercent(prodDescription.surchargePercent);
+        }else{
+          prodDescription.discountAmount =
+            prodDescription.salePrice *
+            decimalPercent(prodDescription.discountPercent);
+          prodDescription.surchargeAmount =
+            prodDescription.salePrice *
+            decimalPercent(prodDescription.surchargePercent);
+        }
       });
       return productsDescription;
     },
@@ -1943,10 +1964,16 @@ export default {
     },
 
     calculateSumOfProductSalePrices(productsDescription) {
+      console.log(productsDescription)
       const total = productsDescription.reduce(
-        (acc, el) => acc + el.salePrice * Number(el.quantity),
-        0
-      );
+        (acc, el) => {
+          if(!el.editable){
+            acc = acc + el.salePrice * Number(el.quantity)
+          }else{
+            acc = acc + el.salePrice;
+          }
+          return acc;
+        },0);
       return roundTwoDecimals(total);
     },
 
