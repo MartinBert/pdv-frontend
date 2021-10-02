@@ -840,10 +840,11 @@ export default {
         const total = this.productsDescription.reduce(
           (acc, el) => {
             if(!el.editable){
-              acc = acc + el.salePrice * Number(el.quantity)
+              acc = acc + Number(el.salePrice) * Number(el.quantity)
             }else{
               acc = acc + el.salePrice;
             }
+            return acc;
           },0);
         let percent = calculatePercentaje(total, priceModificationPorcent);
         if (modificator === "descuento") {
@@ -960,7 +961,6 @@ export default {
     },
 
     sendTicketData(jsonToFiscalController, ticketRoute) {
-      // const clientIp = this.loguedUser.puntoVenta.ipLocal;
       axios
         .post(`http://${this.clientIp}/${ticketRoute}`, jsonToFiscalController)
         .then(() => {
@@ -1013,6 +1013,8 @@ export default {
     },
 
     getTotalSurcharges(letter) {
+      const sumOfProductPrices = this.calculateSumOfProductSalePrices(this.productsDescription);
+      const planSurcharge = sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje);
       let total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("RECARGO")) {
           acc += Number(el.precioTotal * 1);
@@ -1022,10 +1024,18 @@ export default {
       if (letter === "A") {
         total = total / 1.21;
       }
-      return total.toString();
+      let totalSurcharge;
+      if(this.object.planPago.porcentaje > 0){
+        totalSurcharge = roundTwoDecimals(total + planSurcharge);
+      }else{
+        totalSurcharge = total;
+      }
+      return totalSurcharge.toString();
     },
 
     getTotalDiscounts(letter) {
+      const sumOfProductPrices = this.calculateSumOfProductSalePrices(this.productsDescription);
+      const planDiscount = (sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje)) * -1;
       let total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("DESCUENTO")) {
           acc += Number(el.precioTotal * -1);
@@ -1035,7 +1045,13 @@ export default {
       if (letter === "A") {
         total = total / 1.21;
       }
-      return total.toString();
+      let totalDiscount;
+      if(this.object.planPago.porcentaje < 0){
+        totalDiscount = roundTwoDecimals(total + planDiscount);
+      }else{
+        totalDiscount = total;
+      }
+      return totalDiscount.toString();
     },
 
     getItemsForFiscalTicketInvoice(letter) {
@@ -1065,7 +1081,7 @@ export default {
           name: el.nombre,
           quantity: el.cantUnidades.toString(),
           price: roundTwoDecimals(
-            el.precioTotal / (1 + decimalPercent(el.ivaVentas))
+            el.precioUnitario / (1 + decimalPercent(el.ivaVentas))
           ).toString(),
         };
         items.push(formattedObject);
@@ -1084,7 +1100,7 @@ export default {
           name: el.nombre,
           quantity: el.cantUnidades.toString(),
           price: roundTwoDecimals(
-            el.precioTotal / (1 + decimalPercent(el.ivaVentas))
+            el.precioUnitario / (1 + decimalPercent(el.ivaVentas))
           ).toString(),
         };
         items.push(formattedObject);
@@ -1102,7 +1118,7 @@ export default {
         const formattedObject = {
           name: el.nombre,
           quantity: el.cantUnidades.toString(),
-          price: el.precioTotal.toString(),
+          price: el.precioUnitario.toString(),
         };
         items.push(formattedObject);
       });
@@ -1957,7 +1973,6 @@ export default {
     },
 
     calculateSumOfProductSalePrices(productsDescription) {
-      console.log(productsDescription)
       const total = productsDescription.reduce(
         (acc, el) => {
           if(!el.editable){
