@@ -1430,16 +1430,9 @@ export default {
                 comprobante.documentoComercial = documento;
               }
 
-<<<<<<< HEAD
               console.log(comprobante);
               printReceipt(comprobante);
 
-=======
-              axios.post(
-                `http://192.168.1.44:3000/api/impresora/factura`,
-                comprobante
-              );
->>>>>>> 8b15f73dd173912c3ca2c980e79476a0228b2e79
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
