@@ -92,8 +92,8 @@ function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
       imagen = false;
       break;
   }
+console.log("entre");
   const conector = new ConectorPlugin()
-
   if(imagen){
     conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
             .imagenDesdeUrl(logo)
@@ -144,7 +144,7 @@ function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer(1)")
+            .imprimirEn("80mm Series Printer")
 }
 
 function notaDebitoX(listProduct,nameEmpresa,totalVenta){
@@ -362,6 +362,7 @@ function facturaA(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .establecerEnfatizado(0)
           .texto(`------------------------------------------------\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+          .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
           .texto(`${barCode}\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
           .texto(`C.A.E: ${cae}\n`)
@@ -373,7 +374,7 @@ function facturaA(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-    .imprimirEn("80mm Series Printer(1)");
+    .imprimirEn("80mm Series Printer");
 }
 
 function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
@@ -458,6 +459,7 @@ function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
             .texto(`${barCode}\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .texto(`C.A.E: ${cae}\n`)
@@ -553,6 +555,7 @@ function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
             .texto(`${barCode}\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .texto(`C.A.E: ${cae}\n`)
@@ -645,6 +648,7 @@ function facturaB(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .establecerEnfatizado(0)
           .texto(`------------------------------------------------\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+          .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
           .texto(`${barCode}\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
           .texto(`C.A.E: ${cae}\n`)
@@ -733,6 +737,7 @@ function notaDebitoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
             .texto(`${barCode}\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .texto(`C.A.E: ${cae}\n`)
@@ -821,6 +826,7 @@ for (let i = 0; i < listProduct.length; i++) {
           .establecerEnfatizado(0)
           .texto(`------------------------------------------------\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+          .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
           .texto(`${barCode}\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
           .texto(`C.A.E: ${cae}\n`)
@@ -913,6 +919,7 @@ function facturaC(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .establecerEnfatizado(0)
           .texto(`------------------------------------------------\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+          .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
           .texto(`${barCode}\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
           .texto(`C.A.E: ${cae}\n`)
@@ -1001,6 +1008,7 @@ for (let i = 0; i < listProduct.length; i++) {
           .establecerEnfatizado(0)
           .texto(`------------------------------------------------\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+          .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
           .texto(`${barCode}\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
           .texto(`C.A.E: ${cae}\n`)
@@ -1089,6 +1097,7 @@ function notaCreditoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
             .texto(`${barCode}\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .texto(`C.A.E: ${cae}\n`)

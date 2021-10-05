@@ -1,0 +1,57 @@
+import { ConectorPlugin } from "../helpers/conectorPlugin";
+
+
+export default function printReceipt(comprobante){
+         console.log(comprobante);
+
+
+
+
+let logo = "";
+let infoCantUni="";
+let precioTotal = ``;
+let espacios = 0;
+let espacioss = "";
+let lineaProd=``;
+let imagen = false;
+     switch (nameEmpresa) {
+            case "servipack":
+                  logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
+                  imagen = true;
+            break;
+
+            default:
+                  imagen = false;
+            break;
+  }
+  const conector = new ConectorPlugin()
+
+    if(imagen){
+       conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+               .imagenDesdeUrl(logo)
+               .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+              }
+
+    conector.texto(`------------------------------------------------\n`)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .establecerTamanioFuente(2, 2)
+            .establecerEnfatizado(1)
+            .texto(`${comprobante.nombreDocumento}\n`)
+            .establecerTamanioFuente(1, 1)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+            .establecerEnfatizado(0)
+            .texto(`------------------------------------------------\n`)
+            .establecerEnfatizado(1)
+            .textoConAcentos(`Descripción                              IMPORTE\n`)
+            .establecerEnfatizado(0)
+            .texto(`Cantidad/Precio unitario\n`)
+            .texto(`------------------------------------------------\n`)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .texto(`Gracias por su Compra!\n`)
+            .texto(`Visite nuestra página WEB!\n`)
+            .texto(`www.prysoft.com.ar\n`)
+            .cortar() 
+            .feed(4)
+            .imprimirEn("80mm Series Printer");
+
+}

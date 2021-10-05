@@ -1,0 +1,123 @@
+import { ConectorPlugin } from "../helpers/conectorPlugin";
+let logo = "";
+let infoCantUni="";
+let precioTotal = ``;
+let espacios = 0;
+let espacioss = "";
+let lineaProd=``;
+let imagen = false;
+
+
+export default function printReceipt(comprobante){
+         console.log(comprobante);
+try {
+      console.log(req.body);
+      switch (nombreDocumento) {
+        case "Ticket X":
+          ticketX(productos,empresa.razonSocial,totalVenta,totalRecargos,
+                  totalDescuentos,subTotal,nombreDocumento)     
+          break;
+
+        case "Nota de débito X":
+          notaDebitoX(productos,empresa.razonSocial,totalVenta)     
+          break;
+
+        case "Nota de crédito X":
+          notaCreditoX(productos,empresa.razonSocial,totalVenta)     
+          break;
+
+        case "FACTURAS C":
+          facturaC(productos,empresa.razonSocial,totalVenta,totalRecargos,
+                  totalDescuentos,subTotal,barCode,cae,cliente,empresa
+                  ,fechaEmision,numeroCbte,fechaVto)
+          break;
+
+        case "NOTAS DE DEBITO C":
+          notaDebitoC(productos,empresa.razonSocial,totalVenta,barCode,cae,cliente,empresa
+            ,fechaEmision,numeroCbte,fechaVto,)
+          break;
+
+        case "NOTAS DE CREDITO C":
+          notaCreditoC(productos,empresa.razonSocial,totalVenta,barCode,cae,cliente,empresa
+            ,fechaEmision,numeroCbte,fechaVto,)
+          break;
+
+        case "FACTURAS B":
+          facturaB(productos,empresa.razonSocial,totalVenta,totalRecargos,
+            totalDescuentos,subTotal,barCode,cae,cliente,empresa
+            ,fechaEmision,numeroCbte,fechaVto)
+          break;
+
+        case "NOTAS DE DEBITO B":
+          notaDebitoB(productos,empresa.razonSocial,totalVenta,barCode,cae,cliente,empresa
+            ,fechaEmision,numeroCbte,fechaVto,)
+          break;
+          
+        case "NOTAS DE CREDITO B":
+          notaCreditoB(productos,empresa.razonSocial,totalVenta,barCode,cae,cliente,empresa
+            ,fechaEmision,numeroCbte,fechaVto,)
+          break;
+
+        case "FACTURAS A":
+          facturaA(productos,empresa.razonSocial,totalVenta,totalRecargos,
+            totalDescuentos,subTotal,barCode,cae,cliente,empresa
+            ,fechaEmision,numeroCbte,fechaVto,
+            totalIva21,totalIva10,totalIva27)
+          break;
+
+        case "NOTAS DE DEBITO A":
+          notaDebitoA(productos,empresa.razonSocial,totalVenta,barCode,cae,cliente,empresa
+            ,fechaEmision,numeroCbte,fechaVto,
+            totalIva21,totalIva10,totalIva27)
+          break;
+
+        case "NOTAS DE CREDITO A":
+          notaCreditoA(productos,empresa.razonSocial,totalVenta,barCode,cae,cliente,empresa
+            ,fechaEmision,numeroCbte,fechaVto,
+            totalIva21,totalIva10,totalIva27)
+          break;
+
+        default:
+          break;
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const conector = new ConectorPlugin()
+conector.texto(`------------------------------------------------\n`)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .establecerTamanioFuente(2, 2)
+            .establecerEnfatizado(1)
+            .texto(`${comprobante.nombreDocumento}\n`)
+            .establecerTamanioFuente(1, 1)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+            .establecerEnfatizado(0)
+            .texto(`------------------------------------------------\n`)
+            .establecerEnfatizado(1)
+            .textoConAcentos(`Descripción                              IMPORTE\n`)
+            .establecerEnfatizado(0)
+            .texto(`Cantidad/Precio unitario\n`)
+            .texto(`------------------------------------------------\n`)
+           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+           .texto(`Gracias por su Compra!\n`)
+           .texto(`Visite nuestra página WEB!\n`)
+           .texto(`www.prysoft.com.ar\n`)
+           .cortar() 
+           .feed(4)
+           .imprimirEn("80mm Series Printer");
+
+}
