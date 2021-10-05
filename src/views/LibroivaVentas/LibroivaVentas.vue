@@ -203,7 +203,7 @@ export default {
             data.netoGrabado = Number(data.totalVenta) - Number(data.totalIvas);
           })
           this.ventas = data.data.content;
-          console.log(ventas);
+          console.log(this.ventas);
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
