@@ -244,7 +244,6 @@ export default {
         "NUMERO COMPROBANTE",
         "RAZON SOCIAL",
         "CONDICION IVA",
-        "CUIT",
         "NETO GRABADO",
         "IVA 27%",
         "IVA 21%",
