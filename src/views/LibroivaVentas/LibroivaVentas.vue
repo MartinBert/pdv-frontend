@@ -159,7 +159,7 @@ export default {
       { text: "Numero Comprobantes", value: "numeroCbte" },
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva.nombre" },
-      { text: "N° Cuit", value: "cliente.cuit" },
+      { text: "N° Cuit", value: "" },
       { text: "Neto Grabado", value: "netoGrabado" },
       { text: "Iva 27%", value: "totalIva27" },
       { text: "Iva 21%", value: "totalIva21" },

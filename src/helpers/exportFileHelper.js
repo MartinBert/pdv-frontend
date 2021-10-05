@@ -69,7 +69,6 @@ export function exportExcelLibro(headers, data) {
             el.numeroCbte,
             el.cliente.razonSocial,
             el.cliente.condicionIva.nombre,
-            el.cliente.cuit,
             Number(el.totalVenta) - Number(el.totalIvas),
             el.totalIva27,
             el.totalIva21,
