@@ -50,12 +50,8 @@
         >
       </template>
       <template v-slot:[`item.acciones`]="{ item }">
-        <v-icon :itemId="item.id" v-on:editItem="editItem">
-          mdi-pencil
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete
-        </v-icon>
+       <Edit :itemId="item.id" v-on:editItem="editItem" />
+        <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
       </template>
     </v-data-table>
     <Pagination
@@ -67,8 +63,8 @@
   </v-container>
 </template>
 <script>
-//import Edit from "../Buttons/Edit";
-//import Delete from "../Buttons/Delete";
+import Edit from "../Buttons/Edit";
+import Delete from "../Buttons/Delete";
 import GenericService from "../../services/GenericService";
 import Pagination from "../../components/Pagination"
 
@@ -98,9 +94,9 @@ export default {
   }),
 
   components: {
-    Pagination
-    // Delete,
-    //Edit,
+    Pagination,
+    Delete,
+    Edit,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;

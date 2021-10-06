@@ -159,7 +159,7 @@ export default {
       { text: "Numero Comprobantes", value: "numeroCbte" },
       { text: "Razon Social", value: "cliente.razonSocial" },
       { text: "Condicion Iva", value: "cliente.condicionIva.nombre" },
-      { text: "N° Cuit", value: "cliente.cuit" },
+      { text: "N° Cuit", value: "" },
       { text: "Neto Grabado", value: "netoGrabado" },
       { text: "Iva 27%", value: "totalIva27" },
       { text: "Iva 21%", value: "totalIva21" },
@@ -203,6 +203,7 @@ export default {
             data.netoGrabado = Number(data.totalVenta) - Number(data.totalIvas);
           })
           this.ventas = data.data.content;
+          console.log(this.ventas);
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
@@ -243,7 +244,6 @@ export default {
         "NUMERO COMPROBANTE",
         "RAZON SOCIAL",
         "CONDICION IVA",
-        "CUIT",
         "NETO GRABADO",
         "IVA 27%",
         "IVA 21%",
