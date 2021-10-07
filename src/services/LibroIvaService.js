@@ -183,11 +183,11 @@ let libroIva = listaFacturas;
         "CUIT":item.cliente.condicionIva.nombre == "Consumidor Final" ? null : item.cliente.cuit,
         "Neto":`${(item.totalVenta-item.totalIvas).toFixed(2)}`,
         "Alic.":`21,00 %`,
-        "I.V.A":item.totalIvas.toFixed(2),
+        "I.V.A":Number(item.totalIvas).toFixed(2),
         "Exento/NG":"0,00",
         "Per.IVA":"0,00",
         "Per.IB":"0,00",
-        "Total": item.totalVenta.toFixed(2)
+        "Total": Number(item.totalVenta).toFixed(2)
       }
       dataExcel.push(Comprobante)
     })
