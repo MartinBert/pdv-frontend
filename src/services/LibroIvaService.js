@@ -11,7 +11,7 @@ export default function orderSales(lista,factA,factB,factC,txt,excel){
   let libroIvaOrden = [];
   //variables para archivo excel
   let dataExcel =[];
-  //variable para LID Ventas
+  //variable para LID Ventas y LID Ventas Alicuotas
   let fechaEmisionTXT;
   let tipoComprobanteTXT;
   let numeroPDVTXT;
@@ -34,7 +34,10 @@ export default function orderSales(lista,factA,factB,factC,txt,excel){
   let codigoOperacion ="";
   let otrosTributos ="";
   let fechaVencimientoPago ="";
+  let importeIVATXT ="";
+  let alicuotaIva ="";
   let libroIvaTXT = [];
+  let libroAlicuotaVentaTXT= [];
 
  /*filtro lo que el usuario quiere sacar por el excel */
 if(factA){
@@ -204,11 +207,14 @@ let libroIva = listaFacturas;
       return buf;    
   }
 
-    let wbout = XLSX.write(wb,{bookType:'xlsx',type:'binary'})
-
-    if(dataExcel.length !=0 && excel){
-        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'LibroIvaPrueba.xlsx');
-    }
+  let wbout = XLSX.write(wb,{bookType:'xlsx',type:'binary'})
+  let date = new Date()
+  let mes = date.getMonth() + 1
+  let anio = date.getFullYear()
+  
+  if(dataExcel.length !=0 && excel){
+      saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), `LID Ventas ${mes}-${anio}.xlsx`);
+  }
 
 //generacion arhivo txt (LID Ventas)
 libroIvaOrden.forEach(venta =>{
@@ -313,14 +319,11 @@ libroIvaOrden.forEach(venta =>{
                     +tipoDeCambio+cantAlicuotaIVA+codigoOperacion+otrosTributos+fechaVencimientoPago+"\n"
   libroIvaTXT.push(itemLibroIvaTXT)
 })
-let date = new Date()
-let mes = date.getMonth() + 1
-let anio = date.getFullYear()
 
-const a = document.createElement("a");
-const contenido = libroIvaTXT
-const blob = new Blob(contenido,{type:"text/plain"});
-const url = window.URL.createObjectURL(blob);
+let a = document.createElement("a");
+let contenido = libroIvaTXT
+let blob = new Blob(contenido,{type:"text/plain"});
+let url = window.URL.createObjectURL(blob);
 
 a.href = url;
 a.download = `LID Ventas ${mes}-${anio}`;
@@ -329,5 +332,64 @@ if(txt) a.click();
 window.URL.revokeObjectURL(url)
 
 //generacion arhivo txt (LID Ventas Alicuotas)
-  
+libroIvaOrden.forEach(venta =>{
+    //diseño de 3 numeros del tipo de comprobante segun afip
+    tipoComprobanteTXT = venta.documentoComercial.codigoDocumento;
+    //diseño 5 numeros para el punto de venta
+    numeroPDVTXT = `0${venta.numeroCbte.slice(0,4)}`
+    //diseño de los 20 numeros del numero de comprobante (se repiten porque van desde -- hasta -- , y es el mismo)
+    let longNumCompr = venta.correlativoComprobante.length;
+    let faltan0NumCompr = 20 - longNumCompr;
+    let cerosNumCompr="";
+    for(let i = 0; i<faltan0NumCompr;i++){
+      cerosNumCompr += "0";
+    }
+    nroComprobanteTXT = cerosNumCompr+venta.correlativoComprobante
+    //diseño de 15 numeros para el importe neto Gravado
+    importeTotalTXT = (venta.totalVenta - venta.totalIvas).toFixed(2);
+    let decimal1 = importeTotalTXT.length - 2;
+    let decimalImporteTotal = importeTotalTXT.slice(decimal1,importeTotalTXT.length);
+    let entero1 = importeTotalTXT.length - 3;
+    let enteroImporteTotal = importeTotalTXT.slice(0,entero1);
+    let numTotal = enteroImporteTotal+decimalImporteTotal;
+    let numTotalCon0 = "";
+    if( numTotal.length < 15){
+      let cantCeros = 15 - numTotal.length
+      for(let i =0 ; i < cantCeros ; i++){
+        numTotalCon0 += "0"
+      }
+    }
+    importeTotalTXT = numTotalCon0 + numTotal
+    //diseño de 04 numeros para alicuota del iva (0005 es para 21%, depende el % es distinto pero dejamos este no mas)
+    alicuotaIva = "0005"
+    //diseño de 15 numeros impuesto liquido iva
+    importeIVATXT = (venta.totalIvas).toFixed(2);
+    decimal1 = importeIVATXT.length - 2;
+    decimalImporteTotal = importeIVATXT.slice(decimal1,importeIVATXT.length);
+    entero1 = importeIVATXT.length - 3;
+    enteroImporteTotal = importeIVATXT.slice(0,entero1);
+    numTotal = enteroImporteTotal+decimalImporteTotal;
+    numTotalCon0 = "";
+    if( numTotal.length < 15){
+      let cantCeros = 15 - numTotal.length
+      for(let i =0 ; i < cantCeros ; i++){
+        numTotalCon0 += "0"
+      }
+    }
+    importeIVATXT = numTotalCon0 + numTotal
+    itemLibroIvaTXT = tipoComprobanteTXT+numeroPDVTXT+nroComprobanteTXT+importeTotalTXT+alicuotaIva+importeIVATXT+"\n"
+
+    libroAlicuotaVentaTXT.push(itemLibroIvaTXT)
+  })
+
+  a = document.createElement("a");
+  contenido = libroAlicuotaVentaTXT
+  blob = new Blob(contenido,{type:"text/plain"});
+  url = window.URL.createObjectURL(blob);
+  a.href = url;
+  a.download = `LID Ventas Alicuotas ${mes}-${anio}`;
+  if(txt) a.click();
+  window.URL.revokeObjectURL(url)
+
+
 }
