@@ -85,7 +85,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
         .then((data) => {
-          this.object = data.data;
+          this.filterParamns = data.data.content;
           this.loaded = true;
         });
     },
@@ -97,7 +97,7 @@ export default {
         .save(this.filterParamns)
         .then(() => {
           console.log(this.filterParamns);
-          this.$router.push({ name: "impresora", params: { id: 0 } });
+          this.$router.push({ name: "impresoras", params: { id: 0 } });
         })
         .catch((error) => {
           if (error.response.status == 500) {

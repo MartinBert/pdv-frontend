@@ -16,17 +16,24 @@
         sort-by="calories"
         class="elevation-1"
         hide-default-footer
-      ></v-data-table>
-      <template >
-
-      </template>
+      >
+        <template v-slot:[`item.impresora`]="{ item }">
+          <v-checkbox @change="selectDefaultDeposit1(item)"></v-checkbox>
+        </template>
+        <template v-slot:[`item.acciones`]="{ }">
+          <Edit />
+          <Delete />
+        </template>
+      </v-data-table>
+      <Spinner v-if="loaded" />
     </v-card>
-    <Spinner v-if="!loaded" />
   </v-container>
 </template>
 <script>
-import ImpresoraTable from "../../components/Tables/ImpresorasTable";
+//import ImpresoraTable from "../../components/Tables/ImpresorasTable";
 import Spinner from "../../components/Graphics/Spinner";
+import Edit from "../../components/Buttons/Edit";
+import Delete from "../../components/Buttons/Delete";
 export default {
   data: () => ({
     itemss: ["80 mm ", "58 mm"],
@@ -59,88 +66,84 @@ export default {
       nombre: "",
       ancho: 0,
     },
-    components: {
-      ImpresoraTable,
+  }),
+  components: {
       Spinner,
+      Edit,
+      Delete,
     },
- }),
-    mounted() {
-      this.tenant = this.$route.params.tenant;
-    },
-    methods: {
-      initialize() {
-        this.desserts = [
-          {
-            nombre: "KitKat",
-            ancho: 518,
-          },
-        ];
-      },
-
-      newObject() {
-        this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
-      },
-
-      editItem(item) {
-        this.editedIndex = this.desserts.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.dialog = true;
-      },
-
-      deleteItem(item) {
-        this.editedIndex = this.desserts.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.dialogDelete = true;
-      },
-
-      deleteItemConfirm() {
-        this.desserts.splice(this.editedIndex, 1);
-        this.closeDelete();
-      },
-
-      close() {
-        this.dialog = false;
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-        });
-      },
-
-      closeDelete() {
-        this.dialogDelete = false;
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-        });
-      },
-
-      save() {
-        if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem);
-        } else {
-          this.desserts.push(this.editedItem);
-        }
-        this.close();
-      },
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+  },
+  methods: {
+    initialize() {
+      this.desserts = [
+        {
+          nombre: "KitKat",
+          ancho: 518,
+        },
+      ];
     },
 
-      computed: {
-      formTitle() {
-        return this.editedIndex === -1 ? "New Item" : "Edit Item";
-      },
+    newObject() {
+      this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
 
-    watch: {
-      dialog(val) {
-        val || this.close();
-      },
-      dialogDelete(val) {
-        val || this.closeDelete();
-      },
+    editItem() {
+       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
+    },
+    deleteItem(itemId) {
+      this.$emit("deleteItem", itemId);
     },
 
-    created() {
-      this.initialize();
+    deleteItemConfirm() {
+      this.desserts.splice(this.editedIndex, 1);
+      this.closeDelete();
     },
+
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+    },
+
+    closeDelete() {
+      this.dialogDelete = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+    },
+
+    save() {
+      if (this.editedIndex > -1) {
+        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+      } else {
+        this.desserts.push(this.editedItem);
+      }
+      this.close();
+    },
+  },
+
+  computed: {
+    formTitle() {
+      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+    },
+  },
+
+  watch: {
+    dialog(val) {
+      val || this.close();
+    },
+    dialogDelete(val) {
+      val || this.closeDelete();
+    },
+  },
+
+  created() {
+    this.initialize();
+  },
 };
 </script>
