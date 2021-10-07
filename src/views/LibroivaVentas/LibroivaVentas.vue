@@ -4,12 +4,16 @@
     margin-left:1px;"
   >
     <v-card min-width="100%">
-      <v-row style="justify-content: center;">
-        <v-col>
-          <form>
-            <v-col cols="2">
-              <div class="d-block">
-                <v-text-field
+      <form style="display:flex;flex-direction:row;align-items:center;justify-content: space-between;
+                  width:100% ;padding:10px">
+
+        <div style="display:flex;flex-direction:column;width:32%; border: 1px solid rgba(24, 23, 23,0.3)
+                    ;align-items:center;padding:10px ;border-radius: 15px;height:220px;
+                      box-shadow: 0px 0px 5px rgb(139, 136, 136);background-color: #f5f5f5;">
+          <h2 style="padding:5px; border-bottom:1px dashed rgba(24, 23, 23,0.3);width:100%;text-align:center">Seleccione las fechas:</h2>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:10px">
+            <v-text-field
+                  style="width:70%"
                   id="input1"
                   name="input1"
                   type="date"
@@ -20,6 +24,7 @@
                 >
                 </v-text-field>
                 <v-text-field
+                  style="width:70%"
                   id="input2"
                   name="input2"
                   type="date"
@@ -29,55 +34,96 @@
                   required
                 >
                 </v-text-field>
-              </div>
-            </v-col>
-            <v-col cols="2">
-                    <v-btn
-                  class="primary v-btn--block"
-                   style="margin-left:400px;
-                margin-top:-150px;
-                "
-                  @click="salesForDate1()"
-                >
-                  Imprimir libro iva
-                </v-btn>
-            </v-col>
-            <v-col cols="3">
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;width:32%; border: 1px solid rgba(24, 23, 23,0.3)
+                    ;align-items:center;padding:10px ;border-radius: 15px;height:220px;
+                      box-shadow: 0px 0px 5px rgb(139, 136, 136);background-color: #f5f5f5;">
+          <h2 style="padding:5px; border-bottom:1px dashed rgba(24, 23, 23,0.3);width:100%;text-align:center;">Seleccione comprobantes:</h2>
+          <div style="display:flex;flex-direction:row;align-items:center;padding:3px;justify-content: space-between;width:100%">
+            <div style="display:flex;flex-direction:column;align-items:center;width:50%;justify-content: space-between">
+              <h4 style="font-size:1rem">Facturas(A)</h4>
               <v-checkbox
+                style="margin:0;height:25px"
                 v-on:change="filterObjects()"
-                style="margin-left:900px;
-                margin-top:-180px;
-                "
-                label="Facturas(A)"
                 v-model="filterParams.facturaA"
               >
               </v-checkbox>
-            </v-col>
-            <v-col cols="3">
+              <h4 style="font-size:1rem">Nota Débito(A)</h4>
               <v-checkbox
+                style="margin:0;height:25px"
                 v-on:change="filterObjects()"
-                style="margin-left:900px;
-                margin-top:-150px;
-                "
-                label="Facturas(B)"
+                v-model="filterParams.notaDeDebitoA"
+              >
+              </v-checkbox>
+              <h4 style="font-size:1rem">Nota Crédito(A)</h4>
+              <v-checkbox
+                style="margin:0;height:25px"
+                v-on:change="filterObjects()"
+                v-model="filterParams.notaDeCreditoA"
+              >
+              </v-checkbox>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;width:50%;justify-content: space-between">
+              <h4 style="font-size:1rem">Facturas(B)</h4>
+              <v-checkbox
+                style="margin:0;height:25px"
+                v-on:change="filterObjects()"
                 v-model="filterParams.facturaB"
               >
               </v-checkbox>
-            </v-col>
-            <v-col cols="3">
+              <h4 style="font-size:1rem">Nota Débito(B)</h4>
               <v-checkbox
+                style="margin:0;height:25px"
                 v-on:change="filterObjects()"
-                style="margin-left:900px;
-                margin-top:-200px;
-                "
-                label="Facturas(C)"
-                v-model="filterParams.facturaC"
+                v-model="filterParams.notaDeDebitoB"
               >
               </v-checkbox>
-            </v-col>
-          </form>
-        </v-col>
-      </v-row>
+              <h4 style="font-size:1rem">Nota Crédito(B)</h4>
+              <v-checkbox
+                style="margin:0;height:25px"
+                v-on:change="filterObjects()"
+                v-model="filterParams.notaDeCreditoB"
+              >
+              </v-checkbox>
+            </div>
+
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;width:32%; border: 1px solid rgba(24, 23, 23,0.3)
+                    ;align-items:center;padding:10px ;border-radius: 15px;height:220px;
+                      box-shadow: 0px 0px 5px rgb(139, 136, 136);background-color: #f5f5f5;">
+          <h2 style="padding:5px; border-bottom:1px dashed rgba(24, 23, 23,0.3);width:100%;text-align:center">Seleccione archivos:</h2>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:10px">
+           <div style="display:flex;flex-direction:row;align-items:center;">
+             <h4 style="font-size:1rem;margin-right:10px">Libro IVA EXCEL</h4>
+              <v-checkbox
+                v-on:change="filterObjects()"
+                v-model="libroIvaExcel"
+              >
+              </v-checkbox>
+           </div>
+           <div style="display:flex;flex-direction:row;align-items:center;">
+             <h4 style="font-size:1rem;margin-right:10px">Libro IVA TXT</h4>
+              <v-checkbox
+                v-on:change="filterObjects()"
+                v-model="libroIvaTxt"
+              >
+              </v-checkbox>
+           </div>
+          </div>
+        </div>
+      </form>
+      <div style="display:flex;margin:20px 0px">
+                <v-btn
+                  class="primary "
+                  style="width:30%; margin:0px auto;font-size:1rem"
+                  @click="salesForDate1()"
+                >
+                  Imprimir
+                </v-btn>
+      </div>
+
       <v-row>
         <v-col>
           <h2 style="text-align:center;">Libro Iva Ventas</h2>
@@ -109,7 +155,8 @@
 import ComprobantesService from "../../services/ComprobantesService";
 import Pagination from "../../components/Pagination";
 import { generateIntegerDate, monthsList, formatDate } from "../../helpers/dateHelper";
-import { exportExcelLibro } from "../../helpers/exportFileHelper";
+//import { exportExcelLibro } from "../../helpers/exportFileHelper";
+import orderSales from "../../services/LibroIvaService"
 import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
@@ -134,6 +181,8 @@ export default {
     },
     fechaDesde: null,
     fechaHasta: null,
+    libroIvaExcel:false,
+    libroIvaTxt:false,
     filterParams: {
       sucursalId: "",
       fechaDesdeString: "",
@@ -141,6 +190,10 @@ export default {
       facturaA: false,
       facturaB: false,
       facturaC: false,
+      notaDeCreditoA:false,
+      notaDeDebitoA:false,
+      notaDeCreditoB:false,
+      notaDeDebitoB:false,
       page: 1,
       size: 10,
       totalPages: 0,
@@ -203,7 +256,6 @@ export default {
             data.netoGrabado = Number(data.totalVenta) - Number(data.totalIvas);
           })
           this.ventas = data.data.content;
-          console.log(this.ventas);
           this.filterParams.totalPages = data.data.totalPages;
           if (this.filterParams.totalPages < this.filterParams.page) {
             this.filterParams.page = 1;
@@ -224,7 +276,14 @@ export default {
       ComprobantesService(this.tenant, "comprobantesFiscales", this.token)
         .getInvoicesForDateRange(filterParams)
         .then((data) => {
-          let invoices = data.data;
+          //let invoices = data.data;
+          //dato de todos los comprobantes
+          orderSales(data.data,this.filterParams.facturaA,
+                               this.filterParams.facturaB,
+                               this.filterParams.facturaC,
+                               this.libroIvaTxt,
+                               this.libroIvaExcel);
+          /*
           if(this.filterParams.facturaA){
             invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS A");
           }else if(this.filterParams.facturaB){
@@ -233,9 +292,11 @@ export default {
             invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS C");
           }
           this.exportGeneralExcel(invoices);
+          */
+
         });
     },
-
+/*
     async exportGeneralExcel(invoices) {
       this.loaded = false;
       const headers = [
@@ -299,6 +360,8 @@ export default {
       
       return invoices;
     },
+
+*/
 
     notPassSucursalValidations() {
       if (this.loguedUser.sucursal) return false;

@@ -9,7 +9,8 @@ import VueBarcodeScanner from 'vue-barcode-scanner';
 import store from './store/index';
 import { errorAlert, infoAlert, infoAlert2, questionAlert, successAlert, successAlert2 } from './helpers/alerts';
 import Toaster from 'v-toaster';
-import 'v-toaster/dist/v-toaster.css'
+import 'v-toaster/dist/v-toaster.css';
+
     
 Vue.prototype.$errorAlert = errorAlert;
 Vue.prototype.$infoAlert = infoAlert;
