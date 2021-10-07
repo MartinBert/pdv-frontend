@@ -63,7 +63,8 @@ import Presupuesto from "../views/Presupuesto/Presupuesto.vue";
 import Cierrez from "../views/Cierrez/Cierrez.vue";
 import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
 import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
-import Impresora from "../views/Impresora/Impresora";
+import Impresora from "../views/Impresoras/Impresoras";
+import ImpresorasForm from "../views/Impresoras/ImpresorasForm";
 
 Vue.use(VueRouter)
 
@@ -107,6 +108,12 @@ const routes = [
                 path: 'perfiles/form/:id',
                 name: 'perfilesForm',
                 component: PerfilesForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'impresoras/form/:id',
+                name: 'ImpresorasForm',
+                component: ImpresorasForm,
                 meta: { requiresAuth: true }
             },
             {

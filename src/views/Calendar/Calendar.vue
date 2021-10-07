@@ -240,7 +240,6 @@ export default {
   },
   methods: {
     getEvent() {
-      
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
