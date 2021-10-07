@@ -363,6 +363,12 @@ const routes = [
                 meta: { requiresAuth: true }
             },
             {
+                path: 'impresoras',
+                name: 'impresoras',
+                component:Impresora,
+                meta: { requiresAuth: true }
+            },
+            {
                 path: 'empresa/form/:id',
                 name: 'empresasForm',
                 component: EmpresasForm,
@@ -420,12 +426,6 @@ const routes = [
                 path: 'manuales',
                 name: 'manuales',
                 component: Manuales,
-                meta: { requiresAuth: true }
-            },
-            {
-                path: 'impresora',
-                name: 'impresora',
-                component:Impresora,
                 meta: { requiresAuth: true }
             },
             {
