@@ -34,8 +34,10 @@
 import Spinner from "../../components/Graphics/Spinner";
 import Edit from "../../components/Buttons/Edit";
 import Delete from "../../components/Buttons/Delete";
+import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
+    impresoras:[],
     itemss: ["80 mm ", "58 mm"],
     filterParams: {
       sucursalId: "",
@@ -83,6 +85,17 @@ export default {
           ancho: 518,
         },
       ];
+    },
+
+     getObject(id) {
+      GenericService(this.tenant, this.service, this.token)
+        .get(id)
+        .then((data) => {
+          this.impresoras = data.data.content;
+          console.log(this.impresoras);
+          this.filterParams.totalPages = data.data.totalPages;  
+          this.loaded = true;
+        });
     },
 
     newObject() {

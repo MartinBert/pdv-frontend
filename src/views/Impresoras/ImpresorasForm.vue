@@ -1,7 +1,9 @@
 <template>
-  <v-container style="min-width: 98%;
+  <v-container
+    style="min-width: 98%;
    margin-right: 40px;
-  ">
+  "
+  >
     <v-card>
       <Error :errorStatus="errorStatus" />
       <div v-if="loaded">
@@ -17,7 +19,7 @@
                 :rules="[(v) => !!v || 'Campo requerido...']"
               ></v-text-field>
             </v-col>
-             <v-col class="col-6">
+            <v-col class="col-6">
               <v-select
                 type="text"
                 :items="items"
@@ -53,16 +55,20 @@ import Spinner from "../../components/Graphics/Spinner";
 import Error from "../../components/Error";
 export default {
   data: () => ({
+    impresoras: [],
     valid: true,
     object: {},
-    filterParamns:{
-        nombreImpresora:"",
-        valor:""
+    filterParamns: {
+      nombreImpresora: "",
+      valor: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
     },
-    items: ['80mm'],
+    items: ["80mm"],
     loaded: false,
     tenant: "",
-    service:"impresoras",
+    service: "impresoras",
     token: localStorage.getItem("token"),
     errorStatus: false,
   }),
@@ -73,6 +79,7 @@ export default {
   },
 
   mounted() {
+    this.getObject();
     this.tenant = this.$route.params.tenant;
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
@@ -85,18 +92,17 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
         .then((data) => {
-          this.filterParamns = data.data.content;
+          this.impresoras = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
-
     save() {
       this.$refs.form.validate();
       this.loaded = false;
       GenericService(this.tenant, this.service, this.token)
-        .save(this.filterParamns)
+        .save(this.impresoras)
         .then(() => {
-          console.log(this.filterParamns);
           this.$router.push({ name: "impresoras", params: { id: 0 } });
         })
         .catch((error) => {
