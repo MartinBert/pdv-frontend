@@ -51,7 +51,7 @@ export default {
     },
     viewCheckboxState: 0,
     checkboxModel:{},
-    loaded: false,
+    loaded: true,
     tenant: "",
     service: "impresoras",
     token: localStorage.getItem("token"),
