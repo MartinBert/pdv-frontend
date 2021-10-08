@@ -75,7 +75,7 @@ export default {
     return {
       loguedUser: JSON.parse(localStorage.getItem("userData")),
       token: localStorage.getItem("token"),
-      service:"historialStock",
+      service:"",
       filterParams: {
         fourthLongParam: "",
         thirdLongParam: "",
@@ -117,7 +117,7 @@ export default {
           break;
       }
 
-      GenericService(this.tenant, this.service, this.token)
+      GenericService(this.tenant, "historialStock", this.token)
         .filter({ thirdLongParam, stringParam, page, size })
         .then((data) => {
           console.log(this.data);
