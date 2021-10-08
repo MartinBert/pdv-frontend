@@ -75,6 +75,7 @@ export default {
     return {
       loguedUser: JSON.parse(localStorage.getItem("userData")),
       token: localStorage.getItem("token"),
+      service:"historialStock",
       filterParams: {
         fourthLongParam: "",
         thirdLongParam: "",
