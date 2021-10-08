@@ -62,9 +62,8 @@
           </v-col>
         </v-row>
       </v-card-text>
+      <ProductListOfStockDialog />
     </v-card>
-
-    <ProductListOfStockDialog />
   </v-dialog>
 </template>
 <script>
@@ -120,6 +119,7 @@ export default {
         .filter({ thirdLongParam, stringParam, page, size })
         .then((data) => {
           this.objects = data.data.content;
+          console.log(this.objects);
         });
     },
 
