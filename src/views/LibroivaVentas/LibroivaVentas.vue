@@ -53,14 +53,14 @@
               <v-checkbox
                 style="margin:0;height:25px"
                 v-on:change="filterObjects()"
-                v-model="filterParams.notaDeDebitoA"
+                v-model="filterParams.notaDebitoA"
               >
               </v-checkbox>
               <h4 style="font-size:1rem">Nota Crédito(A)</h4>
               <v-checkbox
                 style="margin:0;height:25px"
                 v-on:change="filterObjects()"
-                v-model="filterParams.notaDeCreditoA"
+                v-model="filterParams.notaCreditoA"
               >
               </v-checkbox>
             </div>
@@ -76,14 +76,14 @@
               <v-checkbox
                 style="margin:0;height:25px"
                 v-on:change="filterObjects()"
-                v-model="filterParams.notaDeDebitoB"
+                v-model="filterParams.notaDebitoB"
               >
               </v-checkbox>
               <h4 style="font-size:1rem">Nota Crédito(B)</h4>
               <v-checkbox
                 style="margin:0;height:25px"
                 v-on:change="filterObjects()"
-                v-model="filterParams.notaDeCreditoB"
+                v-model="filterParams.notaCreditoB"
               >
               </v-checkbox>
             </div>
@@ -190,10 +190,10 @@ export default {
       facturaA: false,
       facturaB: false,
       facturaC: false,
-      notaDeCreditoA:false,
-      notaDeDebitoA:false,
-      notaDeCreditoB:false,
-      notaDeDebitoB:false,
+      notaCreditoA:false,
+      notaDebitoA:false,
+      notaCreditoB:false,
+      notaDebitoB:false,
       page: 1,
       size: 10,
       totalPages: 0,
@@ -267,6 +267,7 @@ export default {
     salesForDate1() {
       if (this.notPassSucursalValidations()) return this.error("sucursal");
       if (this.notPassDateValidations()) return this.error("fechas");
+      if (this.notPassArchiveType()) return this.error("archivos");
       let sucursalId = this.loguedUser.sucursal.id;
       const filterParams = {
         sucursalId,
@@ -377,13 +378,21 @@ export default {
       if (this.facturaA) return false;
       return true;
     },
-      notPassInvoiceBValidations() {
+    
+    notPassInvoiceBValidations() {
       if (this.facturaB) return false;
       return true;
     },
-      notPassInvoiceCValidations() {
+
+
+    notPassInvoiceCValidations() {
       if (this.facturaC) return false;
       return true;
+    },
+
+    notPassArchiveType(){
+      if(!this.libroIvaExcel && !this.libroIvaTxt) return true;
+      return false;
     },
 
     error(type) {
@@ -395,16 +404,20 @@ export default {
         case "fechas":
           error = "Debe seleccionar las dos fechas para obtener el reporte";
           break;
-        default:
-          error = "Debe seleccionar una sucursal para realizar el reporte";
-          break;
         case "facturas":
           error = "Debe seleccionar el tipo de factura que desea imprimir"
+          break;
+        case "archivos":
+          error = "Debe seleccionar el tipo de archivo que desea imprimir"
+          break;
+        default:
+          error = "Debe seleccionar una sucursal para realizar el reporte";
           break;
       }
       this.$errorAlert(error);
       return;
     },
+
     seeDetails(objects) {
       this.$emit("seeDetails", objects);
     },
@@ -415,6 +428,7 @@ export default {
       const [year, month, day] = date.split("-");
       return `${month}/${day}/${year}`;
     },
+
     parseDate(date) {
       if (!date) return null;
 

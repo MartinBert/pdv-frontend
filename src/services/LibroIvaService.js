@@ -390,6 +390,4 @@ libroIvaOrden.forEach(venta =>{
   a.download = `LID Ventas Alicuotas ${mes}-${anio}`;
   if(txt) a.click();
   window.URL.revokeObjectURL(url)
-
-
 }
