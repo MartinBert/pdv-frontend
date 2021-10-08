@@ -12,7 +12,7 @@
             <v-col class="col-6">
               <v-text-field
                 type="text"
-                v-model="filterParamns.nombreImpresora"
+                v-model="object.nombreImpresora"
                 :counter="50"
                 label="Nombre"
                 required
@@ -23,7 +23,7 @@
               <v-select
                 type="text"
                 :items="items"
-                v-model="filterParamns.valor"
+                v-model="object.valor"
                 :counter="50"
                 label="Tamaño del papel"
                 required
@@ -55,16 +55,8 @@ import Spinner from "../../components/Graphics/Spinner";
 import Error from "../../components/Error";
 export default {
   data: () => ({
-    impresoras: [],
     valid: true,
     object: {},
-    filterParamns: {
-      nombreImpresora: "",
-      valor: "",
-      page: 1,
-      size: 10,
-      totalPages: 0,
-    },
     items: ["80mm"],
     loaded: false,
     tenant: "",
@@ -97,11 +89,13 @@ export default {
           this.loaded = true;
         });
     },
+    
     save() {
       this.$refs.form.validate();
       this.loaded = false;
+      this.object.impresoraPredeterminada = false;
       GenericService(this.tenant, this.service, this.token)
-        .save(this.impresoras)
+        .save(this.object)
         .then(() => {
           this.$router.push({ name: "impresoras", params: { id: 0 } });
         })

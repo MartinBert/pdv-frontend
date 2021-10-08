@@ -12,25 +12,27 @@
       </v-row>
       <v-data-table
         :headers="headers"
-        :items="desserts"
+        :items="impresoras"
         sort-by="calories"
         class="elevation-1"
         hide-default-footer
       >
-        <template v-slot:[`item.impresora`]="{ item }">
-          <v-checkbox @change="selectDefaultDeposit1(item)"></v-checkbox>
+        <template v-slot:[`item.impresoraPredeterminada`]="{ item, index }">
+          <p v-show="viewCheckboxState === 1">
+            {{(item.impresoraPredeterminada) ? checkboxModel[index] = true : checkboxModel[index] = false}}
+          </p>
+          <v-checkbox v-model="checkboxModel[index]" @change="selectDefaultPrinter(item)"></v-checkbox>
         </template>
         <template v-slot:[`item.acciones`]="{ }">
           <Edit />
           <Delete />
         </template>
       </v-data-table>
-      <Spinner v-if="loaded" />
+      <Spinner v-if="!loaded" />
     </v-card>
   </v-container>
 </template>
 <script>
-//import ImpresoraTable from "../../components/Tables/ImpresorasTable";
 import Spinner from "../../components/Graphics/Spinner";
 import Edit from "../../components/Buttons/Edit";
 import Delete from "../../components/Buttons/Delete";
@@ -43,53 +45,43 @@ export default {
       sucursalId: "",
       valor: "",
       nombreImpresora: "",
+      page: 1,
+      size: 10,
+      totalPages: 0
     },
+    viewCheckboxState: 0,
+    checkboxModel:{},
     loaded: false,
     tenant: "",
-    service: "",
+    service: "impresoras",
     token: localStorage.getItem("token"),
-    deleteDialogStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
-    dialog: false,
-    dialogDelete: false,
     headers: [
-      { text: "Nombre", value: "nombre" },
-      { text: "Ancho", value: "ancho" },
-      { text: "Impresora por defecto", value: "impresora" },
+      { text: "Nombre", value: "nombreImpresora" },
+      { text: "Ancho", value: "valor" },
+      { text: "Impresora por defecto", value: "impresoraPredeterminada" },
       { text: "Acciones", value: "acciones", sortable: false },
     ],
-    desserts: [],
-    editedIndex: -1,
-    editedItem: {
-      nombre: "",
-      ancho: 0,
-    },
-    defaultItem: {
-      nombre: "",
-      ancho: 0,
-    },
   }),
+
   components: {
-      Spinner,
-      Edit,
-      Delete,
-    },
+    Spinner,
+    Edit,
+    Delete,
+  },
+
   mounted() {
     this.tenant = this.$route.params.tenant;
+    if(this.loguedUser.perfil > 1){
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.getObjects();
   },
-  methods: {
-    initialize() {
-      this.desserts = [
-        {
-          nombre: "KitKat",
-          ancho: 518,
-        },
-      ];
-    },
 
-     getObject(id) {
+  methods: {
+    getObjects() {
       GenericService(this.tenant, this.service, this.token)
-        .get(id)
+        .filter(this.filterParams)
         .then((data) => {
           this.impresoras = data.data.content;
           console.log(this.impresoras);
@@ -114,14 +106,6 @@ export default {
       this.closeDelete();
     },
 
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
@@ -130,33 +114,17 @@ export default {
       });
     },
 
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-      } else {
-        this.desserts.push(this.editedItem);
-      }
-      this.close();
-    },
-  },
-
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
-    },
-  },
-
-  watch: {
-    dialog(val) {
-      val || this.close();
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
-  },
-
-  created() {
-    this.initialize();
+    selectDefaultPrinter(printer){
+      this.impresoras.forEach(el => {
+        el.impresoraPredeterminada = false;
+      })
+     this.impresoras.filter(el => el.nombreImpresora === printer.nombreImpresora)[0].impresoraPredeterminada = true; 
+      GenericService(this.tenant, this.service, this.token)
+      .saveAll(this.impresoras)
+      .then(() => {
+        this.getObjects()
+      })
+    }
   },
 };
 </script>
