@@ -116,7 +116,7 @@ export default {
           break;
       }
 
-      GenericService(this.tenant, "historialStock", this.token)
+      GenericService(this.tenant, this.service, this.token)
         .filter({ thirdLongParam, stringParam, page, size })
         .then((data) => {
           console.log(this.data);
