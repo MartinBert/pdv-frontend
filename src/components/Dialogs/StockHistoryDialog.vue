@@ -97,6 +97,7 @@ export default {
     this.filterObjects(
       this.loguedUser.perfil,
       this.filterParams.stringParam,
+      this.filterParams.fourthLongParam,
       this.filterParams.page - 1,
       this.filterParams.size
     );
