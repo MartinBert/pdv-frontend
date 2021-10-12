@@ -23,9 +23,9 @@
           </p>
           <v-checkbox v-model="checkboxModel[index]" @change="selectDefaultPrinter(item)"></v-checkbox>
         </template>
-        <template v-slot:[`item.acciones`]="{ }">
-          <Edit />
-          <Delete />
+        <template v-slot:[`item.acciones`]="{item}">
+          <Edit :itemId="item.id" v-on:editItem="editItem"/>
+          <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
         </template>
       </v-data-table>
       <Spinner v-if="!loaded" />
