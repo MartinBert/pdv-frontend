@@ -18,7 +18,6 @@ export default {
     objects: [],
      filterParams: {
       page: 1,
-      fecha:"",
       size: 10,
       totalPages: 0,
     },
@@ -50,6 +49,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.objects = data.data.content;
+          console.log(this.objects);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });

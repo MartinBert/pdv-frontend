@@ -197,6 +197,9 @@ let libroIva = listaFacturas;
   
 
 //generacion archivo excel
+  let totalVentas= 0;
+  let totalIvas= 0;
+  let totalNetos= 0;
     libroIvaOrden.forEach(item =>{
 
       let tipoComprobante;
@@ -247,6 +250,7 @@ let libroIva = listaFacturas;
       }else{
         iva = (Number(item.totalVenta) - Number(item.totalVenta)/1.21).toFixed(2)
       }
+      totalIvas += Number(iva)
       //calculo valor neto
       let neto;
       if(item.totalIvas != null){
@@ -254,7 +258,7 @@ let libroIva = listaFacturas;
       }else{
         neto = (item.totalVenta-iva).toFixed(2)
       }
-
+      totalNetos += Number(neto)
       let numCompr1 = item.numeroCbte.slice(0,4);
       let numCompr2 = item.numeroCbte.slice(5,13);
       let Comprobante={
@@ -269,15 +273,33 @@ let libroIva = listaFacturas;
         "Exento/NG":"0,00",
         "Per.IVA":"0,00",
         "Per.IB":"0,00",
-        "Total": Number(item.totalVenta).toFixed(2)
+        "Total": `${Number(item.totalVenta).toFixed(2)}`
       }
+      totalVentas += Number(item.totalVenta);
       dataExcel.push(Comprobante)
     })
+    //calculos finales
+    let Comprobante={
+      "Fecha":null,
+      "Tipo":null,
+      "Comprobante":null,
+      "Razón Social":null,
+      "CUIT":"TOTALES:",
+      "Neto":totalNetos.toFixed(2),
+      "Alic.":null,
+      "I.V.A":totalIvas.toFixed(2),
+      "Exento/NG":null,
+      "Per.IVA":null,
+      "Per.IB":null,
+      "Total": totalVentas.toFixed(2)
+    }
     
+    dataExcel.push(Comprobante)
+
     let wb = XLSX.utils.book_new();
-    wb.SheetNames.push("Test Sheet");
+    wb.SheetNames.push("Libro I.V.A Ventas");
     let ws = XLSX.utils.json_to_sheet(dataExcel);
-    wb.Sheets["Test Sheet"]=ws;
+    wb.Sheets["Libro I.V.A Ventas"]=ws;
 
     function s2ab(s) { 
       var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
