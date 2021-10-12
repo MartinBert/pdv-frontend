@@ -63,7 +63,7 @@
       </v-col>
       <v-col cols="2">
         <v-autocomplete
-          v-model="filterParams.productoEstado"
+          v-model="filterParams.productoEstado"  
           :items="[{id: 1, text: 'Activo'}, {id: 2, text: 'Inactivo'}]"
           v-on:input="filterObjects()"
           item-value="id"

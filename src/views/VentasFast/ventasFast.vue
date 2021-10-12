@@ -2,35 +2,6 @@
  <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
       <v-row class="mb-1">
-        <v-col cols="6">
-          <div class="d-flex text-left">
-            <v-btn
-              color="primary"
-              @click="$store.commit('productos/dialogProductosMutation')"
-              >BUSCAR PRODUCTOS</v-btn
-            >
-            <v-btn
-              color="primary"
-              class="ml-1"
-              @click="$store.commit('receipt/receiptDialogMutation')"
-              >BUSCAR PRESUPUESTO</v-btn
-            >
-            <h3 class="mt-2 ml-2">
-              Depósito predeterminado:
-              <span v-if="defaultDeposit">
-                {{ defaultDeposit.nombre }}
-              </span>
-              <span v-if="!defaultDeposit"> No definido </span>
-            </h3>
-            <v-btn
-              v-if="loguedUser.perfil === 1"
-              color="primary"
-              class="ml-5"
-              @click="testCert()"
-              >TEST CERTIFICADO</v-btn
-            >
-          </div>
-        </v-col>
         <v-col class="text-right" cols="5">
           <select class="select-ventas-import" v-model="modificator">
             <option value="">Modificar importe total</option>
@@ -58,73 +29,6 @@
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
-                <v-col cols="8">
-                  <v-row>
-                    <v-col cols="6">
-                      <v-autocomplete
-                        @change="
-                          getComercialDocuments(
-                            object.cliente.condicionIva.documentos,
-                            loguedUser.sucursal.condicionIva.documentos
-                          )
-                        "
-                        v-model="object.cliente"
-                        :items="databaseItems.clientes"
-                        item-text="razonSocial"
-                        :return-object="true"
-                        placeholder="Seleccione un cliente"
-                        required
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-autocomplete
-                        ref="documents"
-                        class="button-ventas comprobante"
-                        v-model="object.documento"
-                        :items="databaseItems.documentos"
-                        item-text="nombre"
-                        :return-object="true"
-                        placeholder="Seleccione un tipo de comprobante"
-                        required
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-autocomplete
-                        ref="paymentMethods"
-                        class="button-ventas medio-pago"
-                        @change="getPaymentPlans(object.mediosPago)"
-                        v-model="object.mediosPago"
-                        :items="databaseItems.medios_de_pago"
-                        item-text="nombre"
-                        :return-object="true"
-                        placeholder="Seleccione un medio de pago"
-                        required
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-autocomplete
-                        ref="paymentPlans"
-                        class="button-ventas plan-pago"
-                        v-model="object.planPago"
-                        :items="databaseItems.planes"
-                        item-text="nombre"
-                        :return-object="true"
-                        placeholder="Seleccione un plan de pago"
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="6" v-if="object.documento && object.documento.nombre === 'Presupuesto'">
-                      <label for="date_input">Fecha de vencimiento de presupuesto</label>
-                      <v-text-field 
-                        id="date_input" 
-                        type="date" 
-                        outlined 
-                        filled 
-                        dense
-                        v-model="object.fechaVencimiento"
-                      />
-                    </v-col>
-                  </v-row>
-                </v-col>
                 <v-col cols="4">
                   <div class="verticalSeparator"></div>
                   <v-container style="color: rgb(63, 81, 181)">
