@@ -17,6 +17,8 @@ export default {
   data: () => ({
     objects: [],
      filterParams: {
+      sucursalId: "",
+      descripcion:"",
       page: 1,
       fecha:"",
       size: 10,
