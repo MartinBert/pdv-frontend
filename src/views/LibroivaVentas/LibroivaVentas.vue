@@ -163,6 +163,10 @@ export default {
     checkbox1: false,
     checkbox2: false,
     checkbox3: false,
+    checkbox4: false,
+    checkbox5: false,
+    checkbox6: false,
+    checkbox7: false,
     ventas: [],
     file: null,
     obj: {},
@@ -253,7 +257,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           data.data.content.forEach((data) => {
-            data.netoGrabado = Number(data.totalVenta) - Number(data.totalIvas);
+            data.netoGrabado = (Number(data.totalVenta) - Number(data.totalIvas)).toFixed(2);
           })
           this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
@@ -267,7 +271,9 @@ export default {
     salesForDate1() {
       if (this.notPassSucursalValidations()) return this.error("sucursal");
       if (this.notPassDateValidations()) return this.error("fechas");
+      if (this.notPassInvoicesValidations()) return this.error("facturas");
       if (this.notPassArchiveType()) return this.error("archivos");
+
       let sucursalId = this.loguedUser.sucursal.id;
       const filterParams = {
         sucursalId,
@@ -277,92 +283,18 @@ export default {
       ComprobantesService(this.tenant, "comprobantesFiscales", this.token)
         .getInvoicesForDateRange(filterParams)
         .then((data) => {
-          //let invoices = data.data;
-          //dato de todos los comprobantes
+
           orderSales(data.data,this.filterParams.facturaA,
                                this.filterParams.facturaB,
                                this.filterParams.facturaC,
+                               this.filterParams.notaDebitoA,
+                               this.filterParams.notaCreditoA,
+                               this.filterParams.notaDebitoB,
+                               this.filterParams.notaCreditoB,
                                this.libroIvaTxt,
                                this.libroIvaExcel);
-          /*
-          if(this.filterParams.facturaA){
-            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS A");
-          }else if(this.filterParams.facturaB){
-            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS B");
-          }else if(this.filterParams.facturaC){
-            invoices = invoices.filter(el => el.nombreDocumento === "FACTURAS C");
-          }
-          this.exportGeneralExcel(invoices);
-          */
-
         });
     },
-/*
-    async exportGeneralExcel(invoices) {
-      this.loaded = false;
-      const headers = [
-        "FECHA",
-        "COMPROBANTE",
-        "NUMERO COMPROBANTE",
-        "RAZON SOCIAL",
-        "CONDICION IVA",
-        "NETO GRABADO",
-        "IVA 27%",
-        "IVA 21%",
-        "IVA 10%",
-        "TOTAL FACTURADO",
-      ];
-      if (invoices) {
-        let formatedInvoicesParam = [];
-        invoices.forEach((el) => {
-          el = this.formatForExcel(el);
-          formatedInvoicesParam.push(el);
-        });
-        exportExcelLibro(headers, formatedInvoicesParam);
-      } else {
-        const data = await this.setDataToExcel();
-        exportExcelLibro(headers, data);
-      }
-      this.loaded = true;
-    },
-
-    async setDataToExcel() {
-      let dataForExcel = [];
-      let filters = {
-        fechaEmision: "",
-        nombreDocumento: "",
-        numeroCbte: "",
-        razonSocial: "",
-        condicionIva: "",
-        cuit: "",
-        ingBrutos: "",
-        totalIva27: "",
-        totalIva21: "",
-        totalIva10: "",
-        totalIva0: "",
-        totalVenta: "",
-        page: 1,
-        size: 100000,
-        totalPages: 0,
-      };
-      await GenericService(this.tenant, "ventas", this.token)
-        .filter(filters)
-        .then((data) => {
-          let ventas = data.data.content;
-          ventas.forEach((el) => {
-            el = this.formatForExcel(el);
-            dataForExcel.push(el);
-          });
-        });
-      return dataForExcel;
-    },
-
-    formatForExcel(invoices) {
-      
-      return invoices;
-    },
-
-*/
 
     notPassSucursalValidations() {
       if (this.loguedUser.sucursal) return false;
@@ -393,6 +325,12 @@ export default {
     notPassArchiveType(){
       if(!this.libroIvaExcel && !this.libroIvaTxt) return true;
       return false;
+    },
+
+    notPassInvoicesValidations(){
+      if(!this.filterParams.notaCreditoA && !this.filterParams.notaDebitoA && !this.filterParams.notaCreditoB 
+          && !this.filterParams.notaDebitoB && !this.filterParams.facturaA && !this.filterParams.facturaB) return true
+      return false
     },
 
     error(type) {
