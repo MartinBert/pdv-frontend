@@ -280,7 +280,6 @@
     <Spinner v-if="!loaded" />
   </v-container>
 </template>
-</template>
 <script>
 export default {
     data() {
