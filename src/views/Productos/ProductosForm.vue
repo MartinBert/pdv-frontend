@@ -51,7 +51,7 @@
                   :counter="50"
                   label="Código de barras"
                   required
-                  @keypress.enter="
+                  @blur="
                     checkBarCode(filterParams, object.codigoBarra)
                   "
                   :rules="[(v) => !!v || 'Campo requerido...']"
@@ -312,6 +312,7 @@ export default {
       estado: 1,
       ganancia: 0,
       codigoBarra: "",
+      barcode:"",
       ivaComprasObject: { id: 1, nombre: "Iva 21%", porcentaje: 21 },
       ivaVentasObject: { id: 4, nombre: "Iva 21%", porcentaje: 21 },
       editable: false,
@@ -332,7 +333,7 @@ export default {
       productoPrimerAtributoName: "",
       productoSegundoAtributoName: "",
       productoTercerAtributoName: "",
-      productoEstado: "",
+      productoEstado: 1,
       page: 1,
       size: 10,
       totalPages: 0,

@@ -77,7 +77,7 @@
           </div>
           <v-text-field
             v-if="alterationType === 1"
-            oninput="this.value=this.value.replace(/[^0-9.]/g,'');"
+            oninput="this.value=this.value.replace(^-?\d*\.{0,1}\d+$);"
             type="text"
             label="Ingrese la variación porcentual en los precios"
             v-model="object.percent"
@@ -85,7 +85,7 @@
           />
           <v-text-field
             v-if="alterationType === 2"
-            oninput="this.value=this.value.replace(/[^0-9.]/g,'');"
+            oninput="this.value=this.value.replace(^-?\d*\.{0,1}\d+$);"
             type="text"
             label="Ingrese el monto de variación en los precios"
             v-model="object.amount"
@@ -99,6 +99,7 @@
       </v-card-text>
     </v-card>
     <Spinner v-if="!loaded" />
+    <DialogStop v-if="!loaded"/>
   </v-container>
 </template>
 <script>
@@ -113,6 +114,7 @@ import {
 import Spinner from "../../components/Graphics/Spinner";
 import GenericService from "../../services/GenericService";
 import TabBar from "../../components/Generics/TabBar.vue";
+import DialogStop from "../../components/Dialogs/DialogStop.vue";
 export default {
   data: () => ({
     loaded: false,
@@ -183,7 +185,8 @@ export default {
 
   components: {
     TabBar,
-    Spinner
+    Spinner,
+    DialogStop
   },
 
   mounted() {

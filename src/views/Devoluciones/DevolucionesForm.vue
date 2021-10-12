@@ -24,7 +24,7 @@
                 <label>Productos devueltos</label>
               </v-col>
             </v-row>
-            <v-simple-table style="background-color: transparent" fixed-header>
+            <v-simple-table style="background-color: transparent" fixed-header ref="table">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -75,7 +75,7 @@
                 <label>Productos cedidos</label>
               </v-col>
             </v-row>
-            <v-simple-table style="background-color: transparent" fixed-header>
+            <v-simple-table style="background-color: transparent" fixed-header ref="table">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -410,6 +410,7 @@ export default {
         productoMarcaName: "",
         productoCodigoBarras: "",
         productoPrimerAtributoName: "",
+        productoEstad:1,
         page: 1,
         size: 100000
       }
@@ -460,10 +461,10 @@ export default {
         if (passPaymentsMethodsValidation(mediosPago)) {
           if (containProducts(productosEntrantes)) {
             /*** Send invoice to AFIP ***/
-              console.log(invoice)
               axios
               .post(`${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`, invoice)
               .then(data => {
+                console.log(data);
                 const cae = data.data.CAE;
                 const dateOfCaeExpiration = data.data.CAEFchVto;
                 const barCode = sucursal.cuit + addZerosInString("02", documento.codigoDocumento) + addZerosInString("04", ptoVenta.idFiscal) + cae + formatDateWithoutSlash(dateOfCaeExpiration);
@@ -502,7 +503,7 @@ export default {
                   planesPago: [planesPago],
                   nombreDocumento: documento.nombre,
                 };
-                
+                console.log(comprobante);
                 /*** Save receipt in database ***/
                 if (invoiceContainCAE(comprobante)) {
                   GenericService(tenant, "comprobantesFiscales", token)
@@ -696,7 +697,7 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-
+      console.log(comprobante);
       GenericService(tenant, "comprobantesFiscales", token)
         .save(comprobante)
         .then((data) => {
@@ -756,7 +757,6 @@ export default {
                 });
             });
         });
-
       this.object = {};
       this.$store.commit("productos/resetStates");
     },
@@ -775,6 +775,7 @@ export default {
         productoMarcaName: "",
         productoCodigoBarras: "",
         productoPrimerAtributoName: "",
+        productoEstado:1,
         page: 1,
         size: 100000
       }
@@ -825,6 +826,9 @@ export default {
           this.$successAlert("Devolución realizada").then((result) => {
             if (result.dismiss) {
               this.$router.push({ name: "devoluciones" });
+               setTimeout(() => {
+                window.location.reload();
+              }, 1000);
             }
           });
         });

@@ -92,6 +92,7 @@ export default {
   data: () => ({
     icon: "mdi-check-circle",
     ventas: [],
+    obj:[],
     loaded: false,
     tenant: "",
     service: "ventas",
@@ -106,8 +107,12 @@ export default {
       comprobanteCerrado: "",
       numeroComprobante: "",
       totalVenta: "",
+      facturaA: false,
+      facturaB: false,
+      facturaC: false,
       page: 1,
       size: 10,
+      totalPages:0,
     },
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
@@ -127,9 +132,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-     if (this.loguedUser.perfil > 1) {
-      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
-    }
+    this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     this.filterObjects();
   },
 
@@ -142,18 +145,14 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
-      GenericService(this.tenant, this.service, this.token)
+      GenericService(this.tenant,"ventas", this.token)
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
-          if (this.filterParams.totalPages < this.filterParams.page) {
-            this.filterParams.page = 1;
-          }
           this.loaded = true;
-        });
+          });  
     },
-
     seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
     },

@@ -134,7 +134,7 @@
       >
         <template v-slot:[`item.acciones`]="{ item }">
            <Edit :itemId="item.id" v-on:editItem="editItem" />
-          <Delete :id="item.id" v-on:deleteItem="deleteItem"/>
+          <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
         </template>
         <template v-slot:[`item.migrar`]="{ item }">
           <v-checkbox color="indigo" @click="addToMigration(item)"></v-checkbox>
@@ -169,13 +169,10 @@
 <script>
 import Edit from "../../components/Buttons/Edit";
 import Delete from "../../components/Buttons/Delete";
-//import Add from "../../components/Buttons/Add.vue";
-//import Checked from "../../components/Buttons/Checked.vue";
 import GenericService from "../../services/GenericService";
 import StocksService from "../../services/StocksService";
 import ModifyMinimumStocksDialog from "../../components/Dialogs/ModifyMinimumStocksDialog";
 import StockReportsDialog from "../../components/Dialogs/StockReportsDialog";
-//import StocksTable from "../../components/Tables/StocksTable";
 import Pagination from "../../components/Pagination";
 import Spinner from "../../components/Graphics/Spinner";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
@@ -220,6 +217,7 @@ export default {
       page: 1,
       size: 10,
     },
+    idObject: null,
     productos: [],
     loaded: false,
     tenant: "",
@@ -250,12 +248,9 @@ export default {
     StockReportsDialog,
     Edit,
     Delete,
-    //StocksTable,
     Pagination,
     Spinner,
     DeleteDialog,
-    // Add,
-    //Checked,
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
@@ -354,24 +349,22 @@ export default {
     deleteConfirmation(result) {
       return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
-      deleteItem(id) {
+
+    deleteItem(id) {
       this.idObject = id;
       this.deleteDialogStatus = true;
     },
 
-      deleteObject(id) {
-      this.idObject = id;
+      deleteObject() {
       this.dialog = true;
       this.deleteDialogStatus = false;
-      StocksService(this.tenant, this.service, this.token)
-        .deleteProduct(this.idObjet)
+      GenericService(this.tenant, this.service, this.token)
+        .delete(this.idObject)
         .then(() => {
           this.filterObjects();
         })
-        .catch(() => {
-          this.$errorAlert(
-            "El registro se encuentra asociado a otros elementos en el sistema"
-          );
+        .catch((err) => {
+          console.error(err);
         });
     },
 

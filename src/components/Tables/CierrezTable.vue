@@ -42,7 +42,7 @@
 
   </v-container>
 </template>
-<script>
+<script> 
 import Pagination from "../Pagination";
 import { formatDate } from '../../helpers/dateHelper';
 import GenericService from "../../services/GenericService";
@@ -110,6 +110,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           data.data.content.forEach((data) => {
+            data.notFormattedDate = data.fecha;
             data.fecha = formatDate(data.fecha);
           })
           this.cierres = data.data.content;
@@ -119,12 +120,12 @@ export default {
       console.log(this.cierres);
     },
     
+    print(object) {
+      this.$emit("print", object);
+    },
 
     seeDetails(object) {
       this.$emit("seeDetails", object);
-    },
-    print(object) {
-      this.$emit("print", object);
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);

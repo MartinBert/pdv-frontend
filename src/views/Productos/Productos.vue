@@ -6,6 +6,7 @@
   "
   >
     <TabBar
+     v-if="perfil < 3"
       :tabs="tabs"
       :activeTab="activeTab"
     />
@@ -318,17 +319,21 @@ export default {
         let sheet_name_list = workbook.SheetNames;
         sheet_name_list.forEach(function(y) {
           let exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+          console.log(exceljson);
           if (exceljson.length > 0) {
             for (let i = 0; i < exceljson.length; i++) {
               excel.push(exceljson[i]);
             }
           }
         });
+
         let prod = this.validateImport(excel);
+        console.log(prod);
         if (prod.status) {
           GenericService(this.tenant, this.service, this.token)
             .saveAll(prod.data)
             .then(() => {
+              console.log(prod.data);
               this.$successAlert("Importación exitosa").then(() => {
                 if (this.checkImportStatus > 0) {
                   this.$infoAlert(
@@ -351,12 +356,12 @@ export default {
         data: [],
         message: "",
       };
-      productos.forEach((element, index) => {
+      productos.forEach((element) => {
         if (
           element.nombre &&
           element.codigoBarra &&
           element.codigoProducto &&
-          element.ganancia &&
+          element.ganancia && 
           element.precioTotal
         ) {
           if (element.codigoBarra == 1) {
@@ -413,15 +418,18 @@ export default {
                 )
             ),
             precioTotal: element.precioTotal,
-            estado: 1,
+            estado: 1
           };
           importacion.data.push(obj);
         } else {
           importacion.status = false;
-          importacion.message = "Faltan datos en el renglón " + (index + 2);
+          importacion.message = "Faltan datos en el renglón ";
         }
       });
+      console.log(productos);
+      console.log(importacion);
       return importacion;
+      
     },
 
     getMarca(str) {
@@ -437,6 +445,7 @@ export default {
             this.marcas.push(data.data);
             return data.data;
           });
+          
       }
     },
 

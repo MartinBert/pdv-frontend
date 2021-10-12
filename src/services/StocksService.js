@@ -2,7 +2,6 @@ import axios from "axios";
 
 export default (tenant, service, token) => {
     return {
-
         filterStockForDepositId(object) {
             return axios.post(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/filterStockForDepositId`, object, {
                 headers: { Authorization: "Bearer " + token }
@@ -20,10 +19,11 @@ export default (tenant, service, token) => {
                 headers: { Authorization: "Bearer " + token }
             })
         },
-        delete(id) {
-            return axios.delete(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/items/any/${id}`, {
+
+        getByAlgorim(algorim, sucursalId) {
+            return axios.get(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/item/${algorim}/${sucursalId}`, {
                 headers: { Authorization: "Bearer " + token }
             })
-        },
+        }
     }
 }

@@ -1,4 +1,3 @@
-
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
@@ -323,7 +322,6 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
-import printReceipt from "../../services/ImpresionService";
 import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
@@ -575,7 +573,6 @@ export default {
             this.products.push(this.processProductsObject(databaseItem));
             this.productsDescription.push({
               name: databaseItem.nombre,
-              editable: databaseItem.editable,
               barCode: databaseItem.codigoBarra,
               code: databaseItem.codigoProducto,
               tradeMarkName: databaseItem.marca.nombre,
@@ -627,7 +624,6 @@ export default {
               this.products.push(this.processProductsObject(databaseItem));
               this.productsDescription.push({
                 name: databaseItem.nombre,
-                editable: databaseItem.editable,
                 barCode: databaseItem.codigoBarra,
                 code: databaseItem.codigoProducto,
                 tradeMarkName: databaseItem.marca.nombre,
@@ -670,7 +666,6 @@ export default {
         if (!existe) {
           const objectForProductsDescription = {
             name: product.nombre,
-            editable: product.editable,
             barCode: product.codigoBarra,
             code: product.codigoProducto,
             tradeMarkName: product.marca.nombre,
@@ -754,6 +749,7 @@ export default {
       this.object.totalDescuentoGlobal = 0;
       this.object.totalRecargoGlobal = 0;
       this.productsDescription = this.object.productoDescription;
+      console.log(this.object);
     },
 
     /******************************************************************************************************/
@@ -838,14 +834,9 @@ export default {
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
         const total = this.productsDescription.reduce(
-          (acc, el) => {
-            if(!el.editable){
-              acc = acc + Number(el.salePrice) * Number(el.quantity)
-            }else{
-              acc = acc + el.salePrice;
-            }
-            return acc;
-          },0);
+          (acc, el) => acc + el.salePrice * Number(el.quantity),
+          0
+        );
         let percent = calculatePercentaje(total, priceModificationPorcent);
         if (modificator === "descuento") {
           if (Math.sign(percent) === 1) {
@@ -961,6 +952,7 @@ export default {
     },
 
     sendTicketData(jsonToFiscalController, ticketRoute) {
+      // const clientIp = this.loguedUser.puntoVenta.ipLocal;
       axios
         .post(`http://${this.clientIp}/${ticketRoute}`, jsonToFiscalController)
         .then(() => {
@@ -1013,8 +1005,6 @@ export default {
     },
 
     getTotalSurcharges(letter) {
-      const sumOfProductPrices = this.calculateSumOfProductSalePrices(this.productsDescription);
-      const planSurcharge = sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje);
       let total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("RECARGO")) {
           acc += Number(el.precioTotal * 1);
@@ -1024,18 +1014,10 @@ export default {
       if (letter === "A") {
         total = total / 1.21;
       }
-      let totalSurcharge;
-      if(this.object.planPago.porcentaje > 0){
-        totalSurcharge = roundTwoDecimals(total + planSurcharge);
-      }else{
-        totalSurcharge = total;
-      }
-      return totalSurcharge.toString();
+      return total.toString();
     },
 
     getTotalDiscounts(letter) {
-      const sumOfProductPrices = this.calculateSumOfProductSalePrices(this.productsDescription);
-      const planDiscount = (sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje)) * -1;
       let total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("DESCUENTO")) {
           acc += Number(el.precioTotal * -1);
@@ -1045,13 +1027,7 @@ export default {
       if (letter === "A") {
         total = total / 1.21;
       }
-      let totalDiscount;
-      if(this.object.planPago.porcentaje < 0){
-        totalDiscount = roundTwoDecimals(total + planDiscount);
-      }else{
-        totalDiscount = total;
-      }
-      return totalDiscount.toString();
+      return total.toString();
     },
 
     getItemsForFiscalTicketInvoice(letter) {
@@ -1081,7 +1057,7 @@ export default {
           name: el.nombre,
           quantity: el.cantUnidades.toString(),
           price: roundTwoDecimals(
-            el.precioUnitario / (1 + decimalPercent(el.ivaVentas))
+            el.precioTotal / (1 + decimalPercent(el.ivaVentas))
           ).toString(),
         };
         items.push(formattedObject);
@@ -1100,7 +1076,7 @@ export default {
           name: el.nombre,
           quantity: el.cantUnidades.toString(),
           price: roundTwoDecimals(
-            el.precioUnitario / (1 + decimalPercent(el.ivaVentas))
+            el.precioTotal / (1 + decimalPercent(el.ivaVentas))
           ).toString(),
         };
         items.push(formattedObject);
@@ -1118,7 +1094,7 @@ export default {
         const formattedObject = {
           name: el.nombre,
           quantity: el.cantUnidades.toString(),
-          price: el.precioUnitario.toString(),
+          price: el.precioTotal.toString(),
         };
         items.push(formattedObject);
       });
@@ -1303,7 +1279,11 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-                  printReceipt(comprobante);
+                  console.log(comprobante);    
+                  axios.post(
+                    `http://192.168.1.100:3500/api/impresora/factura`,
+                    comprobante
+                  );
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1445,8 +1425,12 @@ export default {
                 comprobante.nombreDocumento = documento.nombre;
                 comprobante.documentoComercial = documento;
               }
+
               console.log(comprobante);
-              printReceipt(comprobante);
+              axios.post(
+                `http://192.168.1.44:3000/api/impresora/factura`,
+                comprobante
+              );
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
@@ -1748,6 +1732,7 @@ export default {
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
       const planPago = this.object.planPago;
+      console.log(this.porcentajeDescuentoGlobal);
 
       this.productsDescription = await this.restLineDiscounts(
         this.products,
@@ -1933,23 +1918,14 @@ export default {
 
     calculateAmountOfPriceVariations(productsDescription) {
       productsDescription.forEach((prodDescription) => {
-        if(!prodDescription.editable){
-          prodDescription.discountAmount =
-            prodDescription.salePrice *
-            Number(prodDescription.quantity) *
-            decimalPercent(prodDescription.discountPercent);
-          prodDescription.surchargeAmount =
-            prodDescription.salePrice *
-            Number(prodDescription.quantity) *
-            decimalPercent(prodDescription.surchargePercent);
-        }else{
-          prodDescription.discountAmount =
-            prodDescription.salePrice *
-            decimalPercent(prodDescription.discountPercent);
-          prodDescription.surchargeAmount =
-            prodDescription.salePrice *
-            decimalPercent(prodDescription.surchargePercent);
-        }
+        prodDescription.discountAmount =
+          prodDescription.salePrice *
+          Number(prodDescription.quantity) *
+          decimalPercent(prodDescription.discountPercent);
+        prodDescription.surchargeAmount =
+          prodDescription.salePrice *
+          Number(prodDescription.quantity) *
+          decimalPercent(prodDescription.surchargePercent);
       });
       return productsDescription;
     },
@@ -1972,14 +1948,9 @@ export default {
 
     calculateSumOfProductSalePrices(productsDescription) {
       const total = productsDescription.reduce(
-        (acc, el) => {
-          if(!el.editable){
-            acc = acc + el.salePrice * Number(el.quantity)
-          }else{
-            acc = acc + el.salePrice;
-          }
-          return acc;
-        },0);
+        (acc, el) => acc + el.salePrice * Number(el.quantity),
+        0
+      );
       return roundTwoDecimals(total);
     },
 

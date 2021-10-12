@@ -51,6 +51,8 @@ export default {
     objects: [],
     filterParams: {
       sucursalId: "",
+      fecha: "",
+      descripcion:"",
       page: 1,
       size: 10,
       totalPages: 0,
@@ -75,7 +77,6 @@ export default {
   },
   mounted() {
     this.tenant = this.$route.params.tenant;
-    this.filterParams.sucursalId = this.loguedUser.sucursal.id
     this.filterObjects();
     this.getClientIpForFiscalController();
   },
@@ -105,7 +106,7 @@ export default {
           console.error(err);
         });
     },
-    
+
     getClientIpForFiscalController() {
       axios.get("https://api.ipify.org?format=json").then((data) => {
         this.clientIp = data.data.ip;
@@ -114,7 +115,6 @@ export default {
     seeDetails(object) {
       this.$emit("seeDetails", object);
     },
-
   },
 };
 </script>

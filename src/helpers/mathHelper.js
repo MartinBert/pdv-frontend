@@ -34,7 +34,7 @@ export function calculatePercentReductionInAmount(number, percent) {
 }
 
 export function sumarNumeros(array) {
-    return roundTwoDecimals(array.reduce((acc, el) => acc + Number(el)));
+    return roundTwoDecimals(array.reduce((acc, el) => acc + Number(el), 0));
 }
 
 export function restarNumeros(array) {
@@ -48,6 +48,14 @@ export function ordenarMayorMenor(array) {
 export function promediar(array) {
     const total = sumarNumeros(array);
     return roundTwoDecimals(total / array.length);
+}
+
+export function calculatePositivePercentajeCoefficient(fractionOfValue, value){
+    let result = Number(fractionOfValue) / Number(value) * 100;
+    if(result < 0){
+        result = result * -1;
+    }
+    return roundTwoDecimals(result);
 }
 
 export function roundTwoDecimals(number) {

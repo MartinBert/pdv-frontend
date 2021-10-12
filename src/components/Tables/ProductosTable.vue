@@ -63,7 +63,7 @@
       </v-col>
       <v-col cols="2">
         <v-autocomplete
-          v-model="filterParams.productoEstado"
+          v-model="filterParams.productoEstado"  
           :items="[{id: 1, text: 'Activo'}, {id: 2, text: 'Inactivo'}]"
           v-on:input="filterObjects()"
           item-value="id"
@@ -83,7 +83,7 @@
       style="background-color: transparent"
       hide-default-footer
     >
-      <template v-slot:[`item.acciones`]="{ item }">
+      <template v-slot:[`item.acciones`]="{ item }" v-if="perfil < 3">
         <Edit :itemId="item.id" v-on:editItem="editItem" />
         <Delete :itemId="item.id" v-on:deleteItem="deleteItem" v-if="item.estado === 1"/>
         <Add :object="item" v-on:add="add" v-else/>
@@ -164,6 +164,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.productos = data.data.content;
+          console.log(this.productos);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });

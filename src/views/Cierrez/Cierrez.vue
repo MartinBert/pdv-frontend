@@ -339,12 +339,12 @@ export default {
               totalIva27: iva27,
               fecha: new Date(),
             };
-            CierrezService(this.tenant, this.service, this.token)
+            CierrezService(this.tenant, "cierres_z", this.token)
             .getPreviousCorrelativeNumber(this.loguedUser.sucursal.id)
             .then(data => {
               const correlativeNumber = data.data += 1;
               cierreZ.numeroCorrelativo = correlativeNumber;
-              GenericService(this.tenant, this.service, this.token)
+              GenericService(this.tenant, "cierres_z", this.token)
                 .save(cierreZ)
                 .then(() => {
                   this.filterObjects();
@@ -390,7 +390,8 @@ export default {
     },
 
     printZClosure(specification) {
-      ReportsService(this.tenant, "cierres_z", this.token)
+      this.objectToPrint.fecha = this.objectToPrint.notFormattedDate; 
+      ReportsService(this.tenant,"cierres_z", this.token)
         .printZClosure(this.objectToPrint, specification)
         .then((res) => {
           let file = new Blob([res["data"]], {
@@ -398,6 +399,7 @@ export default {
           });
           let fileURL = URL.createObjectURL(file);
           window.open(fileURL, "_blank");
+          this.objectToPrint.fecha = formatDate(this.objectToPrint.fecha)
         });
     },
 

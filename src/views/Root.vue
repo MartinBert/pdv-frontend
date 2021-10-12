@@ -332,6 +332,12 @@ export default {
             title: "Empresa",
             visible: false,
           },
+           {
+            path: "/impresoras",
+            name: "impresoras",
+            title: "Impresoras",
+            visible: false,
+          },
           {
             path: "/sucursales",
             name: "sucursales",
@@ -398,6 +404,20 @@ export default {
           },
         ],
       },
+       {
+        name: "Ventasfast",
+        title: "Ventasfast",
+        visible: false,
+        icon: "/../images/icons/ventas.svg",
+        childs: [
+          {
+            path: "/ventasfast",
+            name: "ventasfast",
+            title: "Ventasfast",
+            visible: false,
+          },
+        ],
+      },
       {
         name: "calendar",
         title: "Calendar",
@@ -408,6 +428,20 @@ export default {
             path: "/calendar",
             name: "calendar",
             title: "Calendar",
+            visible: false,
+          },
+        ],
+      },
+      {
+        name: "impresora",
+        title: "Impresoras",
+        visible: false,
+        icon: "/../images/icons/calendar.svg",
+        childs: [
+          {
+            path: "/impresora",
+            name: "Impresora",
+            title: "Impresora",
             visible: false,
           },
         ],

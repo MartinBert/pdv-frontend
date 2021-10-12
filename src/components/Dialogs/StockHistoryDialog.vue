@@ -62,9 +62,8 @@
           </v-col>
         </v-row>
       </v-card-text>
+      <ProductListOfStockDialog />
     </v-card>
-
-    <ProductListOfStockDialog />
   </v-dialog>
 </template>
 <script>
@@ -76,6 +75,7 @@ export default {
     return {
       loguedUser: JSON.parse(localStorage.getItem("userData")),
       token: localStorage.getItem("token"),
+      service:"",
       filterParams: {
         fourthLongParam: "",
         thirdLongParam: "",
@@ -97,6 +97,7 @@ export default {
     this.filterObjects(
       this.loguedUser.perfil,
       this.filterParams.stringParam,
+      this.filterParams.fourthLongParam,
       this.filterParams.page - 1,
       this.filterParams.size
     );
@@ -119,7 +120,9 @@ export default {
       GenericService(this.tenant, "historialStock", this.token)
         .filter({ thirdLongParam, stringParam, page, size })
         .then((data) => {
+          console.log(this.data);
           this.objects = data.data.content;
+          
         });
     },
 
