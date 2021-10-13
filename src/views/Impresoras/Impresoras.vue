@@ -1,5 +1,6 @@
 <template>
   <v-container style="min-width: 100%;">
+    <v-card min-width="100%">
       <ImpresorasTable
         :items="impresoras"
         v-on:editItem="edit"
@@ -7,6 +8,7 @@
         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -15,7 +17,7 @@ import Spinner from "../../components/Graphics/Spinner";
 import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
-    impresoras:[],
+    impresoras: [],
     itemss: ["80 mm ", "58 mm"],
     filterParams: {
       sucursalId: "",
@@ -23,10 +25,10 @@ export default {
       nombreImpresora: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     viewCheckboxState: 0,
-    checkboxModel:{},
+    checkboxModel: {},
     loaded: true,
     tenant: "",
     service: "impresoras",
@@ -42,12 +44,12 @@ export default {
 
   components: {
     Spinner,
-    ImpresorasTable
+    ImpresorasTable,
   },
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    if(this.loguedUser.perfil > 1){
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.getObjects();
@@ -59,7 +61,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.impresoras = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;  
+          this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
@@ -75,18 +77,20 @@ export default {
       this.$emit("deleteItem", itemId);
     },
 
-    selectDefaultPrinter(printer){
-      this.impresoras.forEach(el => {
+    selectDefaultPrinter(printer) {
+      this.impresoras.forEach((el) => {
         el.impresoraPredeterminada = false;
-      })
+      });
 
-     this.impresoras.filter(el => el.nombreImpresora === printer.nombreImpresora)[0].impresoraPredeterminada = true; 
+      this.impresoras.filter(
+        (el) => el.nombreImpresora === printer.nombreImpresora
+      )[0].impresoraPredeterminada = true;
       GenericService(this.tenant, this.service, this.token)
-      .saveAll(this.impresoras)
-      .then(() => {
-        this.getObjects()
-      })
-    }
+        .saveAll(this.impresoras)
+        .then(() => {
+          this.getObjects();
+        });
+    },
   },
 };
 </script>
