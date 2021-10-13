@@ -535,6 +535,7 @@ export default {
        GenericService(this.tenant, "impresoras", this.token)
         .filter(impresoraFilter)
         .then((data) => {
+          console.log(data);
           this.databaseItems.impresoras = data.data.content;
         });
 
