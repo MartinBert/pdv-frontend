@@ -59,7 +59,6 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.impresoras = data.data.content;
-          console.log(this.impresoras);
           this.filterParams.totalPages = data.data.totalPages;  
           this.loaded = true;
         });
