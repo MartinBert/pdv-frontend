@@ -67,6 +67,7 @@ import Impresora from "../views/Impresoras/Impresoras";
 import ImpresorasForm from "../views/Impresoras/ImpresorasForm";
 import VentasFast from "../views/VentasFast/ventasFast";
 
+
 Vue.use(VueRouter)
 
 //División de rutas por login y root
@@ -373,6 +374,12 @@ const routes = [
                 path: 'impresoras',
                 name: 'impresoras',
                 component:Impresora,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'impresoras/form/:id',
+                name: 'impresorasForm',
+                component: ImpresorasForm,
                 meta: { requiresAuth: true }
             },
             {
