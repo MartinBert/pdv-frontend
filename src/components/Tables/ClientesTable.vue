@@ -89,7 +89,7 @@ export default {
       { text: "Nombre", value: "nombre" },
       { text: "Razon Social", value: "razonSocial" },
       { text: "Cuit", value: "cuit" },
-      {text:"Localidad", value:"region", sortablae:false},
+      {text:"Localidad", value:"cliente.region", sortablae:false},
       { text: "Detalles", value: "detalles", sortable:false},
       { text: "Acciones", value: "acciones" , sortable:false},
     ],
@@ -115,7 +115,6 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.clientes = data.data.content;
-          console.log(this.clientes.region);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
