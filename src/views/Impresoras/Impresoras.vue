@@ -4,7 +4,6 @@
         :items="impresoras"
         v-on:editItem="edit"
         v-on:deleteItem="deleteItem"
-        v-on:seeDetails="seeDetails"
         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
@@ -77,23 +76,11 @@ export default {
       this.$emit("deleteItem", itemId);
     },
 
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     selectDefaultPrinter(printer){
       this.impresoras.forEach(el => {
         el.impresoraPredeterminada = false;
       })
+
      this.impresoras.filter(el => el.nombreImpresora === printer.nombreImpresora)[0].impresoraPredeterminada = true; 
       GenericService(this.tenant, this.service, this.token)
       .saveAll(this.impresoras)

@@ -104,19 +104,6 @@ export default {
       this.$emit("deleteItem", itemId);
     },
 
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     selectDefaultPrinter(printer) {
       this.impresoras.forEach((el) => {
         el.impresoraPredeterminada = false;
