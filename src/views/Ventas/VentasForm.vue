@@ -543,7 +543,7 @@ export default {
               this.defaultPrint = true;
               this.printName = print.nombreImpresora;
               console.log(this.defaultPrint);
-              console.log(this.nombreImpresora);
+              console.log(this.printName);
             }
           });
         });
