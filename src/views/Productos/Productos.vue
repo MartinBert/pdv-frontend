@@ -47,6 +47,7 @@
       </v-form>
       <ProductosTable
         :items="productos"
+        v-on:editItem="edit"
         v-on:deleteItem="deleteItem"
         v-on:add="reactivationOfProduct"
         v-if="loaded"
