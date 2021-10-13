@@ -405,8 +405,8 @@ export default {
         ],
       },
        {
-        name: "Ventasfast",
-        title: "Ventasfast",
+        name: "ventasfast",
+        title: "VentaRapida",
         visible: false,
         icon: "/../images/icons/ventas.svg",
         childs: [
