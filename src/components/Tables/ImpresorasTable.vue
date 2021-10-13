@@ -1,5 +1,5 @@
 <template>
-  <v-container style="min-width: 98%;">
+  <v-container style="min-width: 100%;">
     <v-card min-width="100%">
       <h1 style="text-align: center;">Configuracion Impresora</h1>
       <v-col>
