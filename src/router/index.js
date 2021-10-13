@@ -65,7 +65,7 @@ import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
 import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 import Impresora from "../views/Impresoras/Impresoras";
 import ImpresorasForm from "../views/Impresoras/ImpresorasForm";
-import VentasFast from "../views/VentasFast/ventasfast";
+import VentasFast from "../views/VentasFast/Ventasfast";
 
 Vue.use(VueRouter)
 
