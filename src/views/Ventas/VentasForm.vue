@@ -361,6 +361,7 @@ export default {
       clientes: [],
       medios_de_pago: [],
       documentos: [],
+      impresoras:[]
     },
     comprobantesRules: [(v) => !!v || "Comprobante es requerido"],
     medioPagoRules: [(v) => !!v || "medios de pago es requerido"],
@@ -508,6 +509,15 @@ export default {
         page: 1,
         size: 100000,
       };
+      const impresoraFilter = {
+        sucursalId: sucursalId,
+        valor: "",
+        nombreImpresora: "",
+        impresoraPredeterminada: true,
+        page: 1,
+        size: 100000
+      };
+
       const medioPagoFilter = {
         sucursalId: sucursalId,
         medioPagoName: "",
@@ -522,6 +532,11 @@ export default {
         size: 10,
         totalPages: 0,
       };
+       GenericService(this.tenant, "impresoras", this.token)
+        .filter(impresoraFilter)
+        .then((data) => {
+          this.databaseItems.impresoras = data.data.content;
+        });
 
       GenericService(this.tenant, "clientes", this.token)
         .filter(clientFilter)
@@ -1445,8 +1460,9 @@ export default {
                 comprobante.nombreDocumento = documento.nombre;
                 comprobante.documentoComercial = documento;
               }
-              console.log(comprobante);
-              printReceipt(comprobante);
+              console.log(this.impresoras);
+              //if(impresoraPredeterminada){printReceipt(comprobante,this.impresoraFilter.nombreImpresora);}
+              printReceipt(comprobante,"Nombre cualquiera");
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
