@@ -1,12 +1,18 @@
 import  XLSX  from 'xlsx';
 import { saveAs } from 'file-saver';
 
-export default function orderSales(lista,factA,factB,factC,txt,excel){
+import Swal from 'sweetalert2';
 
+export default function orderSales(lista,factA,factB,factC,notaDA,notaCA,notaDB,notaCB,txt,excel){
+  console.log(lista);
   //variables para ordenar
   let filroFactA =[];
   let filroFactB =[];
   let filroFactC =[];
+  let filtroNotaDebA = [];
+  let filtroNotaCredA = [];
+  let filtroNotaDebB = [];
+  let filtroNotaCredB = [];
   let listaFacturas = [];
   let libroIvaOrden = [];
   //variables para archivo excel
@@ -63,6 +69,38 @@ if(factC){
     }
   })
   filroFactC.forEach(facturaC=> listaFacturas.push(facturaC))
+}
+if(notaDA){
+  filtroNotaDebA= lista.filter(factura=>{
+    if(factura.nombreDocumento === "NOTAS DE DEBITO A"){
+      return true
+    }
+  })
+  filtroNotaDebA.forEach(notaDebitoA=> listaFacturas.push(notaDebitoA))
+}
+if(notaCA){
+  filtroNotaCredA= lista.filter(factura=>{
+    if(factura.nombreDocumento === "NOTAS DE CREDITO A"){
+      return true
+    }
+  })
+  filtroNotaCredA.forEach(notaCreditoA=> listaFacturas.push(notaCreditoA))
+}
+if(notaDB){
+  filtroNotaDebB= lista.filter(factura=>{
+    if(factura.nombreDocumento === "NOTAS DE DEBITO B"){
+      return true
+    }
+  })
+  filtroNotaDebB.forEach(notaDebitoB=> listaFacturas.push(notaDebitoB))
+}
+if(notaCB){
+  filtroNotaCredB= lista.filter(factura=>{
+    if(factura.nombreDocumento === "NOTAS DE CREDITO B"){
+      return true
+    }
+  })
+  filtroNotaCredB.forEach(notaCreditoB=> listaFacturas.push(notaCreditoB))
 }
 
 /*armo el array que va a salir por el excel */
@@ -161,20 +199,67 @@ let libroIva = listaFacturas;
   
 
 //generacion archivo excel
+  let totalVentas= 0;
+  let totalIvas= 0;
+  let totalNetos= 0;
     libroIvaOrden.forEach(item =>{
-
+      console.log(item);
       let tipoComprobante;
       let letra;
-      if(item.nombreDocumento === "FACTURAS A"){
-        tipoComprobante = "FA";
-        letra = "A";
-      }else if(item.nombreDocumento === "FACTURAS B"){
-        tipoComprobante = "FB";
-        letra = "B";
-      }else{
-        tipoComprobante = "FC";
-        letra = "C";
+      switch (item.nombreDocumento) {
+        case "FACTURAS A":
+          tipoComprobante = "FA";
+          letra = "A";
+          break;
+
+        case "FACTURAS B":
+          tipoComprobante = "FB";
+          letra = "B";
+          break;
+
+        case "FACTURAS C":
+          tipoComprobante = "FC";
+          letra = "C";
+          break;
+        case "NOTAS DE DEBITO A":
+          tipoComprobante = "NDA";
+          letra = "A";
+          break;
+
+        case "NOTAS DE CREDITO A":
+          tipoComprobante = "NCA";
+          letra = "A";
+          break;
+
+        case "NOTAS DE DEBITO B":
+          tipoComprobante = "NDB";
+          letra = "B";
+          break;
+
+        case "NOTAS DE CREDITO B":
+          tipoComprobante = "NCB";
+          letra = "B";
+          break;
+
+        default:
+          break;
       }
+      //calculo de iva
+      let iva;
+      if(item.totalIvas != null){
+        iva = item.totalIvas
+      }else{
+        iva = Number(item.totalVenta) - Number(item.totalVenta)/1.21
+      }
+      totalIvas += Number(iva)
+      //calculo valor neto
+      let neto;
+      if(item.totalIvas != null){
+        neto =item.totalVenta-item.totalIvas
+      }else{
+        neto = item.totalVenta-iva
+      }
+      totalNetos += Number(neto)
 
       let numCompr1 = item.numeroCbte.slice(0,4);
       let numCompr2 = item.numeroCbte.slice(5,13);
@@ -184,21 +269,39 @@ let libroIva = listaFacturas;
         "Comprobante":`${letra} 0${numCompr1} ${numCompr2}`,
         "Razón Social":item.cliente.razonSocial,
         "CUIT":item.cliente.condicionIva.nombre == "Consumidor Final" ? null : item.cliente.cuit,
-        "Neto":`${(item.totalVenta-item.totalIvas).toFixed(2)}`,
+        "Neto": neto,
         "Alic.":`21,00 %`,
-        "I.V.A":Number(item.totalIvas).toFixed(2),
+        "I.V.A":iva,
         "Exento/NG":"0,00",
         "Per.IVA":"0,00",
         "Per.IB":"0,00",
-        "Total": Number(item.totalVenta).toFixed(2)
+        "Total": item.totalVenta
       }
+      totalVentas += item.totalVenta;
       dataExcel.push(Comprobante)
     })
+    //calculos finales
+    let Comprobante={
+      "Fecha":null,
+      "Tipo":null,
+      "Comprobante":null,
+      "Razón Social":null,
+      "CUIT":"TOTALES:",
+      "Neto":totalNetos,
+      "Alic.":null,
+      "I.V.A":totalIvas,
+      "Exento/NG":null,
+      "Per.IVA":null,
+      "Per.IB":null,
+      "Total": totalVentas
+    }
     
+    dataExcel.push(Comprobante)
+
     let wb = XLSX.utils.book_new();
-    wb.SheetNames.push("Test Sheet");
+    wb.SheetNames.push("Libro I.V.A Ventas");
     let ws = XLSX.utils.json_to_sheet(dataExcel);
-    wb.Sheets["Test Sheet"]=ws;
+    wb.Sheets["Libro I.V.A Ventas"]=ws;
 
     function s2ab(s) { 
       var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
@@ -211,12 +314,17 @@ let libroIva = listaFacturas;
   let date = new Date()
   let mes = date.getMonth() + 1
   let anio = date.getFullYear()
-  
+
+  Swal.fire(
+    'Generación exitosa!',
+    'Esto puede tardar unos segundos. Si la descarga no se realiza, acepta el pedido del navegador.',
+    'success'
+  )
   if(dataExcel.length !=0 && excel){
       saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), `LID Ventas ${mes}-${anio}.xlsx`);
   }
 
-//generacion arhivo txt (LID Ventas)
+/************************** Generacion arhivo txt (LID Ventas) *********************/
 libroIvaOrden.forEach(venta =>{
 
   //diseño de los 8 numeros fecha emitida
@@ -228,14 +336,25 @@ libroIvaOrden.forEach(venta =>{
   //diseño 5 numeros para el punto de venta
   numeroPDVTXT = `0${venta.numeroCbte.slice(0,4)}`
 
-  //diseño de los 20 numeros del numero de comprobante (se repiten porque van desde -- hasta -- , y es el mismo)
-  let longNumCompr = venta.correlativoComprobante.length;
-  let faltan0NumCompr = 20 - longNumCompr;
-  let cerosNumCompr="";
-  for(let i = 0; i<faltan0NumCompr;i++){
-    cerosNumCompr += "0";
+//diseño de los 20 numeros del numero de comprobante (se repiten porque van desde -- hasta -- , y es el mismo)
+  if(venta.correlativoComprobante != null){
+    let longNumCompr = venta.correlativoComprobante.length;
+    let faltan0NumCompr = 20 - longNumCompr;
+    let cerosNumCompr="";
+    for(let i = 0; i<faltan0NumCompr;i++){
+      cerosNumCompr += "0";
+    }
+    nroComprobanteTXT = cerosNumCompr+venta.correlativoComprobante
+  }else{
+    let longNumCompr = venta.numeroCbte.slice(5,13)
+    let faltan0NumCompr = 20 - longNumCompr.length;
+    let cerosNumCompr="";
+    for(let i = 0; i<faltan0NumCompr;i++){
+      cerosNumCompr += "0";
+    }
+    nroComprobanteTXT = cerosNumCompr+venta.numeroCbte.slice(5,13)
   }
-  nroComprobanteTXT = cerosNumCompr+venta.correlativoComprobante
+
 
   //diseño de 2 numeros para el tipo de documento
   nroDocumentoTXT= venta.cliente.condicionIva.nombre == "Consumidor Final" ? "99" : "80";
@@ -331,13 +450,15 @@ if(txt) a.click();
 
 window.URL.revokeObjectURL(url)
 
-//generacion arhivo txt (LID Ventas Alicuotas)
+/********************** Generacion arhivo txt (LID Ventas Alicuotas) ******************************/
 libroIvaOrden.forEach(venta =>{
     //diseño de 3 numeros del tipo de comprobante segun afip
     tipoComprobanteTXT = venta.documentoComercial.codigoDocumento;
     //diseño 5 numeros para el punto de venta
     numeroPDVTXT = `0${venta.numeroCbte.slice(0,4)}`
-    //diseño de los 20 numeros del numero de comprobante (se repiten porque van desde -- hasta -- , y es el mismo)
+
+//diseño de los 20 numeros del numero de comprobante (se repiten porque van desde -- hasta -- , y es el mismo)
+  if(venta.correlativoComprobante != null){
     let longNumCompr = venta.correlativoComprobante.length;
     let faltan0NumCompr = 20 - longNumCompr;
     let cerosNumCompr="";
@@ -345,8 +466,22 @@ libroIvaOrden.forEach(venta =>{
       cerosNumCompr += "0";
     }
     nroComprobanteTXT = cerosNumCompr+venta.correlativoComprobante
+  }else{
+    let longNumCompr = venta.numeroCbte.slice(5,13)
+    let faltan0NumCompr = 20 - longNumCompr.length;
+    let cerosNumCompr="";
+    for(let i = 0; i<faltan0NumCompr;i++){
+      cerosNumCompr += "0";
+    }
+    nroComprobanteTXT = cerosNumCompr+venta.numeroCbte.slice(5,13)
+  }
     //diseño de 15 numeros para el importe neto Gravado
-    importeTotalTXT = (venta.totalVenta - venta.totalIvas).toFixed(2);
+    if(venta.totalIvas != null){
+      importeTotalTXT = (venta.totalVenta - venta.totalIvas).toFixed(2);
+    }else{
+      importeTotalTXT = (Number(venta.totalVenta)/1.21).toFixed(2);
+    }
+
     let decimal1 = importeTotalTXT.length - 2;
     let decimalImporteTotal = importeTotalTXT.slice(decimal1,importeTotalTXT.length);
     let entero1 = importeTotalTXT.length - 3;
@@ -362,21 +497,42 @@ libroIvaOrden.forEach(venta =>{
     importeTotalTXT = numTotalCon0 + numTotal
     //diseño de 04 numeros para alicuota del iva (0005 es para 21%, depende el % es distinto pero dejamos este no mas)
     alicuotaIva = "0005"
+
     //diseño de 15 numeros impuesto liquido iva
-    importeIVATXT = (venta.totalIvas).toFixed(2);
-    decimal1 = importeIVATXT.length - 2;
-    decimalImporteTotal = importeIVATXT.slice(decimal1,importeIVATXT.length);
-    entero1 = importeIVATXT.length - 3;
-    enteroImporteTotal = importeIVATXT.slice(0,entero1);
-    numTotal = enteroImporteTotal+decimalImporteTotal;
-    numTotalCon0 = "";
-    if( numTotal.length < 15){
-      let cantCeros = 15 - numTotal.length
-      for(let i =0 ; i < cantCeros ; i++){
-        numTotalCon0 += "0"
+    if(venta.totalIvas!=null){
+      importeIVATXT = (venta.totalIvas).toFixed(2);
+      decimal1 = importeIVATXT.length - 2;
+      decimalImporteTotal = importeIVATXT.slice(decimal1,importeIVATXT.length);
+      entero1 = importeIVATXT.length - 3;
+      enteroImporteTotal = importeIVATXT.slice(0,entero1);
+      numTotal = enteroImporteTotal+decimalImporteTotal;
+      numTotalCon0 = "";
+      if( numTotal.length < 15){
+        let cantCeros = 15 - numTotal.length
+        for(let i =0 ; i < cantCeros ; i++){
+          numTotalCon0 += "0"
+        }
       }
+      importeIVATXT = numTotalCon0 + numTotal
+  
+    }else{
+      importeIVATXT = (Number(venta.totalVenta) - Number(venta.totalVenta)/1.21).toFixed(2)
+      decimal1 = importeIVATXT.length - 2;
+      decimalImporteTotal = importeIVATXT.slice(decimal1,importeIVATXT.length);
+      entero1 = importeIVATXT.length - 3;
+      enteroImporteTotal = importeIVATXT.slice(0,entero1);
+      numTotal = enteroImporteTotal+decimalImporteTotal;
+      numTotalCon0 = "";
+      if( numTotal.length < 15){
+        let cantCeros = 15 - numTotal.length
+        for(let i =0 ; i < cantCeros ; i++){
+          numTotalCon0 += "0"
+        }
+      }
+      importeIVATXT = numTotalCon0 + numTotal
+  
     }
-    importeIVATXT = numTotalCon0 + numTotal
+  
     itemLibroIvaTXT = tipoComprobanteTXT+numeroPDVTXT+nroComprobanteTXT+importeTotalTXT+alicuotaIva+importeIVATXT+"\n"
 
     libroAlicuotaVentaTXT.push(itemLibroIvaTXT)

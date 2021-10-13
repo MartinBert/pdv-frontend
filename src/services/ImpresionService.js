@@ -7,71 +7,71 @@ let espacioss = "";
 let lineaProd=``;
 let imagen = false;
 
-export default function printReceipt(comprobante){
+export default function printReceipt(comprobante,nombreImpresora){
 
       switch (comprobante.nombreDocumento) {
         case "Ticket X":
           ticketX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
-                  comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento)
+                  comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento,nombreImpresora)
           break;
 
         case "Nota de débito X":
-          notaDebitoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta)
+          notaDebitoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,nombreImpresora)
           break;
 
         case "Nota de crédito X":
-          notaCreditoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta)
+          notaCreditoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,nombreImpresora)
           break;
 
         case "FACTURAS C":
           facturaC(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
                   comprobante.totalDescuentos,comprobante.subTotal,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-                  ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto)
+                  ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "NOTAS DE DEBITO C":
           notaDebitoC(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "NOTAS DE CREDITO C":
           notaCreditoC(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "FACTURAS B":
           facturaB(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
             comprobante.totalDescuentos,comprobante.subTotal,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "NOTAS DE DEBITO B":
           notaDebitoB(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "NOTAS DE CREDITO B":
           notaCreditoB(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto, nombreImpresora)
           break;
 
         case "FACTURAS A":
           facturaA(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
             comprobante.totalDescuentos,comprobante.subTotal,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
             ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,
-            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27)
+            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27, nombreImpresora)
           break;
 
         case "NOTAS DE DEBITO A":
           notaDebitoA(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
             ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,
-            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27)
+            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27,nombreImpresora)
           break;
 
         case "NOTAS DE CREDITO A":
           notaCreditoA(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
             ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,
-            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27)
+            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27,nombreImpresora)
           break;
 
         default:
@@ -81,7 +81,7 @@ export default function printReceipt(comprobante){
 
 
 function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
-                 totalDescuentos,subTotal,nombreDocumento){
+                 totalDescuentos,subTotal,nombreDocumento,nombreImpresora){
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -144,10 +144,10 @@ console.log("entre");
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer")
+            .imprimirEn(nombreImpresora)
 }
 
-function notaDebitoX(listProduct,nameEmpresa,totalVenta){
+function notaDebitoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -208,10 +208,10 @@ function notaDebitoX(listProduct,nameEmpresa,totalVenta){
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer");
+            .imprimirEn(nombreImpresora);
 }
 
-function notaCreditoX(listProduct,nameEmpresa,totalVenta){
+function notaCreditoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -273,13 +273,13 @@ function notaCreditoX(listProduct,nameEmpresa,totalVenta){
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer");
+            .imprimirEn(nombreImpresora);
 }
 
 function facturaA(listProduct,nameEmpresa,totalVenta,totalRecargos,
                 totalDescuentos,subTotal,barCode,cae,cliente,empresa
                 ,fechaEmision,numeroCbte,fechaVto,
-                totalIva21,totalIva10,totalIva27){
+                totalIva21,totalIva10,totalIva27,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -374,12 +374,12 @@ function facturaA(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-    .imprimirEn("80mm Series Printer");
+    .imprimirEn(nombreImpresora);
 }
 
 function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
                       ,fechaEmision,numeroCbte,fechaVto,
-                      totalIva21,totalIva10,totalIva27){
+                      totalIva21,totalIva10,totalIva27,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -471,12 +471,12 @@ function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-      .imprimirEn("80mm Series Printer");
+      .imprimirEn(nombreImpresora);
 }
 
 function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
               ,fechaEmision,numeroCbte,fechaVto,
-              totalIva21,totalIva10,totalIva27){
+              totalIva21,totalIva10,totalIva27,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -567,12 +567,12 @@ function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-          .imprimirEn("80mm Series Printer");
+          .imprimirEn(nombreImpresora);
 }
 
 function facturaB(listProduct,nameEmpresa,totalVenta,totalRecargos,
   totalDescuentos,subTotal,barCode,cae,cliente,empresa,
-  fechaEmision,numeroCbte,fechaVto){
+  fechaEmision,numeroCbte,fechaVto,nombreImpresora){
 
     switch (nameEmpresa) {
     case "servipack":
@@ -660,11 +660,11 @@ function facturaB(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-    .imprimirEn("80mm Series Printer");
+    .imprimirEn(nombreImpresora);
 }
 
 function notaDebitoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
-                    ,fechaEmision,numeroCbte,fechaVto){
+                    ,fechaEmision,numeroCbte,fechaVto,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -749,11 +749,11 @@ function notaDebitoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-          .imprimirEn("80mm Series Printer");
+          .imprimirEn(nombreImpresora);
   }
 
 function notaCreditoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
-  ,fechaEmision,numeroCbte,fechaVto){
+  ,fechaEmision,numeroCbte,fechaVto,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -838,12 +838,12 @@ for (let i = 0; i < listProduct.length; i++) {
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-        .imprimirEn("80mm Series Printer");
+        .imprimirEn(nombreImpresora);
 }
 
 function facturaC(listProduct,nameEmpresa,totalVenta,totalRecargos,
   totalDescuentos,subTotal,barCode,cae,cliente,empresa,
-  fechaEmision,numeroCbte,fechaVto){
+  fechaEmision,numeroCbte,fechaVto,nombreImpresora){
 
     switch (nameEmpresa) {
       case "servipack":
@@ -931,11 +931,11 @@ function facturaC(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-    .imprimirEn("80mm Series Printer");
+    .imprimirEn(nombreImpresora);
 }
 
 function notaDebitoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
-  ,fechaEmision,numeroCbte,fechaVto){
+  ,fechaEmision,numeroCbte,fechaVto,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -1020,11 +1020,11 @@ for (let i = 0; i < listProduct.length; i++) {
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-        .imprimirEn("80mm Series Printer");
+        .imprimirEn(nombreImpresora);
 }
 
 function notaCreditoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
-  ,fechaEmision,numeroCbte,fechaVto){
+  ,fechaEmision,numeroCbte,fechaVto,nombreImpresora){
 
   switch (nameEmpresa) {
     case "servipack":
@@ -1109,5 +1109,5 @@ function notaCreditoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer");
+            .imprimirEn(nombreImpresora);
 }
