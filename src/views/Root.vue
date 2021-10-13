@@ -436,7 +436,7 @@ export default {
         name: "impresoras",
         title: "Impresoras",
         visible: false,
-        icon: "/../images/icons/print.svg",
+        icon: "/../images/icons/printer.svg",
         childs: [
           {
             path: "/impresora",
