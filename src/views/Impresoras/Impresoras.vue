@@ -1,41 +1,18 @@
 <template>
   <v-container style="min-width: 98%;">
-    <v-card min-width="100%">
-      <h1 style="text-align: center;">Configuracion Impresora</h1>
-      <v-col>
-        <v-btn class="primary" raised @click="newObject()">Nuevo</v-btn>
-      </v-col>
-      <v-row>
-        <v-col cols="12">
-          <div class="horizontalSeparator"></div>
-        </v-col>
-      </v-row>
-      <v-data-table
-        :headers="headers"
+      <ImpresorasTable
         :items="impresoras"
-        sort-by="calories"
-        class="elevation-1"
-        hide-default-footer
-      >
-        <template v-slot:[`item.impresoraPredeterminada`]="{ item, index }">
-          <p v-show="viewCheckboxState === 1">
-            {{(item.impresoraPredeterminada) ? checkboxModel[index] = true : checkboxModel[index] = false}}
-          </p>
-          <v-checkbox v-model="checkboxModel[index]" @change="selectDefaultPrinter(item)"></v-checkbox>
-        </template>
-        <template v-slot:[`item.acciones`]="{item}">
-          <Edit :itemId="item.id" v-on:editItem="editItem"/>
-          <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
-        </template>
-      </v-data-table>
+        v-on:editItem="edit"
+        v-on:deleteItem="deleteItem"
+        v-on:seeDetails="seeDetails"
+        v-if="loaded"
+      />
       <Spinner v-if="!loaded" />
-    </v-card>
   </v-container>
 </template>
 <script>
+import ImpresorasTable from "../../components/Tables/ImpresorasTable.vue";
 import Spinner from "../../components/Graphics/Spinner";
-import Edit from "../../components/Buttons/Edit";
-import Delete from "../../components/Buttons/Delete";
 import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
@@ -66,8 +43,7 @@ export default {
 
   components: {
     Spinner,
-    Edit,
-    Delete,
+    ImpresorasTable
   },
 
   mounted() {
@@ -93,8 +69,9 @@ export default {
     newObject() {
       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
-   editItem(id) {
-      this.$router.push({ name: "ImpresorasForm", params: { id: id } });
+
+    edit(id) {
+      this.$router.push({ name: "clientesForm", params: { id: id } });
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
