@@ -203,7 +203,7 @@ const routes = [
             },
             {
                 path: 'ventasfast',
-                name: 'ventasfast',
+                name: 'ventasFast',
                 component: VentasFast,
                 meta: { requiresAuth: true }
             },

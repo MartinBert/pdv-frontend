@@ -405,14 +405,14 @@ export default {
         ],
       },
        {
-        name: "ventasfast",
+        name: "ventasFast",
         title: "VentaRapida",
         visible: false,
         icon: "/../images/icons/ventas.svg",
         childs: [
           {
             path: "/ventasfast",
-            name: "ventasfast",
+            name: "ventasFast",
             title: "Ventasfast",
             visible: false,
           },
