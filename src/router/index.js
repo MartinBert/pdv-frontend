@@ -114,7 +114,7 @@ const routes = [
             },
             {
                 path: 'impresoras/form/:id',
-                name: 'ImpresorasForm',
+                name: 'impresorasForm',
                 component: ImpresorasForm,
                 meta: { requiresAuth: true }
             },
