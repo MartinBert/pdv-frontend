@@ -394,6 +394,8 @@ export default {
     lowStock: [],
     perfil: null,
     processPresupuesto: false,
+    printName:"",
+    defaultPrint:false
   }),
 
   components: {
@@ -535,8 +537,15 @@ export default {
        GenericService(this.tenant, "impresoras", this.token)
         .filter(impresoraFilter)
         .then((data) => {
-          console.log(data);
           this.databaseItems.impresoras = data.data.content;
+          this.databaseItems.impresoras.forEach(print => {
+            if(print.impresoraPredeterminada == true){
+              this.defaultPrint = true;
+              this.printName = print.nombreImpresora;
+              console.log(this.defaultPrint);
+              console.log(this.nombreImpresora);
+            }
+          });
         });
 
       GenericService(this.tenant, "clientes", this.token)
