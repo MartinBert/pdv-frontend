@@ -63,6 +63,11 @@ export default {
     service: "impresoras",
     token: localStorage.getItem("token"),
     errorStatus: false,
+    filterParams: {
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
   }),
 
   components: {
