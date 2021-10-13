@@ -1,7 +1,6 @@
 <template>
   <v-container>
     <v-card min-width="100%">
-      <v-card min-width="100%">
       <h1 style="text-align: center;">Configuracion Impresora</h1>
       <v-col>
         <v-btn class="primary" raised @click="newObject()">Nuevo</v-btn>
@@ -20,13 +19,20 @@
       >
         <template v-slot:[`item.impresoraPredeterminada`]="{ item, index }">
           <p v-show="viewCheckboxState === 1">
-            {{(item.impresoraPredeterminada) ? checkboxModel[index] = true : checkboxModel[index] = false}}
+            {{
+              item.impresoraPredeterminada
+                ? (checkboxModel[index] = true)
+                : (checkboxModel[index] = false)
+            }}
           </p>
-          <v-checkbox v-model="checkboxModel[index]" @change="selectDefaultPrinter(item)"></v-checkbox>
+          <v-checkbox
+            v-model="checkboxModel[index]"
+            @change="selectDefaultPrinter(item)"
+          ></v-checkbox>
         </template>
-        <template v-slot:[`item.acciones`]="{item}">
-          <Edit :itemId="item.id" v-on:editItem="editItem"/>
-          <Delete :itemId="item.id" v-on:deleteItem="deleteItem"/>
+        <template v-slot:[`item.acciones`]="{ item }">
+          <Edit :itemId="item.id" v-on:editItem="editItem" />
+          <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
         </template>
       </v-data-table>
     </v-card>
@@ -38,7 +44,7 @@ import Delete from "../../components/Buttons/Delete";
 import GenericService from "../../services/GenericService";
 export default {
   data: () => ({
-    impresoras:[],
+    impresoras: [],
     itemss: ["80 mm ", "58 mm"],
     filterParams: {
       sucursalId: "",
@@ -46,10 +52,10 @@ export default {
       nombreImpresora: "",
       page: 1,
       size: 10,
-      totalPages: 0
+      totalPages: 0,
     },
     viewCheckboxState: 0,
-    checkboxModel:{},
+    checkboxModel: {},
     loaded: true,
     tenant: "",
     service: "impresoras",
@@ -70,7 +76,7 @@ export default {
 
   mounted() {
     this.tenant = this.$route.params.tenant;
-    if(this.loguedUser.perfil > 1){
+    if (this.loguedUser.perfil > 1) {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.getObjects();
@@ -83,7 +89,7 @@ export default {
         .then((data) => {
           this.impresoras = data.data.content;
           console.log(this.impresoras);
-          this.filterParams.totalPages = data.data.totalPages;  
+          this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
     },
@@ -91,7 +97,7 @@ export default {
     newObject() {
       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
-   editItem(id) {
+    editItem(id) {
       this.$router.push({ name: "ImpresorasForm", params: { id: id } });
     },
     deleteItem(itemId) {
@@ -111,17 +117,19 @@ export default {
       });
     },
 
-    selectDefaultPrinter(printer){
-      this.impresoras.forEach(el => {
+    selectDefaultPrinter(printer) {
+      this.impresoras.forEach((el) => {
         el.impresoraPredeterminada = false;
-      })
-     this.impresoras.filter(el => el.nombreImpresora === printer.nombreImpresora)[0].impresoraPredeterminada = true; 
+      });
+      this.impresoras.filter(
+        (el) => el.nombreImpresora === printer.nombreImpresora
+      )[0].impresoraPredeterminada = true;
       GenericService(this.tenant, this.service, this.token)
-      .saveAll(this.impresoras)
-      .then(() => {
-        this.getObjects()
-      })
-    }
+        .saveAll(this.impresoras)
+        .then(() => {
+          this.getObjects();
+        });
+    },
   },
 };
 </script>
