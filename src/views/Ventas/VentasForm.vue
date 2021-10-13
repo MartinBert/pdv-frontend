@@ -542,8 +542,6 @@ export default {
             if(print.impresoraPredeterminada == true){
               this.defaultPrint = true;
               this.printName = print.nombreImpresora;
-              console.log(this.defaultPrint);
-              console.log(this.printName);
             }
           });
         });

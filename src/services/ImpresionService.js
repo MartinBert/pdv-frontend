@@ -9,7 +9,6 @@ let imagen = false;
 
 export default function printReceipt(comprobante,nombreImpresora){
       const namePrint = nombreImpresora;
-      console.log(nombreImpresora);
       switch (comprobante.nombreDocumento) {
         case "Ticket X":
           ticketX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
@@ -93,7 +92,6 @@ function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
       imagen = false;
       break;
   }
-console.log("entre");
   const conector = new ConectorPlugin()
   if(imagen){
     conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
