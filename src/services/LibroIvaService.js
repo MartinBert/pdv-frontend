@@ -1,6 +1,8 @@
 import  XLSX  from 'xlsx';
 import { saveAs } from 'file-saver';
 
+import Swal from 'sweetalert2';
+
 export default function orderSales(lista,factA,factB,factC,notaDA,notaCA,notaDB,notaCB,txt,excel){
   console.log(lista);
   //variables para ordenar
@@ -201,7 +203,7 @@ let libroIva = listaFacturas;
   let totalIvas= 0;
   let totalNetos= 0;
     libroIvaOrden.forEach(item =>{
-
+      console.log(item);
       let tipoComprobante;
       let letra;
       switch (item.nombreDocumento) {
@@ -219,7 +221,6 @@ let libroIva = listaFacturas;
           tipoComprobante = "FC";
           letra = "C";
           break;
-
         case "NOTAS DE DEBITO A":
           tipoComprobante = "NDA";
           letra = "A";
@@ -246,19 +247,20 @@ let libroIva = listaFacturas;
       //calculo de iva
       let iva;
       if(item.totalIvas != null){
-        iva = Number(item.totalIvas).toFixed(2)
+        iva = item.totalIvas
       }else{
-        iva = (Number(item.totalVenta) - Number(item.totalVenta)/1.21).toFixed(2)
+        iva = Number(item.totalVenta) - Number(item.totalVenta)/1.21
       }
       totalIvas += Number(iva)
       //calculo valor neto
       let neto;
       if(item.totalIvas != null){
-        neto =(item.totalVenta-item.totalIvas).toFixed(2)
+        neto =item.totalVenta-item.totalIvas
       }else{
-        neto = (item.totalVenta-iva).toFixed(2)
+        neto = item.totalVenta-iva
       }
       totalNetos += Number(neto)
+
       let numCompr1 = item.numeroCbte.slice(0,4);
       let numCompr2 = item.numeroCbte.slice(5,13);
       let Comprobante={
@@ -267,15 +269,15 @@ let libroIva = listaFacturas;
         "Comprobante":`${letra} 0${numCompr1} ${numCompr2}`,
         "Razón Social":item.cliente.razonSocial,
         "CUIT":item.cliente.condicionIva.nombre == "Consumidor Final" ? null : item.cliente.cuit,
-        "Neto":`${neto}`,
+        "Neto": neto,
         "Alic.":`21,00 %`,
         "I.V.A":iva,
         "Exento/NG":"0,00",
         "Per.IVA":"0,00",
         "Per.IB":"0,00",
-        "Total": `${Number(item.totalVenta).toFixed(2)}`
+        "Total": item.totalVenta
       }
-      totalVentas += Number(item.totalVenta);
+      totalVentas += item.totalVenta;
       dataExcel.push(Comprobante)
     })
     //calculos finales
@@ -285,13 +287,13 @@ let libroIva = listaFacturas;
       "Comprobante":null,
       "Razón Social":null,
       "CUIT":"TOTALES:",
-      "Neto":totalNetos.toFixed(2),
+      "Neto":totalNetos,
       "Alic.":null,
-      "I.V.A":totalIvas.toFixed(2),
+      "I.V.A":totalIvas,
       "Exento/NG":null,
       "Per.IVA":null,
       "Per.IB":null,
-      "Total": totalVentas.toFixed(2)
+      "Total": totalVentas
     }
     
     dataExcel.push(Comprobante)
@@ -312,7 +314,12 @@ let libroIva = listaFacturas;
   let date = new Date()
   let mes = date.getMonth() + 1
   let anio = date.getFullYear()
-  
+
+  Swal.fire(
+    'Generación exitosa!',
+    'Esto puede tardar unos segundos. Si la descarga no se realiza, acepta el pedido del navegador.',
+    'success'
+  )
   if(dataExcel.length !=0 && excel){
       saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), `LID Ventas ${mes}-${anio}.xlsx`);
   }
