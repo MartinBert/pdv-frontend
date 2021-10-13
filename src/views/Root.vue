@@ -433,15 +433,15 @@ export default {
         ],
       },
       {
-        name: "impresora",
+        name: "impresoras",
         title: "Impresoras",
         visible: false,
         icon: "/../images/icons/calendar.svg",
         childs: [
           {
             path: "/impresora",
-            name: "Impresora",
-            title: "Impresora",
+            name: "impresoras",
+            title: "Impresoras",
             visible: false,
           },
         ],
