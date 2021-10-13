@@ -74,7 +74,7 @@ export default {
       personaCuit: "",
       personaDirection: "",
       personaContactName: "",
-      personaRegion:"",
+      region:"",
       page: 1,
       size: 10,
       totalPages: 0,
