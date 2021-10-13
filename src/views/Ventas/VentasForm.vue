@@ -1470,9 +1470,10 @@ export default {
                 comprobante.nombreDocumento = documento.nombre;
                 comprobante.documentoComercial = documento;
               }
-              console.log(this.impresoras);
-              //if(impresoraPredeterminada){printReceipt(comprobante,this.impresoraFilter.nombreImpresora);}
-              printReceipt(comprobante,"Nombre cualquiera");
+            
+              if(this.defaultPrint){
+                 printReceipt(comprobante,this.printName);
+              }
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)

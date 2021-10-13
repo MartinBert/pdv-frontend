@@ -8,11 +8,12 @@ let lineaProd=``;
 let imagen = false;
 
 export default function printReceipt(comprobante,nombreImpresora){
-
+      const namePrint = nombreImpresora;
+      console.log(nombreImpresora);
       switch (comprobante.nombreDocumento) {
         case "Ticket X":
           ticketX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
-                  comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento,nombreImpresora)
+                  comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento,namePrint)
           break;
 
         case "Nota de débito X":
