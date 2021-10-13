@@ -71,7 +71,7 @@ export default {
     },
 
     edit(id) {
-      this.$router.push({ name: "clientesForm", params: { id: id } });
+      this.$router.push({ name: "ImpresorasForm", params: { id: id } });
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
