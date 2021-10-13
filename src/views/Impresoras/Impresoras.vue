@@ -1,5 +1,5 @@
 <template>
-  <v-container style="min-width: 98%;">
+  <v-container style="min-width: 100%;">
       <ImpresorasTable
         :items="impresoras"
         v-on:editItem="edit"
