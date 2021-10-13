@@ -94,8 +94,11 @@ export default {
       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
 
-    editItem() {
-       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
+    editItem(id) {
+        this.$router.push({
+        name: "ImpresorasForm",
+        params: { id: id },
+      });
     },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
