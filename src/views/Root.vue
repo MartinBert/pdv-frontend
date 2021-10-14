@@ -332,12 +332,6 @@ export default {
             title: "Empresa",
             visible: false,
           },
-           {
-            path: "/impresoras",
-            name: "impresoras",
-            title: "Impresoras",
-            visible: false,
-          },
           {
             path: "/sucursales",
             name: "sucursales",
