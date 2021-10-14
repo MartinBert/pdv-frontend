@@ -59,7 +59,6 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
-          console.log(data);
           this.atributos = data.data.content;
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
