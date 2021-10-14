@@ -60,6 +60,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.atributos = data.data.content;
+          console.log(this.atributos);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
