@@ -80,6 +80,7 @@ export default {
     },
 
     deleteObject() {
+      this.loaded = false;
       this.dialog = true;
       this.deleteDialogStatus = false;
       GenericService(this.tenant, this.service, this.token)
