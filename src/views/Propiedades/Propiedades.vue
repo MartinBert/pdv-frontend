@@ -30,6 +30,7 @@ export default {
     propiedades: [],
     filterParams: {
       propiedadName: "",
+      estado:true,
       page: 1,
       size: 10,
       totalPages: 0,
@@ -86,11 +87,6 @@ export default {
         .then(() => {
           this.filterObjects();
         })
-        .catch(() => {
-          this.$errorAlert(
-            "El registro se encuentra asociado a otros elementos en el sistema"
-          );
-        });
     },
 
     seeDetails(objects) {
