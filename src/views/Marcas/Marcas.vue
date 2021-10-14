@@ -29,7 +29,7 @@ export default {
     file: null,
     filterParams: {
       marcaName: "",
-      estado:false,
+      estado:true,
       page: 1,
       size: 10,
       totalPages: 0,
