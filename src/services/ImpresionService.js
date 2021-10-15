@@ -85,6 +85,7 @@ export default function printReceipt(comprobante,nombreImpresora){
 
 function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
                  totalDescuentos,subTotal,nombreDocumento,nombreImpresora){
+                   console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -150,7 +151,7 @@ function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
 }
 
 function notaDebitoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
-
+  console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -214,7 +215,7 @@ function notaDebitoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
 }
 
 function notaCreditoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
-
+  console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -282,7 +283,7 @@ function facturaA(listProduct,nameEmpresa,totalVenta,totalRecargos,
                 totalDescuentos,subTotal,barCode,cae,cliente,empresa
                 ,fechaEmision,numeroCbte,fechaVto,
                 totalIva21,totalIva10,totalIva27,nombreImpresora){
-
+                  console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -382,7 +383,7 @@ function facturaA(listProduct,nameEmpresa,totalVenta,totalRecargos,
 function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
                       ,fechaEmision,numeroCbte,fechaVto,
                       totalIva21,totalIva10,totalIva27,nombreImpresora){
-
+                        console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -479,7 +480,7 @@ function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
 function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
               ,fechaEmision,numeroCbte,fechaVto,
               totalIva21,totalIva10,totalIva27,nombreImpresora){
-
+                console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -575,7 +576,7 @@ function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
 function facturaB(listProduct,nameEmpresa,totalVenta,totalRecargos,
   totalDescuentos,subTotal,barCode,cae,cliente,empresa,
   fechaEmision,numeroCbte,fechaVto,nombreImpresora){
-
+    console.log(nombreImpresora);
     switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -668,7 +669,7 @@ function facturaB(listProduct,nameEmpresa,totalVenta,totalRecargos,
 function notaDebitoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
                     ,fechaEmision,numeroCbte,fechaVto,
                     totalIva21,totalIva10,totalIva27,nombreImpresora){
-
+                      console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -765,7 +766,7 @@ function notaDebitoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
 function notaCreditoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
                       ,fechaEmision,numeroCbte,fechaVto,
                       totalIva21,totalIva10,totalIva27,nombreImpresora){
-
+                        console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -862,7 +863,7 @@ for (let i = 0; i < listProduct.length; i++) {
 function facturaC(listProduct,nameEmpresa,totalVenta,totalRecargos,
   totalDescuentos,subTotal,barCode,cae,cliente,empresa,
   fechaEmision,numeroCbte,fechaVto,nombreImpresora){
-
+    console.log(nombreImpresora);
     switch (nameEmpresa) {
       case "servipack":
           logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -954,7 +955,7 @@ function facturaC(listProduct,nameEmpresa,totalVenta,totalRecargos,
 
 function notaDebitoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
   ,fechaEmision,numeroCbte,fechaVto,nombreImpresora){
-
+    console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -1043,7 +1044,7 @@ for (let i = 0; i < listProduct.length; i++) {
 
 function notaCreditoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
   ,fechaEmision,numeroCbte,fechaVto,nombreImpresora){
-
+    console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
