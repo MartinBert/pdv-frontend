@@ -361,6 +361,7 @@ export default {
       clientes: [],
       medios_de_pago: [],
       documentos: [],
+      impresoras:[]
     },
     comprobantesRules: [(v) => !!v || "Comprobante es requerido"],
     medioPagoRules: [(v) => !!v || "medios de pago es requerido"],
@@ -393,6 +394,8 @@ export default {
     lowStock: [],
     perfil: null,
     processPresupuesto: false,
+    printName:"",
+    defaultPrint:false
   }),
 
   components: {
@@ -508,6 +511,15 @@ export default {
         page: 1,
         size: 100000,
       };
+      const impresoraFilter = {
+        sucursalId: sucursalId,
+        valor: "",
+        nombreImpresora: "",
+        impresoraPredeterminada: true,
+        page: 1,
+        size: 100000
+      };
+
       const medioPagoFilter = {
         sucursalId: sucursalId,
         medioPagoName: "",
@@ -522,6 +534,17 @@ export default {
         size: 10,
         totalPages: 0,
       };
+       GenericService(this.tenant, "impresoras", this.token)
+        .filter(impresoraFilter)
+        .then((data) => {
+          this.databaseItems.impresoras = data.data.content;
+          this.databaseItems.impresoras.forEach(print => {
+            if(print.impresoraPredeterminada == true){
+              this.defaultPrint = true;
+              this.printName = print.nombreImpresora;
+            }
+          });
+        });
 
       GenericService(this.tenant, "clientes", this.token)
         .filter(clientFilter)
@@ -1303,7 +1326,9 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-                  printReceipt(comprobante);
+                  if(this.defaultPrint){
+                    printReceipt(comprobante,this.printName);
+                  }
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1445,8 +1470,10 @@ export default {
                 comprobante.nombreDocumento = documento.nombre;
                 comprobante.documentoComercial = documento;
               }
-              console.log(comprobante);
-              printReceipt(comprobante);
+              console.log(this.defaultPrint, this.printName);
+              if(this.defaultPrint){
+                 printReceipt(comprobante,this.printName);
+              }
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)

@@ -7,71 +7,74 @@ let espacioss = "";
 let lineaProd=``;
 let imagen = false;
 
-export default function printReceipt(comprobante){
-
+export default function printReceipt(comprobante,nombreImpresora){
+      const namePrint = nombreImpresora;
+  
       switch (comprobante.nombreDocumento) {
         case "Ticket X":
           ticketX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
-                  comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento)
+                  comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento,namePrint)
           break;
 
-        case "Nota de débito X":
-          notaDebitoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta)
+        case "Nota de débito x":
+          notaDebitoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,namePrint)
           break;
 
-        case "Nota de crédito X":
-          notaCreditoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta)
+        case "Nota de crédito x":
+          notaCreditoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,namePrint)
           break;
 
         case "FACTURAS C":
           facturaC(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
                   comprobante.totalDescuentos,comprobante.subTotal,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-                  ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto)
+                  ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "NOTAS DE DEBITO C":
           notaDebitoC(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "NOTAS DE CREDITO C":
           notaCreditoC(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "FACTURAS B":
           facturaB(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
             comprobante.totalDescuentos,comprobante.subTotal,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,nombreImpresora)
           break;
 
         case "NOTAS DE DEBITO B":
           notaDebitoB(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,
+            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27,nombreImpresora)
           break;
 
         case "NOTAS DE CREDITO B":
           notaCreditoB(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
-            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto)
+            ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto, 
+            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27,nombreImpresora)
           break;
 
         case "FACTURAS A":
           facturaA(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
             comprobante.totalDescuentos,comprobante.subTotal,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
             ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,
-            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27)
+            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27, nombreImpresora)
           break;
 
         case "NOTAS DE DEBITO A":
           notaDebitoA(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
             ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,
-            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27)
+            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27,nombreImpresora)
           break;
 
         case "NOTAS DE CREDITO A":
           notaCreditoA(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.barCode,comprobante.cae,comprobante.cliente,comprobante.empresa
             ,comprobante.fechaEmision,comprobante.numeroCbte,comprobante.fechaVto,
-            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27)
+            comprobante.totalIva21,comprobante.totalIva10,comprobante.totalIva27,nombreImpresora)
           break;
 
         default:
@@ -81,7 +84,8 @@ export default function printReceipt(comprobante){
 
 
 function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
-                 totalDescuentos,subTotal,nombreDocumento){
+                 totalDescuentos,subTotal,nombreDocumento,nombreImpresora){
+                   console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -92,7 +96,6 @@ function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
       imagen = false;
       break;
   }
-console.log("entre");
   const conector = new ConectorPlugin()
   if(imagen){
     conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
@@ -144,11 +147,11 @@ console.log("entre");
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer")
+            .imprimirEn(nombreImpresora)
 }
 
-function notaDebitoX(listProduct,nameEmpresa,totalVenta){
-
+function notaDebitoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
+  console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -199,7 +202,7 @@ function notaDebitoX(listProduct,nameEmpresa,totalVenta){
   }
     conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .establecerEnfatizado(1)
-            .texto(`TOTAL:                            $ ${totalVenta.toFixed(2)}\n`)
+            .texto(`TOTAL:                            $ ${Number(totalVenta).toFixed(2)}\n`)
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
@@ -208,11 +211,11 @@ function notaDebitoX(listProduct,nameEmpresa,totalVenta){
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer");
+            .imprimirEn(nombreImpresora);
 }
 
-function notaCreditoX(listProduct,nameEmpresa,totalVenta){
-
+function notaCreditoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
+  console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -264,7 +267,7 @@ function notaCreditoX(listProduct,nameEmpresa,totalVenta){
   }
     conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .establecerEnfatizado(1)
-            .texto(`TOTAL:                            $ ${totalVenta.toFixed(2)}\n`)
+            .texto(`TOTAL:                            $ ${Number(totalVenta).toFixed(2)}\n`)
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
@@ -273,14 +276,14 @@ function notaCreditoX(listProduct,nameEmpresa,totalVenta){
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer");
+            .imprimirEn(nombreImpresora);
 }
 
 function facturaA(listProduct,nameEmpresa,totalVenta,totalRecargos,
                 totalDescuentos,subTotal,barCode,cae,cliente,empresa
                 ,fechaEmision,numeroCbte,fechaVto,
-                totalIva21,totalIva10,totalIva27){
-
+                totalIva21,totalIva10,totalIva27,nombreImpresora){
+                  console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -374,13 +377,13 @@ function facturaA(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-    .imprimirEn("80mm Series Printer");
+    .imprimirEn(nombreImpresora);
 }
 
 function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
                       ,fechaEmision,numeroCbte,fechaVto,
-                      totalIva21,totalIva10,totalIva27){
-
+                      totalIva21,totalIva10,totalIva27,nombreImpresora){
+                        console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -454,7 +457,7 @@ function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .establecerEnfatizado(1)
             .texto(`Iva 27%:                          $ ${totalIva27}\n`)
-            .texto(`Iva 21%:                          $ ${totalIva21} \n`)
+            .texto(`Iva 21%:                          $ ${(Number(totalVenta) - (Number(totalVenta)/1.21)).toFixed(2)} \n`)
             .texto(`Iva 10.5%:                        $ ${totalIva10}\n`)
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
@@ -471,13 +474,13 @@ function notaDebitoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-      .imprimirEn("80mm Series Printer");
+      .imprimirEn(nombreImpresora);
 }
 
 function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
               ,fechaEmision,numeroCbte,fechaVto,
-              totalIva21,totalIva10,totalIva27){
-
+              totalIva21,totalIva10,totalIva27,nombreImpresora){
+                console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -514,7 +517,7 @@ function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
             .texto(`NOTA DE CREDITO A\n`)
             .establecerEnfatizado(0)
             .establecerTamanioFuente(1, 1)
-            .texto(`ORIGINAL   Cod.0002\n`)
+            .texto(`ORIGINAL   Cod.0003\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .texto(`------------------------------------------------\n`)
             .texto(`Cliente:    ${cliente.nombre}\n`)
@@ -550,7 +553,7 @@ function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .establecerEnfatizado(1)
             .texto(`Iva 27%:                          $ ${totalIva27}\n`)
-            .texto(`Iva 21%:                          $ ${totalIva21} \n`)
+            .texto(`Iva 21%:                          $ ${(Number(totalVenta) - (Number(totalVenta)/1.21)).toFixed(2)} \n`)
             .texto(`Iva 10.5%:                        $ ${totalIva10}\n`)
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
@@ -567,13 +570,13 @@ function notaCreditoA(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-          .imprimirEn("80mm Series Printer");
+          .imprimirEn(nombreImpresora);
 }
 
 function facturaB(listProduct,nameEmpresa,totalVenta,totalRecargos,
   totalDescuentos,subTotal,barCode,cae,cliente,empresa,
-  fechaEmision,numeroCbte,fechaVto){
-
+  fechaEmision,numeroCbte,fechaVto,nombreImpresora){
+    console.log(nombreImpresora);
     switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -660,12 +663,13 @@ function facturaB(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-    .imprimirEn("80mm Series Printer");
+    .imprimirEn(nombreImpresora);
 }
 
 function notaDebitoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
-                    ,fechaEmision,numeroCbte,fechaVto){
-
+                    ,fechaEmision,numeroCbte,fechaVto,
+                    totalIva21,totalIva10,totalIva27,nombreImpresora){
+                      console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -736,6 +740,13 @@ function notaDebitoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
             .texto(`TOTAL:                            $ ${totalVenta}\n`)
             .establecerEnfatizado(0)
             .texto(`------------------------------------------------\n`)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+            .establecerEnfatizado(1)
+            .texto(`Iva 27%:                          $ ${totalIva27}\n`)
+            .texto(`Iva 21%:                          $ ${(Number(totalVenta) - (Number(totalVenta)/1.21)).toFixed(2)} \n`)
+            .texto(`Iva 10.5%:                        $ ${totalIva10}\n`)
+            .establecerEnfatizado(0)
+            .texto(`------------------------------------------------\n`)
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
             .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
             .texto(`${barCode}\n`)
@@ -749,12 +760,13 @@ function notaDebitoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empr
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-          .imprimirEn("80mm Series Printer");
+          .imprimirEn(nombreImpresora);
   }
 
 function notaCreditoB(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
-  ,fechaEmision,numeroCbte,fechaVto){
-
+                      ,fechaEmision,numeroCbte,fechaVto,
+                      totalIva21,totalIva10,totalIva27,nombreImpresora){
+                        console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -825,6 +837,13 @@ for (let i = 0; i < listProduct.length; i++) {
           .texto(`TOTAL:                            $ ${totalVenta}\n`)
           .establecerEnfatizado(0)
           .texto(`------------------------------------------------\n`)
+          .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+          .establecerEnfatizado(1)
+          .texto(`Iva 27%:                          $ ${totalIva27}\n`)
+          .texto(`Iva 21%:                          $ ${(Number(totalVenta) - (Number(totalVenta)/1.21)).toFixed(2)} \n`)
+          .texto(`Iva 10.5%:                        $ ${totalIva10}\n`)
+          .establecerEnfatizado(0)
+          .texto(`------------------------------------------------\n`)
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
           .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
           .texto(`${barCode}\n`)
@@ -838,13 +857,13 @@ for (let i = 0; i < listProduct.length; i++) {
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-        .imprimirEn("80mm Series Printer");
+        .imprimirEn(nombreImpresora);
 }
 
 function facturaC(listProduct,nameEmpresa,totalVenta,totalRecargos,
   totalDescuentos,subTotal,barCode,cae,cliente,empresa,
-  fechaEmision,numeroCbte,fechaVto){
-
+  fechaEmision,numeroCbte,fechaVto,nombreImpresora){
+    console.log(nombreImpresora);
     switch (nameEmpresa) {
       case "servipack":
           logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -931,12 +950,12 @@ function facturaC(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-    .imprimirEn("80mm Series Printer");
+    .imprimirEn(nombreImpresora);
 }
 
 function notaDebitoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
-  ,fechaEmision,numeroCbte,fechaVto){
-
+  ,fechaEmision,numeroCbte,fechaVto,nombreImpresora){
+    console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -1020,12 +1039,12 @@ for (let i = 0; i < listProduct.length; i++) {
           .texto(`www.prysoft.com.ar\n`)
           .cortar()
           .feed(4)
-        .imprimirEn("80mm Series Printer");
+        .imprimirEn(nombreImpresora);
 }
 
 function notaCreditoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,empresa
-  ,fechaEmision,numeroCbte,fechaVto){
-
+  ,fechaEmision,numeroCbte,fechaVto,nombreImpresora){
+    console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -1109,5 +1128,5 @@ function notaCreditoC(listProduct,nameEmpresa,totalVenta,barCode,cae,cliente,emp
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)
-            .imprimirEn("80mm Series Printer");
+            .imprimirEn(nombreImpresora);
 }

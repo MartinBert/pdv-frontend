@@ -127,8 +127,7 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
-    },
-    initialize() {},
+    }, 
     deleteItemConfirm() {
       this.marcas.splice(this.editedIndex, 1);
       this.closeDelete();
