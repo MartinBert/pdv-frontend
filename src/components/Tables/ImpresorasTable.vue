@@ -107,11 +107,13 @@ export default {
           this.getObjects();
         });
     },
+
+    deleteItem(id) {
+      this.idObjet = id;
+      this.deleteDialogStatus = true;
+    },
     editItem(itemId) {
       this.$emit("editItem", itemId);
-    },
-    deleteItem(itemId) {
-      this.$emit("deleteItem", itemId);
     },
     selectDefaultPrinter(printer) {
       this.impresoras.forEach((el) => {
