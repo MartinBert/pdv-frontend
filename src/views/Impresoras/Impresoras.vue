@@ -57,7 +57,7 @@ export default {
   },
 
   methods: {
-    getObjects() {
+    getObjects(page) {
       if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
