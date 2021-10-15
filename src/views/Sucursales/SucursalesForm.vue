@@ -287,7 +287,7 @@ export default {
 
     save() {
       this.loaded = false;
-      this.invoiceFilterParams.fechaEmision = formatDate(getCurrentDate());
+      this.object.fechaInicioAct = formatDate(getCurrentDate());
       if (
         !this.object.condicionIva ||
         !this.object.cuit ||
