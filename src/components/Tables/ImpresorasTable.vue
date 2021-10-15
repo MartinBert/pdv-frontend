@@ -114,7 +114,12 @@ export default {
       this.idObjet = id;
       this.deleteDialogStatus = true;
     },
-
+    editItem(itemId) {
+      this.$emit("editItem", itemId);
+    },
+    deleteItem(itemId) {
+      this.$emit("deleteItem", itemId);
+    },
     selectDefaultPrinter(printer) {
       this.impresoras.forEach((el) => {
         el.impresoraPredeterminada = false;
