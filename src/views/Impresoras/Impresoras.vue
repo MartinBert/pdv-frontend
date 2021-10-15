@@ -70,6 +70,7 @@ export default {
     deleteItem(id) {
       this.idObjet = id;
       this.deleteDialogStatus = true;
+      console.log(id);
     },
 
     deleteConfirmation(result) {
