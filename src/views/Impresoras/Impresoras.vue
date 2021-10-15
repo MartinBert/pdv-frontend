@@ -67,6 +67,11 @@ export default {
         });
     },
 
+    
+    deleteConfirmation(result) {
+      return result ? this.deleteObject() : (this.deleteDialogStatus = false);
+    },
+
      deleteObject() {
       this.loaded = false;
       this.deleteDialogStatus = false;
