@@ -8,6 +8,10 @@
         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
     </v-card>
   </v-container>
 </template>
@@ -15,6 +19,7 @@
 import ImpresorasTable from "../../components/Tables/ImpresorasTable.vue";
 import Spinner from "../../components/Graphics/Spinner";
 import GenericService from "../../services/GenericService";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog.vue";
 export default {
   data: () => ({
     impresoras: [],
@@ -32,6 +37,7 @@ export default {
     checkboxModel: {},
     loaded: true,
     tenant: "",
+    deleteDialogStatus: false,
     service: "impresoras",
     token: localStorage.getItem("token"),
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -46,6 +52,7 @@ export default {
   components: {
     Spinner,
     ImpresorasTable,
+    DeleteDialog
   },
 
   mounted() {
@@ -57,7 +64,8 @@ export default {
   },
 
   methods: {
-    getObjects() {
+    getObjects(page) {
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -65,6 +73,11 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+    },
+
+    deleteItem(id) {
+      this.idObjet = id;
+      this.deleteDialogStatus = true;
     },
 
     deleteConfirmation(result) {
@@ -80,12 +93,6 @@ export default {
           this.getObjects();
         });
     },
-
-    deleteItem(id) {
-      this.idObjet = id;
-      this.deleteDialogStatus = true;
-    },
-
     newObject() {
       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
