@@ -97,9 +97,7 @@ export default {
     newObject() {
       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
-    editItem(itemId) {
-       this.$emit("editItem", itemId);
-    },
+  
   deleteObject() {
       this.loaded = false;
       this.deleteDialogStatus = false;
@@ -108,11 +106,6 @@ export default {
         .then(() => {
           this.getObjects();
         });
-    },
-
-    deleteItem(id) {
-      this.idObjet = id;
-      this.deleteDialogStatus = true;
     },
     editItem(itemId) {
       this.$emit("editItem", itemId);
