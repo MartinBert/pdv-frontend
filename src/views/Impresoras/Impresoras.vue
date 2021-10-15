@@ -8,6 +8,10 @@
         v-if="loaded"
       />
       <Spinner v-if="!loaded" />
+      <DeleteDialog
+        :status="deleteDialogStatus"
+        v-on:deleteConfirmation="deleteConfirmation"
+      />
     </v-card>
   </v-container>
 </template>
@@ -15,6 +19,7 @@
 import ImpresorasTable from "../../components/Tables/ImpresorasTable.vue";
 import Spinner from "../../components/Graphics/Spinner";
 import GenericService from "../../services/GenericService";
+import DeleteDialog from "../../components/Dialogs/DeleteDialog.vue";
 export default {
   data: () => ({
     impresoras: [],
@@ -46,6 +51,7 @@ export default {
   components: {
     Spinner,
     ImpresorasTable,
+    DeleteDialog
   },
 
   mounted() {
