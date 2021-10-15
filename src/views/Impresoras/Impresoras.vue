@@ -37,6 +37,7 @@ export default {
     checkboxModel: {},
     loaded: true,
     tenant: "",
+    deleteDialogStatus: false,
     service: "impresoras",
     token: localStorage.getItem("token"),
     loguedUser: JSON.parse(localStorage.getItem("userData")),
