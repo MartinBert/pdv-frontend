@@ -99,8 +99,19 @@ export default {
     editItem(itemId) {
        this.$emit("editItem", itemId);
     },
-    deleteItem(itemId) {
-      this.$emit("deleteItem", itemId);
+  deleteObject() {
+      this.loaded = false;
+      this.deleteDialogStatus = false;
+      GenericService(this.tenant, this.service, this.token)
+        .delete(this.idObjet)
+        .then(() => {
+          this.getObjects();
+        });
+    },
+
+    deleteItem(id) {
+      this.idObjet = id;
+      this.deleteDialogStatus = true;
     },
 
     selectDefaultPrinter(printer) {
