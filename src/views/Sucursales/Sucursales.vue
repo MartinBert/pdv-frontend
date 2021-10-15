@@ -25,6 +25,7 @@ import Spinner from "../../components/Graphics/Spinner";
 import SucursalesTable from "../../components/Tables/SucursalesTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import SucursalDetails from "../../components/Details/SucursalDetails";
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 export default {
   data: () => ({
     sucursales: [],
