@@ -1326,9 +1326,7 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-                  if(this.defaultPrint){
-                    printReceipt(comprobante,this.printName);
-                  }
+                  
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1342,6 +1340,9 @@ export default {
                             });
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
+                            if(this.defaultPrint){
+                              printReceipt(comprobante,this.printName);
+                            }
                           });
                       })
                       .then(() => {
