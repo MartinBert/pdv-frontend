@@ -107,10 +107,8 @@ export default {
           this.getObjects();
         });
     },
-
-    deleteItem(id) {
-      this.idObjet = id;
-      this.deleteDialogStatus = true;
+    deleteItem(itemId) {
+      this.$emit("deleteItem", itemId);
     },
 
     deleteItemConfirm() {
