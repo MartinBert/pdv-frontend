@@ -58,6 +58,7 @@ export default {
 
   methods: {
     getObjects() {
+      if (page) this.filterParams.page = page;
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {
@@ -70,7 +71,6 @@ export default {
     deleteItem(id) {
       this.idObjet = id;
       this.deleteDialogStatus = true;
-      console.log(id);
     },
 
     deleteConfirmation(result) {
