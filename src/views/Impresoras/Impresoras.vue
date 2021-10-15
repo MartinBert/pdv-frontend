@@ -67,6 +67,11 @@ export default {
         });
     },
 
+    deleteItem(id) {
+      this.idObjet = id;
+      this.deleteDialogStatus = true;
+    },
+
     deleteConfirmation(result) {
       return result ? this.deleteObject() : (this.deleteDialogStatus = false);
     },
@@ -80,12 +85,6 @@ export default {
           this.getObjects();
         });
     },
-
-    deleteItem(id) {
-      this.idObjet = id;
-      this.deleteDialogStatus = true;
-    },
-
     newObject() {
       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
