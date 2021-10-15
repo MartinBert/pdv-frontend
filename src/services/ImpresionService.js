@@ -83,7 +83,7 @@ export default function printReceipt(comprobante,nombreImpresora){
 }
 
 
-function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
+async function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
                  totalDescuentos,subTotal,nombreDocumento,nombreImpresora){
                    console.log(nombreImpresora);
   switch (nameEmpresa) {
@@ -133,7 +133,7 @@ function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
     conector.texto(`${lineaProd}\n`)
             .texto(`------------------------------------------------\n`)
   }
-    conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+   await conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .establecerEnfatizado(1)
             .texto(`Subtotal:                         $ ${subTotal}\n`)
             .texto(`Descuentos:                       $ ${totalDescuentos} \n`)
