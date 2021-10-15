@@ -213,6 +213,11 @@ export default {
       { id: 2, text: "Jurídica" },
     ],
     filterParams: {
+      sucursalName: "",
+      sucursalSocialReason: "",
+      sucursalDirection: "",
+      sucursalId: "",
+      fechaInicioAct,
       empresas: {
         perfilId: "",
         empresaId: "",
@@ -261,7 +266,7 @@ export default {
 
   methods: {
     getObject(id) {
-      this.object.fechaInicioAct = formatDate(getCurrentDate());
+      this.filterParams.fechaInicioAct = formatDate(getCurrentDate());
       GenericService(this.tenant, this.service, this.token)
         .get(id)
         .then((data) => {
@@ -271,7 +276,6 @@ export default {
     },
 
     filterObjects() {
-      this.object.fechaInicioAct = formatDate(getCurrentDate());
       this.loaded = false;
       GenericService(this.tenant, "empresas", this.token)
         .filter(this.filterParams.empresas)
@@ -289,7 +293,7 @@ export default {
 
     save() {
       this.loaded = false;
-      this.object.fechaInicioAct = formatDate(getCurrentDate());
+      this.filterParams.fechaInicioAct = formatDate(getCurrentDate());
       if (
         !this.object.condicionIva ||
         !this.object.cuit ||
@@ -306,7 +310,7 @@ export default {
         this.object.logo = this.object.empresa.logo
       }
       this.$refs.form.validate();
-      this.object.fechaInicioAct = formatDate(getCurrentDate());
+
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
