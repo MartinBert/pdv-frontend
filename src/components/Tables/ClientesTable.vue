@@ -74,7 +74,6 @@ export default {
       personaCuit: "",
       personaDirection: "",
       personaContactName: "",
-      region:"",
       page: 1,
       size: 10,
       totalPages: 0,
@@ -115,7 +114,6 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.clientes = data.data.content;
-          console.log(this.clientes.region);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
