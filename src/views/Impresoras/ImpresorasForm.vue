@@ -63,6 +63,11 @@ export default {
     service: "impresoras",
     token: localStorage.getItem("token"),
     errorStatus: false,
+    filterParams: {
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
   }),
 
   components: {
@@ -84,12 +89,11 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
         .then((data) => {
-          this.impresoras = data.data.content;
-          this.filterParams.totalPages = data.data.totalPages;
+          this.object = data.data;
           this.loaded = true;
         });
     },
-    
+
     save() {
       this.$refs.form.validate();
       this.loaded = false;
@@ -108,7 +112,7 @@ export default {
     },
 
     back() {
-      this.$router.push({ name: "marcas" });
+      this.$router.push({ name: "impresoras" });
     },
   },
 };

@@ -1,104 +1,121 @@
 <template>
-  <v-container>
+  <v-container style="min-width: 100%;">
     <v-card min-width="100%">
+      <h1 style="text-align: center;">Configuracion Impresora</h1>
+      <v-col>
+        <v-btn class="primary" raised @click="newObject()">Nuevo</v-btn>
+      </v-col>
+      <v-row>
+        <v-col cols="12">
+          <div class="horizontalSeparator"></div>
+        </v-col>
+      </v-row>
       <v-data-table
         :headers="headers"
-        :items="desserts"
+        :items="impresoras"
         sort-by="calories"
         class="elevation-1"
         hide-default-footer
       >
-        <template v-slot:top>
-          <v-toolbar flat>
-            <v-toolbar-title>Impresoras</v-toolbar-title>
-            <v-divider class="mx-4" inset vertical></v-divider>
-            <v-spacer></v-spacer>
-            <v-dialog v-model="dialog" max-width="500px">
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  dark
-                  class="mb-2"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  Nueva Impresora
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title>
-                  <span class="text-h5">{{ formTitle }}</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-row>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.name"
-                          label="Nombre Impresora"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-select
-                          :items="itemss"
-                          label="Tamaño Papel"
-                        ></v-select>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="close">
-                    Cancelar
-                  </v-btn>
-                  <v-btn color="blue darken-1" text @click="save">
-                    Guardar
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
-                <v-card-title class="text-h5"
-                  >Esta seguro de querer borrar este item?</v-card-title
-                >
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="closeDelete"
-                    >Cancel</v-btn
-                  >
-                  <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                    >OK</v-btn
-                  >
-                  <v-spacer></v-spacer>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-toolbar>
+        <template v-slot:[`item.impresoraPredeterminada`]="{ item, index }">
+          <p v-show="viewCheckboxState === 1">
+            {{
+              item.impresoraPredeterminada
+                ? (checkboxModel[index] = true)
+                : (checkboxModel[index] = false)
+            }}
+          </p>
+          <v-checkbox
+            v-model="checkboxModel[index]"
+            @change="selectDefaultPrinter(item)"
+          ></v-checkbox>
         </template>
-        <template v:slot:[`item.actions`]="{ item }">
-          <v-checkbox></v-checkbox>
-        </template>
-        <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="deleteItem(item)">
-            mdi-delete
-          </v-icon>
-        </template>
-        <template v-slot:no-data>
-          <v-btn color="primary" @click="initialize">
-            Reset
-          </v-btn>
+        <template v-slot:[`item.acciones`]="{ item }">
+          <Edit :itemId="item.id" v-on:editItem="editItem" />
+          <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
         </template>
       </v-data-table>
     </v-card>
   </v-container>
 </template>
 <script>
+import Edit from "../../components/Buttons/Edit";
+import Delete from "../../components/Buttons/Delete";
+import GenericService from "../../services/GenericService";
 export default {
-  data: () => ({}),
+  data: () => ({
+    impresoras: [],
+    itemss: ["80 mm ", "58 mm"],
+    filterParams: {
+      sucursalId: "",
+      valor: "",
+      nombreImpresora: "",
+      page: 1,
+      size: 10,
+      totalPages: 0,
+    },
+    viewCheckboxState: 0,
+    checkboxModel: {},
+    loaded: true,
+    tenant: "",
+    service: "impresoras",
+    token: localStorage.getItem("token"),
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
+    headers: [
+      { text: "Nombre", value: "nombreImpresora" },
+      { text: "Ancho", value: "valor" },
+      { text: "Impresora por defecto", value: "impresoraPredeterminada" },
+      { text: "Acciones", value: "acciones", sortable: false },
+    ],
+  }),
+
+  components: {
+    Edit,
+    Delete,
+  },
+
+  mounted() {
+    this.tenant = this.$route.params.tenant;
+    if (this.loguedUser.perfil > 1) {
+      this.filterParams.sucursalId = this.loguedUser.sucursal.id;
+    }
+    this.getObjects();
+  },
+
+  methods: {
+    getObjects() {
+      GenericService(this.tenant, this.service, this.token)
+        .filter(this.filterParams)
+        .then((data) => {
+          this.impresoras = data.data.content;
+          this.filterParams.totalPages = data.data.totalPages;
+          this.loaded = true;
+        });
+    },
+
+    newObject() {
+      this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
+    },
+    editItem(itemId) {
+       this.$emit("editItem", itemId);
+    },
+    deleteItem(itemId) {
+      this.$emit("deleteItem", itemId);
+    },
+
+    selectDefaultPrinter(printer) {
+      this.impresoras.forEach((el) => {
+        el.impresoraPredeterminada = false;
+      });
+      this.impresoras.filter(
+        (el) => el.nombreImpresora === printer.nombreImpresora
+      )[0].impresoraPredeterminada = true;
+      GenericService(this.tenant, this.service, this.token)
+        .saveAll(this.impresoras)
+        .then(() => {
+          this.getObjects();
+        });
+    },
+  },
 };
 </script>

@@ -64,7 +64,9 @@ import Cierrez from "../views/Cierrez/Cierrez.vue";
 import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
 import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 import Impresora from "../views/Impresoras/Impresoras";
-import ImpresorasForm from "../views/Impresoras/ImpresorasForm";
+import ImpresorasForm from "../views/Impresoras/ImpresorasForm.vue";
+import VentasFast from "../views/VentasFast/ventasFast";
+
 
 Vue.use(VueRouter)
 
@@ -198,6 +200,12 @@ const routes = [
                 path: 'vendedores/form/:id',
                 name: 'vendedoresForm',
                 component: VendedoresForm,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'ventasfast',
+                name: 'ventasFast',
+                component: VentasFast,
                 meta: { requiresAuth: true }
             },
             {
@@ -366,6 +374,12 @@ const routes = [
                 path: 'impresoras',
                 name: 'impresoras',
                 component:Impresora,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'impresoras/form/:id',
+                name: 'impresorasForm',
+                component: ImpresorasForm,
                 meta: { requiresAuth: true }
             },
             {
