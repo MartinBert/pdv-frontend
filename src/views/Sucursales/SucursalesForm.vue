@@ -203,6 +203,7 @@
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
 import Error from "../../components/Error";
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 export default {
   data: () => ({
     valid: true,
@@ -286,6 +287,7 @@ export default {
 
     save() {
       this.loaded = false;
+      this.invoiceFilterParams.fechaEmision = formatDate(getCurrentDate());
       if (
         !this.object.condicionIva ||
         !this.object.cuit ||
