@@ -36,7 +36,7 @@ export default {
       sucursalSocialReason: "",
       sucursalDirection: "",
       sucursalId: "",
-      fechaInicioAct,
+      fechaInicioAct:"",
       page: 1,
       size: 10,
       totalPages: 0,
