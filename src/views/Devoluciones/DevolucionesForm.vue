@@ -540,10 +540,6 @@ export default {
                   planesPago: [planesPago],
                   nombreDocumento: documento.nombre,
                 };
-                console.log(comprobante);
-                if(this.defaultPrint){
-                  printReceipt(comprobante,this.printName);
-                }
                 /*** Save receipt in database ***/
                 if (invoiceContainCAE(comprobante)) {
                   GenericService(tenant, "comprobantesFiscales", token)
@@ -600,6 +596,9 @@ export default {
                             });
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
+                            if(this.defaultPrint){
+                              printReceipt(comprobante,this.printName);
+                            }
                           });
                       });
                   });
@@ -737,9 +736,6 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-      if(this.defaultPrint){
-        printReceipt(comprobante,this.printName);
-      }
       GenericService(tenant, "comprobantesFiscales", token)
         .save(comprobante)
         .then((data) => {
@@ -796,6 +792,9 @@ export default {
                   });
                   fileURL = URL.createObjectURL(file);
                   window.open(fileURL, "_blank");
+                   if(this.defaultPrint){
+                      printReceipt(comprobante,this.printName);
+                    }
                 });
             });
         });
