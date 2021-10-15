@@ -266,7 +266,6 @@ export default {
 
   methods: {
     getObject(id) {
-      this.filterParams.fechaInicioAct = formatDate(getCurrentDate());
       GenericService(this.tenant, this.service, this.token)
         .get(id)
         .then((data) => {
