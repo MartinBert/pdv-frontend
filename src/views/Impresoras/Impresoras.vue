@@ -23,6 +23,7 @@ export default {
       sucursalId: "",
       valor: "",
       nombreImpresora: "",
+      estado:true,
       page: 1,
       size: 10,
       totalPages: 0,
@@ -64,6 +65,16 @@ export default {
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
+    },
+
+     deleteObject() {
+      this.loaded = false;
+      this.deleteDialogStatus = false;
+      GenericService(this.tenant, this.service, this.token)
+        .delete(this.idObjet)
+        .then(() => {
+          this.filterObjects();
+        })
     },
 
     newObject() {
