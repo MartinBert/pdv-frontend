@@ -73,7 +73,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .delete(this.idObjet)
         .then(() => {
-          this.filterObjects();
+          this.getObjects();
         })
     },
 
