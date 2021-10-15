@@ -1326,7 +1326,9 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-                  printReceipt(comprobante);
+                  if(this.defaultPrint){
+                    printReceipt(comprobante,this.printName);
+                  }
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1468,7 +1470,7 @@ export default {
                 comprobante.nombreDocumento = documento.nombre;
                 comprobante.documentoComercial = documento;
               }
-            
+              console.log(this.defaultPrint, this.printName);
               if(this.defaultPrint){
                  printReceipt(comprobante,this.printName);
               }

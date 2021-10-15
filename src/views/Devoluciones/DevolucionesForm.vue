@@ -192,6 +192,7 @@ import ProductDialog from "../../components/Dialogs/ProductDialog";
 import ReceiptDialog from "../../components/Dialogs/ReceiptDialog";
 import Spinner from '../../components/Graphics/Spinner';
 import Error from '../../components/Error';
+import printReceipt from "../../services/ImpresionService";
 export default {
   data: () => ({
     tiposOperacion: [
@@ -207,6 +208,9 @@ export default {
       productosEntrantes: [],
       productosSalientes: [],
       descripcion: "",
+    },
+    databaseItems:{
+      impresoras:[]
     },
     valid: true,
     loaded: false,
@@ -234,7 +238,9 @@ export default {
     checked: false,
     saveDialog: false,
     receiptDialogData: null,
-    listennerOfListChange: 0
+    listennerOfListChange: 0,
+    printName:"",
+    defaultPrint:false
   }),
 
   components: {
@@ -269,6 +275,7 @@ export default {
       this.filterParams.depositos.sucursalId = this.loguedUser.sucursal.id;
     }
     this.getDeposits();
+    this.getImpresoras();
   },
 
   methods: {
@@ -279,6 +286,36 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
+    },
+    getImpresoras(){
+      let sucursalId;
+      if (this.loguedUser.perfil > 1) {
+        sucursalId = this.loguedUser.sucursal.id;
+      }
+
+      const impresoraFilter = {
+        sucursalId: sucursalId,
+        valor: "",
+        nombreImpresora: "",
+        impresoraPredeterminada: true,
+        page: 1,
+        size: 100000
+      };
+
+      GenericService(this.tenant, "impresoras", this.token)
+      .filter(impresoraFilter)
+      .then((data) => {
+        this.databaseItems.impresoras = data.data.content;
+        this.databaseItems.impresoras.forEach(print => {
+          if(print.impresoraPredeterminada == true){
+            this.defaultPrint = true;
+            this.printName = print.nombreImpresora;
+
+          }
+        });
+      });
+
+
     },
 
     getDeposits(){
@@ -504,6 +541,9 @@ export default {
                   nombreDocumento: documento.nombre,
                 };
                 console.log(comprobante);
+                if(this.defaultPrint){
+                  printReceipt(comprobante,this.printName);
+                }
                 /*** Save receipt in database ***/
                 if (invoiceContainCAE(comprobante)) {
                   GenericService(tenant, "comprobantesFiscales", token)
@@ -697,7 +737,9 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-      console.log(comprobante);
+      if(this.defaultPrint){
+        printReceipt(comprobante,this.printName);
+      }
       GenericService(tenant, "comprobantesFiscales", token)
         .save(comprobante)
         .then((data) => {

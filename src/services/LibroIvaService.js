@@ -4,6 +4,11 @@ import { saveAs } from 'file-saver';
 import Swal from 'sweetalert2';
 
 export default function orderSales(lista,factA,factB,factC,notaDA,notaCA,notaDB,notaCB,txt,excel){
+  Swal.fire(
+    'Generación exitosa!',
+    'Esto puede tardar unos segundos. Si la descarga no se realiza, acepta el pedido del navegador.',
+    'success'
+  )
   //variables para ordenar
   let filroFactA =[];
   let filroFactB =[];
@@ -313,11 +318,7 @@ let libroIva = listaFacturas;
   let mes = date.getMonth() + 1
   let anio = date.getFullYear()
 
-  Swal.fire(
-    'Generación exitosa!',
-    'Esto puede tardar unos segundos. Si la descarga no se realiza, acepta el pedido del navegador.',
-    'success'
-  )
+  
   if(dataExcel.length !=0 && excel){
       saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), `LID Ventas ${mes}-${anio}.xlsx`);
   }
