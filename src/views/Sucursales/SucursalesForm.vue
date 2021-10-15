@@ -217,7 +217,7 @@ export default {
       sucursalSocialReason: "",
       sucursalDirection: "",
       sucursalId: "",
-      fechaInicioAct,
+      fechaInicioAct:"",
       empresas: {
         perfilId: "",
         empresaId: "",
