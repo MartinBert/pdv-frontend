@@ -203,6 +203,7 @@
 import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
 import Error from "../../components/Error";
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 export default {
   data: () => ({
     valid: true,
@@ -212,6 +213,11 @@ export default {
       { id: 2, text: "Jurídica" },
     ],
     filterParams: {
+      sucursalName: "",
+      sucursalSocialReason: "",
+      sucursalDirection: "",
+      sucursalId: "",
+      fechaInicioAct:"",
       empresas: {
         perfilId: "",
         empresaId: "",
@@ -286,6 +292,7 @@ export default {
 
     save() {
       this.loaded = false;
+      this.filterParams.fechaInicioAct = formatDate(getCurrentDate());
       if (
         !this.object.condicionIva ||
         !this.object.cuit ||
@@ -302,6 +309,7 @@ export default {
         this.object.logo = this.object.empresa.logo
       }
       this.$refs.form.validate();
+
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {

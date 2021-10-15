@@ -25,6 +25,7 @@ import Spinner from "../../components/Graphics/Spinner";
 import SucursalesTable from "../../components/Tables/SucursalesTable";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog";
 import SucursalDetails from "../../components/Details/SucursalDetails";
+import { getCurrentDate, formatDate } from "../../helpers/dateHelper";
 export default {
   data: () => ({
     sucursales: [],
@@ -35,6 +36,7 @@ export default {
       sucursalSocialReason: "",
       sucursalDirection: "",
       sucursalId: "",
+      fechaInicioAct:"",
       page: 1,
       size: 10,
       totalPages: 0,
@@ -64,6 +66,7 @@ export default {
   methods: {
     filterObjects(page) {
       if (page) this.filterParams.page = page;
+      this.filterParams.fechaInicioAct = formatDate(getCurrentDate());
       GenericService(this.tenant, this.service, this.token)
         .filter(this.filterParams)
         .then((data) => {

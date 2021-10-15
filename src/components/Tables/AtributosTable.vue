@@ -80,6 +80,7 @@ export default {
     ],
     filterParams: {
       atributoValor: "",
+      estado:true,
       page: 1,
       size: 10,
       totalPages: 0,

@@ -332,12 +332,6 @@ export default {
             title: "Empresa",
             visible: false,
           },
-           {
-            path: "/impresoras",
-            name: "impresoras",
-            title: "Impresoras",
-            visible: false,
-          },
           {
             path: "/sucursales",
             name: "sucursales",
@@ -405,14 +399,14 @@ export default {
         ],
       },
        {
-        name: "Ventasfast",
-        title: "Ventasfast",
+        name: "ventasFast",
+        title: "VentaRapida",
         visible: false,
         icon: "/../images/icons/ventas.svg",
         childs: [
           {
             path: "/ventasfast",
-            name: "ventasfast",
+            name: "ventasFast",
             title: "Ventasfast",
             visible: false,
           },
@@ -433,15 +427,15 @@ export default {
         ],
       },
       {
-        name: "impresora",
+        name: "impresoras",
         title: "Impresoras",
         visible: false,
-        icon: "/../images/icons/calendar.svg",
+        icon: "/../images/icons/printer.svg",
         childs: [
           {
             path: "/impresora",
-            name: "Impresora",
-            title: "Impresora",
+            name: "impresoras",
+            title: "Impresoras",
             visible: false,
           },
         ],

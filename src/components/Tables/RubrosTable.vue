@@ -74,6 +74,7 @@ export default {
     },
     filterParams: {
       rubroName: "",
+      estado:true,
       page: 1,
       size: 10,
       totalPages: 0,
