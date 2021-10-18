@@ -102,6 +102,7 @@ export default {
         .save(this.object)
         .then(() => {
           this.$router.push({ name: "impresoras", params: { id: 0 } });
+          console.log(this.object);
         })
         .catch((error) => {
           if (error.response.status == 500) {
