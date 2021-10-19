@@ -1,32 +1,32 @@
 <template>
   <v-container style="min-width: 100%">
     <v-card>
-      <v-col cols="4">
-        <div class="verticalSeparator"></div>
-        <v-container style="color: rgb(63, 81, 181)">
-          <v-row>
-            <v-col class="text-right">
-              <label class="mr-3">TOTAL:</label>
-              <input
-                disabled
-                class="totalInput"
-                v-model="totalVenta"
-                type="text"
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-right">
-              <label class="mr-3">ITEMS:</label>
-              <input
-                disabled
-                class="totalInput"
-                type="text"
-                v-model="totalItems"
-              />
-            </v-col>
-          </v-row>
-          <!-- <v-row>
+       <v-col cols="4">
+                  <div class="verticalSeparator"></div>
+                  <v-container style="color: rgb(63, 81, 181)">
+                    <v-row>
+                      <v-col class="text-right">
+                        <label class="mr-3">TOTAL:</label>
+                        <input
+                          disabled
+                          class="totalInput"
+                          v-model="totalVenta"
+                          type="text"
+                        />
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col class="text-right">
+                        <label class="mr-3">ITEMS:</label>
+                        <input
+                          disabled
+                          class="totalInput"
+                          type="text"
+                          v-model="totalItems"
+                        />
+                      </v-col>
+                    </v-row>
+                    <!-- <v-row>
                       <v-col class="text-right">
                         <label class="mr-3 align-center">TOTAL DE DESCUENTOS Y RECARGOS POR LÍNEA</label>
                         <input
@@ -43,8 +43,8 @@
                         />
                       </v-col>
                     </v-row> -->
-        </v-container>
-      </v-col>
+                  </v-container>
+                </v-col>
       <v-row>
         <v-col>
           <div class="horizontalSeparator"></div>
