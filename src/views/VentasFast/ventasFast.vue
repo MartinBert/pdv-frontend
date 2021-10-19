@@ -1,6 +1,48 @@
 <template>
   <v-container style="min-width: 100%">
-    <v-card>  
+    <v-card>
+      <div class="verticalSeparator"></div>
+      <v-container style="color: rgb(63, 81, 181)">
+        <v-row>
+          <v-col class="text-right">
+            <label class="mr-3">TOTAL:</label>
+            <input
+              disabled
+              class="totalInput"
+              v-model="totalVenta"
+              type="text"
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="text-right">
+            <label class="mr-3">ITEMS:</label>
+            <input
+              disabled
+              class="totalInput"
+              type="text"
+              v-model="totalItems"
+            />
+          </v-col>
+        </v-row>
+        <!-- <v-row>
+                      <v-col class="text-right">
+                        <label class="mr-3 align-center">TOTAL DE DESCUENTOS Y RECARGOS POR LÍNEA</label>
+                        <input
+                          disabled
+                          class="totalInput mr-1"
+                          type="text"
+                          v-model="totalLineDiscounts"
+                        />
+                        <input
+                          disabled
+                          class="totalInput"
+                          type="text"
+                          v-model="totalLineSurchages"
+                        />
+                      </v-col>
+                    </v-row> -->
+      </v-container>
       <v-row>
         <v-col>
           <div class="horizontalSeparator"></div>
@@ -85,7 +127,6 @@
               <div class="verticalSeparator"></div>
             </v-col>
             <v-col cols="10">
-
               <div style="text-align: center; padding: 1em 0">
                 <h3>
                   <a
