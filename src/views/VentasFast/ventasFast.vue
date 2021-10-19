@@ -2,16 +2,16 @@
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
-      <v-col cols="10">
-        <div class="horizontalSeparator"></div>
-      </v-col>
+      <div class="horizontalSeparator"></div>
       <v-card style="min-width: 100%">
         <v-row>
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
                 <v-col cols="12">
-                  <div class="verticalSeparator"></div>
+                  <v-col cols="8">
+                    <div class="verticalSeparator"></div>
+                  </v-col>
                   <v-container style="color: rgb(63, 81, 181)">
                     <v-row>
                       <v-col class="text-right">
