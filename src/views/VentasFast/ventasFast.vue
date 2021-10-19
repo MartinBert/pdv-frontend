@@ -2,57 +2,6 @@
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
-      <v-row class="mb-1">
-        <v-col cols="6">
-          <div class="d-flex text-left">
-            <v-btn
-              color="primary"
-              @click="$store.commit('productos/dialogProductosMutation')"
-              >BUSCAR PRODUCTOS</v-btn
-            >
-            <v-btn
-              color="primary"
-              class="ml-1"
-              @click="$store.commit('receipt/receiptDialogMutation')"
-              >BUSCAR PRESUPUESTO</v-btn
-            >
-            <h3 class="mt-2 ml-2">
-              Depósito predeterminado:
-              <span v-if="defaultDeposit">
-                {{ defaultDeposit.nombre }}
-              </span>
-              <span v-if="!defaultDeposit"> No definido </span>
-            </h3>
-            <v-btn
-              v-if="loguedUser.perfil === 1"
-              color="primary"
-              class="ml-5"
-              @click="testCert()"
-              >TEST CERTIFICADO</v-btn
-            >
-          </div>
-        </v-col>
-        <v-col class="text-right" cols="5">
-          <select class="select-ventas-import" v-model="modificator">
-            <option value="">Modificar importe total</option>
-            <option value="descuento">Descuento</option>
-            <option value="recargo">Recargo</option>
-          </select>
-        </v-col>
-        <v-col cols="3" v-if="modificator">
-          <input
-            class="totalInput"
-            v-model="priceModificationPorcent"
-            type="number"
-          />
-          <v-btn
-            class="success ml-3"
-            @click="applyModification(modificator, priceModificationPorcent)"
-            >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
-          >
-        </v-col>
-      </v-row>
-      <br />
       <div class="horizontalSeparator"></div>
       <v-card style="min-width: 100%">
         <v-row>
