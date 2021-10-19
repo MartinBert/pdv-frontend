@@ -1020,42 +1020,6 @@ export default {
     /******************************************************************************************************/
     saveSale() {
       this.loaded = false;
-      const documento = this.object.documento;
-      if (
-        documento !== undefined &&
-        this.object.mediosPago !== undefined &&
-        this.object.planPago !== undefined
-      ) {
-        if (documento.tipo === true) {
-          if (documento.ticket === true) {
-            this.saveTicket(documento.nombre);
-          } else {
-            this.save();
-          }
-        } else if (documento.presupuesto === true) {
-          if (this.object.fechaVencimiento) {
-            this.savePresupuesto();
-          } else {
-            this.$errorAlert(
-              "Debe indicar una fecha de vencimiento en el presupuesto"
-            ).then((result) => {
-              if (result.isDismissed) {
-                this.loaded = true;
-              }
-            });
-          }
-        } else {
-          this.saveNoFiscal();
-        }
-      } else {
-        this.$errorAlert(
-          "Debe seleccionar un cliente, comprobante y medio de pago para realizar la operación"
-        ).then((result) => {
-          if (result.isDismissed) {
-            this.loaded = true;
-          }
-        });
-      }
     },
 
     save() {
