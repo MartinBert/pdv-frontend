@@ -98,26 +98,14 @@ export default {
       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
 
-    deleteObject() {
-      this.loaded = false;
-      this.deleteDialogStatus = false;
-      GenericService(this.tenant, this.service, this.token)
-        .delete(this.idObjet)
-        .then(() => {
-          this.getObjects();
-        });
-    },
     deleteItem(itemId) {
       this.$emit("deleteItem", itemId);
     },
 
-    deleteItemConfirm() {
-      this.impresoras.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
     editItem(itemId) {
       this.$emit("editItem", itemId);
     },
+
     selectDefaultPrinter(printer) {
       this.impresoras.forEach((el) => {
         el.impresoraPredeterminada = false;
