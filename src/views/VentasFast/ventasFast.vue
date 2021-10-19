@@ -136,7 +136,6 @@
                 <div class="verticalSeparator"></div>
               </v-col>
               <v-col cols="10">
-                <Calculator class="mt-2" />
                 <div style="text-align: center; padding: 1em 0">
                   <h3>
                     <a
@@ -194,7 +193,6 @@ import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
 import printReceipt from "../../services/ImpresionService";
-import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
 import SearchPresupuestoDialog from "../../components/Dialogs/SearchPresupuestoDialog";
@@ -269,7 +267,6 @@ export default {
   }),
 
   components: {
-    Calculator,
     ProductDialog,
     Spinner,
     SearchPresupuestoDialog,
