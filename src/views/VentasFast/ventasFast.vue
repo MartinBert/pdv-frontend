@@ -1020,6 +1020,9 @@ export default {
     /******************************************************************************************************/
     saveSale() {
       this.loaded = false;
+      this.saveTicket()
+      this.save();
+      this.saveNoFiscal();
     },
 
     save() {
