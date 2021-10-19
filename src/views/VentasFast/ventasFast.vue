@@ -4,8 +4,6 @@
       <v-row>
         <v-col>
           <div class="horizontalSeparator"></div>
-          <label class="mr-3">TOTAL:</label>
-          <input disabled class="totalInput" v-model="totalVenta" type="text" />
           <v-form>
             <v-row>
               <v-col cols="12">
