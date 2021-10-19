@@ -8,7 +8,7 @@
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
-                <v-col cols="4">
+                <v-col cols="8">
                   <div class="verticalSeparator"></div>
                   <v-container style="color: rgb(63, 81, 181)">
                     <v-row>
