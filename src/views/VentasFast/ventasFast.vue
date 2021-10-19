@@ -1,18 +1,5 @@
 <template>
   <v-container style="min-width: 100%">
-    <div class="verticalSeparator"></div>
-    <v-row>
-      <v-col class="text-right">
-        <label class="mr-3">TOTAL:</label>
-        <input disabled class="totalInput" v-model="totalVenta" type="text" />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col class="text-right">
-        <label class="mr-3">ITEMS:</label>
-        <input disabled class="totalInput" type="text" v-model="totalItems" />
-      </v-col>
-    </v-row>
     <v-card>
       <v-row>
         <v-col>
