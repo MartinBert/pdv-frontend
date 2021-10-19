@@ -99,6 +99,7 @@ export default {
       this.loaded = false;
       this.object.impresoraPredeterminada = false;
       this.object.sucursal = this.loguedUser.sucursal;
+      this.object.estado = true;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
