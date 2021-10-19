@@ -1,5 +1,6 @@
 <template>
  <v-container style="min-width: 100%">
+   <h1>Hola</h1>
     <v-col cols="12" v-if="loaded">
       <v-row class="mb-1">
         <v-col class="text-right" cols="5">
