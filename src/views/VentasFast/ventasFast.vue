@@ -2,7 +2,9 @@
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
-      <div class="horizontalSeparator"></div>
+      <v-col cols="10">
+        <div class="horizontalSeparator"></div>
+      </v-col>
       <v-card style="min-width: 100%">
         <v-row>
           <v-col cols="9">
