@@ -62,6 +62,7 @@ export default {
     tenant: "",
     service: "impresoras",
     token: localStorage.getItem("token"),
+    loguedUser: JSON.parse(localStorage.getItem("userData")),
     errorStatus: false,
     filterParams: {
       page: 1,
@@ -76,7 +77,6 @@ export default {
   },
 
   mounted() {
-    this.getObject();
     this.tenant = this.$route.params.tenant;
     if (this.$route.params.id && this.$route.params.id > 0) {
       this.getObject(this.$route.params.id);
@@ -98,6 +98,7 @@ export default {
       this.$refs.form.validate();
       this.loaded = false;
       this.object.impresoraPredeterminada = false;
+      this.object.sucursal = this.loguedUser.sucursal;
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {

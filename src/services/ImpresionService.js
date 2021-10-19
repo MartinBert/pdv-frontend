@@ -133,7 +133,7 @@ function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
     conector.texto(`${lineaProd}\n`)
             .texto(`------------------------------------------------\n`)
   }
-    conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+   conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
             .establecerEnfatizado(1)
             .texto(`Subtotal:                         $ ${subTotal}\n`)
             .texto(`Descuentos:                       $ ${totalDescuentos} \n`)
