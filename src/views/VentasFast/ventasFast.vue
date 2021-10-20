@@ -675,11 +675,11 @@ export default {
     },
 
     updateTotal(id) {
+      this.dialogIndividualCant=true;
       this.products.forEach((el) => {
         this.productsDescription.forEach((e) => {
           if (el.codigoBarra == e.barCode) {
             e.quantity = el.cantUnidades;
-            this.dialogIndividualCant=true;
           }
         });
       });
