@@ -72,7 +72,7 @@
                       </thead>
                       <tbody>
                         <tr v-for="p in products" :key="p.id">
-                          <td
+                          <input
                             @keyup.enter="applyIndividualPercent(p)"
                             style="cursor: pointer"
                           >
