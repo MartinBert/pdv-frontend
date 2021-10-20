@@ -81,7 +81,7 @@
                           <td>{{ p.codigoBarra }}</td>
                           <td>
                             <input
-                              type="number"
+                              type="submit"
                               @keypress.enter="updateTotal(p.id)"
                               v-model="p.cantUnidades"
                             />
