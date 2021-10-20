@@ -192,7 +192,8 @@ import ProductDialog from "../../components/Dialogs/ProductDialog";
 import ReceiptDialog from "../../components/Dialogs/ReceiptDialog";
 import Spinner from '../../components/Graphics/Spinner';
 import Error from '../../components/Error';
-import printReceipt from "../../services/ImpresionService";
+import {printReceipt} from "../../services/ImpresionService";
+import Swal from 'sweetalert2';
 export default {
   data: () => ({
     tiposOperacion: [
@@ -425,6 +426,7 @@ export default {
     },
     
     saveFiscalNote() {
+      Swal.fire("Generando Venta","Espere por favor","info");
       /*** Constants ***/
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
@@ -596,6 +598,7 @@ export default {
                             });
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
+                            
                             if(this.defaultPrint){
                               printReceipt(comprobante,this.printName);
                             }
@@ -645,6 +648,7 @@ export default {
     },
 
     saveNoFiscalNote() {
+      Swal.fire("Generando Venta","Espere por favor","info");
       /* Constants */
       const mediosPago = this.receiptDialogData.mediosPago;
       const planesPago = this.receiptDialogData.planPago;

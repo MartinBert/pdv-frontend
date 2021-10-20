@@ -7,7 +7,7 @@ let espacioss = "";
 let lineaProd=``;
 let imagen = false;
 
-export default function printReceipt(comprobante,nombreImpresora){
+export  function printReceipt(comprobante,nombreImpresora){
       const namePrint = nombreImpresora;
   
       switch (comprobante.nombreDocumento) {
@@ -82,6 +82,24 @@ export default function printReceipt(comprobante,nombreImpresora){
       }
 }
 
+export  function printBarCodes(listBars,nombreImpresora){ 
+
+    const conector = new ConectorPlugin()
+    listBars.forEach(barCode => {
+      console.log(barCode);
+      conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+              .establecerEnfatizado(1)
+              .texto(barCode.nombre)
+              .establecerEnfatizado(0)
+              .codigoDeBarras(barCode.codigoBarra, ConectorPlugin.Constantes.AccionBarcode39)
+              .establecerEnfatizado(1)
+              .texto(barCode.codigoBarra)
+    });
+      conector.feed(3)
+              .cortar()
+              .feed(4)
+              .imprimirEn(nombreImpresora)
+}
 
 function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
                  totalDescuentos,subTotal,nombreDocumento,nombreImpresora){
