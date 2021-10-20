@@ -73,7 +73,7 @@
                       <tbody>
                         <tr v-for="p in products" :key="p.id">
                           <td
-                            @click="applyIndividualPercent(p)"
+                            @keypress.enter="applyIndividualPercent(p)"
                             style="cursor: pointer"
                           >
                             {{ p.nombre }}
