@@ -72,18 +72,17 @@
                       </thead>
                       <tbody>
                         <tr v-for="p in products" :key="p.id">
-                          <td>
-                            <input
-                            type="text"
-                            v-model="p.nombre"
-                            @keypress.enter="applyIndividualPercent(p)"
-                            />
+                          <td
+                            @click="applyIndividualPercent(p)"
+                            style="cursor: pointer"
+                          >
+                            {{ p.nombre }}
                           </td>
                           <td>{{ p.codigoBarra }}</td>
                           <td>
                             <input
                               type="number"
-                              @input="updateTotal(p.id)"
+                              @keyup.enter="dialogIndividualPercent()"
                               v-model="p.cantUnidades"
                             />
                           </td>
