@@ -196,7 +196,7 @@
             type="number"
             v-model="individualCant"
           ></v-text-field>
-          <v-btn class="success ml-3" @keypress.enter="updateTotal(individualCant)"
+          <v-btn class="success ml-3" @click="updateTotal(individualCant)"
             >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
           >
         </v-container>
@@ -685,7 +685,6 @@ export default {
       return this.products.reduce((acc, el) => {
         if (el.id == id) {
           el.precioTotal = acc;
-          this.dialogIndividualCant=true;
           el.precioTotal = roundTwoDecimals(
             parseFloat(el.precioUnitario) * el.cantUnidades
           );
