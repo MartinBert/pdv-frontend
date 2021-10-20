@@ -675,7 +675,6 @@ export default {
     },
 
     updateTotal(id) {
-      this.dialogIndividualCant=true;
       this.products.forEach((el) => {
         this.productsDescription.forEach((e) => {
           if (el.codigoBarra == e.barCode) {
@@ -686,6 +685,7 @@ export default {
       return this.products.reduce((acc, el) => {
         if (el.id == id) {
           el.precioTotal = acc;
+          this.dialogIndividualCant=true;
           el.precioTotal = roundTwoDecimals(
             parseFloat(el.precioUnitario) * el.cantUnidades
           );
