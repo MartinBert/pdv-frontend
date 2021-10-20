@@ -82,7 +82,7 @@
                           <td>
                             <input
                               type="submit"
-                              @keypress.enter="updateTotal(p.id)"
+                              @keyup.67="dialogIndividualCant()"
                               v-model="p.cantUnidades"
                             />
                           </td>
