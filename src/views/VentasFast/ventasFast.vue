@@ -82,7 +82,7 @@
                           <td>
                             <input
                               type="number"
-                              @keyup.enter="dialogIndividualPercent()"
+                              @keypress.enter="updateTotal(p.id)"
                               v-model="p.cantUnidades"
                             />
                           </td>
@@ -185,10 +185,28 @@
         </v-container>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogcount" width="600">
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          Modificar precio a renglón
+        </v-card-title>
+        <v-container class="text-center">
+          <v-text-field
+            placeholder="Porcentaje"
+            type="number"
+            v-model="individualCant"
+          ></v-text-field>
+          <v-btn class="success ml-3" @keypress.native.enter="updateTotal(individualCant)"
+            >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
+          >
+        </v-container>
+      </v-card>
+    </v-dialog>
     <Spinner v-if="!loaded" />
   </v-container>
 </template>
 <script>
+import Dialogcount from "../../components/Dialogs/Dialogcant";
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
@@ -251,8 +269,10 @@ export default {
     modificator: "",
     priceModificationPorcent: 0,
     dialogIndividualPercent: false,
+    dialogIndividualCant:false,
     renglon: {},
     individualPercent: "",
+    individualCant:"",
     listennerOfListChange: 0,
     clientIp: "",
     resetPresupuestSearch: false,
@@ -270,6 +290,7 @@ export default {
     ProductDialog,
     Spinner,
     SearchPresupuestoDialog,
+    Dialogcount
   },
 
   created() {
@@ -660,6 +681,7 @@ export default {
         this.productsDescription.forEach((e) => {
           if (el.codigoBarra == e.barCode) {
             e.quantity = el.cantUnidades;
+            this.dialogIndividualCant=true;
           }
         });
       });
@@ -779,6 +801,11 @@ export default {
 
     applyIndividualPercent(p) {
       this.dialogIndividualPercent = true;
+      this.renglon = p;
+    },
+
+    applyIndividualCant(p) {
+      this.dialogIndividualCant = true;
       this.renglon = p;
     },
 
