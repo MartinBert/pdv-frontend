@@ -196,7 +196,7 @@
             type="number"
             v-model="individualCant"
           ></v-text-field>
-          <v-btn class="success ml-3" @click="updateTotal(individualCant)"
+          <v-btn class="success ml-3" @keydown.space="updateTotal(individualCant)"
             >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
           >
         </v-container>
