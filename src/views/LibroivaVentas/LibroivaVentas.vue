@@ -158,6 +158,7 @@ import { generateIntegerDate, monthsList, formatDate } from "../../helpers/dateH
 
 import orderSales from "../../services/LibroIvaService"
 import GenericService from "../../services/GenericService";
+import Swal from 'sweetalert2';
 export default {
   data: () => ({
     checkbox1: false,
@@ -274,6 +275,11 @@ export default {
       if (this.notPassInvoicesValidations()) return this.error("facturas");
       if (this.notPassArchiveType()) return this.error("archivos");
 
+      Swal.fire(
+        'Generación exitosa!',
+        'Esto puede tardar unos segundos. Si la descarga no se realiza, acepta el pedido del navegador.',
+        'success'
+      )
       let sucursalId = this.loguedUser.sucursal.id;
       const filterParams = {
         sucursalId,
