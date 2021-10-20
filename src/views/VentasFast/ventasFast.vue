@@ -206,7 +206,6 @@
   </v-container>
 </template>
 <script>
-import Dialogcount from "../../components/Dialogs/Dialogcant";
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
@@ -290,7 +289,6 @@ export default {
     ProductDialog,
     Spinner,
     SearchPresupuestoDialog,
-    Dialogcount
   },
 
   created() {
