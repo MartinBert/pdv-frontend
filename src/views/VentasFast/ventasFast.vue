@@ -188,11 +188,11 @@
     <v-dialog v-model="dialogIndividualCant" width="600">
       <v-card>
         <v-card-title class="headline grey lighten-2">
-          Modificar precio a renglón
+          Modificar cantidad de unidades
         </v-card-title>
         <v-container class="text-center">
           <v-text-field
-            placeholder="Porcentaje"
+            placeholder="Cantidad de unidades"
             type="number"
             v-model="individualCant"
           ></v-text-field>
