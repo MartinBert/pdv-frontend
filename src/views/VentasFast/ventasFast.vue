@@ -73,7 +73,7 @@
                       <tbody>
                         <tr v-for="p in products" :key="p.id">
                           <td
-                            @click="applyIndividualPercent(p)"
+                            @keypress.shift="applyIndividualPercent(p)"
                             style="cursor: pointer"
                           >
                             {{ p.nombre }}
@@ -179,7 +179,7 @@
             type="number"
             v-model="individualPercent"
           ></v-text-field>
-          <v-btn class="success ml-3" @click="applyToLine(individualPercent)"
+          <v-btn class="success ml-3" @keypress.enter="applyToLine(individualPercent)"
             >Aplicar<v-icon>mdi-check-bold</v-icon></v-btn
           >
         </v-container>
