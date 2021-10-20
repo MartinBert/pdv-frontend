@@ -75,9 +75,8 @@
                           <input
                             @keyup.enter="applyIndividualPercent(p)"
                             style="cursor: pointer"
-                          >
+                          />
                             {{ p.nombre }}
-                          </td>
                           <td>{{ p.codigoBarra }}</td>
                           <td>
                             <input
