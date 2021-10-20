@@ -185,7 +185,7 @@
         </v-container>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogcount" width="600">
+    <v-dialog v-model="dialogIndividualCant" width="600">
       <v-card>
         <v-card-title class="headline grey lighten-2">
           Modificar precio a renglón
