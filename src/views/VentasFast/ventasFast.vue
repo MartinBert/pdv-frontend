@@ -158,7 +158,6 @@
         </v-row>
       </v-card>
     </v-col>
-    <v-text-field label="Codigo de barra"></v-text-field>
     <ProductDialog
       v-on:productList="addProduct"
       v-on:resetListStatus="resetListOfDialog"
@@ -201,6 +200,10 @@
       </v-card>
     </v-dialog>
     <Spinner v-if="!loaded" />
+      <v-text-field
+      label="Codigo de barras"
+      hide-details="auto"
+    ></v-text-field>
   </v-container>
 </template>
 <script>
