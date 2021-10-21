@@ -203,6 +203,11 @@
       </v-card>
     </v-dialog>
     <Spinner v-if="!loaded" />
+    <v-text-field
+      label="Main input"
+      hide-details="auto"
+    ></v-text-field>
+    <v-text-field label="Codigo de barras"></v-text-field>
   </v-container>
 </template>
 <script>
