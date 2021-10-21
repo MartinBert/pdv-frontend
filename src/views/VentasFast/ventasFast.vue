@@ -1,8 +1,6 @@
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
-      <v-text-field label="Main input" hide-details="auto"></v-text-field>
-      <v-text-field label="Codigo de barras"></v-text-field>
       <div class="horizontalSeparator"></div>
       <v-card style="min-width: 100%">
         <v-row>
@@ -10,6 +8,11 @@
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
                 <v-col cols="12">
+                  <v-text-field
+                    label="Main input"
+                    hide-details="auto"
+                  ></v-text-field>
+                  <v-text-field label="Codigo de barras"></v-text-field>
                   <v-col cols="8">
                     <div class="verticalSeparator"></div>
                   </v-col>
