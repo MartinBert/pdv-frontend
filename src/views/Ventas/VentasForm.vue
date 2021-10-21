@@ -323,7 +323,7 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
-import printReceipt from "../../services/ImpresionService";
+import { printReceipt }  from "../../services/ImpresionService";
 import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
@@ -348,6 +348,7 @@ import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
+import Swal from 'sweetalert2';
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -1192,6 +1193,7 @@ export default {
     },
 
     save() {
+      Swal.fire("Generando Venta","Espere por favor","info");
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
@@ -1371,6 +1373,7 @@ export default {
     },
 
     saveNoFiscal() {
+      Swal.fire("Generando Venta","Espere por favor","info");
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
       const cliente = this.object.cliente;
