@@ -164,10 +164,11 @@
       v-on:resetListStatus="resetListOfDialog"
       :refreshListStatus="listennerOfListChange"
     />
-    <SearchPresupuestoDialog
-      v-on:selectPresupuesto="selectPresupuesto"
-      :resetPresupuestSearch="resetPresupuestSearch"
-    />
+    <v-text-field
+      label="Main input"
+      hide-details="auto"
+    ></v-text-field>
+    <v-text-field label="Codigo de barras"></v-text-field>
     <v-dialog v-model="dialogIndividualPercent" width="600">
       <v-card>
         <v-card-title class="headline grey lighten-2">
@@ -203,11 +204,6 @@
       </v-card>
     </v-dialog>
     <Spinner v-if="!loaded" />
-    <v-text-field
-      label="Main input"
-      hide-details="auto"
-    ></v-text-field>
-    <v-text-field label="Codigo de barras"></v-text-field>
   </v-container>
 </template>
 <script>
@@ -217,7 +213,6 @@ import StocksService from "../../services/StocksService";
 import printReceipt from "../../services/ImpresionService";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
-import SearchPresupuestoDialog from "../../components/Dialogs/SearchPresupuestoDialog";
 import {
   formatDate,
   getCurrentDate,
@@ -293,7 +288,6 @@ export default {
   components: {
     ProductDialog,
     Spinner,
-    SearchPresupuestoDialog,
   },
 
   created() {
