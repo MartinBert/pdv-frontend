@@ -8,11 +8,13 @@
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
                 <v-col cols="12">
-                  <v-text-field
-                    label="Main input"
-                    hide-details="auto"
-                  ></v-text-field>
-                  <v-text-field label="Codigo de barras"></v-text-field>
+                  <div>
+                    <v-text-field
+                      label="Main input"
+                      hide-details="auto"
+                    ></v-text-field>
+                    <v-text-field label="Another input"></v-text-field>
+                  </div>
                   <v-col cols="8">
                     <div class="verticalSeparator"></div>
                   </v-col>
