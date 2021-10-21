@@ -7,11 +7,6 @@
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
-                <v-text-field
-                  label="Main input"
-                  hide-details="auto"
-                ></v-text-field>
-                <v-text-field label="Another input"></v-text-field>
                 <v-col cols="12">
                   <v-col cols="8">
                     <div class="verticalSeparator"></div>
@@ -163,6 +158,7 @@
         </v-row>
       </v-card>
     </v-col>
+    <v-text-field label="Codigo de barra"></v-text-field>
     <ProductDialog
       v-on:productList="addProduct"
       v-on:resetListStatus="resetListOfDialog"
