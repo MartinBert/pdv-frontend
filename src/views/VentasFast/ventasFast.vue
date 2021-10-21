@@ -7,18 +7,16 @@
           <v-col cols="9">
             <v-form v-on:submit.prevent="saveSale()">
               <v-row>
+                <v-text-field
+                  label="Main input"
+                  hide-details="auto"
+                ></v-text-field>
+                <v-text-field label="Another input"></v-text-field>
                 <v-col cols="12">
                   <v-col cols="8">
                     <div class="verticalSeparator"></div>
                   </v-col>
                   <v-container style="color: rgb(63, 81, 181)">
-                    <div>
-                      <v-text-field
-                        label="Main input"
-                        hide-details="auto"
-                      ></v-text-field>
-                      <v-text-field label="Another input"></v-text-field>
-                    </div>
                     <v-row>
                       <v-col class="text-right">
                         <label class="mr-3">TOTAL:</label>
