@@ -57,7 +57,7 @@ export default {
   data: () => ({
     valid: true,
     object: {},
-    items: ["80mm"],
+    items: ["80mm" , "58mm"],
     loaded: false,
     tenant: "",
     service: "impresoras",
