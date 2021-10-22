@@ -159,7 +159,7 @@ export  function printReceipt(comprobante,nombreImpresora,ancho){
 }
 
 export  function printBarCodes(listBars,nombreImpresora,ancho){ 
-  
+
   if(ancho === '58mm'){
     const conector = new ConectorPlugin()
     listBars.forEach(barCode => {
@@ -1913,6 +1913,7 @@ function facturaC58(listProduct,nameEmpresa,totalVenta,totalRecargos,
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
           .imagenDesdeUrl("https://i.ibb.co/HPKqQVv/qeafip.png")
           .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+          .texto('\n')
           .texto(`C.A.E: ${cae}\n`)
           .texto(`Vencimiento: ${fechaVto}\n`)
           .texto(`--------------------------------\n`)
