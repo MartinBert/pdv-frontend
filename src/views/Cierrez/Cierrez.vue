@@ -134,6 +134,7 @@ export default {
         let iva27 = 0;
         let mediosPagoDetalle = [];
         this.comprobantes.forEach((comprobante) => {
+          console.log(this.comprobantes);
           const totalIva21 = comprobante.productoDescription.reduce(
             (acc, producto) => {
               if (producto.saleIvaPercent == 21) {
