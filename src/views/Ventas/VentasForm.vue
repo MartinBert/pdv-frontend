@@ -1489,7 +1489,7 @@ export default {
                       fileURL = URL.createObjectURL(file);
                       window.open(fileURL, "_blank");
                       if(this.defaultPrint){
-                        printReceipt(comprobante,this.printName,58);
+                        printReceipt(comprobante,this.printName,this.valorPrint);
                       }
                     })
                     .then(() => {

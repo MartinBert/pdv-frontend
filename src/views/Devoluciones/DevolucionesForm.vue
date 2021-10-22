@@ -241,7 +241,8 @@ export default {
     receiptDialogData: null,
     listennerOfListChange: 0,
     printName:"",
-    defaultPrint:false
+    defaultPrint:false,
+    valorPrint:""
   }),
 
   components: {
@@ -311,6 +312,7 @@ export default {
           if(print.impresoraPredeterminada == true){
             this.defaultPrint = true;
             this.printName = print.nombreImpresora;
+            this.valorPrint = print.valor;
 
           }
         });
@@ -600,7 +602,7 @@ export default {
                             window.open(fileURL, "_blank");
                             
                             if(this.defaultPrint){
-                              printReceipt(comprobante,this.printName);
+                              printReceipt(comprobante,this.printName,this.valorPrint);
                             }
                           });
                       });
@@ -797,7 +799,7 @@ export default {
                   fileURL = URL.createObjectURL(file);
                   window.open(fileURL, "_blank");
                    if(this.defaultPrint){
-                      printReceipt(comprobante,this.printName);
+                      printReceipt(comprobante,this.printName,this.valorPrint);
                     }
                 });
             });
