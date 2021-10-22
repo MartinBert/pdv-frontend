@@ -192,6 +192,8 @@ import ProductDialog from "../../components/Dialogs/ProductDialog";
 import ReceiptDialog from "../../components/Dialogs/ReceiptDialog";
 import Spinner from '../../components/Graphics/Spinner';
 import Error from '../../components/Error';
+import {printReceipt} from "../../services/ImpresionService";
+import Swal from 'sweetalert2';
 export default {
   data: () => ({
     tiposOperacion: [
@@ -207,6 +209,9 @@ export default {
       productosEntrantes: [],
       productosSalientes: [],
       descripcion: "",
+    },
+    databaseItems:{
+      impresoras:[]
     },
     valid: true,
     loaded: false,
@@ -234,7 +239,10 @@ export default {
     checked: false,
     saveDialog: false,
     receiptDialogData: null,
-    listennerOfListChange: 0
+    listennerOfListChange: 0,
+    printName:"",
+    defaultPrint:false,
+    valorPrint:""
   }),
 
   components: {
@@ -269,6 +277,7 @@ export default {
       this.filterParams.depositos.sucursalId = this.loguedUser.sucursal.id;
     }
     this.getDeposits();
+    this.getImpresoras();
   },
 
   methods: {
@@ -279,6 +288,37 @@ export default {
           this.object = data.data;
           this.loaded = true;
         });
+    },
+    getImpresoras(){
+      let sucursalId;
+      if (this.loguedUser.perfil > 1) {
+        sucursalId = this.loguedUser.sucursal.id;
+      }
+
+      const impresoraFilter = {
+        sucursalId: sucursalId,
+        valor: "",
+        nombreImpresora: "",
+        impresoraPredeterminada: true,
+        page: 1,
+        size: 100000
+      };
+
+      GenericService(this.tenant, "impresoras", this.token)
+      .filter(impresoraFilter)
+      .then((data) => {
+        this.databaseItems.impresoras = data.data.content;
+        this.databaseItems.impresoras.forEach(print => {
+          if(print.impresoraPredeterminada == true){
+            this.defaultPrint = true;
+            this.printName = print.nombreImpresora;
+            this.valorPrint = print.valor;
+
+          }
+        });
+      });
+
+
     },
 
     getDeposits(){
@@ -388,6 +428,7 @@ export default {
     },
     
     saveFiscalNote() {
+      Swal.fire("Generando Venta","Espere por favor","info");
       /*** Constants ***/
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
@@ -503,7 +544,6 @@ export default {
                   planesPago: [planesPago],
                   nombreDocumento: documento.nombre,
                 };
-                console.log(comprobante);
                 /*** Save receipt in database ***/
                 if (invoiceContainCAE(comprobante)) {
                   GenericService(tenant, "comprobantesFiscales", token)
@@ -560,6 +600,10 @@ export default {
                             });
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
+                            
+                            if(this.defaultPrint){
+                              printReceipt(comprobante,this.printName,this.valorPrint);
+                            }
                           });
                       });
                   });
@@ -606,6 +650,7 @@ export default {
     },
 
     saveNoFiscalNote() {
+      Swal.fire("Generando Venta","Espere por favor","info");
       /* Constants */
       const mediosPago = this.receiptDialogData.mediosPago;
       const planesPago = this.receiptDialogData.planPago;
@@ -697,7 +742,6 @@ export default {
         planesPago: [planesPago],
         nombreDocumento: documento.nombre,
       };
-      console.log(comprobante);
       GenericService(tenant, "comprobantesFiscales", token)
         .save(comprobante)
         .then((data) => {
@@ -754,6 +798,9 @@ export default {
                   });
                   fileURL = URL.createObjectURL(file);
                   window.open(fileURL, "_blank");
+                   if(this.defaultPrint){
+                      printReceipt(comprobante,this.printName,this.valorPrint);
+                    }
                 });
             });
         });

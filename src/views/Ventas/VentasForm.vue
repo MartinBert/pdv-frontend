@@ -323,7 +323,7 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
-import printReceipt from "../../services/ImpresionService";
+import { printReceipt }  from "../../services/ImpresionService";
 import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
@@ -348,6 +348,7 @@ import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
+import Swal from 'sweetalert2';
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -395,7 +396,8 @@ export default {
     perfil: null,
     processPresupuesto: false,
     printName:"",
-    defaultPrint:false
+    defaultPrint:false,
+    valorPrint:""
   }),
 
   components: {
@@ -542,6 +544,7 @@ export default {
             if(print.impresoraPredeterminada == true){
               this.defaultPrint = true;
               this.printName = print.nombreImpresora;
+              this.valorPrint = print.valor
             }
           });
         });
@@ -1192,6 +1195,7 @@ export default {
     },
 
     save() {
+      Swal.fire("Generando Venta","Espere por favor","info");
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
@@ -1326,7 +1330,7 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-                  printReceipt(comprobante);
+                  
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1340,6 +1344,9 @@ export default {
                             });
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
+                            if(this.defaultPrint){
+                              printReceipt(comprobante,this.printName,this.valorPrint);
+                            }
                           });
                       })
                       .then(() => {
@@ -1368,6 +1375,7 @@ export default {
     },
 
     saveNoFiscal() {
+      Swal.fire("Generando Venta","Espere por favor","info");
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
       const cliente = this.object.cliente;
@@ -1468,10 +1476,6 @@ export default {
                 comprobante.nombreDocumento = documento.nombre;
                 comprobante.documentoComercial = documento;
               }
-            
-              if(this.defaultPrint){
-                 printReceipt(comprobante,this.printName);
-              }
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
@@ -1484,6 +1488,9 @@ export default {
                       });
                       fileURL = URL.createObjectURL(file);
                       window.open(fileURL, "_blank");
+                      if(this.defaultPrint){
+                        printReceipt(comprobante,this.printName,this.valorPrint);
+                      }
                     })
                     .then(() => {
                       this.applyStockModifications(comprobante);

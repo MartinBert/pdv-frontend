@@ -180,9 +180,11 @@ import GenericService from "../../services/GenericService";
 import TabBar from "../../components/Generics/TabBar";
 import Add from "../../components/Buttons/Add";
 import Checked from "../../components/Buttons/Checked";
+import {printBarCodes} from "../../services/ImpresionService";
 export default {
   data: () => ({
     productos: [],
+    valorPrint:"",
     filterParams: {
       sucursalId: "",
       productoName: "",
@@ -196,6 +198,7 @@ export default {
       page: 1,
       size: 10,
       totalPages: 0,
+      impresoras:[]
     },
     tabs: [
       { id: 1, title: "Lista", route: "/productos" },
@@ -238,6 +241,7 @@ export default {
       this.filterParams.sucursalId = this.loguedUser.sucursal.id;
     }
     this.filterObjects();
+    this.getImpresoras();
   },
 
   components: {
@@ -248,7 +252,35 @@ export default {
   },
 
   methods: {
+    getImpresoras(){
+      let sucursalId;
+      if (this.loguedUser.perfil > 1) {
+        sucursalId = this.loguedUser.sucursal.id;
+      }
 
+      const impresoraFilter = {
+        sucursalId: sucursalId,
+        valor: "",
+        nombreImpresora: "",
+        impresoraPredeterminada: true,
+        page: 1,
+        size: 100000
+      };
+
+      GenericService(this.tenant, "impresoras", this.token)
+      .filter(impresoraFilter)
+      .then((data) => {
+
+        this.impresoras = data.data.content;
+        this.impresoras.forEach(print => {
+          if(print.impresoraPredeterminada == true){
+            this.defaultPrint = true;
+            this.printName = print.nombreImpresora;
+            this.valorPrint = print.valor
+          }
+        });
+      });
+    },
      filterObjects(page) {
       if (page) this.filterParams.page = page;
       if (this.loguedUser.perfil > 1) {
@@ -302,6 +334,7 @@ export default {
     },
 
     printLabels(labelList) {
+      printBarCodes(labelList,this.printName,this.valorPrint);
       ReportsService(this.tenant, "productos", this.token)
         .labels(labelList)
         .then((res) => {

@@ -50,7 +50,7 @@ export default {
       sucursalId: "",
       valor: "",
       nombreImpresora: "",
-      estado:true,
+      estado: true,
       page: 1,
       size: 10,
       totalPages: 0,
@@ -97,22 +97,13 @@ export default {
     newObject() {
       this.$router.push({ name: "ImpresorasForm", params: { id: 0 } });
     },
-    editItem(itemId) {
-       this.$emit("editItem", itemId);
-    },
-  deleteObject() {
-      this.loaded = false;
-      this.deleteDialogStatus = false;
-      GenericService(this.tenant, this.service, this.token)
-        .delete(this.idObjet)
-        .then(() => {
-          this.getObjects();
-        });
+
+    deleteItem(itemId) {
+      this.$emit("deleteItem", itemId);
     },
 
-    deleteItem(id) {
-      this.idObjet = id;
-      this.deleteDialogStatus = true;
+    editItem(itemId) {
+      this.$emit("editItem", itemId);
     },
 
     selectDefaultPrinter(printer) {

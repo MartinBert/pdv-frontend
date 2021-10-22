@@ -1,10 +1,8 @@
 import  XLSX  from 'xlsx';
 import { saveAs } from 'file-saver';
 
-import Swal from 'sweetalert2';
 
 export default function orderSales(lista,factA,factB,factC,notaDA,notaCA,notaDB,notaCB,txt,excel){
-  console.log(lista);
   //variables para ordenar
   let filroFactA =[];
   let filroFactB =[];
@@ -203,7 +201,6 @@ let libroIva = listaFacturas;
   let totalIvas= 0;
   let totalNetos= 0;
     libroIvaOrden.forEach(item =>{
-      console.log(item);
       let tipoComprobante;
       let letra;
       switch (item.nombreDocumento) {
@@ -315,11 +312,7 @@ let libroIva = listaFacturas;
   let mes = date.getMonth() + 1
   let anio = date.getFullYear()
 
-  Swal.fire(
-    'Generación exitosa!',
-    'Esto puede tardar unos segundos. Si la descarga no se realiza, acepta el pedido del navegador.',
-    'success'
-  )
+  
   if(dataExcel.length !=0 && excel){
       saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), `LID Ventas ${mes}-${anio}.xlsx`);
   }
