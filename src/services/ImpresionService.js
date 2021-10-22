@@ -7,17 +7,27 @@ let espacioss = "";
 let lineaProd=``;
 let imagen = false;
 
-export  function printReceipt(comprobante,nombreImpresora){
+export  function printReceipt(comprobante,nombreImpresora,ancho){
       const namePrint = nombreImpresora;
-  
+
       switch (comprobante.nombreDocumento) {
         case "Ticket X":
-          ticketX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
-                  comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento,namePrint)
+          if(ancho === '58mm'){
+            ticketX58(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
+              comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento,namePrint)
+          }else{
+            ticketX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,comprobante.totalRecargos,
+              comprobante.totalDescuentos,comprobante.subTotal,comprobante.nombreDocumento,namePrint)
+          }
           break;
 
         case "Nota de débito x":
-          notaDebitoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,namePrint)
+          if(ancho === '58mm'){
+            notaDebitoX58(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,namePrint)
+            break;
+          }else{
+            notaDebitoX(comprobante.productos,comprobante.empresa.razonSocial,comprobante.totalVenta,namePrint)
+          }
           break;
 
         case "Nota de crédito x":
@@ -103,7 +113,6 @@ export  function printBarCodes(listBars,nombreImpresora){
 
 function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
                  totalDescuentos,subTotal,nombreDocumento,nombreImpresora){
-                   console.log(nombreImpresora);
   switch (nameEmpresa) {
     case "servipack":
         logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
@@ -168,6 +177,68 @@ function ticketX(listProduct,nameEmpresa,totalVenta,totalRecargos,
             .imprimirEn(nombreImpresora)
 }
 
+function ticketX58(listProduct,nameEmpresa,totalVenta,totalRecargos,
+  totalDescuentos,subTotal,nombreDocumento,nombreImpresora){
+    console.log(nombreImpresora);
+
+switch (nameEmpresa) {
+  case "servipack":
+    logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
+    imagen = true;
+  break;
+
+  default:
+  imagen = false;
+  break;
+}
+const conector = new ConectorPlugin()
+
+conector.texto(`--------------------------------\n`)
+        .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+        .establecerTamanioFuente(2, 2)
+        .establecerEnfatizado(1)
+        .texto(`${nombreDocumento}\n`)
+        .establecerTamanioFuente(1, 1)
+        .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+        .establecerEnfatizado(0)
+        .texto(`--------------------------------\n`)
+        .establecerEnfatizado(1)
+        .texto(`Descripcion              IMPORTE\n`)
+        .establecerEnfatizado(0)
+        .texto(`Cant/Precio unitario\n`)
+        .texto(`--------------------------------\n`);
+for (let i = 0; i < listProduct.length; i++) {
+conector.establecerEnfatizado(1)
+        .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+        .texto(`${listProduct[i].nombre}\n`)
+        .establecerEnfatizado(0);
+        infoCantUni = `Uni: ${listProduct[i].cantUnidades} /  $ ${listProduct[i].precioUnitario}`;
+        precioTotal = `${(listProduct[i].cantUnidades*listProduct[i].precioUnitario).toFixed(2)}`;
+        espacios = 32 - (precioTotal.length + infoCantUni.length)
+        espacioss = ""
+        for(let h =0; h<espacios; h++){
+          espacioss += " "
+        }
+        lineaProd = infoCantUni+espacioss+precioTotal
+        conector.texto(`${lineaProd}\n`)
+        .texto(`--------------------------------\n`)
+        }
+conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+        .establecerEnfatizado(1)
+        .texto(`Subtotal:         $ ${subTotal}\n`)
+        .texto(`Descuentos:       $ ${totalDescuentos} \n`)
+        .texto(`Recargos:         $ ${totalRecargos}\n`)
+        .texto(`TOTAL:            $ ${totalVenta}\n`)
+        .establecerEnfatizado(0)
+        .texto(`--------------------------------\n`)
+        .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+        .texto(`Gracias por su Compra!\n`)
+        .texto(`Visite nuestra pagina WEB!\n`)
+        .texto(`www.prysoft.com.ar\n`)
+        .feed(4)
+        .imprimirEn(nombreImpresora)
+}
+
 function notaDebitoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
   console.log(nombreImpresora);
   switch (nameEmpresa) {
@@ -226,6 +297,70 @@ function notaDebitoX(listProduct,nameEmpresa,totalVenta,nombreImpresora){
             .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
             .texto(`Gracias por su Compra!\n`)
             .texto(`Visite nuestra página WEB!\n`)
+            .texto(`www.prysoft.com.ar\n`)
+            .cortar()
+            .feed(4)
+            .imprimirEn(nombreImpresora);
+}
+
+function notaDebitoX58(listProduct,nameEmpresa,totalVenta,nombreImpresora){
+  console.log(nombreImpresora);
+  switch (nameEmpresa) {
+    case "servipack":
+        logo = "https://i.ibb.co/GtTYmgg/LOGO-TICKET-SP-2.png";
+        imagen = true;
+      break;
+
+    default:
+      imagen = false;
+      break;
+  }
+  const conector = new ConectorPlugin()
+
+  if(imagen){
+    conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .imagenDesdeUrl(logo)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+  }
+
+    conector.texto(`--------------------------------\n`)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .establecerTamanioFuente(2, 2)
+            .establecerEnfatizado(1)
+            .texto(`NOTA DE DEBITO X\n`)
+            .establecerTamanioFuente(1, 1)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+            .establecerEnfatizado(0)
+            .texto(`--------------------------------\n`)
+            .establecerEnfatizado(1)
+            .texto(`Descripcion              IMPORTE\n`)
+            .establecerEnfatizado(0)
+            .texto(`Cantidad/Precio unitario\n`)
+            .texto(`--------------------------------\n`);
+  for (let i = 0; i < listProduct.length; i++) {
+    conector.establecerEnfatizado(1)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+            .texto(`${listProduct[i].nombre}\n`)
+            .establecerEnfatizado(0);
+    infoCantUni = `Uni: ${listProduct[i].cantUnidades} /  $ ${listProduct[i].precioUnitario}`;
+    precioTotal = `${(listProduct[i].cantUnidades*listProduct[i].precioUnitario).toFixed(2)}`;
+    espacios = 48 - (precioTotal.length + infoCantUni.length)
+    espacioss = ""
+    for(let h =0; h<espacios; h++){
+      espacioss += " "
+    }
+    lineaProd = infoCantUni+espacioss+precioTotal
+    conector.texto(`${lineaProd}\n`)
+            .texto(`--------------------------------\n`)
+  }
+    conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionIzquierda)
+            .establecerEnfatizado(1)
+            .texto(`TOTAL:            $ ${Number(totalVenta).toFixed(2)}\n`)
+            .establecerEnfatizado(0)
+            .texto(`--------------------------------\n`)
+            .establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
+            .texto(`Gracias por su Compra!\n`)
+            .texto(`Visite nuestra pagina WEB!\n`)
             .texto(`www.prysoft.com.ar\n`)
             .cortar()
             .feed(4)

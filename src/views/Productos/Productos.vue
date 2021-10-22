@@ -311,6 +311,7 @@ export default {
       this.loaded = false;
       this.file = event;
       let excel = [];
+      
       let reader = new FileReader();
       reader.onload = (e) => {
         let data = e.target.result;
