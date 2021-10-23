@@ -6,6 +6,7 @@ import eventual from './eventual'
 import stocks from './stocks'
 import details from './details'
 import budgets from './budgets'
+import ventasFast from './ventasFast'
 
 Vue.use(Vuex);
 export default new Vuex.Store({
@@ -15,6 +16,7 @@ export default new Vuex.Store({
         eventual,
         stocks,
         details,
-        budgets
+        budgets,
+        ventasFast
     }
 })
