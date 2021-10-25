@@ -204,7 +204,7 @@ const routes = [
             },
             {
                 path: 'ventasfast',
-                name: 'ventasFast',
+                name: 'ventasfast',
                 component: VentasFast,
                 meta: { requiresAuth: true }
             },

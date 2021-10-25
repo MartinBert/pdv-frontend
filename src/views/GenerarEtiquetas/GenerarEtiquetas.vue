@@ -184,6 +184,7 @@ import {printBarCodes} from "../../services/ImpresionService";
 export default {
   data: () => ({
     productos: [],
+    valorPrint:"",
     filterParams: {
       sucursalId: "",
       productoName: "",
@@ -275,6 +276,7 @@ export default {
           if(print.impresoraPredeterminada == true){
             this.defaultPrint = true;
             this.printName = print.nombreImpresora;
+            this.valorPrint = print.valor
           }
         });
       });
@@ -332,7 +334,7 @@ export default {
     },
 
     printLabels(labelList) {
-      printBarCodes(labelList,this.printName);
+      printBarCodes(labelList,this.printName,this.valorPrint);
       ReportsService(this.tenant, "productos", this.token)
         .labels(labelList)
         .then((res) => {

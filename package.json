@@ -31,6 +31,7 @@
     "vue": "^2.6.11",
     "vue-barcode-scanner": "^0.8.1",
     "vue-chartjs": "^3.5.1",
+    "vue-global-events": "^1.2.1",
     "vue-html2canvas": "0.0.4",
     "vue-html2pdf": "^1.8.0",
     "vue-loader": "^15.9.6",

@@ -133,6 +133,12 @@ export default {
         icon: "/../images/icons/sale.svg",
         childs: [
           {
+            path: "/ventasfast",
+            name: "ventasfast",
+            title: "Ventas Rápidas",
+            visible: false,
+          },
+          {
             path: "/ventas",
             name: "ventasForm",
             title: "Generar Venta",
@@ -394,20 +400,6 @@ export default {
             path: "/libroivaventas",
             name: "libroivaventas",
             title: "LibroIvaVentas",
-            visible: false,
-          },
-        ],
-      },
-       {
-        name: "ventasFast",
-        title: "VentaRapida",
-        visible: false,
-        icon: "/../images/icons/ventas.svg",
-        childs: [
-          {
-            path: "/ventasfast",
-            name: "ventasFast",
-            title: "Ventasfast",
             visible: false,
           },
         ],
