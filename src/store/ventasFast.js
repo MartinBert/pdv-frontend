@@ -29,7 +29,6 @@ export default {
       },
 
       loadModification(state, percentOfModification){
-        console.log(percentOfModification)
         if(percentOfModification < 0){
           state.discountPercent = percentOfModification * -1;
         }else{
