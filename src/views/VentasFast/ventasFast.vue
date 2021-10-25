@@ -122,7 +122,6 @@ import Spinner from "../../components/Graphics/Spinner";
 import { getCurrentDate } from "../../helpers/dateHelper";
 import axios from "axios";
 import GlobalEvents from 'vue-global-events';
-import GenericService from "../../services/GenericService";
 
 export default {
   data: () => ({
