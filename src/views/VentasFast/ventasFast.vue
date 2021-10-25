@@ -225,6 +225,110 @@ export default {
         this.$store.commit("ventasFast/loadModification", this.percentOfModification);
         this.totalModificationDialog = false;
       }
+    },
+    onBarcodeScanned(barcode) {
+      const filterParams = {
+        productoName: "",
+        productoCodigo: "",
+        productoCodigoBarras: barcode,
+        productoMarcaName: "",
+        productoPrimerAtributoName: "",
+        productoSegundoAtributoName: "",
+        productoTercerAtributoName: "",
+        productoEstado: 1,
+        page: 1,
+        size: 1,
+        totalPages: 0,
+      };
+      GenericService(this.tenant, "productos", this.token)
+        .filter(filterParams)
+        .then((data) => {
+          let databaseItem = data.data.content[0];
+          if (this.products.length == 0) {
+            databaseItem.cantUnidades = 1;
+            databaseItem.total = databaseItem.precioTotal;
+            this.products.push(this.processProductsObject(databaseItem));
+            this.productsDescription.push({
+              name: databaseItem.nombre,
+              editable: databaseItem.editable,
+              barCode: databaseItem.codigoBarra,
+              code: databaseItem.codigoProducto,
+              tradeMarkName: databaseItem.marca.nombre,
+              tradeMarkId: databaseItem.marca.id,
+              rubroName: databaseItem.rubro.nombre,
+              rubroId: databaseItem.rubro.id,
+              attributes: databaseItem.atributos,
+              properties: databaseItem.propiedades,
+              quantity: databaseItem.cantUnidades,
+              costPrice: databaseItem.precioCosto,
+              salePrice: databaseItem.precioTotal,
+              buyIvaPercent: databaseItem.ivaComprasObject.porcentaje,
+              saleIvaPercent: databaseItem.ivaVentasObject.porcentaje,
+              buyIvaAmount: databaseItem.ivaCompra,
+              saleIvaAmount: databaseItem.ivaVenta,
+              providerData: databaseItem.proveedores
+                ? databaseItem.proveedores
+                : [],
+            });
+          } else {
+            if (
+              this.products.filter((el) => el.id === databaseItem.id).length > 0
+            ) {
+              this.products.filter((el) => el.id === databaseItem.id)[0]
+                .cantUnidades++;
+              this.products.filter(
+                (el) => el.id === databaseItem.id
+              )[0].precioTotal =
+                this.products.filter((el) => el.id === databaseItem.id)[0]
+                  .precioUnitario *
+                this.products.filter((el) => el.id === databaseItem.id)[0]
+                  .cantUnidades;
+
+              this.productsDescription.filter(
+                (el) => el.barCode === databaseItem.codigoBarra
+              )[0].quantity++;
+              this.productsDescription.filter(
+                (el) => el.barCode === databaseItem.codigoBarra
+              )[0].precioTotal =
+                this.productsDescription.filter(
+                  (el) => el.barCode === databaseItem.codigoBarra
+                )[0].precioUnitario *
+                this.productsDescription.filter(
+                  (el) => el.barCode === databaseItem.codigoBarra
+                )[0].quantity;
+            } else {
+              databaseItem.cantUnidades = 1;
+              databaseItem.total = databaseItem.precioTotal;
+              this.products.push(this.processProductsObject(databaseItem));
+              this.productsDescription.push({
+                name: databaseItem.nombre,
+                editable: databaseItem.editable,
+                barCode: databaseItem.codigoBarra,
+                code: databaseItem.codigoProducto,
+                tradeMarkName: databaseItem.marca.nombre,
+                tradeMarkId: databaseItem.marca.id,
+                rubroName: databaseItem.rubro.nombre,
+                rubroId: databaseItem.rubro.id,
+                attributes: databaseItem.atributos,
+                properties: databaseItem.propiedades,
+                quantity: databaseItem.cantUnidades,
+                costPrice: databaseItem.precioCosto,
+                salePrice: databaseItem.precioTotal,
+                buyIvaPercent: databaseItem.ivaComprasObject.porcentaje,
+                saleIvaPercent: databaseItem.ivaVentasObject.porcentaje,
+                buyIvaAmount: databaseItem.ivaCompra,
+                saleIvaAmount: databaseItem.ivaVenta,
+                providerData: databaseItem.proveedores
+                  ? databaseItem.proveedores
+                  : [],
+              });
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          this.$errorAlert("No existe un producto con ese código de barras");
+        });
     }
   },
 };
