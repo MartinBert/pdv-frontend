@@ -7,7 +7,7 @@
       <v-card style="min-width: 100%">
         <v-row>
           <v-col>
-            <v-form v-on:submit.prevent="saveSale()"  @toggle-off="resetForm">
+            <v-form v-on:submit.prevent="saveSale()" ref="anyName">
               <v-row>
                 <v-col cols="4">
                    <v-text-field
@@ -214,6 +214,7 @@ export default {
             if(res.data) {
               res.data.cantUnidades = 1;
               this.$store.commit("ventasFast/addProductsToList", res.data);
+               this.$ref.anyName.reset();
             }else{
               this.$errorAlert("No se encontró un producto con ese codigo de barras") 
             }
