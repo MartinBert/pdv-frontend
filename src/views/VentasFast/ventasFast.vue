@@ -7,7 +7,7 @@
       <v-card style="min-width: 100%">
         <v-row>
           <v-col>
-            <v-form v-on:submit.prevent="saveSale()">
+            <v-form v-on:submit.prevent="saveSale()"  @toggle-off="resetForm">
               <v-row>
                 <v-col cols="4">
                    <v-text-field
@@ -192,6 +192,10 @@ export default {
         default:
           break;
       }
+    },
+    
+    resetForm () {
+      this.barCodeSearch = '';
     },
 
     getInputFocus(inputId){
