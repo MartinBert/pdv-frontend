@@ -203,7 +203,7 @@ export default {
     },
 
     searchProduct(e){
-        if(e.keyCode === 13){
+        if(e.keyCode === 13 || !e){
           ProductsService(this.tenant, "productos", this.token)
           .getProductForBarCode(this.barCodeSearch)
           .then(res => {
