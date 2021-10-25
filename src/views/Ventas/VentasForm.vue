@@ -570,7 +570,6 @@ export default {
           )[0];
         });
     },
-
     getClientIpForFiscalController() {
       axios.get("https://api.ipify.org?format=json").then((data) => {
         this.clientIp = data.data.ip;

@@ -13,7 +13,6 @@
                    <v-text-field
                     label="Codigo de barras"
                     hide-details="auto"
-                    id="searchBarCodeInput"
                     v-model="barCodeSearch"
                     @keyup="(e) => searchProduct(e)"
                   ></v-text-field>
@@ -224,6 +223,12 @@ export default {
       if(e.keyCode === 13){
         this.$store.commit("ventasFast/loadModification", this.percentOfModification);
         this.totalModificationDialog = false;
+      }
+    },
+
+    deleteProduct(e){
+      if(e.key === 101){
+        this.$store.commit("ventasFast/removeProductsToList")
       }
     }
   },
