@@ -161,6 +161,7 @@ export  function printReceipt(comprobante,nombreImpresora,ancho){
 export  function printBarCodes(listBars,nombreImpresora,ancho){ 
 
   if(ancho === '58mm'){
+    console.log("58mm");
     const conector = new ConectorPlugin()
     listBars.forEach(barCode => {
       conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
@@ -177,6 +178,7 @@ export  function printBarCodes(listBars,nombreImpresora,ancho){
       conector.establecerJustificacion(ConectorPlugin.Constantes.AlineacionCentro)
               .texto(`${barCode.nombre}\n`)
               .codigoDeBarras(barCode.codigoBarra, ConectorPlugin.Constantes.AccionBarcode39)
+              .texto(`${barCode.codigoBarra}\n`)
               .texto('\n')
     });
       conector.cortar()
