@@ -149,6 +149,7 @@ export default {
 
   created() {
     this.$barcodeScanner.init((barcode) => {
+      this.onBarcodeScanned(barcode);
       this.barCodeSearch = barcode;
       this.searchProduct();
     });
