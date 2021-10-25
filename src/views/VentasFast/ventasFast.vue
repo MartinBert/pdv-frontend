@@ -331,7 +331,7 @@ export default {
     },
 
     deleteProduct(e){
-      if(e.key === 101 || res.data){
+      if(e.key === 101){
         this.$store.commit("ventasFast/removeProductsToList");
       }
     }
