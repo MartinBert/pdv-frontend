@@ -195,7 +195,7 @@ export default {
     excecuteShortcut(e) {
       switch (e.keyCode) {
          case 27:
-          this.blurInputFocus();
+          this.blurInputFocus("searchBarCodeInput");
           break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
@@ -237,7 +237,7 @@ export default {
       this.search(barcode);
     },
 
-    search(barcode) {
+    search(barcode,e) {
       ProductsService(this.tenant, "productos", this.token)
         .getProductForBarCode(barcode)
         .then((res) => {
