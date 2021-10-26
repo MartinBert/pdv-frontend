@@ -151,7 +151,7 @@ export default {
       this.blurInputFocus('searchBarCodeInput');
       setTimeout(() => {
         this.searchWithScanner(barcode);
-      }, 10)
+      }, 80)
     });
   },
 
@@ -189,7 +189,7 @@ export default {
             this.totalModificationDialog = true;
             setTimeout(() => {
               this.getInputFocus('modificationInput');
-            }, 50);
+            }, 10);
           break;
         default:
           break;
