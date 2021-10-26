@@ -247,6 +247,7 @@ export default {
             this.$errorAlert(
               "No se encontró un producto con ese codigo de barras"
             );
+            this.barCodeSearch='';
           }
         })
         .catch((err) => {
