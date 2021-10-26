@@ -224,6 +224,8 @@ export default {
       }if(e.keyCode === 27){
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
+      }if (e.key === 101) {
+        this.$store.commit("ventasFast/removeProductsToList");
       }
 
     },
