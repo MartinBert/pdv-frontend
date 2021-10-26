@@ -242,7 +242,7 @@ export default {
       }
       if(e.keyCode === 101) {
         console.log("Eliminando");
-        this.deleteProduct();
+        this.deleteProduct("searchBarCodeInput");
       }
     },
 
