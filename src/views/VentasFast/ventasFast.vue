@@ -228,7 +228,7 @@ export default {
 
     },
 
-    searchWithScanner(barcode) {
+    searchWithScanner(barcode,e) {
       this.search(barcode);
       if(e.keyCode === 27){
          document.getElementById("searchBarCodeInput").blur();
