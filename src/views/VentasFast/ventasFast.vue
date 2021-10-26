@@ -271,7 +271,8 @@ export default {
     },
 
     deleteProduct(e,object) {
-      if (e.keyCode === 101) {
+      if (e.keyCode === 69) {
+        console.log("Borrando");
         this.$store.commit("ventasFast/removeProductsToList", object.id);
       }
     },
