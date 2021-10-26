@@ -245,7 +245,7 @@ export default {
               "No se encontró un producto con ese codigo de barras"
             );
             this.barCodeSearch='';
-            document.getElementById(inputId).blur();
+            document.getElementById(this.barCodeSearch).blur();
           }
         })
         .catch((err) => {
