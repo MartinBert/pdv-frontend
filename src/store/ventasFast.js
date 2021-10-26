@@ -23,8 +23,8 @@ export default {
         }
       },
 
-      removeProductsToList(state, id) {
-        const productos = state.products.filter(el => el.id !== id);
+      removeProductsToList(state, barcode) {
+        const productos = state.products.filter(el => el.barcode !== barcode);
         state.products = productos;
       },
 

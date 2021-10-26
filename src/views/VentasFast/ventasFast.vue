@@ -225,7 +225,6 @@ export default {
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
       }
-      this.deleteProduct();
 
     },
 
@@ -237,6 +236,10 @@ export default {
       if(e.keyCode === 27){
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
+      }
+        if (e.keyCode === 69) {
+        console.log("Borrando");
+        this.$store.commit("ventasFast/removeProductsToList", barcode);
       }
     },
 
