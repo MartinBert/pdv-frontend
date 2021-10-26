@@ -227,7 +227,7 @@ export default {
         this.barCodeSearch = "";
       }
       if (e.keyCode === 69) {
-        this.$store.commit("ventasFast/removeProductsToList", object.barcode);
+        this.$store.commit("ventasFast/removeProductsToList", object.codigoBarra);
       }
     },
 
