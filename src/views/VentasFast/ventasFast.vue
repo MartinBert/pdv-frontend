@@ -269,9 +269,9 @@ export default {
       }
     },
 
-    deleteProduct(e) {
+    deleteProduct(e,object) {
       if (e.keyCode === 101) {
-        this.$store.commit("ventasFast/removeProductsToList");
+        this.$store.commit("ventasFast/removeProductsToList", object.id);
       }
     },
   },
