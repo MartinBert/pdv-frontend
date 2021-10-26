@@ -194,6 +194,9 @@ export default {
     /******************************************************************************************************/
     excecuteShortcut(e) {
       switch (e.keyCode) {
+         case 27:
+          this.blurInputFocus();
+          break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
           break;
@@ -203,9 +206,6 @@ export default {
           setTimeout(() => {
             this.blurInputFocus("modificationInput");
           },30);
-          break;
-        case 27:
-          this.blurInputFocus();
           break;
         default:
           break;
@@ -227,6 +227,8 @@ export default {
     searchWithInput(e) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
+      }if(e.keyCode === 27){
+        this.blurInputFocus()
       }
 
     },
