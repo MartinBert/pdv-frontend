@@ -218,7 +218,7 @@ export default {
       document.getElementById(inputId).blur();
     },
 
-    searchWithInput(e,barcode) {
+    searchWithInput(e,object) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }
@@ -228,7 +228,7 @@ export default {
       }
       if (e.keyCode === 69) {
         console.log("eliminando");
-        this.$store.commit("ventasFast/removeProductsToList",barcode);
+        this.$store.commit("ventasFast/removeProductsToList",object.barcode);
       }
     },
 
