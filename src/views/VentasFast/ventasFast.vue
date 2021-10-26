@@ -228,7 +228,7 @@ export default {
       }
       if (e.keyCode === 69) {
         console.log("eliminando");
-        this.$store.commit("ventasFast/removeProductsToList",object.barcode);
+        this.$store.commit("ventasFast/removeProductsToList",object);
       }
     },
 
