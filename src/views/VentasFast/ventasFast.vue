@@ -229,7 +229,6 @@ export default {
               this.$ref.anyName.reset();
           }else{
             this.$errorAlert("No se encontró un producto con ese codigo de barras");
-            this.blurInputFocus();
           }
         })
         .catch((err) => {
