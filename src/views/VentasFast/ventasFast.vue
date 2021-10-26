@@ -237,7 +237,7 @@ export default {
       this.search(barcode);
     },
 
-    search(barcode,e) {
+    search(barcode) {
       ProductsService(this.tenant, "productos", this.token)
         .getProductForBarCode(barcode)
         .then((res) => {
