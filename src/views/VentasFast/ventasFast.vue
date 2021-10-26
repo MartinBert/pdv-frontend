@@ -228,7 +228,8 @@ export default {
             this.$store.commit("ventasFast/addProductsToList", res.data);
               this.$ref.anyName.reset();
           }else{
-            this.$errorAlert("No se encontró un producto con ese codigo de barras") 
+            this.$errorAlert("No se encontró un producto con ese codigo de barras");
+            this.blurInputFocus();
           }
         })
         .catch((err) => {
