@@ -241,8 +241,7 @@ export default {
          this.barCodeSearch = "";
       }
       if(e.keyCode === 101) {
-        console.log("Eliminando");
-        this.$store.commit("ventasFast/removeProductsToList",id);
+        this.deleteProduct();
       }
     },
 
@@ -277,7 +276,7 @@ export default {
     },
 
     deleteProduct(e) {
-      if (e.key === 101) {
+      if (e.keyCode === 101) {
         this.$store.commit("ventasFast/removeProductsToList");
       }
     },
