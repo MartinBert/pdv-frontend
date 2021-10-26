@@ -28,8 +28,9 @@ export default {
         if(productos){
           state.products.filter(el => el.barcode === barcode)[0].cantUnidades -= 1;
         }else{
-          state.products.push(productos);
+          state.products = productos;  
         }
+        
       },
 
       loadModification(state, percentOfModification){
