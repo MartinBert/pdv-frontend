@@ -194,9 +194,6 @@ export default {
     /******************************************************************************************************/
     excecuteShortcut(e) {
       switch (e.keyCode) {
-         case 27:
-          this.blurInputFocus("searchBarCodeInput");
-          break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
           break;
@@ -225,7 +222,7 @@ export default {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }if(e.keyCode === 27){
-        this.blurInputFocus(this.barCodeSearch);
+        this.blurInputFocus();
       }
 
     },
@@ -246,6 +243,7 @@ export default {
               "No se encontró un producto con ese codigo de barras"
             );
             this.barCodeSearch='';
+
           }
         })
         .catch((err) => {
