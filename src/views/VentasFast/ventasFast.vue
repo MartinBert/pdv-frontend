@@ -229,12 +229,13 @@ export default {
     },
 
     searchWithScanner(barcode,e) {
-      this.search(barcode);
+      if(e.keyCode === 13){
+        this.search(barcode);
+      }
       if(e.keyCode === 27){
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
       }
-
     },
 
     search(barcode) {
