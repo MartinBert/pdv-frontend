@@ -24,9 +24,9 @@ export default {
       },
 
       removeProductsToList(state, barcode) {
-        const productos = state.products.filter(el => el.barcode !== barcode)[0];
+        const productos = state.products.filter(el => el.codigoBarra !== barcode)[0];
         if(productos){
-          state.products.filter(el => el.barcode === barcode)[0].cantUnidades -= 1;
+          state.products.filter(el => el.codigoBarra === barcode)[0].cantUnidades -= 1;
         }else{
           state.products = productos;  
         }
