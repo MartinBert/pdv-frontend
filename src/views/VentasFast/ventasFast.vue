@@ -204,6 +204,9 @@ export default {
             this.blurInputFocus("modificationInput");
           },30);
           break;
+        case 27:
+          this.blurInputFocus();
+          break;
         default:
           break;
       }
