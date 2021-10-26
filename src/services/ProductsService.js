@@ -7,5 +7,10 @@ export default (tenant, service, token) => {
                 headers: { Authorization: "Bearer " + token }
             })
         },
+        deleteProductForBarCode(barCode){
+            return axios.delete(`${process.env.VUE_APP_SERVER}/${tenant}/api/${service}/deleteByBarCode/${barCode}`, {
+                headers: { Authorization: "Bearer " + token }
+            })
+        }
     }
 }
