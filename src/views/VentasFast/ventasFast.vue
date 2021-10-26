@@ -228,7 +228,7 @@ export default {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }if(e.keyCode === 27){
-        this.blurInputFocus()
+        this.blurInputFocus(this.barCodeSearch);
       }
 
     },
@@ -244,9 +244,6 @@ export default {
           if (res.data) {
             res.data.cantUnidades = 1;
             this.$store.commit("ventasFast/addProductsToList", res.data);
-            if(e.keyCode === 27){
-              this.blurInputFocus("searchBarCodeInput")
-            }
           } else {
             this.$errorAlert(
               "No se encontró un producto con ese codigo de barras"
