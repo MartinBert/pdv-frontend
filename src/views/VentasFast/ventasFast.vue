@@ -212,9 +212,7 @@ export default {
     searchWithInput(e){
         if(e.keyCode === 13){
           this.search(this.barCodeSearch)
-          if(this.barCodeSearch && e.keyCode === 27){
-             this.barCodeSearch = '';
-          }
+          this.barCodeSearch = '';
         }
     },
 
