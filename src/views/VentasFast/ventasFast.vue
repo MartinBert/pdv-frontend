@@ -218,14 +218,14 @@ export default {
       document.getElementById(inputId).blur();
     },
 
-    searchWithInput(e, id) {
+    searchWithInput(e,searchBarCodeInput) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }if(e.keyCode === 27){
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
       }if(e.keyCode === 101) {
-        this.$store.commit("ventasFast/removeProductsToList",id);
+        this.$store.commit("ventasFast/removeProductsToList",searchBarCodeInput);
       }
 
     },
