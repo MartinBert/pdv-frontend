@@ -225,7 +225,7 @@ export default {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
         if (this.barCodeSearch) {
-          this.search();
+          this.search(this.barCodeSearch);
         } else {
           this.barCodeSearch = "";
         }
