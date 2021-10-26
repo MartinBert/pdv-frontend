@@ -222,7 +222,7 @@ export default {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }if(e.keyCode === 27){
-      console.log("Saliendo del focus");
+         document.getElementById(inputId).blur();
       }
 
     },
