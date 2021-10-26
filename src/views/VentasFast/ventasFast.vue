@@ -225,6 +225,7 @@ export default {
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
       }
+      this.deleteProduct();
 
     },
 
