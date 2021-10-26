@@ -189,7 +189,7 @@ export default {
             this.totalModificationDialog = true;
             setTimeout(() => {
               this.getInputFocus('modificationInput');
-            }, 10);
+            }, 50);
           break;
         default:
           break;
