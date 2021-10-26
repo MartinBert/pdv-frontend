@@ -15,7 +15,7 @@
                     hide-details="auto"
                     id="searchBarCodeInput"
                     v-model="barCodeSearch"
-                    @keypress.enter="searchWithInput(e)"
+                    @keypress.esc="blurInputFocus"
                     @keyup="(e) =>searchWithInput(e)"
                   ></v-text-field>
                 </v-col>
