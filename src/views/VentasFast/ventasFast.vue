@@ -218,15 +218,12 @@ export default {
       document.getElementById(inputId).blur();
     },
 
-    searchWithInput(e,searchBarCodeInput) {
+    searchWithInput(e) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }if(e.keyCode === 27){
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
-      }if(e.keyCode === 101) {
-        console.log("Eliminando");
-        this.$store.commit("ventasFast/removeProductsToList",searchBarCodeInput);
       }
 
     },
@@ -239,10 +236,6 @@ export default {
       if(e.keyCode === 27){
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
-      }
-      if(e.keyCode === 101) {
-        console.log("Eliminando");
-        this.deleteProduct("searchBarCodeInput");
       }
     },
 
