@@ -15,7 +15,7 @@
                     hide-details="auto"
                     id="searchBarCodeInput"
                     v-model="barCodeSearch"
-                    @keyup="(e) => searchProduct(e)"
+                    @keyup="(e) => searchWithInput(e)"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="4" class="mt-5">
@@ -148,8 +148,10 @@ export default {
 
   created() {
     this.$barcodeScanner.init((barcode) => {
-      this.barCodeSearch = barcode;
-      this.searchProduct();
+      this.blurInputFocus('searchBarCodeInput');
+      setTimeout(() => {
+        this.searchWithScanner(barcode);
+      }, 50)
     });
   },
 
@@ -206,23 +208,31 @@ export default {
       document.getElementById(inputId).blur();
     },
 
-    searchProduct(e){
-        if(e.keyCode === 13 || !e){
-          ProductsService(this.tenant, "productos", this.token)
-          .getProductForBarCode(this.barCodeSearch)
-          .then(res => {
-            if(res.data) {
-              res.data.cantUnidades = 1;
-              this.$store.commit("ventasFast/addProductsToList", res.data);
-               this.$ref.anyName.reset();
-            }else{
-              this.$errorAlert("No se encontró un producto con ese codigo de barras") 
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          })
+    searchWithInput(e){
+        if(e.keyCode === 13){
+          this.search(this.barCodeSearch)
         }
+    },
+
+    searchWithScanner(barcode){
+      this.search(barcode);
+    },
+
+    search(barcode){
+      ProductsService(this.tenant, "productos", this.token)
+        .getProductForBarCode(barcode)
+        .then(res => {
+          if(res.data) {
+            res.data.cantUnidades = 1;
+            this.$store.commit("ventasFast/addProductsToList", res.data);
+              this.$ref.anyName.reset();
+          }else{
+            this.$errorAlert("No se encontró un producto con ese codigo de barras") 
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        })
     },
 
     loadModification(e){
