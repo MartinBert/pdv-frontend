@@ -15,7 +15,7 @@
                     hide-details="auto"
                     id="searchBarCodeInput"
                     v-model="barCodeSearch"
-                    @keyup="(e) => searchWithInput(e)"
+                    @keyup="(e) =>searchWithInput(e)"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="4" class="mt-5">
@@ -151,7 +151,7 @@ export default {
       this.blurInputFocus('searchBarCodeInput');
       setTimeout(() => {
         this.searchWithScanner(barcode);
-      }, 50)
+      }, 75)
     });
   },
 
@@ -211,6 +211,7 @@ export default {
     searchWithInput(e){
         if(e.keyCode === 13){
           this.search(this.barCodeSearch)
+
         }
     },
 
