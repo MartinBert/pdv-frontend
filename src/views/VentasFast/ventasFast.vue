@@ -225,6 +225,7 @@ export default {
          document.getElementById("searchBarCodeInput").blur();
          this.barCodeSearch = "";
       }if(e.keyCode === 101) {
+        console.log("Eliminando");
         this.$store.commit("ventasFast/removeProductsToList",searchBarCodeInput);
       }
 
