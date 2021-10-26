@@ -223,6 +223,7 @@ export default {
         this.search(this.barCodeSearch);
       }if(e.keyCode === 27){
          document.getElementById("searchBarCodeInput").blur();
+         this.barCodeSearch = "";
       }
 
     },
