@@ -151,7 +151,7 @@ export default {
       this.blurInputFocus('searchBarCodeInput');
       setTimeout(() => {
         this.searchWithScanner(barcode);
-      }, 75)
+      }, 100)
     });
   },
 
