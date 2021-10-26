@@ -23,12 +23,12 @@ export default {
         }
       },
 
-      removeProductsToList(state, object) {
-        const productos = state.products.filter(el => el.codigoBarra !== object.codigoBarra)[0];
+      removeProductsToList(state, codigoBarra) {
+        const productos = state.products.filter(el => el.codigoBarra !== codigoBarra)[0];
         if(productos){
-          state.products.filter(el => el.codigoBarra === object.codigoBarra)[0].cantUnidades -= 1;
+          state.products.filter(el => el.codigoBarra === codigoBarra)[0].cantUnidades -= 1;
         }else{
-          state.products.push(object);
+          state.products.push(productos);
         }
       },
 
