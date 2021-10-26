@@ -231,7 +231,7 @@ export default {
 
     },
 
-    searchWithScanner(barcode,e,id) {
+    searchWithScanner(barcode,e) {
       this.search(barcode);
       if(e.keyCode === 13){
         this.search(barcode);
@@ -241,6 +241,7 @@ export default {
          this.barCodeSearch = "";
       }
       if(e.keyCode === 101) {
+        console.log("Eliminando");
         this.deleteProduct();
       }
     },
