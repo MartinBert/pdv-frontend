@@ -1,8 +1,6 @@
 <template>
-   <v-container style="min-width: 100%">
-  <GlobalEvents
-    @keyup="(e) => excecuteShortcut(e)"
-  />
+  <v-container style="min-width: 100%">
+    <GlobalEvents @keyup="(e) => excecuteShortcut(e)" />
     <v-col cols="12" v-if="loaded">
       <v-card style="min-width: 100%">
         <v-row>
@@ -10,21 +8,27 @@
             <v-form v-on:submit.prevent="saveSale()" ref="anyName">
               <v-row>
                 <v-col cols="4">
-                   <v-text-field
+                  <v-text-field
                     label="Codigo de barras"
                     hide-details="auto"
                     id="searchBarCodeInput"
                     v-model="barCodeSearch"
                     @keypress.esc="blurInputFocus(e)"
-                    @keyup="(e) =>searchWithInput(e)"
+                    @keyup="(e) => searchWithInput(e)"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="4" class="mt-5">
                   <div v-if="$store.state.ventasFast.discountPercent">
-                    <h2>Descuento aplicado: {{$store.state.ventasFast.discountPercent}}%</h2>
+                    <h2>
+                      Descuento aplicado:
+                      {{ $store.state.ventasFast.discountPercent }}%
+                    </h2>
                   </div>
                   <div v-if="$store.state.ventasFast.surchargePercent">
-                    <h2>Recargo aplicado: {{$store.state.ventasFast.surchargePercent}}%</h2>
+                    <h2>
+                      Recargo aplicado:
+                      {{ $store.state.ventasFast.surchargePercent }}%
+                    </h2>
                   </div>
                 </v-col>
                 <v-col cols="4">
@@ -69,7 +73,10 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="p in $store.state.ventasFast.products" :key="p.id">
+                        <tr
+                          v-for="p in $store.state.ventasFast.products"
+                          :key="p.id"
+                        >
                           <td>
                             {{ p.nombre }}
                           </td>
@@ -80,7 +87,10 @@
                           <td>${{ p.precioTotal }}</td>
                           <td>
                             <div v-show="hiddenElements === 2">
-                              {{ p.precioTotalXCantidad = p.precioTotal * p.cantUnidades }}
+                              {{
+                                (p.precioTotalXCantidad =
+                                  p.precioTotal * p.cantUnidades)
+                              }}
                             </div>
                             <div v-if="p.editable === false">
                               ${{ p.precioTotalXCantidad }}
@@ -100,7 +110,9 @@
     <v-dialog v-model="totalModificationDialog" width="400">
       <v-card>
         <v-card-title class="headline grey lighten-2">
-          <p style="text-align: center; width: 100%; padding: 0; margin: 0;">Aplicar porcentaje de variación</p>
+          <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
+            Aplicar porcentaje de variación
+          </p>
         </v-card-title>
         <v-container class="text-center">
           <v-text-field
@@ -122,7 +134,7 @@ import ProductsService from "../../services/ProductsService";
 import Spinner from "../../components/Graphics/Spinner";
 import { getCurrentDate } from "../../helpers/dateHelper";
 import axios from "axios";
-import GlobalEvents from 'vue-global-events';
+import GlobalEvents from "vue-global-events";
 
 export default {
   data: () => ({
@@ -139,20 +151,20 @@ export default {
     percentOfModification: 0,
     totalModificationDialog: false,
     defaultPrint: false,
-    barCodeSearch: ''
+    barCodeSearch: "",
   }),
 
   components: {
     Spinner,
-    GlobalEvents
+    GlobalEvents,
   },
 
   created() {
     this.$barcodeScanner.init((barcode) => {
-      this.blurInputFocus('searchBarCodeInput');
+      this.blurInputFocus("searchBarCodeInput");
       setTimeout(() => {
         this.searchWithScanner(barcode);
-      }, 80)
+      }, 80);
     });
   },
 
@@ -180,75 +192,84 @@ export default {
     /******************************************************************************************************/
     /* GLOBAL KEY EVENTS ---------------------------------------------------------------------------------*/
     /******************************************************************************************************/
-    excecuteShortcut(e){
+    excecuteShortcut(e) {
       switch (e.keyCode) {
         case 66:
-            this.getInputFocus('searchBarCodeInput')
+          this.getInputFocus("searchBarCodeInput");
           break;
         case 68:
-            this.blurInputFocus('searchBarCodeInput');
-            this.totalModificationDialog = true;
-            setTimeout(() => {
-              this.getInputFocus('modificationInput');
-            }, 10);
+          this.blurInputFocus("searchBarCodeInput");
+          this.totalModificationDialog = true;
+          setTimeout(() => {
+            this.getInputFocus("modificationInput");
+          }, 10);
           break;
         default:
           break;
       }
     },
-    
-    resetForm () {
-      this.barCodeSearch = '';
+
+    resetForm() {
+      this.barCodeSearch = "";
     },
 
-    getInputFocus(inputId){
+    getInputFocus(inputId) {
       document.getElementById(inputId).focus();
     },
 
-    blurInputFocus(inputId){
+    blurInputFocus(inputId) {
       document.getElementById(inputId).blur();
     },
 
-    searchWithInput(e){
-        if(e.keyCode === 13){
-          this.search(this.barCodeSearch)
-          this.barCodeSearch = '';
+    searchWithInput(e) {
+      if (e.keyCode === 13) {
+        this.search(this.barCodeSearch);
+        if (!this.barCodeSearch) {
+          this.search();
+        } else {
+          this.barCodeSearch = "";
         }
+      }
     },
 
-    searchWithScanner(barcode){
+    searchWithScanner(barcode) {
       this.search(barcode);
     },
 
-    search(barcode){
+    search(barcode) {
       ProductsService(this.tenant, "productos", this.token)
         .getProductForBarCode(barcode)
-        .then(res => {
-          if(res.data) {
+        .then((res) => {
+          if (res.data) {
             res.data.cantUnidades = 1;
             this.$store.commit("ventasFast/addProductsToList", res.data);
-              this.$ref.anyName.reset();
-          }else{
-            this.$errorAlert("No se encontró un producto con ese codigo de barras");
+            this.$ref.anyName.reset();
+          } else {
+            this.$errorAlert(
+              "No se encontró un producto con ese codigo de barras"
+            );
           }
         })
         .catch((err) => {
           console.error(err);
-        })
+        });
     },
 
-    loadModification(e){
-      if(e.keyCode === 13){
-        this.$store.commit("ventasFast/loadModification", this.percentOfModification);
+    loadModification(e) {
+      if (e.keyCode === 13) {
+        this.$store.commit(
+          "ventasFast/loadModification",
+          this.percentOfModification
+        );
         this.totalModificationDialog = false;
       }
     },
 
-    deleteProduct(e){
-      if(e.key === 101){
-        this.$store.commit("ventasFast/removeProductsToList")
+    deleteProduct(e) {
+      if (e.key === 101) {
+        this.$store.commit("ventasFast/removeProductsToList");
       }
-    }
+    },
   },
 };
 </script>
