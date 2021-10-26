@@ -218,26 +218,30 @@ export default {
       document.getElementById(inputId).blur();
     },
 
-    searchWithInput(e) {
+    searchWithInput(e, barcode) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
-      }if(e.keyCode === 27){
-         document.getElementById("searchBarCodeInput").blur();
-         this.barCodeSearch = "";
       }
-
+      if (e.keyCode === 27) {
+        document.getElementById("searchBarCodeInput").blur();
+        this.barCodeSearch = "";
+      }
+      if (e.keyCode === 69) {
+        console.log("Borrando");
+        this.$store.commit("ventasFast/removeProductsToList", barcode);
+      }
     },
 
-    searchWithScanner(barcode,e) {
+    searchWithScanner(barcode, e) {
       this.search(barcode);
-      if(e.keyCode === 13){
+      if (e.keyCode === 13) {
         this.search(barcode);
       }
-      if(e.keyCode === 27){
-         document.getElementById("searchBarCodeInput").blur();
-         this.barCodeSearch = "";
+      if (e.keyCode === 27) {
+        document.getElementById("searchBarCodeInput").blur();
+        this.barCodeSearch = "";
       }
-        if (e.keyCode === 69) {
+      if (e.keyCode === 69) {
         console.log("Borrando");
         this.$store.commit("ventasFast/removeProductsToList", barcode);
       }
@@ -254,8 +258,7 @@ export default {
             this.$errorAlert(
               "No se encontró un producto con ese codigo de barras"
             );
-            this.barCodeSearch='';
-
+            this.barCodeSearch = "";
           }
         })
         .catch((err) => {
@@ -273,7 +276,7 @@ export default {
       }
     },
 
-    deleteProduct(e,object) {
+    deleteProduct(e, object) {
       if (e.keyCode === 69) {
         console.log("Borrando");
         this.$store.commit("ventasFast/removeProductsToList", object.id);
