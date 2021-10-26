@@ -224,6 +224,9 @@ export default {
     searchWithInput(e) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
+        if(!this.search){
+          this.barCodeSearch='';
+        }
       }
 
     },
