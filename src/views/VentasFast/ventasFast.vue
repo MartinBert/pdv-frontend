@@ -218,11 +218,11 @@ export default {
       document.getElementById(inputId).blur();
     },
 
-    searchWithInput(e) {
+    searchWithInput(e,inputId) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }if(e.keyCode === 27){
-         document.getElementById().blur();
+         document.getElementById(inputId).blur();
       }
 
     },
