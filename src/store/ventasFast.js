@@ -23,9 +23,13 @@ export default {
         }
       },
 
-      removeProductsToList(state, barcode) {
-        const productos = state.products.filter(el => el.barcode !== barcode)[0].cantUnidades -= 1;
-        state.products = productos;
+      removeProductsToList(state, object) {
+        const productos = state.products.filter(el => el.barcode !== object.barcode)[0];
+        if(productos){
+          state.products.filter(el => el.barcode === object.barcode)[0].cantUnidades -= 1;
+        }else{
+          state.products.push(object);
+        }
       },
 
       loadModification(state, percentOfModification){
