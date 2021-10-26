@@ -202,7 +202,7 @@ export default {
           this.totalModificationDialog = true;
           setTimeout(() => {
             this.blurInputFocus("modificationInput");
-          },10);
+          },30);
           break;
         default:
           break;
