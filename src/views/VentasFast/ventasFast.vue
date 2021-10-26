@@ -218,7 +218,7 @@ export default {
       document.getElementById(inputId).blur();
     },
 
-    searchWithInput(e, object) {
+    searchWithInput(e, codigoBarra) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }
@@ -227,7 +227,7 @@ export default {
         this.barCodeSearch = "";
       }
       if (e.keyCode === 69) {
-        this.$store.commit("ventasFast/removeProductsToList", object.codigoBarra);
+        this.$store.commit("ventasFast/removeProductsToList", codigoBarra);
       }
     },
 
