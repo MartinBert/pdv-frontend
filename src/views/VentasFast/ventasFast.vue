@@ -126,7 +126,7 @@
         </v-container>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="totalProductload" width="400">
+    <v-dialog v-model="totalProductload" width="800">
       <v-card>
         <v-card-title class="headline grey lighten-2">
           <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
