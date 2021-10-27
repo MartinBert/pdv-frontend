@@ -134,13 +134,14 @@
           </p>
         </v-card-title>
         <v-container class="text-center">
-          <v-text-field
-            style="width: 100%;"
-            id="searchproductOfModification"
-            placeholder="Eliminacion de productos"
-            v-model="productOfModification"
-            @keyup="(e) =>loadProductDelete(e)"
-          ></v-text-field>
+         <v-text-field
+          dense
+          outlined
+          rounded
+          class="text-left"
+          label="Codigo de Barras"
+          append-icon="mdi-magnify"
+        ></v-text-field>
         </v-container>
       </v-card>
     </v-dialog>
