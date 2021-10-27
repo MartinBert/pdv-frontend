@@ -126,7 +126,7 @@
         </v-container>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="$store.state.ventasFast.products" width="800">
+    <v-dialog v-model="totalProductload" width="800">
       <v-card>
         <v-card-title class="headline grey lighten-2">
           <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
@@ -138,6 +138,7 @@
             style="width: 100%;"
             id="searchproductOfModification"
             placeholder="Eliminacion de productos"
+            v-model="productOfModification"
             @keyup="(e) =>loadProductDelete(e)"
           ></v-text-field>
         </v-container>
@@ -215,7 +216,7 @@ export default {
     excecuteShortcut(e) {
       switch (e.keyCode) {
         case 81:
-          this.$store.state.ventasFast.products;
+          this.$store.commit("productos/dialogProductosMutation");
           this.totalProductload = true;
           break;
         case 66:
