@@ -136,6 +136,7 @@
         <v-container class="text-center">
           <v-text-field
             style="width: 100%;"
+            id="searchproductOfModification"
             placeholder="Porcentaje"
             type="number"
             v-model="productOfModification"
@@ -216,7 +217,7 @@ export default {
     excecuteShortcut(e) {
       switch (e.keyCode) {
         case 81:
-          this.loadProductDelete("productOfModification");
+          this.loadProductDelete("searchproductOfModification");
           break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
