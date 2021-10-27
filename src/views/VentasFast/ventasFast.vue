@@ -137,7 +137,7 @@
           <v-text-field
             style="width: 100%;"
             id="searchproductOfModification"
-            placeholder="Porcentaje"
+            placeholder=""
             type="number"
             v-model="productOfModification"
             @keyup="(e) =>loadProductDelete(e)"
@@ -218,6 +218,7 @@ export default {
       switch (e.keyCode) {
         case 81:
           this.loadProductDelete("searchproductOfModification");
+          this.totalProductload = true;
           break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
