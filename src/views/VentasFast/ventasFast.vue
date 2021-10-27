@@ -1,6 +1,6 @@
 <template>
   <v-container style="min-width: 100%">
-    <GlobalEvents @keyup="(e) => excecuteShortcut(e)" />
+    <GlobalEvents @keydown="(e) => excecuteShortcut(e)" />
     <v-col cols="12" v-if="loaded">
       <v-card style="min-width: 100%">
         <v-row>
@@ -152,6 +152,7 @@ export default {
     totalModificationDialog: false,
     defaultPrint: false,
     barCodeSearch: "",
+    writedBarCodes: []
   }),
 
   components: {
@@ -201,6 +202,11 @@ export default {
           this.blurInputFocus("searchBarCodeInput");
           this.totalModificationDialog = true;
           break;
+        case 69:
+          this.blurInputFocus("searchBarCodeInput");
+          this.$store.commit("ventasFast/removeProductsToList", this.writedBarCodes[this.writedBarCodes.length - 1]);
+          this.writedBarCodes = this.writedBarCodes.filter(el => el !== this.writedBarCodes[this.writedBarCodes.length - 1]);
+          break;
         default:
           break;
       }
@@ -218,17 +224,13 @@ export default {
       document.getElementById(inputId).blur();
     },
 
-    searchWithInput(e,barcode) {
+    searchWithInput(e) {
       if (e.keyCode === 13) {
         this.search(this.barCodeSearch);
       }
       if (e.keyCode === 27) {
         document.getElementById("searchBarCodeInput").blur();
         this.barCodeSearch = "";
-      }
-      if (e.keyCode === 69) {
-        console.log("eliminando");
-        this.$store.commit("ventasFast/removeProductsToList",barcode);
       }
     },
 
@@ -241,13 +243,11 @@ export default {
         document.getElementById("searchBarCodeInput").blur();
         this.barCodeSearch = "";
       }
-      if (e.keyCode === 69) {
-        console.log("Borrando");
-        this.$store.commit("ventasFast/removeProductsToList", barcode);
-      }
     },
 
     search(barcode) {
+      this.writedBarCodes.push(barcode);
+      console.log(this.writedBarCodes);
       ProductsService(this.tenant, "productos", this.token)
         .getProductForBarCode(barcode)
         .then((res) => {
