@@ -200,6 +200,9 @@ export default {
           break;
         case 68:
           this.blurInputFocus("searchBarCodeInput");
+           setTimeout(() => {
+              this.getInputFocus('modificationInput');
+            },50);
           this.totalModificationDialog = true;
           break;
         case 69:
