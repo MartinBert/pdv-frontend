@@ -216,7 +216,7 @@ export default {
     excecuteShortcut(e) {
       switch (e.keyCode) {
         case 81:
-          this.totalProductload("productOfModification");
+          this.loadProductDelete("productOfModification");
           break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
