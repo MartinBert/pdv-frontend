@@ -304,7 +304,8 @@ export default {
 
     loadProductDelete(e){
       if(e.keyCode === 81){
-        this.$store.commit("productos/dialogProductosMutation")
+        console.log("Alla la estan apretando");
+        this.$store.commit("productos/dialogProductosMutation");
         this.totalProductload = false;
       }
     },
