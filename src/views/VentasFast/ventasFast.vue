@@ -196,7 +196,7 @@ export default {
     excecuteShortcut(e) {
       switch (e.keyCode) {
         case 66:
-          this.blurInputFocus("searchBarCodeInput");
+          this.getInputFocus("searchBarCodeInput");
           break;
         case 68:
           this.blurInputFocus("searchBarCodeInput");
