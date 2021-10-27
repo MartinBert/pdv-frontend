@@ -126,7 +126,7 @@
         </v-container>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="totalProductload" width="800">
+    <v-dialog v-model="$store.state.ventasFast.products" width="800">
       <v-card>
         <v-card-title class="headline grey lighten-2">
           <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
@@ -138,7 +138,7 @@
             style="width: 100%;"
             id="searchproductOfModification"
             placeholder="Eliminacion de productos"
-            v-model="productOfModification"
+            v-model="$store.state.ventasFast.products"
             @keyup="(e) =>loadProductDelete(e)"
           ></v-text-field>
         </v-container>
