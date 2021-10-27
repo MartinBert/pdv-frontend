@@ -167,7 +167,7 @@ export default {
     clientIp: "",
     printName: "",
     percentOfModification: 0,
-    productOfModification:0,
+    productOfModification:"",
     totalModificationDialog: false,
     totalProductload:false,
     defaultPrint: false,
@@ -216,7 +216,7 @@ export default {
     excecuteShortcut(e) {
       switch (e.keyCode) {
         case 81:
-          this.$store.commit("productos/dialogProductosMutation");
+          this.$store.state.ventasFast.products;
           this.totalProductload = true;
           break;
         case 66:
