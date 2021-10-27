@@ -4,6 +4,7 @@ export default {
     namespaced: true,
 
     state: {
+      dialogProd: false,
       discountPercent: 0,
       surchargePercent: 0,
       products: [],
@@ -12,6 +13,7 @@ export default {
     mutations: {
       resetStates(state) {
         state.products = [];
+        state.dialogProd = false;
       },
 
       addProductsToList(state, object) {
@@ -23,6 +25,7 @@ export default {
         }
       },
 
+
       removeProductsToList(state, barcode) {
         state.products = state.products.filter(el => el.codigoBarra !== barcode);
       },
@@ -33,6 +36,10 @@ export default {
         }else{
           state.surchargePercent = percentOfModification;
         }
+      },
+
+      dialogProductosMutation(state) {
+        state.dialogProd = !state.dialogProd;
       },
 
       clearProductsState(state) {

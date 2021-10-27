@@ -126,6 +126,24 @@
         </v-container>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="totalProductload" width="400">
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
+            Eliminar productos
+          </p>
+        </v-card-title>
+        <v-container class="text-center">
+          <v-text-field
+            style="width: 100%;"
+            placeholder="Porcentaje"
+            type="number"
+            v-model="productOfModification"
+            @keyup="(e) =>loadProductDelete(e)"
+          ></v-text-field>
+        </v-container>
+      </v-card>
+    </v-dialog>
     <Spinner v-if="!loaded" />
   </v-container>
 </template>
@@ -149,7 +167,9 @@ export default {
     clientIp: "",
     printName: "",
     percentOfModification: 0,
+    productOfModification:0,
     totalModificationDialog: false,
+    totalProductload:false,
     defaultPrint: false,
     barCodeSearch: "",
     writedBarCodes: []
@@ -195,6 +215,8 @@ export default {
     /******************************************************************************************************/
     excecuteShortcut(e) {
       switch (e.keyCode) {
+        case 81:
+          this.totalProductload("productOfModification");
         case 66:
           this.getInputFocus("searchBarCodeInput");
           break;
@@ -276,6 +298,13 @@ export default {
           this.percentOfModification
         );
         this.totalModificationDialog = false;
+      }
+    },
+
+    loadProductDelete(e){
+      if(e.keyCode === 81){
+        this.$store.commit("productos/dialogProductosMutation")
+        this.totalProductload = false;
       }
     },
 
