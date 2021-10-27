@@ -217,6 +217,7 @@ export default {
       switch (e.keyCode) {
         case 81:
           this.totalProductload("productOfModification");
+          break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
           break;
