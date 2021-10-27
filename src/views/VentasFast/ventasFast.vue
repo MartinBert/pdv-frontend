@@ -138,7 +138,6 @@
             style="width: 100%;"
             id="searchproductOfModification"
             placeholder="Eliminacion de productos"
-            v-model="$store.state.ventasFast.products"
             @keyup="(e) =>loadProductDelete(e)"
           ></v-text-field>
         </v-container>
