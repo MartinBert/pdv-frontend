@@ -138,7 +138,6 @@
             style="width: 100%;"
             id="searchproductOfModification"
             placeholder=""
-            type="number"
             v-model="productOfModification"
             @keyup="(e) =>loadProductDelete(e)"
           ></v-text-field>
