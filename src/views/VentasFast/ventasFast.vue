@@ -130,7 +130,7 @@
       <v-card>
         <v-card-title class="headline grey lighten-2">
           <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
-            Eliminar productos
+            Eliminar productos de la lista
           </p>
         </v-card-title>
         <v-container class="text-center">
@@ -138,6 +138,7 @@
           dense
           outlined
           rounded
+          style="align-items:center;"
           class="text-left"
           label="Codigo de Barras"
           append-icon="mdi-magnify"
