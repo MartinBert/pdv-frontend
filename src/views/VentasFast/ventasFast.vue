@@ -270,8 +270,14 @@ export default {
           break;
         case 69:
           this.blurInputFocus("searchBarCodeInput");
+          if(!this.totalProductload){
           this.$store.commit("ventasFast/removeProductsToList", this.writedBarCodes[this.writedBarCodes.length - 1]);
           this.writedBarCodes = this.writedBarCodes.filter(el => el !== this.writedBarCodes[this.writedBarCodes.length - 1]);
+          }
+          if(this.totalProductload){
+            this.$store.commit("ventasFast/removeProductsToList",this.writedBarCodes);
+            console.log("Eliminando producto");
+          }
           break;
         default:
           break;

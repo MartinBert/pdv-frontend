@@ -30,6 +30,32 @@
             @change="selectDefaultPrinter(item)"
           ></v-checkbox>
         </template>
+        <template v-slot:[`item.ticket`]="{item,index}">
+          <p v-show="viewCheckboxState === 1">
+            {{
+              item.impresoraPredeterminada
+                ? (checkboxModel[index] = true)
+                : (checkboxModel[index] = false)
+            }}
+          </p>
+          <v-checkbox
+            v-model="checkboxModel[index]"
+            @change="selectDefaultetiquet(item)"
+          ></v-checkbox>
+        </template>
+        <template v-slot:[`item.etiqueta`]="{item,index}">
+          <p v-show="viewCheckboxState === 1">
+            {{
+              item.impresoraPredeterminada
+                ? (checkboxModel[index] = true)
+                : (checkboxModel[index] = false)
+            }}
+          </p>
+          <v-checkbox
+            v-model="checkboxModel[index]"
+            @change="selectDefaultetiqueta(item)"
+          ></v-checkbox>
+        </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <Edit :itemId="item.id" v-on:editItem="editItem" />
           <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
@@ -66,6 +92,8 @@ export default {
       { text: "Nombre", value: "nombreImpresora" },
       { text: "Ancho", value: "valor" },
       { text: "Impresora por defecto", value: "impresoraPredeterminada" },
+      {text:"Ticket", value:"ticket"},
+      {text:"Etiqueta", value:"etiqueta"},
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
@@ -113,6 +141,32 @@ export default {
       this.impresoras.filter(
         (el) => el.nombreImpresora === printer.nombreImpresora
       )[0].impresoraPredeterminada = true;
+      GenericService(this.tenant, this.service, this.token)
+        .saveAll(this.impresoras)
+        .then(() => {
+          this.getObjects();
+        });
+    },
+      selectDefaulteticket(printer) {
+      this.impresoras.forEach((el) => {
+       el.ticket  = false;
+      });
+      this.impresoras.filter(
+        (el) => el.ticket === printer.ticket
+      )[0].ticket = true;
+      GenericService(this.tenant, this.service, this.token)
+        .saveAll(this.impresoras)
+        .then(() => {
+          this.getObjects();
+        });
+    },
+      selectDefaultetiqueta(printer) {
+      this.impresoras.forEach((el) => {
+       el.etiqueta  = false;
+      });
+      this.impresoras.filter(
+        (el) => el.etiqueta === printer.etiqueta
+      )[0].etiqueta = true;
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
         .then(() => {
