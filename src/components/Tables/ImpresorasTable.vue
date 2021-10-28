@@ -33,7 +33,7 @@
         <template v-slot:[`item.ticket`]="{item,index}">
           <p v-show="viewCheckboxState === 1">
             {{
-              item.impresoraPredeterminada
+              item.ticket
                 ? (checkboxModel[index] = true)
                 : (checkboxModel[index] = false)
             }}
@@ -46,7 +46,7 @@
         <template v-slot:[`item.etiqueta`]="{item,index}">
           <p v-show="viewCheckboxState === 1">
             {{
-              item.impresoraPredeterminada
+              item.etiqueta
                 ? (checkboxModel[index] = true)
                 : (checkboxModel[index] = false)
             }}
