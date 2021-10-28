@@ -40,7 +40,7 @@
           </p>
           <v-checkbox
             v-model="checkboxModel[index]"
-            @change="selectDefaultetiquet(item)"
+            @change="selectDefaultetiqueta(item)"
           ></v-checkbox>
         </template>
         <template v-slot:[`item.etiqueta`]="{item,index}">
