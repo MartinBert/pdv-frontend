@@ -163,6 +163,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
         .then(() => {
+          console.log(this.impresoras);
           this.getObjects();
         });
     },
@@ -176,6 +177,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
         .then(() => {
+          console.log(this.impresoras);
           this.getObjects();
         });
     },
