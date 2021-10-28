@@ -34,12 +34,12 @@
           <p v-show="viewCheckboxState === 1">
             {{
               item.ticket
-                ? (checkboxModel1[index] = true)
-                : (checkboxModel1[index] = false)
+                ? (checkboxModel[index] = true)
+                : (checkboxModel[index] = false)
             }}
           </p>
           <v-checkbox
-            v-model="checkboxModel1[index]"
+            v-model="checkboxModel[index]"
             @change="selectDefaulticket(item)"
           ></v-checkbox>
         </template>
@@ -47,12 +47,12 @@
           <p v-show="viewCheckboxState === 1">
             {{
               item.etiqueta
-                ? (checkboxModel2[index] = true)
-                : (checkboxModel2[index] = false)
+                ? (checkboxModel[index] = true)
+                : (checkboxModel[index] = false)
             }}
           </p>
           <v-checkbox
-            v-model="checkboxModel2[index]"
+            v-model="checkboxModel[index]"
             @change="selectDefaultetiqueta(item)"
           ></v-checkbox>
         </template>
@@ -155,7 +155,7 @@ export default {
     },
       selectDefaulticket(printer) {
       this.impresoras.forEach((el) => {
-       el.ticket  = false;
+       el.ticket = false;
       });
       this.impresoras.filter(
         (el) => el.ticket === printer.ticket
