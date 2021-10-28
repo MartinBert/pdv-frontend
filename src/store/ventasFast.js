@@ -8,6 +8,7 @@ export default {
       discountPercent: 0,
       surchargePercent: 0,
       products: [],
+      focusedProduct: null
     },
 
     mutations: {
@@ -25,7 +26,6 @@ export default {
         }
       },
 
-
       removeProductsToList(state, barcode) {
         state.products = state.products.filter(el => el.codigoBarra !== barcode);
       },
@@ -36,6 +36,12 @@ export default {
         }else{
           state.surchargePercent = percentOfModification;
         }
+      },
+
+      focusToProduct(state, barcode){
+        console.log(barcode);
+        console.log(state.products.filter(el => el.codigoBarra === barcode))
+        state.focusedProduct = state.products.filter(el => el.codigoBarra === barcode);
       },
 
       dialogProductosMutation(state) {

@@ -133,17 +133,36 @@
             Eliminar productos de la lista
           </p>
         </v-card-title>
-        <v-container class="text-center">
-         <v-text-field
-          dense
-          outlined
-          rounded
-          style="align-items:center;"
-          class="text-left"
-          label="Codigo de Barras"
-          append-icon="mdi-magnify"
-        ></v-text-field>
-        </v-container>
+          <v-container class="text-center">
+          <v-text-field
+            dense
+            outlined
+            rounded
+            class="text-left"
+            label="Codigo de Barras"
+            append-icon="mdi-magnify"
+            v-model="searchOfDialog"
+            id="dialogInput"
+          ></v-text-field>
+            <v-simple-table style="background-color: transparent">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">Producto</th>
+                    <th class="text-left">Codigo de barras</th>
+                    <th class="text-left">Cantidad de unidades</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="p in $store.state.ventasFast.focusedProduct" :key="p.id">
+                    <td>{{ p.nombre }}</td>
+                    <td>{{ p.codigoBarra }}</td>
+                    <td>{{ p.cantUnidades }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-container>
       </v-card>
     </v-dialog>
     <Spinner v-if="!loaded" />
@@ -174,7 +193,8 @@ export default {
     totalProductload:false,
     defaultPrint: false,
     barCodeSearch: "",
-    writedBarCodes: []
+    writedBarCodes: [],
+    searchOfDialog: null
   }),
 
   components: {
@@ -185,9 +205,14 @@ export default {
   created() {
     this.$barcodeScanner.init((barcode) => {
       this.blurInputFocus("searchBarCodeInput");
-      setTimeout(() => {
-        this.searchWithScanner(barcode);
-      }, 80);
+      if(this.totalProductload){
+        this.$store.commit('ventasFast/focusToProduct', barcode)
+        this.searchOfDialog = null;
+      }else{
+        setTimeout(() => {
+          this.searchWithScanner(barcode);
+        }, 50);
+      }
     });
   },
 
@@ -217,9 +242,11 @@ export default {
     /******************************************************************************************************/
     excecuteShortcut(e) {
       switch (e.keyCode) {
-        case 81:
-          this.$store.commit("productos/dialogProductosMutation");
+        case 81:          
           this.totalProductload = true;
+          setTimeout(() => {
+            this.getInputFocus("dialogInput");
+          }, 50)
           break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
