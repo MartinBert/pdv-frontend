@@ -75,6 +75,8 @@ export default {
     filterParams: {
       sucursalId: "",
       valor: "",
+      ticket:"",
+      etiqueta:"",
       nombreImpresora: "",
       estado: true,
       page: 1,
