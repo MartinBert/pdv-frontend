@@ -31,7 +31,7 @@
           ></v-checkbox>
         </template>
         <template v-slot:[`item.ticket`]="{item,index}">
-          <p v-show="viewCheckboxState === 1">
+          <p v-show="viewCheckboxState1 === 1">
             {{
               item.ticket
                 ? (checkboxModel[index] = true)
@@ -44,7 +44,7 @@
           ></v-checkbox>
         </template>
         <template v-slot:[`item.etiqueta`]="{item,index}">
-          <p v-show="viewCheckboxState === 1">
+          <p v-show="viewCheckboxState2 === 1">
             {{
               item.etiqueta
                 ? (checkboxModel[index] = true)
@@ -84,6 +84,8 @@ export default {
       totalPages: 0,
     },
     viewCheckboxState: 0,
+    viewCheckboxState1:0,
+    viewCheckboxState2:0,
     checkboxModel: {},
     loaded: true,
     tenant: "",
@@ -164,7 +166,7 @@ export default {
     },
       selectDefaultetiqueta(printer) {
       this.impresoras.forEach((el) => {
-       el.etiqueta  = false;
+       el.etiqueta = false;
       });
       this.impresoras.filter(
         (el) => el.etiqueta === printer.etiqueta
