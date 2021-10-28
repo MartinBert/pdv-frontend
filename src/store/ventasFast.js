@@ -4,14 +4,17 @@ export default {
     namespaced: true,
 
     state: {
+      dialogProd: false,
       discountPercent: 0,
       surchargePercent: 0,
       products: [],
+      focusedProduct: null
     },
 
     mutations: {
       resetStates(state) {
         state.products = [];
+        state.dialogProd = false;
       },
 
       addProductsToList(state, object) {
@@ -23,9 +26,8 @@ export default {
         }
       },
 
-      removeProductsToList(state, id) {
-        const productos = state.products.filter(el => el.id !== id);
-        state.products = productos;
+      removeProductsToList(state, barcode) {
+        state.products = state.products.filter(el => el.codigoBarra !== barcode);
       },
 
       loadModification(state, percentOfModification){
@@ -34,6 +36,16 @@ export default {
         }else{
           state.surchargePercent = percentOfModification;
         }
+      },
+
+      focusToProduct(state, barcode){
+        console.log(barcode);
+        console.log(state.products.filter(el => el.codigoBarra === barcode))
+        state.focusedProduct = state.products.filter(el => el.codigoBarra === barcode);
+      },
+
+      dialogProductosMutation(state) {
+        state.dialogProd = !state.dialogProd;
       },
 
       clearProductsState(state) {

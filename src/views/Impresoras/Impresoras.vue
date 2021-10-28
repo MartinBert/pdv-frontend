@@ -45,6 +45,8 @@ export default {
       { text: "Nombre", value: "nombreImpresora" },
       { text: "Ancho", value: "valor" },
       { text: "Impresora por defecto", value: "impresoraPredeterminada" },
+      {text:"Etiquetas",value:""},
+      {text:"Ticket",value:""},
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),

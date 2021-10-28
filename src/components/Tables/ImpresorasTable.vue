@@ -30,6 +30,32 @@
             @change="selectDefaultPrinter(item)"
           ></v-checkbox>
         </template>
+        <template v-slot:[`item.ticket`]="{item,index}">
+          <p v-show="viewCheckboxState === 1">
+            {{
+              item.ticket
+                ? (checkboxModel[index] = true)
+                : (checkboxModel[index] = false)
+            }}
+          </p>
+          <v-checkbox
+            v-model="checkboxModel[index]"
+            @change="selectDefaulticket(item)"
+          ></v-checkbox>
+        </template>
+        <template v-slot:[`item.etiqueta`]="{item,index}">
+          <p v-show="viewCheckboxState === 1">
+            {{
+              item.etiqueta
+                ? (checkboxModel[index] = true)
+                : (checkboxModel[index] = false)
+            }}
+          </p>
+          <v-checkbox
+            v-model="checkboxModel[index]"
+            @change="selectDefaultetiqueta(item)"
+          ></v-checkbox>
+        </template>
         <template v-slot:[`item.acciones`]="{ item }">
           <Edit :itemId="item.id" v-on:editItem="editItem" />
           <Delete :itemId="item.id" v-on:deleteItem="deleteItem" />
@@ -49,6 +75,8 @@ export default {
     filterParams: {
       sucursalId: "",
       valor: "",
+      ticket:"",
+      etiqueta:"",
       nombreImpresora: "",
       estado: true,
       page: 1,
@@ -56,7 +84,11 @@ export default {
       totalPages: 0,
     },
     viewCheckboxState: 0,
+    viewCheckboxState1:0,
+    viewCheckboxState2:0,
     checkboxModel: {},
+    checkboxModel1: {},
+    checkboxModel2: {},
     loaded: true,
     tenant: "",
     service: "impresoras",
@@ -66,6 +98,8 @@ export default {
       { text: "Nombre", value: "nombreImpresora" },
       { text: "Ancho", value: "valor" },
       { text: "Impresora por defecto", value: "impresoraPredeterminada" },
+      {text:"Ticket", value:"ticket"},
+      {text:"Etiqueta", value:"etiqueta"},
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
@@ -116,6 +150,34 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
         .then(() => {
+          this.getObjects();
+        });
+    },
+      selectDefaulticket(printer) {
+      this.impresoras.forEach((el) => {
+       el.ticket = false;
+      });
+      this.impresoras.filter(
+        (el) => el.nombreImpresora === printer.nombreImpresora
+      )[0].ticket = true;
+      GenericService(this.tenant, this.service, this.token)
+        .saveAll(this.impresoras)
+        .then(() => {
+          console.log(this.impresoras);
+          this.getObjects();
+        });
+    },
+      selectDefaultetiqueta(printer) {
+      this.impresoras.forEach((el) => {
+       el.etiqueta = false;
+      });
+      this.impresoras.filter(
+        (el) => el.nombreImpresora === printer.nombreImpresora
+      )[0].etiqueta = true;
+      GenericService(this.tenant, this.service, this.token)
+        .saveAll(this.impresoras)
+        .then(() => {
+          console.log(this.impresoras);
           this.getObjects();
         });
     },
