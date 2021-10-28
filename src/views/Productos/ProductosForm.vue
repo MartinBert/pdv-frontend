@@ -485,12 +485,9 @@ export default {
       ]);
     },
     gainCalculations() {
-      this.object.ganancia = roundTwoDecimals(
-        calculatePercentReductionInAmount(
-          this.object.precioTotal,
-          this.object.ivaVentasObject.porcentaje
-        ) - this.object.costoBruto
-      );
+      this.object.ganancia =roundTwoDecimals( (((this.object.precioTotal) / 
+                                              (this.object.costoBruto*(((this.object.ivaVentasObject.porcentaje)/100)+1))) -1)*100 )
+      
       this.object.precioSinIva = calculatePercentReductionInAmount(
         this.object.precioTotal,
         this.object.ivaVentasObject.porcentaje
