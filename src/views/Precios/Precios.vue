@@ -519,11 +519,8 @@ export default {
           this.object.amount,
         ]);
       }
-      product.ganancia = roundTwoDecimals(
-        calculatePercentReductionInAmount(
-          product.precioTotal,
-          product.ivaVentasObject.porcentaje
-        ) - product.costoBruto
+      product.ganancia = roundTwoDecimals(roundTwoDecimals( (((product.precioTotal) / 
+                                              (product.costoBruto*(((product.ivaVentasObject.porcentaje)/100)+1))) -1)*100 )
       );
       product.precioSinIva = calculatePercentReductionInAmount(
         product.precioTotal,
