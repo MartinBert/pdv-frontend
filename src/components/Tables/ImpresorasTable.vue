@@ -34,8 +34,8 @@
           <p v-show="viewCheckboxState1 === 1">
             {{
               item.ticket
-                ? (checkboxModel[index] = true)
-                : (checkboxModel[index] = false)
+                ? (checkboxModel1[index] = true)
+                : (checkboxModel1[index] = false)
             }}
           </p>
           <v-checkbox
@@ -47,8 +47,8 @@
           <p v-show="viewCheckboxState2 === 1">
             {{
               item.etiqueta
-                ? (checkboxModel[index] = true)
-                : (checkboxModel[index] = false)
+                ? (checkboxModel2[index] = true)
+                : (checkboxModel2[index] = false)
             }}
           </p>
           <v-checkbox
@@ -87,6 +87,8 @@ export default {
     viewCheckboxState1:0,
     viewCheckboxState2:0,
     checkboxModel: {},
+    checkboxModel1: {},
+    checkboxModel2: {},
     loaded: true,
     tenant: "",
     service: "impresoras",
