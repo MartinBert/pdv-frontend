@@ -39,7 +39,7 @@
             }}
           </p>
           <v-checkbox
-            v-model="checkboxModel[index]"
+            v-model="checkboxModel1[index]"
             @change="selectDefaulticket(item)"
           ></v-checkbox>
         </template>
@@ -52,7 +52,7 @@
             }}
           </p>
           <v-checkbox
-            v-model="checkboxModel[index]"
+            v-model="checkboxModel2[index]"
             @change="selectDefaultetiqueta(item)"
           ></v-checkbox>
         </template>
