@@ -157,7 +157,11 @@
                   <tr v-for="p in $store.state.ventasFast.focusedProduct" :key="p.id">
                     <td>{{ p.nombre }}</td>
                     <td>{{ p.codigoBarra }}</td>
-                    <td>{{ p.cantUnidades }}</td>
+                    <input
+                    id="cantUnidades"
+                    type="number"
+                    v-model="p.cantUnidades"
+                    />
                   </tr>
                 </tbody>
               </template>
@@ -242,6 +246,12 @@ export default {
     /******************************************************************************************************/
     excecuteShortcut(e) {
       switch (e.keyCode) {
+        case 67:
+          this.blurInputFocus("dialogInput");
+           setTimeout(() => {
+            this.getInputFocus("cantUnidades");
+          }, 50)
+          break;
         case 81:          
           this.totalProductload = true;
           setTimeout(() => {
