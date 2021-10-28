@@ -151,7 +151,7 @@ export default {
           this.getObjects();
         });
     },
-      selectDefaulteticket(printer) {
+      selectDefaulticket(printer) {
       this.impresoras.forEach((el) => {
        el.ticket  = false;
       });
