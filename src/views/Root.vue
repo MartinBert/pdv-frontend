@@ -289,6 +289,11 @@ export default {
             name: "transportistas",
             title: "Transportistas",
             visible: false,
+          },{
+            path: "/cuentascorrientes",
+            name: "cuentascorrientes",
+            title: "Cuentas Corrientes",
+            visible: false,
           },
         ],
       },

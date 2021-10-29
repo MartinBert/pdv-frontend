@@ -66,6 +66,7 @@ import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 import Impresora from "../views/Impresoras/Impresoras";
 import ImpresorasForm from "../views/Impresoras/ImpresorasForm.vue";
 import VentasFast from "../views/VentasFast/ventasFast";
+import CuentasCorrientes from "../views/CuentasCorrientes/CuentasCorrientes.vue";
 
 
 Vue.use(VueRouter)
@@ -183,6 +184,12 @@ const routes = [
                 name: 'clientes',
                 component: Clientes,
                 meta: { requiresAuth: true }
+            },
+            {
+                path: 'cuentascorrientes',
+                name: 'cuentascorrientes',
+                component: CuentasCorrientes,
+                meta: {requiresAuth: true}
             },
             {
                 path: 'clientes/form/:id',
