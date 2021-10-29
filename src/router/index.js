@@ -66,6 +66,7 @@ import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 import Impresora from "../views/Impresoras/Impresoras";
 import ImpresorasForm from "../views/Impresoras/ImpresorasForm.vue";
 import VentasFast from "../views/VentasFast/ventasFast";
+import VentasConfig from "../views/VentasFast/ventasConfig";
 
 
 Vue.use(VueRouter)
@@ -206,6 +207,12 @@ const routes = [
                 path: 'ventasfast',
                 name: 'ventasfast',
                 component: VentasFast,
+                meta: { requiresAuth: true }
+            },
+            {
+                path: 'ventasfast/form/:id',
+                name: 'ventasConfig',
+                component: VentasConfig,
                 meta: { requiresAuth: true }
             },
             {
