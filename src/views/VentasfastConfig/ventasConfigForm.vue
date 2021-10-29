@@ -72,7 +72,7 @@ export default {
     object: {},
     loaded: false,
     tenant: "",
-    service: "planesPago",
+    service: "ventas",
     token: localStorage.getItem("token"),
     errorStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -110,20 +110,7 @@ export default {
     },
 
     save() {
-      this.$refs.form.validate();
-      this.loaded = false;
-      this.object.sucursal = this.loguedUser.sucursal;
-      GenericService(this.tenant, this.service, this.token)
-        .save(this.object)
-        .then(() => {
-          this.$router.push({ name: "planesPago" });
-        })
-        .catch((error) => {
-          if (error.response.status == 500) {
-            this.errorStatus = true;
-            this.loaded = true;
-          }
-        });
+        console.log("guardando");
     },
 
     getComercialDocuments(clientCond, businessCond) {
