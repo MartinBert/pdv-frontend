@@ -1,6 +1,9 @@
 <template>
   <v-container style="min-width: 100%">
     <GlobalEvents @keydown="(e) => excecuteShortcut(e)" />
+    <v-col cols="1" >
+         <v-btn class="primary" raised @click="newObject()">Configuraciones</v-btn>
+    </v-col>
     <v-col cols="12" v-if="loaded">
       <v-card style="min-width: 100%">
         <v-row>
@@ -354,6 +357,10 @@ export default {
         this.$store.commit("productos/dialogProductosMutation");
         this.totalProductload = false;
       }
+    },
+
+    newObject() {
+      this.$router.push({ name: "ventasConfig", params: { id: 0 } });
     },
 
     deleteProduct(e, object) {
