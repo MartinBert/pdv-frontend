@@ -44,9 +44,7 @@
         <template v-slot:[`item.etiqueta`]="{item,index}">
           <p v-show="viewCheckboxState === 1">
             {{
-              item.etiqueta
-                ? (checkboxModel[index] = true)
-                : (checkboxModel[index] = false)
+              (item.etiqueta) ? checkboxModel[index] = true : checkboxModel[index] = false
             }}
           </p>
           <v-checkbox
