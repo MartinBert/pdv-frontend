@@ -102,21 +102,6 @@ export default {
     edit(id) {
       this.$router.push({ name: "ImpresorasForm", params: { id: id } });
     },
-
-    selectDefaultPrinter(printer) {
-      this.impresoras.forEach((el) => {
-        el.impresoraPredeterminada = false;
-      });
-
-      this.impresoras.filter(
-        (el) => el.nombreImpresora === printer.nombreImpresora
-      )[0].impresoraPredeterminada = true;
-      GenericService(this.tenant, this.service, this.token)
-        .saveAll(this.impresoras)
-        .then(() => {
-          this.getObjects();
-        });
-    },
   },
 };
 </script>
