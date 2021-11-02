@@ -156,7 +156,7 @@ export default {
        el.ticket = false;
       });
       this.impresoras.filter(
-        (el) => el.nombreImpresora === printer.nombreImpresora
+        (el) => el.ticket === printer.ticket
       )[0].ticket = true;
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
