@@ -170,7 +170,7 @@ export default {
        el.etiqueta = false;
       });
       this.impresoras.filter(
-        (el) => el.nombreImpresora === printer.nombreImpresora
+        (el) => el.id === printer.etiqueta
       )[0].etiqueta = true;
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
