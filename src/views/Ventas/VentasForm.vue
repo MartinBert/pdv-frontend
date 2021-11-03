@@ -138,6 +138,15 @@
                         required
                       />
                     </v-col>
+                    <v-col
+                      cols="6"
+                      v-if="
+                        object.documento &&
+                          object.documento.nombre === 'REMITOS R'
+                      "
+                    >
+                      <h1>Remitos R</h1>
+                    </v-col>
                   </v-row>
                 </v-col>
                 <v-col cols="4">
