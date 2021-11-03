@@ -1,4 +1,3 @@
-
 <template>
   <v-container style="min-width: 100%">
     <v-col cols="12" v-if="loaded">
@@ -145,7 +144,10 @@
                           object.documento.nombre === 'REMITOS R'
                       "
                     >
-                      <h1>Remitos R</h1>
+                      <v-checkbox
+                      ></v-checkbox>
+                      <v-checkbox
+                      ></v-checkbox>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -332,7 +334,7 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
-import { printReceipt }  from "../../services/ImpresionService";
+import { printReceipt } from "../../services/ImpresionService";
 import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
@@ -357,7 +359,7 @@ import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -371,7 +373,7 @@ export default {
       clientes: [],
       medios_de_pago: [],
       documentos: [],
-      impresoras:[]
+      impresoras: [],
     },
     comprobantesRules: [(v) => !!v || "Comprobante es requerido"],
     medioPagoRules: [(v) => !!v || "medios de pago es requerido"],
@@ -404,9 +406,9 @@ export default {
     lowStock: [],
     perfil: null,
     processPresupuesto: false,
-    printName:"",
-    defaultPrint:false,
-    valorPrint:""
+    printName: "",
+    defaultPrint: false,
+    valorPrint: "",
   }),
 
   components: {
@@ -528,7 +530,7 @@ export default {
         nombreImpresora: "",
         impresoraPredeterminada: true,
         page: 1,
-        size: 100000
+        size: 100000,
       };
 
       const medioPagoFilter = {
@@ -545,15 +547,15 @@ export default {
         size: 10,
         totalPages: 0,
       };
-       GenericService(this.tenant, "impresoras", this.token)
+      GenericService(this.tenant, "impresoras", this.token)
         .filter(impresoraFilter)
         .then((data) => {
           this.databaseItems.impresoras = data.data.content;
-          this.databaseItems.impresoras.forEach(print => {
-            if(print.impresoraPredeterminada == true){
+          this.databaseItems.impresoras.forEach((print) => {
+            if (print.impresoraPredeterminada == true) {
               this.defaultPrint = true;
               this.printName = print.nombreImpresora;
-              this.valorPrint = print.valor
+              this.valorPrint = print.valor;
             }
           });
         });
@@ -773,16 +775,17 @@ export default {
       this.object.planPago = presupuesto.planesPago[0];
       presupuesto.productos.forEach((product, index) => {
         product.id = index;
-      })
+      });
       this.products = presupuesto.productos;
       this.porcentajeDescuentoGlobal = this.object.porcentajeDescuentoGlobal;
       this.porcentajeRecargoGlobal = this.object.porcentajeRecargoGlobal;
       this.processPresupuesto = true;
       this.object.productoDescription.forEach((product) => {
-        product.salePrice = product.salePrice + product.discountAmount - product.surchargeAmount;
+        product.salePrice =
+          product.salePrice + product.discountAmount - product.surchargeAmount;
         product.discountPercent = 0;
         product.discountAmount = 0;
-      })
+      });
       this.object.porcentajeDescuentoGlobal = 0;
       this.object.porcentajeRecargoGlobal = 0;
       this.object.totalDescuentoGlobal = 0;
@@ -871,15 +874,14 @@ export default {
 
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
-        const total = this.productsDescription.reduce(
-          (acc, el) => {
-            if(!el.editable){
-              acc = acc + Number(el.salePrice) * Number(el.quantity)
-            }else{
-              acc = acc + el.salePrice;
-            }
-            return acc;
-          },0);
+        const total = this.productsDescription.reduce((acc, el) => {
+          if (!el.editable) {
+            acc = acc + Number(el.salePrice) * Number(el.quantity);
+          } else {
+            acc = acc + el.salePrice;
+          }
+          return acc;
+        }, 0);
         let percent = calculatePercentaje(total, priceModificationPorcent);
         if (modificator === "descuento") {
           if (Math.sign(percent) === 1) {
@@ -1047,8 +1049,11 @@ export default {
     },
 
     getTotalSurcharges(letter) {
-      const sumOfProductPrices = this.calculateSumOfProductSalePrices(this.productsDescription);
-      const planSurcharge = sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje);
+      const sumOfProductPrices = this.calculateSumOfProductSalePrices(
+        this.productsDescription
+      );
+      const planSurcharge =
+        sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje);
       let total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("RECARGO")) {
           acc += Number(el.precioTotal * 1);
@@ -1059,17 +1064,22 @@ export default {
         total = total / 1.21;
       }
       let totalSurcharge;
-      if(this.object.planPago.porcentaje > 0){
+      if (this.object.planPago.porcentaje > 0) {
         totalSurcharge = roundTwoDecimals(total + planSurcharge);
-      }else{
+      } else {
         totalSurcharge = total;
       }
       return totalSurcharge.toString();
     },
 
     getTotalDiscounts(letter) {
-      const sumOfProductPrices = this.calculateSumOfProductSalePrices(this.productsDescription);
-      const planDiscount = (sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje)) * -1;
+      const sumOfProductPrices = this.calculateSumOfProductSalePrices(
+        this.productsDescription
+      );
+      const planDiscount =
+        sumOfProductPrices *
+        decimalPercent(this.object.planPago.porcentaje) *
+        -1;
       let total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("DESCUENTO")) {
           acc += Number(el.precioTotal * -1);
@@ -1080,9 +1090,9 @@ export default {
         total = total / 1.21;
       }
       let totalDiscount;
-      if(this.object.planPago.porcentaje < 0){
+      if (this.object.planPago.porcentaje < 0) {
         totalDiscount = roundTwoDecimals(total + planDiscount);
-      }else{
+      } else {
         totalDiscount = total;
       }
       return totalDiscount.toString();
@@ -1203,7 +1213,7 @@ export default {
     },
 
     save() {
-      Swal.fire("Generando Venta","Espere por favor","info");
+      Swal.fire("Generando Venta", "Espere por favor", "info");
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
@@ -1338,7 +1348,7 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-                  
+
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1352,8 +1362,12 @@ export default {
                             });
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
-                            if(this.defaultPrint){
-                              printReceipt(comprobante,this.printName,this.valorPrint);
+                            if (this.defaultPrint) {
+                              printReceipt(
+                                comprobante,
+                                this.printName,
+                                this.valorPrint
+                              );
                             }
                           });
                       })
@@ -1383,7 +1397,7 @@ export default {
     },
 
     saveNoFiscal() {
-      Swal.fire("Generando Venta","Espere por favor","info");
+      Swal.fire("Generando Venta", "Espere por favor", "info");
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
       const cliente = this.object.cliente;
@@ -1496,8 +1510,12 @@ export default {
                       });
                       fileURL = URL.createObjectURL(file);
                       window.open(fileURL, "_blank");
-                      if(this.defaultPrint){
-                        printReceipt(comprobante,this.printName,this.valorPrint);
+                      if (this.defaultPrint) {
+                        printReceipt(
+                          comprobante,
+                          this.printName,
+                          this.valorPrint
+                        );
                       }
                     })
                     .then(() => {
@@ -1973,7 +1991,7 @@ export default {
 
     calculateAmountOfPriceVariations(productsDescription) {
       productsDescription.forEach((prodDescription) => {
-        if(!prodDescription.editable){
+        if (!prodDescription.editable) {
           prodDescription.discountAmount =
             prodDescription.salePrice *
             Number(prodDescription.quantity) *
@@ -1982,7 +2000,7 @@ export default {
             prodDescription.salePrice *
             Number(prodDescription.quantity) *
             decimalPercent(prodDescription.surchargePercent);
-        }else{
+        } else {
           prodDescription.discountAmount =
             prodDescription.salePrice *
             decimalPercent(prodDescription.discountPercent);
@@ -2011,15 +2029,14 @@ export default {
     },
 
     calculateSumOfProductSalePrices(productsDescription) {
-      const total = productsDescription.reduce(
-        (acc, el) => {
-          if(!el.editable){
-            acc = acc + el.salePrice * Number(el.quantity)
-          }else{
-            acc = acc + el.salePrice;
-          }
-          return acc;
-        },0);
+      const total = productsDescription.reduce((acc, el) => {
+        if (!el.editable) {
+          acc = acc + el.salePrice * Number(el.quantity);
+        } else {
+          acc = acc + el.salePrice;
+        }
+        return acc;
+      }, 0);
       return roundTwoDecimals(total);
     },
 
