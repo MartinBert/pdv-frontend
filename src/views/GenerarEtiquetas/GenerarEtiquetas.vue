@@ -185,6 +185,8 @@ export default {
   data: () => ({
     productos: [],
     valorPrint:"",
+    printName:"",
+    printEtiqueta: false,
     filterParams: {
       sucursalId: "",
       productoName: "",
@@ -276,7 +278,8 @@ export default {
           if(print.impresoraPredeterminada == true){
             this.defaultPrint = true;
             this.printName = print.nombreImpresora;
-            this.valorPrint = print.valor
+            this.valorPrint = print.valor;
+            this.printEtiqueta = print.etiqueta;
           }
         });
       });
@@ -334,7 +337,11 @@ export default {
     },
 
     printLabels(labelList) {
-      printBarCodes(labelList,this.printName,this.valorPrint);
+      if(this.printEtiqueta){
+        printBarCodes(labelList,this.printName,this.valorPrint);
+        console.log("print");
+      }
+      
       ReportsService(this.tenant, "productos", this.token)
         .labels(labelList)
         .then((res) => {

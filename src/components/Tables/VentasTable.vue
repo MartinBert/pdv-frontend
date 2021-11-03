@@ -149,6 +149,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
+          console.log(this.ventas);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
           });  

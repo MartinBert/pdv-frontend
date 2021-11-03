@@ -28,6 +28,8 @@ export default {
       sucursalId: "",
       valor: "",
       nombreImpresora: "",
+      etiqueta:"",
+      ticket:"",
       estado: true,
       page: 1,
       size: 10,
@@ -72,6 +74,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.impresoras = data.data.content;
+          console.log(this.impresoras);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
