@@ -339,7 +339,6 @@ export default {
     printLabels(labelList) {
       if(this.printEtiqueta){
         printBarCodes(labelList,this.printName,this.valorPrint);
-        console.log("print");
       }
       
       ReportsService(this.tenant, "productos", this.token)
