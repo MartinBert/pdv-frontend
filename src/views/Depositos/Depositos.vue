@@ -316,7 +316,6 @@ export default {
             this.$refs.depositosTable.$forceUpdate();
           }
         });
-      console.log(this.defaultDeposit);
     },
     selectDefaultDeposit1(deposit) {
       this.loaded = false;

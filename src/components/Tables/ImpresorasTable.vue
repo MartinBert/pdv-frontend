@@ -27,33 +27,29 @@
           </p>
           <v-checkbox
             v-model="checkboxModel[index]"
-            @change="selectDefaultPrinter(item)"
+            @change="selectDefaultPrinter(item, checkboxModel[index])"
           ></v-checkbox>
         </template>
         <template v-slot:[`item.ticket`]="{item,index}">
           <p v-show="viewCheckboxState === 1">
             {{
-              item.ticket
-                ? (checkboxModel[index] = true)
-                : (checkboxModel[index] = false)
+              (item.ticket) ? checkboxModel1[index] = true : checkboxModel1[index] = false
             }}
           </p>
           <v-checkbox
-            v-model="checkboxModel[index]"
-            @change="selectDefaulticket(item)"
+            v-model="checkboxModel1[index]"
+            @change="selectDefaulticket(item, checkboxModel1[index])"
           ></v-checkbox>
         </template>
         <template v-slot:[`item.etiqueta`]="{item,index}">
           <p v-show="viewCheckboxState === 1">
             {{
-              item.etiqueta
-                ? (checkboxModel[index] = true)
-                : (checkboxModel[index] = false)
+              (item.etiqueta) ? checkboxModel2[index] = true : checkboxModel2[index] = false
             }}
           </p>
           <v-checkbox
-            v-model="checkboxModel[index]"
-            @change="selectDefaultetiqueta(item)"
+            v-model="checkboxModel2[index]"
+            @change="selectDefaultetiqueta(item, checkboxModel2[index])"
           ></v-checkbox>
         </template>
         <template v-slot:[`item.acciones`]="{ item }">
@@ -140,46 +136,56 @@ export default {
       this.$emit("editItem", itemId);
     },
 
-    selectDefaultPrinter(printer) {
-      this.impresoras.forEach((el) => {
-        el.impresoraPredeterminada = false;
-      });
-      this.impresoras.filter(
-        (el) => el.nombreImpresora === printer.nombreImpresora
-      )[0].impresoraPredeterminada = true;
+    selectDefaultPrinter(printer, status) {
+      this.impresoras.forEach(el => el.impresoraPredeterminada = false);
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
         .then(() => {
-          this.getObjects();
-        });
+          printer.impresoraPredeterminada = status;
+          GenericService(this.tenant, this.service, this.token)
+          .save(printer)
+          .then(() => {
+            this.getObjects();
+          })
+        })
+        .catch(err => {
+          console.error(err);
+        })
     },
-      selectDefaulticket(printer) {
-      this.impresoras.forEach((el) => {
-       el.ticket = false;
-      });
-      this.impresoras.filter(
-        (el) => el.nombreImpresora === printer.nombreImpresora
-      )[0].ticket = true;
+
+    selectDefaulticket(printer, status) {
+      this.impresoras.forEach(el => el.ticket = false);
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
         .then(() => {
-          console.log(this.impresoras);
-          this.getObjects();
-        });
+          printer.ticket = status;
+          GenericService(this.tenant, this.service, this.token)
+          .save(printer)
+          .then(() => {
+            this.getObjects();
+          })
+        })
+        .catch(err => {
+          console.error(err);
+        })
     },
-      selectDefaultetiqueta(printer) {
-      this.impresoras.forEach((el) => {
-       el.etiqueta = false;
-      });
-      this.impresoras.filter(
-        (el) => el.nombreImpresora === printer.nombreImpresora
-      )[0].etiqueta = true;
+
+    selectDefaultetiqueta(printer, status) {
+      this.impresoras.forEach(el => el.etiqueta = false);
       GenericService(this.tenant, this.service, this.token)
         .saveAll(this.impresoras)
         .then(() => {
-          console.log(this.impresoras);
-          this.getObjects();
-        });
+          console.log(printer, status)
+          printer.etiqueta = status;
+          GenericService(this.tenant, this.service, this.token)
+          .save(printer)
+          .then(() => {
+            this.getObjects();
+          })
+        })
+        .catch(err => {
+          console.error(err);
+        })
     },
   },
 };

@@ -18,11 +18,11 @@
               <v-autocomplete
                 @change="
                   getComercialDocuments(
-                    object.cliente.condicionIva.documentos,
+                    object.clientePorDefecto.condicionIva.documentos,
                     loguedUser.sucursal.condicionIva.documentos
                   )
                 "
-                v-model="object.cliente"
+                v-model="object.clientePorDefecto"
                 :items="databaseItems.clientes"
                 item-text="razonSocial"
                 :return-object="true"
@@ -35,7 +35,7 @@
                 ref="documents"
                 class="button-ventas comprobante"
                 item-text="nombre"
-                v-model="object.documento"
+                v-model="object.documentoPorDefecto"
                 :items="databaseItems.documentos"
                 :return-object="true"
                 placeholder="Seleccione un tipo de comprobante"
@@ -72,16 +72,13 @@ export default {
     object: {},
     loaded: false,
     tenant: "",
-    service: "ventas",
+    service: "ventasFastConfig",
     token: localStorage.getItem("token"),
     errorStatus: false,
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     databaseItems: {
-      clientes: [],
-      medios_de_pago: [],
-      documentos: [],
-      impresoras: [],
-    },
+      clientes: []
+    }
   }),
 
   components: {
@@ -110,7 +107,16 @@ export default {
     },
 
     save() {
-        console.log("guardando");
+      this.object.estado = true;
+      this.object.sucursal = this.loguedUser.sucursal;
+      GenericService(this.tenant, this.service, this.token)
+      .save(this.object)
+      .then(() => {
+        this.$router.push({ name: "ventasfastconfiguracion" });
+      })
+      .catch(err => {
+        console.error(err);
+      })
     },
 
     getComercialDocuments(clientCond, businessCond) {
@@ -126,16 +132,12 @@ export default {
     },
 
     back() {
-      this.$router.push({ name: "ventasfast" });
+      this.$router.push({ name: "ventasfastconfiguracion" });
     },
 
     getObjects(){
-      let sucursalId;
-      if (this.loguedUser.perfil > 1) {
-        sucursalId = this.loguedUser.sucursal.id;
-      }
       const clientFilter = {
-        sucursalId: sucursalId,
+        sucursalId: this.loguedUser.sucursal.id,
         personaSocialReason: "",
         personaName: "",
         personaCuit: "",
@@ -148,10 +150,9 @@ export default {
        GenericService(this.tenant, "clientes", this.token)
         .filter(clientFilter)
         .then((data) => {
+          console.log(data);
           this.databaseItems.clientes = data.data.content;
         });
-
-
     }
   },
 };

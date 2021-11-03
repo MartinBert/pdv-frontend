@@ -373,6 +373,18 @@ export default {
             title: "Ivas",
             visible: false,
           },
+          {
+            path: "/impresora",
+            name: "impresoras",
+            title: "Impresoras",
+            visible: false,
+          },
+          {
+            path: "/ventasfastconfiguracion",
+            name: "ventasfastconfiguracion",
+            title: "Ventas Rapidas",
+            visible: false,
+          },
         ],
       },
       {
@@ -425,20 +437,6 @@ export default {
             path: "/calendar",
             name: "calendar",
             title: "Calendar",
-            visible: false,
-          },
-        ],
-      },
-      {
-        name: "impresoras",
-        title: "Impresoras",
-        visible: false,
-        icon: "/../images/icons/printer.svg",
-        childs: [
-          {
-            path: "/impresora",
-            name: "impresoras",
-            title: "Impresoras",
             visible: false,
           },
         ],

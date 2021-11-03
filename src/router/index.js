@@ -65,7 +65,7 @@ import LibroivaVentas from "../views/LibroivaVentas/LibroivaVentas";
 import GenerarEtiquetas from "../views/GenerarEtiquetas/GenerarEtiquetas.vue";
 import Impresora from "../views/Impresoras/Impresoras";
 import ImpresorasForm from "../views/Impresoras/ImpresorasForm.vue";
-//import VentasfastConfig from "../views/VentasfastConfig/ventasConfig";
+import VentasfastConfig from "../views/VentasfastConfig/ventasConfig";
 import VentasFormconfig from "../views/VentasfastConfig/ventasConfigForm";
 import VentasFast from "../views/VentasFast/ventasFast";
 import CuentasCorrientes from "../views/CuentasCorrientes/CuentasCorrientes.vue";
@@ -218,8 +218,14 @@ const routes = [
                 meta: { requiresAuth: true }
             },
             {
-                path:'ventasfastconfig',
-                name:'ventasConfig',
+                path:'ventasfastconfiguracion',
+                name:'ventasfastconfiguracion',
+                component: VentasfastConfig,
+                meta:{requiresAuth : true}
+            },
+            {
+                path:'ventasfastconfiguracionForm',
+                name:'ventasfastconfiguracionForm',
                 component: VentasFormconfig,
                 meta:{requiresAuth : true}
             },
