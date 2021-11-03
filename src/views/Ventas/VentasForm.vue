@@ -137,18 +137,6 @@
                         required
                       />
                     </v-col>
-                    <v-col
-                      cols="6"
-                      v-if="
-                        object.documento &&
-                          object.documento.nombre === 'REMITOS R'
-                      "
-                    >
-                      <v-checkbox
-                      ></v-checkbox>
-                      <v-checkbox
-                      ></v-checkbox>
-                    </v-col>
                   </v-row>
                 </v-col>
                 <v-col cols="4">
