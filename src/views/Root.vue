@@ -289,6 +289,11 @@ export default {
             name: "transportistas",
             title: "Transportistas",
             visible: false,
+          },{
+            path: "/cuentascorrientes",
+            name: "cuentascorrientes",
+            title: "Cuentas Corrientes",
+            visible: false,
           },
         ],
       },
@@ -333,6 +338,12 @@ export default {
         icon: "/../images/icons/settings.svg",
         childs: [
           {
+            path:"/ventasfastconfig",
+            name:"ventasConfig",
+            title:"Ventas rapidas configuracion",
+            visible:false
+          },
+          {
             path: "/empresa",
             name: "empresas",
             title: "Empresa",
@@ -360,6 +371,18 @@ export default {
             path: "/ivas",
             name: "ivas",
             title: "Ivas",
+            visible: false,
+          },
+          {
+            path: "/impresora",
+            name: "impresoras",
+            title: "Impresoras",
+            visible: false,
+          },
+          {
+            path: "/ventasfastconfiguracion",
+            name: "ventasfastconfiguracion",
+            title: "Ventas Rapidas",
             visible: false,
           },
         ],
@@ -414,20 +437,6 @@ export default {
             path: "/calendar",
             name: "calendar",
             title: "Calendar",
-            visible: false,
-          },
-        ],
-      },
-      {
-        name: "impresoras",
-        title: "Impresoras",
-        visible: false,
-        icon: "/../images/icons/printer.svg",
-        childs: [
-          {
-            path: "/impresora",
-            name: "impresoras",
-            title: "Impresoras",
             visible: false,
           },
         ],

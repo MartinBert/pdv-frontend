@@ -28,6 +28,8 @@ export default {
       sucursalId: "",
       valor: "",
       nombreImpresora: "",
+      etiqueta:"",
+      ticket:"",
       estado: true,
       page: 1,
       size: 10,
@@ -45,6 +47,8 @@ export default {
       { text: "Nombre", value: "nombreImpresora" },
       { text: "Ancho", value: "valor" },
       { text: "Impresora por defecto", value: "impresoraPredeterminada" },
+      {text:"Etiquetas",value:""},
+      {text:"Ticket",value:""},
       { text: "Acciones", value: "acciones", sortable: false },
     ],
   }),
@@ -70,6 +74,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.impresoras = data.data.content;
+          console.log(this.impresoras);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
@@ -99,21 +104,6 @@ export default {
 
     edit(id) {
       this.$router.push({ name: "ImpresorasForm", params: { id: id } });
-    },
-
-    selectDefaultPrinter(printer) {
-      this.impresoras.forEach((el) => {
-        el.impresoraPredeterminada = false;
-      });
-
-      this.impresoras.filter(
-        (el) => el.nombreImpresora === printer.nombreImpresora
-      )[0].impresoraPredeterminada = true;
-      GenericService(this.tenant, this.service, this.token)
-        .saveAll(this.impresoras)
-        .then(() => {
-          this.getObjects();
-        });
     },
   },
 };

@@ -7,11 +7,19 @@ export default {
       discountPercent: 0,
       surchargePercent: 0,
       products: [],
+      paymentMethod: null,
+      paymentPlan: null,
+      focusedProduct: null
     },
 
     mutations: {
       resetStates(state) {
+        state.discountPercent = 0;
+        state.surchargePercent = 0;
         state.products = [];
+        state.paymentMethod = null;
+        state.paymentPlan = null;
+        state.focusedProduct = null;
       },
 
       addProductsToList(state, object) {
@@ -23,9 +31,16 @@ export default {
         }
       },
 
-      removeProductsToList(state, id) {
-        const productos = state.products.filter(el => el.id !== id);
-        state.products = productos;
+      addPaymentMethod(state, object){
+        state.paymentMethod = object;
+      },
+
+      addPaymentPlan(state, object){
+        state.paymentPlan = object;
+      },
+
+      removeProductsToList(state, barcode) {
+        state.products = state.products.filter(el => el.codigoBarra !== barcode);
       },
 
       loadModification(state, percentOfModification){
@@ -34,6 +49,20 @@ export default {
         }else{
           state.surchargePercent = percentOfModification;
         }
+      },
+
+      focusToProduct(state, barcode){
+        console.log(state.products.filter(el => el.codigoBarra === barcode))
+        state.focusedProduct = state.products.filter(el => el.codigoBarra === barcode);
+      },
+
+      deleteWhenQuantityZero(state){
+        state.products = state.products.filter(el => el.cantUnidades > 0);
+        console.log(state.products);
+      },
+
+      dialogProductosMutation(state) {
+        state.dialogProd = !state.dialogProd;
       },
 
       clearProductsState(state) {
@@ -45,6 +74,16 @@ export default {
       sumOfProductPrices(state) {
         const result = state.products.reduce((acc, el) => acc + (el.precioTotal * el.cantUnidades));
         return result;
+      },
+
+      totalDiscount(state){
+        const result = this.sumOfProductPrices() * decimalPercent(state.discountPercent)
+        return roundTwoDecimals(result);
+      },
+
+      totalSurcharge(state){
+        const result = this.sumOfProductPrices() * decimalPercent(state.surchargePercent)
+        return roundTwoDecimals(result);
       },
 
       totalVenta(state){

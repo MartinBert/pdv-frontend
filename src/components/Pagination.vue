@@ -27,6 +27,7 @@ export default {
   }),
   methods: {
     emmitPaginationStatus() {
+
       this.$emit("changePage", this.paginationProperties.currentPage);
     },
   },
