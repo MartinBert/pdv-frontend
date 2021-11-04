@@ -57,7 +57,7 @@
         <v-autocomplete
           :items="sucursales"
           v-model="loguedUser.sucursal"
-          item-text="razonSocial"
+          item-text="nombre"
           :return-object="true"
           @change="getSalesPoint(loguedUser.sucursal)"
         />
