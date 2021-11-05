@@ -4,7 +4,7 @@
   ">
     <v-card>
       <MarcasTable
-       :items="devoluciones"
+       :items="marcas"
         v-on:editItem="edit"
         v-on:deleteItem="deleteItem"
         v-if="loaded"

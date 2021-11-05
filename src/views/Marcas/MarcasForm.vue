@@ -80,6 +80,7 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .save(this.object)
         .then(() => {
+          console.log(this.object);
           this.$router.push({ name: "marcas" });
         })
         .catch((error) => {

@@ -116,17 +116,18 @@ export default {
     },
     headers: [
       { text: "Fecha de Venta", value: "fechaEmision" },
-      { text: "Codigo de barra", value: "barCode" },
+      { text: "Numero Comprobante", value: "numeroCbte" },
       { text: "Comprobante", value: "nombreDocumento", sortable: false },
       { text: "Detalles", value: "productos", sortable: false },
       {
-        text: "Medios de pago empleados",
+        text: "Medios de pago",
         value: "mediosPago",
         sortable: false,
       },
       { text: "Planes de pago", value: "planesPago", sortable: false },
       { text: "Precio de venta", value: "totalVenta" },
-      { text: "Acciones", value: "acciones", sortable: false },
+      { text: "Remitos", value: "acciones", sortable: false },
+      { text: "Facturas", value: "acciones", sortable: false },
     ],
   }),
 
@@ -149,6 +150,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
+
           console.log(this.ventas);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
