@@ -8,6 +8,7 @@ export default {
       surchargePercent: 0,
       products: [],
       paymentMethod: null,
+      paymentPlans: null,
       paymentPlan: null,
       focusedProduct: null
     },
@@ -33,6 +34,7 @@ export default {
 
       addPaymentMethod(state, object){
         state.paymentMethod = object;
+        state.paymentPlans = object.planPago
       },
 
       addPaymentPlan(state, object){
