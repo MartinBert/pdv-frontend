@@ -10,7 +10,7 @@
           <v-col>
             <v-form v-on:submit.prevent="saveSale()" ref="anyName">
               <v-row>
-                <v-col cols="4">
+                <v-col cols="3">
                   <v-text-field
                     label="Codigo de barras"
                     hide-details="auto"
@@ -20,7 +20,7 @@
                     @keyup="(e) => searchWithInput(e)"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4" class="mt-5">
+                <v-col cols="3" class="mt-5">
                   <div v-if="$store.state.ventasFast.discountPercent">
                     <h2>
                       Descuento aplicado:
@@ -34,7 +34,21 @@
                     </h2>
                   </div>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="3">
+                  <div v-if="$store.state.ventasFast.paymentMethod">
+                    <h2>
+                      Medio de pago:
+                      {{ $store.state.ventasFast.paymentMethod.nombre }}
+                    </h2>
+                  </div>
+                  <div v-if="$store.state.ventasFast.paymentPlan">
+                    <h2>
+                      Plan de pago:
+                      {{ $store.state.ventasFast.paymentPlan.nombre }}
+                    </h2>
+                  </div>
+                </v-col>
+                <v-col cols="3">
                   <v-container style="color: rgb(63, 81, 181)">
                     <v-row>
                       <v-col class="text-right">
@@ -173,12 +187,49 @@
           </v-container>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="paymentMethodSelection" @input="selectPaymentMethod()" width="800">
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
+            Seleccione un medio de pago
+          </p>
+        </v-card-title>
+          <v-container class="text-center">
+            <v-autocomplete
+              :items="mediosPago"
+              item-text="nombre"
+              :return-object="true"
+              v-model="medioPagoSeleccionado"
+              id="medioPagoAutocomplete"
+            />
+          </v-container>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="paymentPlanSelection" @input="selectPaymentPlan()" width="800">
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
+            Seleccione un plan de pago
+          </p>
+        </v-card-title>
+          <v-container class="text-center">
+            <v-autocomplete
+              :items="$store.state.ventasFast.paymentPlans"
+              item-text="nombre"
+              :return-object="true"
+              v-model="planPagoSeleccionado"
+              id="planPagoAutocomplete"
+            />
+          </v-container>
+      </v-card>
+    </v-dialog>
     <Spinner v-if="!loaded" />
   </v-container>
 </template>
 <script>
 import ProductsService from "../../services/ProductsService";
 import VentasFastService from "../../services/VentasFastService";
+import GenericService from "../../services/GenericService";
 import Spinner from "../../components/Graphics/Spinner";
 import { getCurrentDate } from "../../helpers/dateHelper";
 import axios from "axios";
@@ -205,7 +256,12 @@ export default {
     barCodeSearch: "",
     writedBarCodes: [],
     searchOfDialog: null,
-    defaultConfig: null
+    defaultConfig: null,
+    paymentMethodSelection: false,
+    mediosPago: [],
+    medioPagoSeleccionado: null,
+    paymentPlanSelection: false,
+    planPagoSeleccionado: null
   }),
 
   components: {
@@ -247,6 +303,18 @@ export default {
       .then(data => {
         this.defaultConfig = data.data;
       })
+      GenericService(this.tenant, "mediosPago", this.token)
+      .filter({
+        sucursalId: this.loguedUser.sucursal.id,
+        medioPagoName: "",
+        page: 1,
+        size: 1000000,
+        totalPages: 0,
+      })
+      .then(data => {
+        this.mediosPago = data.data.content;
+        console.log(this.mediosPago);
+      })
     },
 
     getClientIpForFiscalController() {
@@ -259,7 +327,24 @@ export default {
     /* GLOBAL KEY EVENTS ---------------------------------------------------------------------------------*/
     /******************************************************************************************************/
     excecuteShortcut(e) {
+      console.log(e.keyCode);
       switch (e.keyCode) {
+        case 32:
+          this.blurInputFocus("searchBarCodeInput");
+          if(this.$store.state.ventasFast.paymentMethod && this.$store.state.ventasFast.paymentPlan){
+            this.$successAlert("Vendiste merca a los pendejos, felicidades")
+          }else if(this.$store.state.ventasFast.paymentMethod){
+            this.paymentPlanSelection = true;
+            setTimeout(() => {
+              this.getInputFocus("planPagoAutocomplete");
+            }, 50)
+          }else{
+            this.paymentMethodSelection = true;
+            setTimeout(() => {
+              this.getInputFocus("medioPagoAutocomplete");
+            }, 50)
+          }
+          break;
         case 67:
           this.blurInputFocus("dialogInput");
            setTimeout(() => {
@@ -298,6 +383,18 @@ export default {
           break;
         default:
           break;
+      }
+    },
+
+    selectPaymentMethod(){
+      if(this.medioPagoSeleccionado){
+        this.$store.commit('ventasFast/addPaymentMethod', this.medioPagoSeleccionado)
+      }
+    },
+
+    selectPaymentPlan(){
+      if(this.planPagoSeleccionado){
+        this.$store.commit('ventasFast/addPaymentPlan', this.planPagoSeleccionado)
       }
     },
 
