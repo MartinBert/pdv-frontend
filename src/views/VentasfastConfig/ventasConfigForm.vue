@@ -125,6 +125,7 @@ export default {
         businessCond.forEach((el) => {
           if (clientCond[i].id == el.id) {
             AllDocuments.push(el);
+            console.log(AllDocuments);
           }
         });
       }

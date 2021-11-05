@@ -266,7 +266,7 @@ export default {
         visible: false,
         icon: "/../images/icons/people.svg",
         childs: [
-          {
+          { 
             path: "/clientes",
             name: "clientes",
             title: "Clientes",
@@ -281,7 +281,7 @@ export default {
           {
             path: "/distribuidores",
             name: "distribuidores",
-            title: "Distribuidores",
+            title: "Proveedores",
             visible: false,
           },
           {
