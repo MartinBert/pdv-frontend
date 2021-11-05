@@ -70,7 +70,7 @@
                   v-model="object.distribuidores"
                   multiple
                   item-text="razonSocial"
-                  label="Distribuidores"
+                  label="Proveedores"
                   :return-object="true"
                   :rules="[(v) => !!v || 'Campo requerido...']"
                 ></v-autocomplete>
