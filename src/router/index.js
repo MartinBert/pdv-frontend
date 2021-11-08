@@ -308,11 +308,6 @@ const routes = [
                 meta: { requiresAuth: true }
             },
             {
-                path:'ventasfast/config',
-                name:'ventasfastconfig',
-
-            },
-            {
                 path: 'ventas',
                 name: 'ventasForm',
                 component: VentasForm,

@@ -2,7 +2,10 @@
   <v-container style="min-width: 100%">
     <GlobalEvents @keydown="(e) => excecuteShortcut(e)" />
     <v-col v-if="this.defaultConfig">
-      <h3>Cliente: {{this.defaultConfig.clientePorDefecto.nombre}}, Comprobante: {{this.defaultConfig.documentoPorDefecto.nombre}}</h3>
+      <h3>
+        Cliente: {{ this.defaultConfig.clientePorDefecto.nombre }}, Comprobante:
+        {{ this.defaultConfig.documentoPorDefecto.nombre }}
+      </h3>
     </v-col>
     <v-col cols="12" v-if="loaded">
       <v-card style="min-width: 100%">
@@ -143,14 +146,18 @@
         </v-container>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="totalProductload" @input="$store.commit('ventasFast/deleteWhenQuantityZero')" width="800">
+    <v-dialog
+      v-model="totalProductload"
+      @input="$store.commit('ventasFast/deleteWhenQuantityZero')"
+      width="800"
+    >
       <v-card>
         <v-card-title class="headline grey lighten-2">
           <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
             Eliminar productos de la lista
           </p>
         </v-card-title>
-          <v-container class="text-center">
+        <v-container class="text-center">
           <v-text-field
             dense
             outlined
@@ -162,65 +169,97 @@
             id="dialogInput"
             @keydown="(e) => searchProductToModify(e)"
           ></v-text-field>
-            <v-simple-table style="background-color: transparent" v-if="searchOfDialog && $store.state.ventasFast.products.find(el => el.codigoBarra === searchOfDialog)">
-              <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th class="text-left">Producto</th>
-                    <th class="text-left">Codigo de barras</th>
-                    <th class="text-left">Cantidad de unidades</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{{ $store.state.ventasFast.products.find(el => el.codigoBarra === searchOfDialog).nombre }}</td>
-                    <td>{{ $store.state.ventasFast.products.find(el => el.codigoBarra === searchOfDialog).codigoBarra }}</td>
-                    <input
+          <v-simple-table
+            style="background-color: transparent"
+            v-if="
+              searchOfDialog &&
+                $store.state.ventasFast.products.find(
+                  (el) => el.codigoBarra === searchOfDialog
+                )
+            "
+          >
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Producto</th>
+                  <th class="text-left">Codigo de barras</th>
+                  <th class="text-left">Cantidad de unidades</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    {{
+                      $store.state.ventasFast.products.find(
+                        (el) => el.codigoBarra === searchOfDialog
+                      ).nombre
+                    }}
+                  </td>
+                  <td>
+                    {{
+                      $store.state.ventasFast.products.find(
+                        (el) => el.codigoBarra === searchOfDialog
+                      ).codigoBarra
+                    }}
+                  </td>
+                  <input
                     id="cantUnidades"
                     type="number"
-                    v-model="$store.state.ventasFast.products.find(el => el.codigoBarra === searchOfDialog).cantUnidades"
-                    />
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-container>
+                    v-model="
+                      $store.state.ventasFast.products.find(
+                        (el) => el.codigoBarra === searchOfDialog
+                      ).cantUnidades
+                    "
+                  />
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-container>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="paymentMethodSelection" @input="selectPaymentMethod()" width="800">
+    <v-dialog
+      v-model="paymentMethodSelection"
+      @input="selectPaymentMethod()"
+      width="800"
+    >
       <v-card>
         <v-card-title class="headline grey lighten-2">
           <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
             Seleccione un medio de pago
           </p>
         </v-card-title>
-          <v-container class="text-center">
-            <v-autocomplete
-              :items="mediosPago"
-              item-text="nombre"
-              :return-object="true"
-              v-model="medioPagoSeleccionado"
-              id="medioPagoAutocomplete"
-            />
-          </v-container>
+        <v-container class="text-center">
+          <v-autocomplete
+            :items="mediosPago"
+            item-text="nombre"
+            :return-object="true"
+            v-model="medioPagoSeleccionado"
+            id="medioPagoAutocomplete"
+          />
+        </v-container>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="paymentPlanSelection" @input="selectPaymentPlan()" width="800">
+    <v-dialog
+      v-model="paymentPlanSelection"
+      @input="selectPaymentPlan()"
+      width="800"
+    >
       <v-card>
         <v-card-title class="headline grey lighten-2">
           <p style="text-align: center; width: 100%; padding: 0; margin: 0;">
             Seleccione un plan de pago
           </p>
         </v-card-title>
-          <v-container class="text-center">
-            <v-autocomplete
-              :items="$store.state.ventasFast.paymentPlans"
-              item-text="nombre"
-              :return-object="true"
-              v-model="planPagoSeleccionado"
-              id="planPagoAutocomplete"
-            />
-          </v-container>
+        <v-container class="text-center">
+          <v-autocomplete
+            :items="$store.state.ventasFast.paymentPlans"
+            item-text="nombre"
+            :return-object="true"
+            v-model="planPagoSeleccionado"
+            id="planPagoAutocomplete"
+          />
+        </v-container>
       </v-card>
     </v-dialog>
     <Spinner v-if="!loaded" />
@@ -230,11 +269,28 @@
 import ProductsService from "../../services/ProductsService";
 import VentasFastService from "../../services/VentasFastService";
 import GenericService from "../../services/GenericService";
+import ReportsService from "../../services/ReportsService";
+import StocksService from "../../services/StocksService";
+import { printReceipt } from "../../services/ImpresionService";
 import Spinner from "../../components/Graphics/Spinner";
-import { getCurrentDate } from "../../helpers/dateHelper";
+import Swal from "sweetalert2";
+import {
+  getCurrentDate,
+  getInternationalDate,
+  formatDate,
+  formatDateWithoutSlash,
+} from "../../helpers/dateHelper";
+import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import axios from "axios";
 import GlobalEvents from "vue-global-events";
-import {decimalPercent, roundTwoDecimals} from '../../helpers/mathHelper';
+import { addZerosInString } from "../../helpers/stringHelper";
+import {
+  decimalPercent,
+  roundTwoDecimals,
+  sumarNumeros,
+  transformPositive,
+  calculatePositivePercentajeCoefficient,
+} from "../../helpers/mathHelper";
 
 export default {
   data: () => ({
@@ -249,9 +305,9 @@ export default {
     clientIp: "",
     printName: "",
     percentOfModification: 0,
-    productOfModification:"",
+    productOfModification: "",
     totalModificationDialog: false,
-    totalProductload:false,
+    totalProductload: false,
     defaultPrint: false,
     barCodeSearch: "",
     writedBarCodes: [],
@@ -261,7 +317,7 @@ export default {
     mediosPago: [],
     medioPagoSeleccionado: null,
     paymentPlanSelection: false,
-    planPagoSeleccionado: null
+    planPagoSeleccionado: null,
   }),
 
   components: {
@@ -272,10 +328,10 @@ export default {
   created() {
     this.$barcodeScanner.init((barcode) => {
       this.blurInputFocus("searchBarCodeInput");
-      if(this.totalProductload){
-        this.$store.commit('ventasFast/focusToProduct', barcode)
+      if (this.totalProductload) {
+        this.$store.commit("ventasFast/focusToProduct", barcode);
         this.searchOfDialog = null;
-      }else{
+      } else {
         setTimeout(() => {
           this.searchWithScanner(barcode);
         }, 50);
@@ -299,22 +355,23 @@ export default {
     /******************************************************************************************************/
     getObjects() {
       VentasFastService(this.tenant, "ventasFastConfig", this.token)
-      .getSelected(this.loguedUser.sucursal.id)
-      .then(data => {
-        this.defaultConfig = data.data;
-      })
+        .getSelected(this.loguedUser.sucursal.id)
+        .then((data) => {
+          this.defaultConfig = data.data;
+          console.log(this.defaultConfig)
+        });
       GenericService(this.tenant, "mediosPago", this.token)
-      .filter({
-        sucursalId: this.loguedUser.sucursal.id,
-        medioPagoName: "",
-        page: 1,
-        size: 1000000,
-        totalPages: 0,
-      })
-      .then(data => {
-        this.mediosPago = data.data.content;
-        console.log(this.mediosPago);
-      })
+        .filter({
+          sucursalId: this.loguedUser.sucursal.id,
+          medioPagoName: "",
+          page: 1,
+          size: 1000000,
+          totalPages: 0,
+        })
+        .then((data) => {
+          this.mediosPago = data.data.content;
+          console.log(this.mediosPago);
+        });
     },
 
     getClientIpForFiscalController() {
@@ -331,53 +388,64 @@ export default {
       switch (e.keyCode) {
         case 32:
           this.blurInputFocus("searchBarCodeInput");
-          if(this.$store.state.ventasFast.paymentMethod && this.$store.state.ventasFast.paymentPlan){
-            this.$successAlert("Vendiste merca a los pendejos, felicidades")
-          }else if(this.$store.state.ventasFast.paymentMethod){
+          if (
+            this.$store.state.ventasFast.paymentMethod &&
+            this.$store.state.ventasFast.paymentPlan
+          ) {
+            this.saveSale();
+          } else if (this.$store.state.ventasFast.paymentMethod) {
             this.paymentPlanSelection = true;
             setTimeout(() => {
               this.getInputFocus("planPagoAutocomplete");
-            }, 50)
-          }else{
+            }, 50);
+          } else {
             this.paymentMethodSelection = true;
             setTimeout(() => {
               this.getInputFocus("medioPagoAutocomplete");
-            }, 50)
+            }, 50);
           }
           break;
         case 67:
           this.blurInputFocus("dialogInput");
-           setTimeout(() => {
+          setTimeout(() => {
             this.getInputFocus("cantUnidades");
-          }, 50)
+          }, 50);
           break;
-        case 81:          
+        case 81:
           this.totalProductload = true;
           setTimeout(() => {
             this.getInputFocus("dialogInput");
-          }, 50)
+          }, 50);
           break;
         case 66:
           this.getInputFocus("searchBarCodeInput");
           setTimeout(() => {
-            this.barCodeSearch = '';
-          }, 50)
+            this.barCodeSearch = "";
+          }, 50);
           break;
         case 68:
           this.blurInputFocus("searchBarCodeInput");
-           setTimeout(() => {
-              this.getInputFocus('modificationInput');
-            },50);
+          setTimeout(() => {
+            this.getInputFocus("modificationInput");
+          }, 50);
           this.totalModificationDialog = true;
           break;
         case 69:
           this.blurInputFocus("searchBarCodeInput");
-          if(!this.totalProductload){
-          this.$store.commit("ventasFast/removeProductsToList", this.writedBarCodes[this.writedBarCodes.length - 1]);
-          this.writedBarCodes = this.writedBarCodes.filter(el => el !== this.writedBarCodes[this.writedBarCodes.length - 1]);
+          if (!this.totalProductload) {
+            this.$store.commit(
+              "ventasFast/removeProductsToList",
+              this.writedBarCodes[this.writedBarCodes.length - 1]
+            );
+            this.writedBarCodes = this.writedBarCodes.filter(
+              (el) => el !== this.writedBarCodes[this.writedBarCodes.length - 1]
+            );
           }
-          if(this.totalProductload){
-            this.$store.commit("ventasFast/removeProductsToList",this.writedBarCodes);
+          if (this.totalProductload) {
+            this.$store.commit(
+              "ventasFast/removeProductsToList",
+              this.writedBarCodes
+            );
             console.log("Eliminando producto");
           }
           break;
@@ -386,23 +454,29 @@ export default {
       }
     },
 
-    selectPaymentMethod(){
-      if(this.medioPagoSeleccionado){
-        this.$store.commit('ventasFast/addPaymentMethod', this.medioPagoSeleccionado)
+    selectPaymentMethod() {
+      if (this.medioPagoSeleccionado) {
+        this.$store.commit(
+          "ventasFast/addPaymentMethod",
+          this.medioPagoSeleccionado
+        );
       }
     },
 
-    selectPaymentPlan(){
-      if(this.planPagoSeleccionado){
-        this.$store.commit('ventasFast/addPaymentPlan', this.planPagoSeleccionado)
+    selectPaymentPlan() {
+      if (this.planPagoSeleccionado) {
+        this.$store.commit(
+          "ventasFast/addPaymentPlan",
+          this.planPagoSeleccionado
+        );
       }
     },
 
-    searchProductToModify(e){
-      if(e.keyCode === 13){
-        this.$store.commit('ventasFast/focusToProduct', this.searchOfDialog)
+    searchProductToModify(e) {
+      if (e.keyCode === 13) {
+        this.$store.commit("ventasFast/focusToProduct", this.searchOfDialog);
         this.searchOfDialog = null;
-        this.blurInputFocus('dialogInput');
+        this.blurInputFocus("dialogInput");
       }
     },
 
@@ -470,8 +544,8 @@ export default {
       }
     },
 
-    loadProductDelete(e){
-      if(e.keyCode === 81){
+    loadProductDelete(e) {
+      if (e.keyCode === 81) {
         console.log("Alla la estan apretando");
         this.$store.commit("productos/dialogProductosMutation");
         this.totalProductload = false;
@@ -485,15 +559,16 @@ export default {
       }
     },
 
-    saveSale(){
-      if(!this.defaultConfig) return this.$errorAlert(
-        "No hay caracteristicas predeterminadas configuradas, contacte a su administrador para que configure las caracteristicas predeterminadas de la venta rapida"
-      );
-      const { nombre, presupuesto, tipo } = this.defaultConfig.documentoPorDefecto;
-      if(nombre.includes('TIQUE FACTURA')) return this.saveTicketOnFiscalController(nombre);
-      if(presupuesto) return this.savePresupuesto();
-      if(tipo) return this.saveFiscalSale();
-      if(!tipo) return this.saveNotFiscalSale();    
+    saveSale() {
+      if (!this.defaultConfig)
+        return this.$errorAlert(
+          "No hay caracteristicas predeterminadas configuradas, contacte a su administrador para que configure las caracteristicas predeterminadas de la venta rapida"
+        );
+      const { nombre, tipo } = this.defaultConfig.documentoPorDefecto;
+      if (nombre.includes("TIQUE FACTURA"))
+        return this.saveTicketOnFiscalController(nombre);
+      if (tipo) return this.saveFiscalSale();
+      if (!tipo) return this.saveNotFiscalSale();
     },
 
     /******************************************************************************************************/
@@ -578,13 +653,13 @@ export default {
     },
 
     getTotalSurcharges(letter) {
-      const totalSurcharge = this.$store.getter['ventasFast/totalSurcharge'];
+      const totalSurcharge = this.$store.getter["ventasFast/totalSurcharge"];
       console.log(letter);
       return totalSurcharge.toString();
     },
 
     getTotalDiscounts(letter) {
-      const totalDiscount = this.$store.getter['ventasFast/totalDiscount'];
+      const totalDiscount = this.$store.getter["ventasFast/totalDiscount"];
       console.log(letter);
       return totalDiscount.toString();
     },
@@ -659,7 +734,670 @@ export default {
       });
       return items;
     },
-    
+
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR FISCAL SALE ---------------------------------------------------------------------*/
+    /******************************************************************************************************/
+    saveFiscalSale() {
+      Swal.fire("Generando Venta", "Espere por favor", "info");
+      const sucursal = this.loguedUser.sucursal;
+      const ptoVenta = this.loguedUser.puntoVenta;
+      const products = this.products;
+      const productsDetail = this.productsDetail;
+      const documento = this.defaultConfig.documentoPorDefecto;
+      const empresa = this.loguedUser.empresa;
+      const cliente = this.defaultConfig.clientePorDefecto;
+      const mediosPago = this.object.mediosPago;
+      const totalVenta = this.totalVenta;
+      const tenant = this.tenant;
+      const token = this.token;
+      const service = this.service;
+      const planPago = this.object.planPago;
+      const condVenta = this.checkSaleCondition(planPago);
+      let comprobante;
+      let file;
+      let fileURL;
+      let invoice;
+
+      /*** Get last invoice emmited number ***/
+      axios
+        .get(
+          `${process.env.VUE_APP_API_AFIP}/rest_api_afip/obtenerUltimoNumeroAutorizado/${sucursal.cuit}/${ptoVenta.idFiscal}/${documento.codigoDocumento}`
+        )
+        .then((data) => {
+          const numberOfReceipt = parseInt(data.data.responseOfAfip) + 1;
+          const dataForCreateInvoice = {
+            ptoVentaId: ptoVenta.idFiscal,
+            receiptCode: documento.codigoDocumento,
+            clientCuit: cliente.cuit,
+            percentIngBrutos: cliente.alicIngBrutos,
+            numberOfReceipt: numberOfReceipt,
+            date: getInternationalDate(),
+            products: products,
+            totalVenta: totalVenta,
+          };
+          invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice);
+
+          /*** Send invoice to AFIP ***/
+          axios
+            .post(
+              `${process.env.VUE_APP_API_AFIP}/rest_api_afip/generarComprobante/${sucursal.cuit}`,
+              invoice
+            )
+            .then((data) => {
+              const cae = data.data.CAE;
+              const dateOfCaeExpiration = data.data.CAEFchVto;
+              const barCode =
+                sucursal.cuit +
+                addZerosInString("02", documento.codigoDocumento) +
+                addZerosInString("04", ptoVenta.idFiscal) +
+                cae +
+                formatDateWithoutSlash(dateOfCaeExpiration);
+
+              this.calculateRelevantAmountsOfInvoice().then(
+                ({
+                  total,
+                  subTotal,
+                  amountOfIva21,
+                  amountOfIva10,
+                  amountOfIva27,
+                  totalOfIvas,
+                  totalOfDiscounts,
+                  totalOfSurcharges,
+                  planPercentSurcharge,
+                  planPercentDiscount,
+                  planAmountSurcharge,
+                  planAmountDiscount,
+                }) => {
+                  // Create receipt
+                  if (total && subTotal && amountOfIva21) {
+                    comprobante = {
+                      letra: documento.letra,
+                      numeroCbte:
+                        addZerosInString("04", ptoVenta.idFiscal) +
+                        "-" +
+                        addZerosInString("08", numberOfReceipt),
+                      fechaEmision: formatDate(getCurrentDate()),
+                      fechaVto: formatDate(dateOfCaeExpiration),
+                      correlativoComprobante: numberOfReceipt,
+                      condicionVenta: condVenta,
+                      productos: products,
+                      productosDetalle: productsDetail,
+                      productoDescription: this.productsDescription,
+                      barCode: barCode,
+                      cae: cae,
+                      logoUrl: this.loguedUser.sucursal.logo,
+                      puntoVenta: ptoVenta,
+                      sucursal: sucursal,
+                      documentoComercial: documento,
+                      empresa: empresa,
+                      cliente: cliente,
+                      totalVenta: total,
+                      subTotal: subTotal,
+                      totalDescuentoGlobal: this.descuentoGlobal,
+                      totalRecargoGlobal: this.recargoGlobal,
+                      porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
+                      porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                      totalIva21: amountOfIva21,
+                      totalIva10: amountOfIva10,
+                      totalIva27: amountOfIva27,
+                      totalIvas: totalOfIvas,
+                      totalDescuentos: totalOfDiscounts,
+                      totalRecargos: totalOfSurcharges,
+                      porcentajeRecargoPlan: planPercentSurcharge,
+                      porcentajeDescuentoPlan: planPercentDiscount,
+                      totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
+                      totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
+                      mediosPago: [mediosPago],
+                      planesPago: [planPago],
+                      nombreDocumento: documento.nombre,
+                    };
+                  } else {
+                    comprobante = this.object;
+                    comprobante.letra = documento.letra;
+                    comprobante.numeroCbte =
+                      addZerosInString("04", ptoVenta.idFiscal) +
+                      "-" +
+                      addZerosInString("08", numberOfReceipt);
+                    comprobante.fechaEmision = formatDate(getCurrentDate());
+                    comprobante.fechaVto = formatDate(dateOfCaeExpiration);
+                    comprobante.correlativoComprobante = numberOfReceipt;
+                    comprobante.condicionVenta = condVenta;
+                    comprobante.barCode = barCode;
+                    comprobante.cae = cae;
+                    comprobante.mediosPago = [this.object.mediosPago];
+                    comprobante.planesPago = this.object.planesPago;
+                    comprobante.nombreDocumento = documento.nombre;
+                    comprobante.documentoComercial = documento;
+                  }
+
+                  if (this.object.id) {
+                    comprobante.id = this.object.id;
+                  }
+
+                  /*** Save receipt in database and print invoice ***/
+                  if (comprobante.cae) {
+                    GenericService(tenant, "comprobantesFiscales", token)
+                      .save(comprobante)
+                      .then(() => {
+                        ReportsService(tenant, service, token)
+                          .onCloseSaleReport(comprobante)
+                          .then((res) => {
+                            file = new Blob([res["data"]], {
+                              type: "application/pdf",
+                            });
+                            fileURL = URL.createObjectURL(file);
+                            window.open(fileURL, "_blank");
+                            if (this.defaultPrint) {
+                              printReceipt(
+                                comprobante,
+                                this.printName,
+                                this.valorPrint
+                              );
+                            }
+                          });
+                      })
+                      .then(() => {
+                        this.applyStockModifications(comprobante);
+                      });
+                  } else {
+                    this.$errorAlert("Tipo de comprobante no disponible").then(
+                      (result) => {
+                        if (result.isDismissed) {
+                          this.loaded = true;
+                        }
+                      }
+                    );
+                  }
+                }
+              );
+            })
+            .catch((err) => {
+              console.log(
+                "---------------- ERROR IN AFIP RESPONSE ----------------"
+              );
+              console.log(err);
+              this.loaded = true;
+            });
+        });
+    },
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS TO CALCULATE STATUS OF STOCKS IN SALE -----------------------------------------------*/
+    /******************************************************************************************************/
+    applyStockModifications(comprobante) {
+      comprobante.productos.forEach((product) => {
+        StocksService(this.tenant, "stock", this.token)
+          .getStockByProductCodeBarInDefaultDeposit(
+            product.codigoBarra,
+            comprobante.sucursal.id
+          )
+          .then((data) => {
+            let stock = data.data;
+            if (stock) {
+              stock.cantidad = stock.cantidad - Number(product.cantUnidades);
+              this.saveStockModifications(stock, comprobante.productos.length);
+            } else {
+              StocksService(this.tenant, "stock", this.token)
+                .getStockByProductCodeBarInAnyDeposit(
+                  product.codigoBarra,
+                  comprobante.sucursal.id
+                )
+                .then((data) => {
+                  let firstStockDetected = data.data[0];
+                  if (firstStockDetected) {
+                    firstStockDetected.cantidad =
+                      firstStockDetected.cantidad -
+                      Number(product.cantUnidades);
+                    this.saveStockModifications(
+                      firstStockDetected,
+                      comprobante.productos.length
+                    );
+                  } else {
+                    this.saveStockModifications(
+                      product.nombre,
+                      comprobante.productos.length
+                    );
+                  }
+                });
+            }
+          });
+      });
+    },
+
+    saveStockModifications(stock, processProductsLength) {
+      if (typeof stock === "string") {
+        this.productsWithoutStock.push(stock);
+        this.processStockResult.push("success");
+        if (this.processStockResult.length === processProductsLength) {
+          this.endSaleProcess();
+        }
+      } else {
+        if (
+          stock.cantidadMinima &&
+          !stock.cantidadMinima.includes("asign") &&
+          stock.cantidad < parseFloat(stock.cantidadMinima)
+        ) {
+          this.lowStock.push(stock.producto.nombre);
+        }
+        if (!stock.deposito.defaultDeposit) {
+          this.productsInOtherDeposits.push(stock.producto.nombre);
+        }
+        GenericService(this.tenant, "stock", this.token)
+          .save(stock)
+          .then(() => {
+            this.processStockResult.push("success");
+            if (this.processStockResult.length === processProductsLength) {
+              this.endSaleProcess();
+            }
+          })
+          .catch((err) => {
+            this.$errorAlert("Error al procesar stock");
+            this.loaded = true;
+            console.error(err);
+          });
+      }
+    },
+
+    endSaleProcess() {
+      if (this.productsWithoutStock.length > 0) {
+        this.$infoAlert2(
+          `No existo un registro de stock de estos productos: ${this.productsWithoutStock.reduce(
+            (acc, el) => acc + ", " + el
+          )}.`
+        ).then(() => {
+          if (this.lowStock.length > 0) {
+            this.$infoAlert2(
+              `Productos bajos de stock: ${this.lowStock.reduce(
+                (acc, el) => acc + ", " + el
+              )}`
+            ).then(() => {
+              if (this.productsInOtherDeposits.length > 0) {
+                this.$infoAlert2(
+                  `Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce(
+                    (acc, el) => acc + ", " + el
+                  )}. Sus unidades fueron descontadas de otros depósitos.`
+                ).then(() => {
+                  this.$successAlert("Facturación realizada").then(() => {
+                    this.clear();
+                  });
+                });
+              } else {
+                this.$successAlert("Facturación realizada").then(() => {
+                  this.clear();
+                });
+              }
+            });
+          } else if (this.productsInOtherDeposits.length > 0) {
+            this.$infoAlert2(
+              `Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce(
+                (acc, el) => acc + ", " + el
+              )}. Sus unidades fueron descontadas de otros depósitos.`
+            ).then(() => {
+              this.$successAlert("Facturación realizada").then(() => {
+                this.clear();
+              });
+            });
+          } else {
+            this.$successAlert("Facturación realizada").then(() => {
+              this.clear();
+            });
+          }
+        });
+      } else if (this.lowStock.length > 0) {
+        this.$infoAlert2(
+          `Productos bajos de stock: ${this.lowStock.reduce(
+            (acc, el) => acc + ", " + el
+          )}`
+        ).then(() => {
+          if (this.productsInOtherDeposits.length > 0) {
+            this.$infoAlert2(
+              `Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce(
+                (acc, el) => acc + ", " + el
+              )}. Sus unidades fueron descontadas de otros depósitos.`
+            ).then(() => {
+              this.$successAlert("Facturación realizada").then(() => {
+                this.clear();
+              });
+            });
+          } else {
+            this.$successAlert("Facturación realizada").then(() => {
+              this.clear();
+            });
+          }
+        });
+      } else if (this.productsInOtherDeposits.length > 0) {
+        this.$infoAlert2(
+          `Estos productos no se encuentran en el depósito principal: ${this.productsInOtherDeposits.reduce(
+            (acc, el) => acc + ", " + el
+          )}. Sus unidades fueron descontadas de otros depósitos.`
+        ).then(() => {
+          this.$successAlert("Facturación realizada").then(() => {
+            this.clear();
+          });
+        });
+      } else {
+        this.$successAlert("Facturación realizada").then(() => {
+          this.clear();
+        });
+      }
+    },
+
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
+    /******************************************************************************************************/
+    async calculateRelevantAmountsOfInvoice() {
+      const planPago = this.object.planPago;
+
+      this.productsDescription = await this.restLineDiscounts(
+        this.products,
+        this.productsDescription
+      );
+
+      this.productsDescription = await this.sumLineSurcharges(
+        this.products,
+        this.productsDescription
+      );
+
+      this.productsDescription = await this.restGlobalDiscount(
+        this.productsDescription,
+        this.porcentajeDescuentoGlobal
+      );
+
+      this.productsDescription = await this.sumGlobalSurcharge(
+        this.productsDescription,
+        this.porcentajeRecargoGlobal
+      );
+
+      this.productsDescription = await this.applyPaymentPlantPercentVariation(
+        this.productsDescription,
+        planPago.porcentaje
+      );
+
+      this.productsDescription = await this.calculateAmountOfPriceVariations(
+        this.productsDescription
+      );
+
+      const totalOfDiscounts = await this.calculateTotalOfDiscounts(
+        this.productsDescription
+      );
+
+      const totalOfSurcharges = await this.calculateTotalOfSurcharges(
+        this.productsDescription
+      );
+
+      const subTotal = await this.calculateSumOfProductSalePrices(
+        this.productsDescription
+      );
+
+      const planAmountDiscount =
+        planPercentDiscount > 0
+          ? subTotal * decimalPercent(planPercentDiscount)
+          : 0;
+
+      const planAmountSurcharge =
+        planPercentSurcharge > 0
+          ? subTotal * decimalPercent(planPercentSurcharge)
+          : 0;
+
+      const planPercentSurcharge =
+        planPago.porcentaje > 0 ? planPago.porcentaje : 0;
+      const planPercentDiscount =
+        planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
+
+      this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
+        this.productsDescription
+      );
+
+      const amountOfIva21 = await this.calculateAmountOfIva21(
+        this.productsDescription
+      );
+
+      const amountOfIva10 = await this.calculateAmountOfIva10(
+        this.productsDescription
+      );
+
+      const amountOfIva27 = await this.calculateAmountOfIva27(
+        this.productsDescription
+      );
+
+      const totalOfIvas = sumarNumeros([
+        amountOfIva21,
+        amountOfIva10,
+        amountOfIva27,
+      ]);
+
+      const total = subTotal - totalOfDiscounts + totalOfSurcharges;
+
+      return {
+        total,
+        subTotal,
+        amountOfIva21,
+        amountOfIva10,
+        amountOfIva27,
+        totalOfIvas,
+        totalOfDiscounts,
+        totalOfSurcharges,
+        planPercentSurcharge,
+        planPercentDiscount,
+        planAmountSurcharge,
+        planAmountDiscount,
+      };
+    },
+
+    restLineDiscounts(products, productDescriptions) {
+      const discounts = products.filter((el) =>
+        el.nombre.includes("DESCUENTO - ")
+      );
+      discounts.forEach((discount) => {
+        const discountCleanName = discount.nombre.replace("DESCUENTO - ", "");
+        productDescriptions.forEach((prodDescription) => {
+          if (prodDescription.name === discountCleanName) {
+            prodDescription.discountPercent = calculatePositivePercentajeCoefficient(
+              discount.precioTotal,
+              prodDescription.salePrice * Number(prodDescription.quantity)
+            );
+          }
+        });
+      });
+      return productDescriptions;
+    },
+
+    sumLineSurcharges(products, productDescriptions) {
+      const surcharges = products.filter((el) =>
+        el.nombre.includes("RECARGO - ")
+      );
+      surcharges.forEach((surcharge) => {
+        const surchargeCleanName = surcharge.nombre.replace("RECARGO - ", "");
+        productDescriptions.forEach((prodDescription) => {
+          if (prodDescription.name === surchargeCleanName) {
+            prodDescription.surchargePercent = calculatePositivePercentajeCoefficient(
+              surcharge.precioTotal,
+              prodDescription.salePrice * Number(prodDescription.quantity)
+            );
+          }
+        });
+      });
+      return productDescriptions;
+    },
+
+    restGlobalDiscount(productsDescription, globalDiscountPercent) {
+      productsDescription.forEach((product) => {
+        if (product.discountPercent) {
+          product.discountPercent += globalDiscountPercent;
+        } else {
+          product.discountPercent = globalDiscountPercent;
+        }
+      });
+      return productsDescription;
+    },
+
+    sumGlobalSurcharge(productsDescription, globalSurchargePercent) {
+      productsDescription.forEach((product) => {
+        if (product.surchargePercent) {
+          product.surchargePercent += globalSurchargePercent;
+        } else {
+          product.surchargePercent = globalSurchargePercent;
+        }
+      });
+      return productsDescription;
+    },
+
+    applyPaymentPlantPercentVariation(productsDescription, planPercent) {
+      if (planPercent < 0)
+        return this.restPlanDiscount(
+          productsDescription,
+          transformPositive(planPercent)
+        );
+      if (planPercent > 0)
+        return this.sumPlanSurcharge(
+          productsDescription,
+          transformPositive(planPercent)
+        );
+      if (planPercent == 0) return productsDescription;
+    },
+
+    restPlanDiscount(productsDescription, planPercent) {
+      productsDescription.forEach((prodDescription) => {
+        prodDescription.discountPercent += planPercent;
+      });
+      return productsDescription;
+    },
+
+    sumPlanSurcharge(productsDescription, planPercent) {
+      productsDescription.forEach((prodDescription) => {
+        prodDescription.surchargePercent += planPercent;
+      });
+      return productsDescription;
+    },
+
+    calculateAmountOfPriceVariations(productsDescription) {
+      productsDescription.forEach((prodDescription) => {
+        if (!prodDescription.editable) {
+          prodDescription.discountAmount =
+            prodDescription.salePrice *
+            Number(prodDescription.quantity) *
+            decimalPercent(prodDescription.discountPercent);
+          prodDescription.surchargeAmount =
+            prodDescription.salePrice *
+            Number(prodDescription.quantity) *
+            decimalPercent(prodDescription.surchargePercent);
+        } else {
+          prodDescription.discountAmount =
+            prodDescription.salePrice *
+            decimalPercent(prodDescription.discountPercent);
+          prodDescription.surchargeAmount =
+            prodDescription.salePrice *
+            decimalPercent(prodDescription.surchargePercent);
+        }
+      });
+      return productsDescription;
+    },
+
+    calculateTotalOfDiscounts(productsDescription) {
+      const discounts = productsDescription.map((el) =>
+        el.discountAmount ? el.discountAmount : 0
+      );
+      const total = sumarNumeros(discounts);
+      return total;
+    },
+
+    calculateTotalOfSurcharges(productsDescription) {
+      const surcharges = productsDescription.map((el) =>
+        el.surchargeAmount ? el.surchargeAmount : 0
+      );
+      const total = sumarNumeros(surcharges);
+      return total;
+    },
+
+    calculateSumOfProductSalePrices(productsDescription) {
+      const total = productsDescription.reduce((acc, el) => {
+        if (!el.editable) {
+          acc = acc + el.salePrice * Number(el.quantity);
+        } else {
+          acc = acc + el.salePrice;
+        }
+        return acc;
+      }, 0);
+      return roundTwoDecimals(total);
+    },
+
+    correctSalePriceAndIvaAmountOfProducts(productsDescription) {
+      productsDescription.forEach((product) => {
+        if (product.saleIvaPercent === 0) {
+          product.saleIvaPercent = 21;
+        }
+        product.salePrice =
+          product.salePrice -
+          product.discountAmount / Number(product.quantity) +
+          product.surchargeAmount / product.quantity;
+        product.saleIvaAmount =
+          product.salePrice * Number(product.quantity) -
+          (product.salePrice * Number(product.quantity)) /
+            (1 + decimalPercent(product.saleIvaPercent));
+      });
+      return productsDescription;
+    },
+
+    calculateAmountOfIva21(productsDescription) {
+      const productsWithIva21 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 21
+      );
+      const amountOfIva = productsWithIva21.reduce(
+        (acc, el) => acc + el.saleIvaAmount,
+        0
+      );
+      return roundTwoDecimals(amountOfIva);
+    },
+
+    calculateAmountOfIva10(productsDescription) {
+      const productsWithIva10 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 10.5
+      );
+      const amountOfIva = productsWithIva10.reduce(
+        (acc, el) => acc + el.saleIvaAmount,
+        0
+      );
+      return roundTwoDecimals(amountOfIva);
+    },
+
+    calculateAmountOfIva27(productsDescription) {
+      const productsWithIva27 = productsDescription.filter(
+        (el) => el.saleIvaPercent === 27
+      );
+      const amountOfIva = productsWithIva27.reduce(
+        (acc, el) => acc + el.saleIvaAmount,
+        0
+      );
+      return roundTwoDecimals(amountOfIva);
+    },
+
+    /******************************************************************************************************/
+    /* CLEAR SALE FORM DATA ------------------------------------------------------------------------------*/
+    /******************************************************************************************************/
+    clear() {
+      window.location.reload();
+    },
+
+    /******************************************************************************************************/
+    /* CHECK IF SALE CONDITION IS EFFECTIVE --------------------------------------------------------------*/
+    /******************************************************************************************************/
+    checkSaleCondition(paymentPlan) {
+      let saleCondition;
+      if (paymentPlan) {
+        if (paymentPlan.length < 2) {
+          if (paymentPlan[0].cuotas > 1) {
+            saleCondition = true;
+          } else {
+            saleCondition = false;
+          }
+        } else {
+          saleCondition = false;
+        }
+      } else {
+        saleCondition = true;
+      }
+      return saleCondition;
+    },
   },
 };
 </script>
