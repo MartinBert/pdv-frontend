@@ -24,7 +24,7 @@
         <v-col>
           <v-text-field
             type="text"
-            v-model="filterParams.barCode"
+            v-model="filterParams.numeroComprobante"
             v-on:input="filterObjects()"
             dense
             outlined
@@ -150,7 +150,6 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.ventas = data.data.content;
-
           console.log(this.ventas);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;

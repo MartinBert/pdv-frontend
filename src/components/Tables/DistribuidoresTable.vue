@@ -49,6 +49,7 @@ export default {
     token: localStorage.getItem("token"),
     deleteDialogStatus: false,
     headers: [
+      {text:"Id", value:"id"},
       { text: "Nombre", value: "nombre" },
       { text: "Razon Social", value: "razonSocial" },
       { text: "Detalles", value: "detalles", sortable:false},

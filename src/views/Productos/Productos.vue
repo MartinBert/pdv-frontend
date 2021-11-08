@@ -341,6 +341,7 @@ export default {
                     "Se agregaron nuevos atributos al sistema. Realice nuevamente la importación para asignarlos correctamente"
                   );
                 }
+                location.reload();
               });
               this.filterObjects();
               this.loaderStatus = true;
