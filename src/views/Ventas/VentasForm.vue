@@ -1169,14 +1169,6 @@ export default {
         this.object.mediosPago !== undefined &&
         this.object.planPago !== undefined
       ) {
-        if(documento.tipo === true){
-          if(documento.remito === true){  
-            this.saveRemito();
-            console.log(this.documento.remito);  
-          }else{
-            this.saveNoFiscal();
-          }
-        }
         if (documento.tipo === true) {
           if (documento.ticket === true) {
             this.saveTicket(documento.nombre);
