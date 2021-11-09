@@ -1105,7 +1105,7 @@ export default {
     /******************************************************************************************************/
     /* ALL FUNCTIONS FOR ELECTRONIC BILLING --------------------------------------------------------------*/
     /******************************************************************************************************/
-    saveSale() {
+   saveSale() {
       this.loaded = false;
       const documento = this.object.documento;
       if (
@@ -1464,6 +1464,7 @@ export default {
       let file;
       let fileURL;
       let comprobante;
+
       VentasService(tenant, "ventas", token)
         .getPreviousCorrelativeDocumentNumber(
           sucursal.id,
@@ -1471,6 +1472,7 @@ export default {
         )
         .then((data) => {
           const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
+
           this.calculateRelevantAmountsOfInvoice().then(
             ({
               total,
@@ -1529,6 +1531,7 @@ export default {
                 planesPago: [planesPago],
                 nombreDocumento: documento.nombre,
               };
+
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
