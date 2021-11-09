@@ -30,7 +30,6 @@ export default {
     ventas:[],
     obj:[],
     icon: "mdi-check-circle",
-    service:"ventas",
     loguedUser: JSON.parse(localStorage.getItem("userData")),
     loaded: true,
     token: localStorage.getItem("token"),
@@ -81,7 +80,7 @@ export default {
     },
 
     print(object) {
-      ReportsService(this.tenant, this.service, this.token)
+      ReportsService(this.tenant,"ventas", this.token)
         .onCloseSaleReport(object)
         .then((res) => {
           let file = new Blob([res["data"]], {
