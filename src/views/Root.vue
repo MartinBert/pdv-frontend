@@ -338,8 +338,8 @@ export default {
         icon: "/../images/icons/settings.svg",
         childs: [
           {
-            path:"/ventasfastconfig",
-            name:"ventasConfig",
+            path:"/ventasfastconfiguracion",
+            name:"ventasfastconfiguracion",
             title:"Ventas rapidas configuracion",
             visible:false
           },
