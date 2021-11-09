@@ -322,7 +322,7 @@
 import GenericService from "../../services/GenericService";
 import VentasService from "../../services/VentasService";
 import StocksService from "../../services/StocksService";
-import { printReceipt } from "../../services/ImpresionService";
+import { printReceipt }  from "../../services/ImpresionService";
 import Calculator from "../../components/Graphics/Calculator";
 import Spinner from "../../components/Graphics/Spinner";
 import ProductDialog from "../../components/Dialogs/ProductDialog";
@@ -347,7 +347,7 @@ import { formatFiscalInvoice } from "../../helpers/receiptFormatHelper";
 import { addZerosInString } from "../../helpers/stringHelper";
 import axios from "axios";
 import ReportsService from "../../services/ReportsService";
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2';
 export default {
   data: () => ({
     loguedUser: JSON.parse(localStorage.getItem("userData")),
@@ -361,7 +361,7 @@ export default {
       clientes: [],
       medios_de_pago: [],
       documentos: [],
-      impresoras: [],
+      impresoras:[]
     },
     comprobantesRules: [(v) => !!v || "Comprobante es requerido"],
     medioPagoRules: [(v) => !!v || "medios de pago es requerido"],
@@ -394,26 +394,22 @@ export default {
     lowStock: [],
     perfil: null,
     processPresupuesto: false,
-    printName: "",
-    defaultPrint: false,
-    valorPrint: "",
+    printName:"",
+    defaultPrint:false,
+    valorPrint:""
   }),
-
   components: {
     Calculator,
     ProductDialog,
     Spinner,
     SearchPresupuestoDialog,
   },
-
   created() {
     this.$barcodeScanner.init((barcode) => this.onBarcodeScanned(barcode));
   },
-
   destroyed() {
     this.$barcodeScanner.destroy();
   },
-
   computed: {
     totalVenta() {
       let planDiscountPercent = 0;
@@ -455,7 +451,6 @@ export default {
         globalSurcharge;
       return roundTwoDecimals(total);
     },
-
     totalItems() {
       const totItems = this.products.reduce(
         (acc, el) => acc + Number(el.cantUnidades),
@@ -463,7 +458,6 @@ export default {
       );
       return totItems;
     },
-
     totalLineDiscounts() {
       const total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("DESCUENTO - ")) {
@@ -473,7 +467,6 @@ export default {
       }, 0);
       return total;
     },
-
     totalLineSurchages() {
       const total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("RECARGO - ")) {
@@ -484,7 +477,6 @@ export default {
       return total;
     },
   },
-
   mounted() {
     this.perfil = this.loguedUser.perfil;
     this.$store.commit("productos/resetStates");
@@ -492,7 +484,6 @@ export default {
     this.getObjects();
     this.getClientIpForFiscalController();
   },
-
   methods: {
     /******************************************************************************************************/
     /* ALL FUNCTIONS FOR GET OBJECTS ---------------------------------------------------------------------*/
@@ -518,9 +509,8 @@ export default {
         nombreImpresora: "",
         impresoraPredeterminada: true,
         page: 1,
-        size: 100000,
+        size: 100000
       };
-
       const medioPagoFilter = {
         sucursalId: sucursalId,
         medioPagoName: "",
@@ -535,31 +525,28 @@ export default {
         size: 10,
         totalPages: 0,
       };
-      GenericService(this.tenant, "impresoras", this.token)
+       GenericService(this.tenant, "impresoras", this.token)
         .filter(impresoraFilter)
         .then((data) => {
           this.databaseItems.impresoras = data.data.content;
-          this.databaseItems.impresoras.forEach((print) => {
-            if (print.impresoraPredeterminada == true) {
+          this.databaseItems.impresoras.forEach(print => {
+            if(print.impresoraPredeterminada == true){
               this.defaultPrint = true;
               this.printName = print.nombreImpresora;
-              this.valorPrint = print.valor;
+              this.valorPrint = print.valor
             }
           });
         });
-
       GenericService(this.tenant, "clientes", this.token)
         .filter(clientFilter)
         .then((data) => {
           this.databaseItems.clientes = data.data.content;
         });
-
       GenericService(this.tenant, "mediosPago", this.token)
         .filter(medioPagoFilter)
         .then((data) => {
           this.databaseItems.medios_de_pago = data.data.content;
         });
-
       GenericService(this.tenant, "depositos", this.token)
         .filter(depositoFilter)
         .then((data) => {
@@ -574,7 +561,6 @@ export default {
         this.clientIp = data.data.ip;
       });
     },
-
     onBarcodeScanned(barcode) {
       const filterParams = {
         productoName: "",
@@ -632,7 +618,6 @@ export default {
                   .precioUnitario *
                 this.products.filter((el) => el.id === databaseItem.id)[0]
                   .cantUnidades;
-
               this.productsDescription.filter(
                 (el) => el.barCode === databaseItem.codigoBarra
               )[0].quantity++;
@@ -679,7 +664,6 @@ export default {
           this.$errorAlert("No existe un producto con ese código de barras");
         });
     },
-
     addProduct(data) {
       let existe = false;
       data = [...new Set(data)];
@@ -715,7 +699,6 @@ export default {
           this.productsDescription.push(objectForProductsDescription);
         }
       });
-
       let processPorducts = [];
       data.forEach((el) => {
         processPorducts.push(this.processProductsObject(el));
@@ -731,24 +714,20 @@ export default {
         this.products = processPorducts;
       }
     },
-
     getComercialDocuments(clientCond, businessCond) {
       let AllDocuments = [];
       for (let i = 0; i < clientCond.length; i++) {
         businessCond.forEach((el) => {
           if (clientCond[i].id == el.id) {
             AllDocuments.push(el);
-            console.log(AllDocuments);
           }
         });
       }
       this.databaseItems.documentos = checkIfInvoice(AllDocuments);
     },
-
     getPaymentPlans(paymentMethod) {
       this.databaseItems.planes = paymentMethod.planPago;
     },
-
     selectPresupuesto(presupuesto) {
       presupuesto.productos.forEach((el) => {
         el.total = el.precioTotal;
@@ -764,24 +743,22 @@ export default {
       this.object.planPago = presupuesto.planesPago[0];
       presupuesto.productos.forEach((product, index) => {
         product.id = index;
-      });
+      })
       this.products = presupuesto.productos;
       this.porcentajeDescuentoGlobal = this.object.porcentajeDescuentoGlobal;
       this.porcentajeRecargoGlobal = this.object.porcentajeRecargoGlobal;
       this.processPresupuesto = true;
       this.object.productoDescription.forEach((product) => {
-        product.salePrice =
-          product.salePrice + product.discountAmount - product.surchargeAmount;
+        product.salePrice = product.salePrice + product.discountAmount - product.surchargeAmount;
         product.discountPercent = 0;
         product.discountAmount = 0;
-      });
+      })
       this.object.porcentajeDescuentoGlobal = 0;
       this.object.porcentajeRecargoGlobal = 0;
       this.object.totalDescuentoGlobal = 0;
       this.object.totalRecargoGlobal = 0;
       this.productsDescription = this.object.productoDescription;
     },
-
     /******************************************************************************************************/
     /* ALL FUNCTIONS FOR PROCESS SALE DATA ---------------------------------------------------------------*/
     /******************************************************************************************************/
@@ -790,7 +767,6 @@ export default {
         (el) => el.barCode === p.codigoBarra
       )[0].salePrice = Number(p.precioTotal);
     },
-
     updateTotal(id) {
       this.products.forEach((el) => {
         this.productsDescription.forEach((e) => {
@@ -808,7 +784,6 @@ export default {
         }
       }, 0);
     },
-
     processProductsObject(producto) {
       const {
         id,
@@ -832,7 +807,6 @@ export default {
       };
       return object;
     },
-
     deleteLine(product) {
       const { id, codigoBarra } = product;
       const filter = this.products.filter((el) => el.id !== id);
@@ -843,34 +817,31 @@ export default {
       const filterForProductsDetail = this.productsDetail.filter(
         (el) => el.id !== id
       );
-
       if (product.nombre === "DESCUENTO") {
         this.descuentoGlobal = 0;
         this.porcentajeDescuentoGlobal = 0;
       }
-
       if (product.nombre === "RECARGO") {
         this.recargoGlobal = 0;
         this.porcentajeRecargoGlobal = 0;
       }
-
       this.products = filter;
       this.productsDescription = filterForProductsDescription;
       this.productsDetail = filterForProductsDetail;
       this.$store.commit("productos/removeProductsToList", filterForStore);
       this.listennerOfListChange = id;
     },
-
     applyModification(modificator, priceModificationPorcent) {
       if (this.totalVenta > 0) {
-        const total = this.productsDescription.reduce((acc, el) => {
-          if (!el.editable) {
-            acc = acc + Number(el.salePrice) * Number(el.quantity);
-          } else {
-            acc = acc + el.salePrice;
-          }
-          return acc;
-        }, 0);
+        const total = this.productsDescription.reduce(
+          (acc, el) => {
+            if(!el.editable){
+              acc = acc + Number(el.salePrice) * Number(el.quantity)
+            }else{
+              acc = acc + el.salePrice;
+            }
+            return acc;
+          },0);
         let percent = calculatePercentaje(total, priceModificationPorcent);
         if (modificator === "descuento") {
           if (Math.sign(percent) === 1) {
@@ -911,12 +882,10 @@ export default {
         this.$errorAlert("No hay productos seleccionados en la venta");
       }
     },
-
     applyIndividualPercent(p) {
       this.dialogIndividualPercent = true;
       this.renglon = p;
     },
-
     applyToLine(percent) {
       let object = {};
       if (Math.sign(percent) === -1) {
@@ -951,11 +920,9 @@ export default {
       this.products.push(object);
       this.dialogIndividualPercent = false;
     },
-
     resetListOfDialog() {
       this.listennerOfListChange = 0;
     },
-
     /******************************************************************************************************/
     /* ALL FUNCTIONS FOR FISCAL CONTROLLER ---------------------------------------------------------------*/
     /******************************************************************************************************/
@@ -972,19 +939,15 @@ export default {
           break;
       }
     },
-
     saveTicketInvoiceA() {
       this.sendTicketData(this.createJsonForTicketInvoiceA(), "ticket_a");
     },
-
     saveTicketInvoiceB() {
       this.sendTicketData(this.createJsonForTicketInvoiceB(), "ticket_b");
     },
-
     saveTicketInvoiceC() {
       this.sendTicketData(this.createJsonForTicketInvoiceC(), "ticket");
     },
-
     sendTicketData(jsonToFiscalController, ticketRoute) {
       axios
         .post(`http://${this.clientIp}/${ticketRoute}`, jsonToFiscalController)
@@ -997,7 +960,6 @@ export default {
           console.error(err);
         });
     },
-
     createJsonForTicketInvoiceA() {
       const jsonToFiscalController = {
         client: this.getClientData(),
@@ -1007,7 +969,6 @@ export default {
       };
       return jsonToFiscalController;
     },
-
     createJsonForTicketInvoiceB() {
       const jsonToFiscalController = {
         client: this.getClientData(),
@@ -1017,7 +978,6 @@ export default {
       };
       return jsonToFiscalController;
     },
-
     createJsonForTicketInvoiceC() {
       const jsonToFiscalController = {
         surcharge: this.getTotalSurcharges("C"),
@@ -1026,7 +986,6 @@ export default {
       };
       return jsonToFiscalController;
     },
-
     getClientData() {
       const formattedObject = {
         name: this.object.cliente.nombre,
@@ -1036,13 +995,9 @@ export default {
       };
       return formattedObject;
     },
-
     getTotalSurcharges(letter) {
-      const sumOfProductPrices = this.calculateSumOfProductSalePrices(
-        this.productsDescription
-      );
-      const planSurcharge =
-        sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje);
+      const sumOfProductPrices = this.calculateSumOfProductSalePrices(this.productsDescription);
+      const planSurcharge = sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje);
       let total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("RECARGO")) {
           acc += Number(el.precioTotal * 1);
@@ -1053,22 +1008,16 @@ export default {
         total = total / 1.21;
       }
       let totalSurcharge;
-      if (this.object.planPago.porcentaje > 0) {
+      if(this.object.planPago.porcentaje > 0){
         totalSurcharge = roundTwoDecimals(total + planSurcharge);
-      } else {
+      }else{
         totalSurcharge = total;
       }
       return totalSurcharge.toString();
     },
-
     getTotalDiscounts(letter) {
-      const sumOfProductPrices = this.calculateSumOfProductSalePrices(
-        this.productsDescription
-      );
-      const planDiscount =
-        sumOfProductPrices *
-        decimalPercent(this.object.planPago.porcentaje) *
-        -1;
+      const sumOfProductPrices = this.calculateSumOfProductSalePrices(this.productsDescription);
+      const planDiscount = (sumOfProductPrices * decimalPercent(this.object.planPago.porcentaje)) * -1;
       let total = this.products.reduce((acc, el) => {
         if (el.nombre.includes("DESCUENTO")) {
           acc += Number(el.precioTotal * -1);
@@ -1079,14 +1028,13 @@ export default {
         total = total / 1.21;
       }
       let totalDiscount;
-      if (this.object.planPago.porcentaje < 0) {
+      if(this.object.planPago.porcentaje < 0){
         totalDiscount = roundTwoDecimals(total + planDiscount);
-      } else {
+      }else{
         totalDiscount = total;
       }
       return totalDiscount.toString();
     },
-
     getItemsForFiscalTicketInvoice(letter) {
       let items = [];
       switch (letter) {
@@ -1102,7 +1050,6 @@ export default {
       }
       return items;
     },
-
     itemsInvoiceA() {
       let items = [];
       const validItems = this.products.filter(
@@ -1121,7 +1068,6 @@ export default {
       });
       return items;
     },
-
     itemsInvoiceB() {
       let items = [];
       const validItems = this.products.filter(
@@ -1140,7 +1086,6 @@ export default {
       });
       return items;
     },
-
     itemsInvoiceC() {
       let items = [];
       const validItems = this.products.filter(
@@ -1157,7 +1102,6 @@ export default {
       });
       return items;
     },
-
     /******************************************************************************************************/
     /* ALL FUNCTIONS FOR ELECTRONIC BILLING --------------------------------------------------------------*/
     /******************************************************************************************************/
@@ -1200,10 +1144,8 @@ export default {
         });
       }
     },
-
-
     save() {
-      Swal.fire("Generando Venta", "Espere por favor", "info");
+      Swal.fire("Generando Venta","Espere por favor","info");
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
       const products = this.products;
@@ -1222,7 +1164,6 @@ export default {
       let file;
       let fileURL;
       let invoice;
-
       /*** Get last invoice emmited number ***/
       axios
         .get(
@@ -1241,7 +1182,6 @@ export default {
             totalVenta: totalVenta,
           };
           invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice);
-
           /*** Send invoice to AFIP ***/
           axios
             .post(
@@ -1257,7 +1197,6 @@ export default {
                 addZerosInString("04", ptoVenta.idFiscal) +
                 cae +
                 formatDateWithoutSlash(dateOfCaeExpiration);
-
               this.calculateRelevantAmountsOfInvoice().then(
                 ({
                   total,
@@ -1334,11 +1273,10 @@ export default {
                     comprobante.nombreDocumento = documento.nombre;
                     comprobante.documentoComercial = documento;
                   }
-
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-
+                  
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
                     GenericService(tenant, "comprobantesFiscales", token)
@@ -1352,12 +1290,8 @@ export default {
                             });
                             fileURL = URL.createObjectURL(file);
                             window.open(fileURL, "_blank");
-                            if (this.defaultPrint) {
-                              printReceipt(
-                                comprobante,
-                                this.printName,
-                                this.valorPrint
-                              );
+                            if(this.defaultPrint){
+                              printReceipt(comprobante,this.printName,this.valorPrint);
                             }
                           });
                       })
@@ -1385,9 +1319,8 @@ export default {
             });
         });
     },
-
     saveNoFiscal() {
-      Swal.fire("Generando Venta", "Espere por favor", "info");
+      Swal.fire("Generando Venta","Espere por favor","info");
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
       const cliente = this.object.cliente;
@@ -1406,7 +1339,6 @@ export default {
       let file;
       let fileURL;
       let comprobante;
-
       VentasService(tenant, "ventas", token)
         .getPreviousCorrelativeDocumentNumber(
           sucursal.id,
@@ -1500,12 +1432,8 @@ export default {
                       });
                       fileURL = URL.createObjectURL(file);
                       window.open(fileURL, "_blank");
-                      if (this.defaultPrint) {
-                        printReceipt(
-                          comprobante,
-                          this.printName,
-                          this.valorPrint
-                        );
+                      if(this.defaultPrint){
+                        printReceipt(comprobante,this.printName,this.valorPrint);
                       }
                     })
                     .then(() => {
@@ -1516,7 +1444,6 @@ export default {
           );
         });
     },
-
     savePresupuesto() {
       const mediosPago = this.object.mediosPago;
       const planesPago = this.object.planPago;
@@ -1537,7 +1464,6 @@ export default {
       let file;
       let fileURL;
       let comprobante;
-
       VentasService(tenant, "ventas", token)
         .getPreviousCorrelativeDocumentNumber(
           sucursal.id,
@@ -1545,7 +1471,6 @@ export default {
         )
         .then((data) => {
           const numeroCorrelativoDeComprobante = parseInt(data.data) + 1;
-
           this.calculateRelevantAmountsOfInvoice().then(
             ({
               total,
@@ -1604,7 +1529,6 @@ export default {
                 planesPago: [planesPago],
                 nombreDocumento: documento.nombre,
               };
-
               /*** Save receipt in database and print ticket ***/
               GenericService(tenant, "comprobantesFiscales", token)
                 .save(comprobante)
@@ -1671,7 +1595,6 @@ export default {
           });
       });
     },
-
     saveStockModifications(stock, processProductsLength) {
       if (typeof stock === "string") {
         this.productsWithoutStock.push(stock);
@@ -1705,7 +1628,6 @@ export default {
           });
       }
     },
-
     endSaleProcess() {
       if (this.productsWithoutStock.length > 0) {
         this.$infoAlert2(
@@ -1789,93 +1711,73 @@ export default {
         });
       }
     },
-
     /******************************************************************************************************/
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
       const planPago = this.object.planPago;
-
       this.productsDescription = await this.restLineDiscounts(
         this.products,
         this.productsDescription
       );
-
       this.productsDescription = await this.sumLineSurcharges(
         this.products,
         this.productsDescription
       );
-
       this.productsDescription = await this.restGlobalDiscount(
         this.productsDescription,
         this.porcentajeDescuentoGlobal
       );
-
       this.productsDescription = await this.sumGlobalSurcharge(
         this.productsDescription,
         this.porcentajeRecargoGlobal
       );
-
       this.productsDescription = await this.applyPaymentPlantPercentVariation(
         this.productsDescription,
         planPago.porcentaje
       );
-
       this.productsDescription = await this.calculateAmountOfPriceVariations(
         this.productsDescription
       );
-
       const totalOfDiscounts = await this.calculateTotalOfDiscounts(
         this.productsDescription
       );
-
       const totalOfSurcharges = await this.calculateTotalOfSurcharges(
         this.productsDescription
       );
-
       const subTotal = await this.calculateSumOfProductSalePrices(
         this.productsDescription
       );
-
       const planAmountDiscount =
         planPercentDiscount > 0
           ? subTotal * decimalPercent(planPercentDiscount)
           : 0;
-
       const planAmountSurcharge =
         planPercentSurcharge > 0
           ? subTotal * decimalPercent(planPercentSurcharge)
           : 0;
-
       const planPercentSurcharge =
         planPago.porcentaje > 0 ? planPago.porcentaje : 0;
       const planPercentDiscount =
         planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
-
       this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
         this.productsDescription
       );
-
       const amountOfIva21 = await this.calculateAmountOfIva21(
         this.productsDescription
       );
-
       const amountOfIva10 = await this.calculateAmountOfIva10(
         this.productsDescription
       );
-
       const amountOfIva27 = await this.calculateAmountOfIva27(
         this.productsDescription
       );
-
       const totalOfIvas = sumarNumeros([
         amountOfIva21,
         amountOfIva10,
         amountOfIva27,
       ]);
-
       const total = subTotal - totalOfDiscounts + totalOfSurcharges;
-
       return {
         total,
         subTotal,
@@ -1891,7 +1793,6 @@ export default {
         planAmountDiscount,
       };
     },
-
     restLineDiscounts(products, productDescriptions) {
       const discounts = products.filter((el) =>
         el.nombre.includes("DESCUENTO - ")
@@ -1909,7 +1810,6 @@ export default {
       });
       return productDescriptions;
     },
-
     sumLineSurcharges(products, productDescriptions) {
       const surcharges = products.filter((el) =>
         el.nombre.includes("RECARGO - ")
@@ -1927,7 +1827,6 @@ export default {
       });
       return productDescriptions;
     },
-
     restGlobalDiscount(productsDescription, globalDiscountPercent) {
       productsDescription.forEach((product) => {
         if (product.discountPercent) {
@@ -1938,7 +1837,6 @@ export default {
       });
       return productsDescription;
     },
-
     sumGlobalSurcharge(productsDescription, globalSurchargePercent) {
       productsDescription.forEach((product) => {
         if (product.surchargePercent) {
@@ -1949,7 +1847,6 @@ export default {
       });
       return productsDescription;
     },
-
     applyPaymentPlantPercentVariation(productsDescription, planPercent) {
       if (planPercent < 0)
         return this.restPlanDiscount(
@@ -1963,24 +1860,21 @@ export default {
         );
       if (planPercent == 0) return productsDescription;
     },
-
     restPlanDiscount(productsDescription, planPercent) {
       productsDescription.forEach((prodDescription) => {
         prodDescription.discountPercent += planPercent;
       });
       return productsDescription;
     },
-
     sumPlanSurcharge(productsDescription, planPercent) {
       productsDescription.forEach((prodDescription) => {
         prodDescription.surchargePercent += planPercent;
       });
       return productsDescription;
     },
-
     calculateAmountOfPriceVariations(productsDescription) {
       productsDescription.forEach((prodDescription) => {
-        if (!prodDescription.editable) {
+        if(!prodDescription.editable){
           prodDescription.discountAmount =
             prodDescription.salePrice *
             Number(prodDescription.quantity) *
@@ -1989,7 +1883,7 @@ export default {
             prodDescription.salePrice *
             Number(prodDescription.quantity) *
             decimalPercent(prodDescription.surchargePercent);
-        } else {
+        }else{
           prodDescription.discountAmount =
             prodDescription.salePrice *
             decimalPercent(prodDescription.discountPercent);
@@ -2000,7 +1894,6 @@ export default {
       });
       return productsDescription;
     },
-
     calculateTotalOfDiscounts(productsDescription) {
       const discounts = productsDescription.map((el) =>
         el.discountAmount ? el.discountAmount : 0
@@ -2008,7 +1901,6 @@ export default {
       const total = sumarNumeros(discounts);
       return total;
     },
-
     calculateTotalOfSurcharges(productsDescription) {
       const surcharges = productsDescription.map((el) =>
         el.surchargeAmount ? el.surchargeAmount : 0
@@ -2016,19 +1908,18 @@ export default {
       const total = sumarNumeros(surcharges);
       return total;
     },
-
     calculateSumOfProductSalePrices(productsDescription) {
-      const total = productsDescription.reduce((acc, el) => {
-        if (!el.editable) {
-          acc = acc + el.salePrice * Number(el.quantity);
-        } else {
-          acc = acc + el.salePrice;
-        }
-        return acc;
-      }, 0);
+      const total = productsDescription.reduce(
+        (acc, el) => {
+          if(!el.editable){
+            acc = acc + el.salePrice * Number(el.quantity)
+          }else{
+            acc = acc + el.salePrice;
+          }
+          return acc;
+        },0);
       return roundTwoDecimals(total);
     },
-
     correctSalePriceAndIvaAmountOfProducts(productsDescription) {
       productsDescription.forEach((product) => {
         if (product.saleIvaPercent === 0) {
@@ -2045,7 +1936,6 @@ export default {
       });
       return productsDescription;
     },
-
     calculateAmountOfIva21(productsDescription) {
       const productsWithIva21 = productsDescription.filter(
         (el) => el.saleIvaPercent === 21
@@ -2056,7 +1946,6 @@ export default {
       );
       return roundTwoDecimals(amountOfIva);
     },
-
     calculateAmountOfIva10(productsDescription) {
       const productsWithIva10 = productsDescription.filter(
         (el) => el.saleIvaPercent === 10.5
@@ -2067,7 +1956,6 @@ export default {
       );
       return roundTwoDecimals(amountOfIva);
     },
-
     calculateAmountOfIva27(productsDescription) {
       const productsWithIva27 = productsDescription.filter(
         (el) => el.saleIvaPercent === 27
@@ -2078,14 +1966,12 @@ export default {
       );
       return roundTwoDecimals(amountOfIva);
     },
-
     /******************************************************************************************************/
     /* CLEAR SALE FORM DATA ------------------------------------------------------------------------------*/
     /******************************************************************************************************/
     clear() {
       window.location.reload();
     },
-
     /******************************************************************************************************/
     /* CHECK IF SALE CONDITION IS EFFECTIVE --------------------------------------------------------------*/
     /******************************************************************************************************/
@@ -2106,7 +1992,6 @@ export default {
       }
       return saleCondition;
     },
-
     /******************************************************************************************************/
     /* FUNCITON FOR TEST AFIP CERT -----------------------------------------------------------------------*/
     /******************************************************************************************************/
