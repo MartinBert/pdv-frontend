@@ -1201,6 +1201,7 @@ export default {
       }
     },
 
+
     save() {
       Swal.fire("Generando Venta", "Espere por favor", "info");
       const sucursal = this.loguedUser.sucursal;
