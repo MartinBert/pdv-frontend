@@ -80,7 +80,7 @@ export default {
     },
 
     print(object) {
-      ReportsService(this.tenant, "ventas", this.token)
+      ReportsService(this.tenant,"ventas", this.token)
         .onCloseSaleReport(object)
         .then((res) => {
           let file = new Blob([res["data"]], {
