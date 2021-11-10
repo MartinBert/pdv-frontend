@@ -17,6 +17,12 @@ export default {
   data: () => ({
     objects: [],
      filterParams: {
+      blackReceiptFilter: "",
+      sucursalId: "",
+      fechaEmision: "",
+      comprobanteCerrado: null,
+      numeroComprobante: "",
+      totalVenta: "",
       page: 1,
       size: 10,
       totalPages: 0,
