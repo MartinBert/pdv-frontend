@@ -304,6 +304,8 @@ export default {
     object: {},
     clientIp: "",
     printName: "",
+    products: [],
+    productsDescription: [],
     percentOfModification: 0,
     productOfModification: "",
     totalModificationDialog: false,
@@ -318,6 +320,7 @@ export default {
     medioPagoSeleccionado: null,
     paymentPlanSelection: false,
     planPagoSeleccionado: null,
+    totalVenta: 0
   }),
 
   components: {
@@ -358,7 +361,6 @@ export default {
         .getSelected(this.loguedUser.sucursal.id)
         .then((data) => {
           this.defaultConfig = data.data;
-          console.log(this.defaultConfig)
         });
       GenericService(this.tenant, "mediosPago", this.token)
         .filter({
@@ -370,7 +372,6 @@ export default {
         })
         .then((data) => {
           this.mediosPago = data.data.content;
-          console.log(this.mediosPago);
         });
     },
 
@@ -384,7 +385,6 @@ export default {
     /* GLOBAL KEY EVENTS ---------------------------------------------------------------------------------*/
     /******************************************************************************************************/
     excecuteShortcut(e) {
-      console.log(e.keyCode);
       switch (e.keyCode) {
         case 32:
           this.blurInputFocus("searchBarCodeInput");
@@ -515,7 +515,6 @@ export default {
 
     search(barcode) {
       this.writedBarCodes.push(barcode);
-      console.log(this.writedBarCodes);
       ProductsService(this.tenant, "productos", this.token)
         .getProductForBarCode(barcode)
         .then((res) => {
@@ -546,7 +545,6 @@ export default {
 
     loadProductDelete(e) {
       if (e.keyCode === 81) {
-        console.log("Alla la estan apretando");
         this.$store.commit("productos/dialogProductosMutation");
         this.totalProductload = false;
       }
@@ -554,7 +552,6 @@ export default {
 
     deleteProduct(e, object) {
       if (e.keyCode === 69) {
-        console.log("Borrando");
         this.$store.commit("ventasFast/removeProductsToList", object.id);
       }
     },
@@ -569,6 +566,33 @@ export default {
         return this.saveTicketOnFiscalController(nombre);
       if (tipo) return this.saveFiscalSale();
       if (!tipo) return this.saveNotFiscalSale();
+    },
+
+    /******************************************************************************************************/
+    /* ALL FUNCTIONS FOR FORMAT OBJECTS ------------------------------------------------------------------*/
+    /******************************************************************************************************/
+    processProductsObject(producto) {
+      const {
+        id,
+        nombre,
+        codigoBarra,
+        cantUnidades,
+        precioTotal,
+        ivaVentasObject,
+        precioTotalXCantidad,
+        editable,
+      } = producto;
+      let object = {
+        id: id,
+        nombre: nombre,
+        codigoBarra: codigoBarra,
+        cantUnidades: cantUnidades,
+        precioUnitario: parseFloat(precioTotal),
+        ivaVentas: ivaVentasObject.porcentaje,
+        precioTotal: parseFloat(precioTotalXCantidad),
+        editable: editable,
+      };
+      return object;
     },
 
     /******************************************************************************************************/
@@ -652,15 +676,13 @@ export default {
       return formattedObject;
     },
 
-    getTotalSurcharges(letter) {
+    getTotalSurcharges() {
       const totalSurcharge = this.$store.getter["ventasFast/totalSurcharge"];
-      console.log(letter);
       return totalSurcharge.toString();
     },
 
-    getTotalDiscounts(letter) {
+    getTotalDiscounts() {
       const totalDiscount = this.$store.getter["ventasFast/totalDiscount"];
-      console.log(letter);
       return totalDiscount.toString();
     },
 
@@ -739,6 +761,12 @@ export default {
     /* ALL FUNCTIONS FOR FISCAL SALE ---------------------------------------------------------------------*/
     /******************************************************************************************************/
     saveFiscalSale() {
+      this.$store.state.ventasFast.products.forEach(el => {
+        const formattedObject = this.processProductsObject(el);
+        this.products.push(formattedObject);
+      })
+      this.productsDescription = this.$store.state.ventasFast.products;
+      this.totalVenta = this.$store.getters['ventasFast/totalVenta'];
       Swal.fire("Generando Venta", "Espere por favor", "info");
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
@@ -874,6 +902,8 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
+
+                  console.log(comprobante);
 
                   /*** Save receipt in database and print invoice ***/
                   if (comprobante.cae) {
@@ -1086,7 +1116,7 @@ export default {
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
-      const planPago = this.object.planPago;
+      const planPago = this.$store.state.ventasFast.paymentPlan;
 
       this.productsDescription = await this.restLineDiscounts(
         this.products,
@@ -1167,6 +1197,21 @@ export default {
       ]);
 
       const total = subTotal - totalOfDiscounts + totalOfSurcharges;
+
+      console.log({
+        total,
+        subTotal,
+        amountOfIva21,
+        amountOfIva10,
+        amountOfIva27,
+        totalOfIvas,
+        totalOfDiscounts,
+        totalOfSurcharges,
+        planPercentSurcharge,
+        planPercentDiscount,
+        planAmountSurcharge,
+        planAmountDiscount,
+      })
 
       return {
         total,
