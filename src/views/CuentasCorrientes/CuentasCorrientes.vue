@@ -78,6 +78,12 @@
         <Print :object="item" v-on:print="print" />
       </template>
     </v-data-table>
+    <Pagination
+        :page="filterParams.page"
+        :totalPages="filterParams.totalPages"
+        :totalVisible="7"
+        v-on:changePage="filterObjects"
+    />
 
     </div>
 
@@ -91,7 +97,7 @@
 
 <script>
 import GenericService from "../../services/GenericService";
-//import Pagination from "../../components/Pagination";
+import Pagination from "../../components/Pagination";
 import Detail from "../../components/Buttons/Detail";
 import Print from "../../components/Buttons/Print";
 export default {
@@ -148,7 +154,7 @@ export default {
   },
       
   components: {
-    //Pagination,
+    Pagination,
     Detail,
     Print,
   },
@@ -176,13 +182,16 @@ export default {
           this.clientes = data.data.content;
         });
 
-
-    },seeReports() {
+    },
+    
+    seeReports() {
       this.$store.commit("eventual/mutateEventualDialog");
     },
+
     seeDetails(objects) {
       this.$emit("seeDetails", objects);
     },
+    
     print(object) {
       this.$emit("print", object);
     },
@@ -194,9 +203,7 @@ export default {
         .then((data) => {
           //filtrar por remitos R
           this.ventas = data.data.content;
-          console.log(this.ventas)
           this.filterParams.totalPages = data.data.totalPages;
-          console.log(this.filterParams);
           this.loaded = true;
           });  
     },
