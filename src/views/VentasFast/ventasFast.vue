@@ -104,16 +104,10 @@
                           <td>
                             {{ p.cantUnidades }}
                           </td>
-                          <td>${{ p.precioTotal }}</td>
+                          <td>${{ p.precioUnitario }}</td>
                           <td>
-                            <div v-show="hiddenElements === 2">
-                              {{
-                                (p.precioTotalXCantidad =
-                                  p.precioTotal * p.cantUnidades)
-                              }}
-                            </div>
                             <div v-if="p.editable === false">
-                              ${{ p.precioTotalXCantidad }}
+                              ${{ p.precioTotal }}
                             </div>
                           </td>
                         </tr>
@@ -288,8 +282,6 @@ import {
   decimalPercent,
   roundTwoDecimals,
   sumarNumeros,
-  transformPositive,
-  calculatePositivePercentajeCoefficient,
 } from "../../helpers/mathHelper";
 
 export default {
@@ -306,6 +298,7 @@ export default {
     printName: "",
     products: [],
     productsDescription: [],
+    productsDetail: [],
     percentOfModification: 0,
     productOfModification: "",
     totalModificationDialog: false,
@@ -557,6 +550,10 @@ export default {
     },
 
     saveSale() {
+      this.products = this.$store.state.ventasFast.products;
+      this.productsDescription = this.$store.state.ventasFast.productsDescription;
+      this.productsDetail = this.$store.state.ventasFast.productsDetails;
+      this.totalVenta = this.$store.getters['ventasFast/totalVenta'];
       if (!this.defaultConfig)
         return this.$errorAlert(
           "No hay caracteristicas predeterminadas configuradas, contacte a su administrador para que configure las caracteristicas predeterminadas de la venta rapida"
@@ -566,33 +563,6 @@ export default {
         return this.saveTicketOnFiscalController(nombre);
       if (tipo) return this.saveFiscalSale();
       if (!tipo) return this.saveNotFiscalSale();
-    },
-
-    /******************************************************************************************************/
-    /* ALL FUNCTIONS FOR FORMAT OBJECTS ------------------------------------------------------------------*/
-    /******************************************************************************************************/
-    processProductsObject(producto) {
-      const {
-        id,
-        nombre,
-        codigoBarra,
-        cantUnidades,
-        precioTotal,
-        ivaVentasObject,
-        precioTotalXCantidad,
-        editable,
-      } = producto;
-      let object = {
-        id: id,
-        nombre: nombre,
-        codigoBarra: codigoBarra,
-        cantUnidades: cantUnidades,
-        precioUnitario: parseFloat(precioTotal),
-        ivaVentas: ivaVentasObject.porcentaje,
-        precioTotal: parseFloat(precioTotalXCantidad),
-        editable: editable,
-      };
-      return object;
     },
 
     /******************************************************************************************************/
@@ -761,12 +731,6 @@ export default {
     /* ALL FUNCTIONS FOR FISCAL SALE ---------------------------------------------------------------------*/
     /******************************************************************************************************/
     saveFiscalSale() {
-      this.$store.state.ventasFast.products.forEach(el => {
-        const formattedObject = this.processProductsObject(el);
-        this.products.push(formattedObject);
-      })
-      this.productsDescription = this.$store.state.ventasFast.products;
-      this.totalVenta = this.$store.getters['ventasFast/totalVenta'];
       Swal.fire("Generando Venta", "Espere por favor", "info");
       const sucursal = this.loguedUser.sucursal;
       const ptoVenta = this.loguedUser.puntoVenta;
@@ -775,12 +739,11 @@ export default {
       const documento = this.defaultConfig.documentoPorDefecto;
       const empresa = this.loguedUser.empresa;
       const cliente = this.defaultConfig.clientePorDefecto;
-      const mediosPago = this.object.mediosPago;
       const totalVenta = this.totalVenta;
       const tenant = this.tenant;
       const token = this.token;
       const service = this.service;
-      const planPago = this.object.planPago;
+      const planPago = this.$store.state.ventasFast.paymentPlan;
       const condVenta = this.checkSaleCondition(planPago);
       let comprobante;
       let file;
@@ -805,6 +768,8 @@ export default {
             totalVenta: totalVenta,
           };
           invoice = formatFiscalInvoice(documento.letra, dataForCreateInvoice);
+
+          console.log(invoice);
 
           /*** Send invoice to AFIP ***/
           axios
@@ -832,11 +797,19 @@ export default {
                   totalOfIvas,
                   totalOfDiscounts,
                   totalOfSurcharges,
-                  planPercentSurcharge,
-                  planPercentDiscount,
-                  planAmountSurcharge,
-                  planAmountDiscount,
                 }) => {
+console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+                  console.log(
+                    total,
+                    subTotal,
+                    amountOfIva21,
+                    amountOfIva10,
+                    amountOfIva27,
+                    totalOfIvas,
+                    totalOfDiscounts,
+                    totalOfSurcharges,
+                  )
+
                   // Create receipt
                   if (total && subTotal && amountOfIva21) {
                     comprobante = {
@@ -862,22 +835,22 @@ export default {
                       cliente: cliente,
                       totalVenta: total,
                       subTotal: subTotal,
-                      totalDescuentoGlobal: this.descuentoGlobal,
-                      totalRecargoGlobal: this.recargoGlobal,
-                      porcentajeDescuentoGlobal: this.porcentajeDescuentoGlobal,
-                      porcentajeRecargoGlobal: this.porcentajeRecargoGlobal,
+                      totalDescuentoGlobal: this.$store.getters['ventasFast/totalGlobalDiscount'],
+                      totalRecargoGlobal: this.$store.getters['ventasFast/totalGlobalSurcharge'],
+                      porcentajeDescuentoGlobal: this.$store.state.ventasFast.discountPercent,
+                      porcentajeRecargoGlobal: this.$store.state.ventasFast.surchargePercent,
                       totalIva21: amountOfIva21,
                       totalIva10: amountOfIva10,
                       totalIva27: amountOfIva27,
                       totalIvas: totalOfIvas,
                       totalDescuentos: totalOfDiscounts,
                       totalRecargos: totalOfSurcharges,
-                      porcentajeRecargoPlan: planPercentSurcharge,
-                      porcentajeDescuentoPlan: planPercentDiscount,
-                      totalDescuentoPlan: roundTwoDecimals(planAmountDiscount),
-                      totalRecargoPlan: roundTwoDecimals(planAmountSurcharge),
-                      mediosPago: [mediosPago],
-                      planesPago: [planPago],
+                      porcentajeRecargoPlan: this.$store.state.ventasFast.planSurchargePercent,
+                      porcentajeDescuentoPlan: this.$store.state.ventasFast.planDiscountPercent,
+                      totalDescuentoPlan: this.$store.getters['ventasFast/totalPlanDiscount'],
+                      totalRecargoPlan: this.$store.getters['ventasFast/totalPlanSurcharge'],
+                      mediosPago: [this.$store.state.ventasFast.paymentMethod],
+                      planesPago: [this.$store.state.ventasFast.paymentPlan],
                       nombreDocumento: documento.nombre,
                     };
                   } else {
@@ -902,7 +875,7 @@ export default {
                   if (this.object.id) {
                     comprobante.id = this.object.id;
                   }
-
+                  
                   console.log(comprobante);
 
                   /*** Save receipt in database and print invoice ***/
@@ -1116,103 +1089,24 @@ export default {
     /* ALL FUNCTIONS TO CALCULATE PRICE ALTERATIONS ------------------------------------------------------*/
     /******************************************************************************************************/
     async calculateRelevantAmountsOfInvoice() {
-      const planPago = this.$store.state.ventasFast.paymentPlan;
-
-      this.productsDescription = await this.restLineDiscounts(
-        this.products,
-        this.productsDescription
-      );
-
-      this.productsDescription = await this.sumLineSurcharges(
-        this.products,
-        this.productsDescription
-      );
-
-      this.productsDescription = await this.restGlobalDiscount(
-        this.productsDescription,
-        this.porcentajeDescuentoGlobal
-      );
-
-      this.productsDescription = await this.sumGlobalSurcharge(
-        this.productsDescription,
-        this.porcentajeRecargoGlobal
-      );
-
-      this.productsDescription = await this.applyPaymentPlantPercentVariation(
-        this.productsDescription,
-        planPago.porcentaje
-      );
-
-      this.productsDescription = await this.calculateAmountOfPriceVariations(
-        this.productsDescription
-      );
-
-      const totalOfDiscounts = await this.calculateTotalOfDiscounts(
-        this.productsDescription
-      );
-
-      const totalOfSurcharges = await this.calculateTotalOfSurcharges(
-        this.productsDescription
-      );
-
-      const subTotal = await this.calculateSumOfProductSalePrices(
-        this.productsDescription
-      );
-
-      const planAmountDiscount =
-        planPercentDiscount > 0
-          ? subTotal * decimalPercent(planPercentDiscount)
-          : 0;
-
-      const planAmountSurcharge =
-        planPercentSurcharge > 0
-          ? subTotal * decimalPercent(planPercentSurcharge)
-          : 0;
-
-      const planPercentSurcharge =
-        planPago.porcentaje > 0 ? planPago.porcentaje : 0;
-      const planPercentDiscount =
-        planPago.porcentaje < 0 ? transformPositive(planPago.porcentaje) : 0;
-
-      this.productsDescription = await this.correctSalePriceAndIvaAmountOfProducts(
-        this.productsDescription
-      );
-
-      const amountOfIva21 = await this.calculateAmountOfIva21(
-        this.productsDescription
-      );
-
-      const amountOfIva10 = await this.calculateAmountOfIva10(
-        this.productsDescription
-      );
-
-      const amountOfIva27 = await this.calculateAmountOfIva27(
-        this.productsDescription
-      );
-
+      this.restDiscounts();
+      this.sumSurcharges();
+      this.calculateAmountOfPriceVariations();
+      const totalOfDiscounts = this.$store.getters['ventasFast/totalDiscount'];
+      const totalOfSurcharges = this.$store.getters['ventasFast/totalSurcharge'];
+      const subTotal = this.$store.getters['ventasFast/sumOfProductPrices'];
+      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
+      console.log(subTotal, totalOfDiscounts, totalOfSurcharges);
+      this.correctSalePriceAndIvaAmountOfProducts();
+      const amountOfIva21 = this.calculateAmountOfIva21();
+      const amountOfIva10 = this.calculateAmountOfIva10();
+      const amountOfIva27 = this.calculateAmountOfIva27();
       const totalOfIvas = sumarNumeros([
         amountOfIva21,
         amountOfIva10,
         amountOfIva27,
       ]);
-
       const total = subTotal - totalOfDiscounts + totalOfSurcharges;
-
-      console.log({
-        total,
-        subTotal,
-        amountOfIva21,
-        amountOfIva10,
-        amountOfIva27,
-        totalOfIvas,
-        totalOfDiscounts,
-        totalOfSurcharges,
-        planPercentSurcharge,
-        planPercentDiscount,
-        planAmountSurcharge,
-        planAmountDiscount,
-      })
-
       return {
         total,
         subTotal,
@@ -1222,101 +1116,21 @@ export default {
         totalOfIvas,
         totalOfDiscounts,
         totalOfSurcharges,
-        planPercentSurcharge,
-        planPercentDiscount,
-        planAmountSurcharge,
-        planAmountDiscount,
       };
     },
 
-    restLineDiscounts(products, productDescriptions) {
-      const discounts = products.filter((el) =>
-        el.nombre.includes("DESCUENTO - ")
-      );
-      discounts.forEach((discount) => {
-        const discountCleanName = discount.nombre.replace("DESCUENTO - ", "");
-        productDescriptions.forEach((prodDescription) => {
-          if (prodDescription.name === discountCleanName) {
-            prodDescription.discountPercent = calculatePositivePercentajeCoefficient(
-              discount.precioTotal,
-              prodDescription.salePrice * Number(prodDescription.quantity)
-            );
-          }
-        });
-      });
-      return productDescriptions;
+    restDiscounts() {
+      const totalDiscountPercent = this.$store.getters['ventasFast/totalDiscountPercent']
+      this.productsDescription.forEach(el => { el.discountPercent += totalDiscountPercent })
     },
 
-    sumLineSurcharges(products, productDescriptions) {
-      const surcharges = products.filter((el) =>
-        el.nombre.includes("RECARGO - ")
-      );
-      surcharges.forEach((surcharge) => {
-        const surchargeCleanName = surcharge.nombre.replace("RECARGO - ", "");
-        productDescriptions.forEach((prodDescription) => {
-          if (prodDescription.name === surchargeCleanName) {
-            prodDescription.surchargePercent = calculatePositivePercentajeCoefficient(
-              surcharge.precioTotal,
-              prodDescription.salePrice * Number(prodDescription.quantity)
-            );
-          }
-        });
-      });
-      return productDescriptions;
+    sumSurcharges() {
+      const totalSurchargePercent = this.$store.getters['ventasFast/totalSurchargePercent']
+      this.productsDescription.forEach(el => { el.surchargePercent += totalSurchargePercent })
     },
 
-    restGlobalDiscount(productsDescription, globalDiscountPercent) {
-      productsDescription.forEach((product) => {
-        if (product.discountPercent) {
-          product.discountPercent += globalDiscountPercent;
-        } else {
-          product.discountPercent = globalDiscountPercent;
-        }
-      });
-      return productsDescription;
-    },
-
-    sumGlobalSurcharge(productsDescription, globalSurchargePercent) {
-      productsDescription.forEach((product) => {
-        if (product.surchargePercent) {
-          product.surchargePercent += globalSurchargePercent;
-        } else {
-          product.surchargePercent = globalSurchargePercent;
-        }
-      });
-      return productsDescription;
-    },
-
-    applyPaymentPlantPercentVariation(productsDescription, planPercent) {
-      if (planPercent < 0)
-        return this.restPlanDiscount(
-          productsDescription,
-          transformPositive(planPercent)
-        );
-      if (planPercent > 0)
-        return this.sumPlanSurcharge(
-          productsDescription,
-          transformPositive(planPercent)
-        );
-      if (planPercent == 0) return productsDescription;
-    },
-
-    restPlanDiscount(productsDescription, planPercent) {
-      productsDescription.forEach((prodDescription) => {
-        prodDescription.discountPercent += planPercent;
-      });
-      return productsDescription;
-    },
-
-    sumPlanSurcharge(productsDescription, planPercent) {
-      productsDescription.forEach((prodDescription) => {
-        prodDescription.surchargePercent += planPercent;
-      });
-      return productsDescription;
-    },
-
-    calculateAmountOfPriceVariations(productsDescription) {
-      productsDescription.forEach((prodDescription) => {
+    calculateAmountOfPriceVariations() {
+      this.productsDescription.forEach((prodDescription) => {
         if (!prodDescription.editable) {
           prodDescription.discountAmount =
             prodDescription.salePrice *
@@ -1335,39 +1149,10 @@ export default {
             decimalPercent(prodDescription.surchargePercent);
         }
       });
-      return productsDescription;
     },
 
-    calculateTotalOfDiscounts(productsDescription) {
-      const discounts = productsDescription.map((el) =>
-        el.discountAmount ? el.discountAmount : 0
-      );
-      const total = sumarNumeros(discounts);
-      return total;
-    },
-
-    calculateTotalOfSurcharges(productsDescription) {
-      const surcharges = productsDescription.map((el) =>
-        el.surchargeAmount ? el.surchargeAmount : 0
-      );
-      const total = sumarNumeros(surcharges);
-      return total;
-    },
-
-    calculateSumOfProductSalePrices(productsDescription) {
-      const total = productsDescription.reduce((acc, el) => {
-        if (!el.editable) {
-          acc = acc + el.salePrice * Number(el.quantity);
-        } else {
-          acc = acc + el.salePrice;
-        }
-        return acc;
-      }, 0);
-      return roundTwoDecimals(total);
-    },
-
-    correctSalePriceAndIvaAmountOfProducts(productsDescription) {
-      productsDescription.forEach((product) => {
+    correctSalePriceAndIvaAmountOfProducts() {
+      this.productsDescription.forEach((product) => {
         if (product.saleIvaPercent === 0) {
           product.saleIvaPercent = 21;
         }
@@ -1380,39 +1165,23 @@ export default {
           (product.salePrice * Number(product.quantity)) /
             (1 + decimalPercent(product.saleIvaPercent));
       });
-      return productsDescription;
     },
 
-    calculateAmountOfIva21(productsDescription) {
-      const productsWithIva21 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 21
-      );
-      const amountOfIva = productsWithIva21.reduce(
-        (acc, el) => acc + el.saleIvaAmount,
-        0
-      );
+    calculateAmountOfIva21() {
+      const productsWithIva21 = this.productsDescription.filter((el) => el.saleIvaPercent === 21);
+      const amountOfIva = productsWithIva21.reduce((acc, el) => acc + el.saleIvaAmount, 0);
       return roundTwoDecimals(amountOfIva);
     },
 
-    calculateAmountOfIva10(productsDescription) {
-      const productsWithIva10 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 10.5
-      );
-      const amountOfIva = productsWithIva10.reduce(
-        (acc, el) => acc + el.saleIvaAmount,
-        0
-      );
+    calculateAmountOfIva10() {
+      const productsWithIva10 = this.productsDescription.filter((el) => el.saleIvaPercent === 10.5);
+      const amountOfIva = productsWithIva10.reduce((acc, el) => acc + el.saleIvaAmount, 0);
       return roundTwoDecimals(amountOfIva);
     },
 
-    calculateAmountOfIva27(productsDescription) {
-      const productsWithIva27 = productsDescription.filter(
-        (el) => el.saleIvaPercent === 27
-      );
-      const amountOfIva = productsWithIva27.reduce(
-        (acc, el) => acc + el.saleIvaAmount,
-        0
-      );
+    calculateAmountOfIva27() {
+      const productsWithIva27 = this.productsDescription.filter((el) => el.saleIvaPercent === 27);
+      const amountOfIva = productsWithIva27.reduce((acc, el) => acc + el.saleIvaAmount, 0);
       return roundTwoDecimals(amountOfIva);
     },
 

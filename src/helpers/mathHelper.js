@@ -11,7 +11,7 @@ export function generateBarCode() {
 }
 
 export function decimalPercent(integerPercent) {
-    return integerPercent / 100;
+    return Number(integerPercent) / 100;
 }
 
 export function calculatePercentaje(number, percent) {
