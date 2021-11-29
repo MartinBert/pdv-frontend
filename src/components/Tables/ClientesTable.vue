@@ -88,7 +88,7 @@ export default {
       { text: "Nombre", value: "nombre" },
       { text: "Razon Social", value: "razonSocial" },
       { text: "Cuit", value: "cuit" },
-      {text:"Localidad", value:"region", sortablae:false},
+      {text:"Localidad", value:"persona.region", sortablae:false},
       { text: "Detalles", value: "detalles", sortable:false},
       { text: "Acciones", value: "acciones" , sortable:false},
     ],
