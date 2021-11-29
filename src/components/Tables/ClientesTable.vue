@@ -114,6 +114,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.clientes = data.data.content;
+          console.log(this.clientes);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
