@@ -69,6 +69,8 @@ export default {
     clientes: [],
     filterParams: {
       sucursalId: "",
+      nombreRegion:"",
+      nombreEstado:"",
       personaSocialReason: "",
       personaName: "",
       personaCuit: "",
