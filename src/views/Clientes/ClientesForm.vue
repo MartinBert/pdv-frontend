@@ -75,7 +75,7 @@
             <v-col>
               <v-text-field
                 type="text"
-                v-model="object.region"
+                v-model="object.nombreRegion"
                 :counter="50"
                 label="Localidad"
                 required
