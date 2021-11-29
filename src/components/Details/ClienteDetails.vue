@@ -7,7 +7,6 @@
           <template v-slot:default>
             <thead>
               <tr>
-                <th>Localidad</th>
                 <th>Dirección</th>
                 <th>Email</th>
                 <th>Teléfono</th>
@@ -18,7 +17,6 @@
             </thead>
             <tbody>
               <tr>
-                <td>{{ $store.state.details.object.region }}</td>
                 <td>{{ $store.state.details.object.direccion }}</td>
                 <td>{{ $store.state.details.object.email }}</td>
                 <td>{{ $store.state.details.object.telefono }}</td>
