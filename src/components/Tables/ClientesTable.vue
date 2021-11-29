@@ -116,7 +116,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.clientes = data.data.content;
-          console.log(this.clientes.region);
+          console.log(this.clientes.nombreRegion);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
