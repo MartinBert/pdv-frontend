@@ -75,7 +75,7 @@
             <v-col>
               <v-text-field
                 type="text"
-                v-model="object.nombre"
+                v-model="object.region"
                 :counter="50"
                 label="Localidad"
                 required
@@ -203,6 +203,7 @@ export default {
         .get(id)
         .then((data) => {
           this.object = data.data;
+          console.log(this.object);
           this.loaded = true;
         });
     },
