@@ -202,8 +202,8 @@ export default {
       GenericService(this.tenant, this.service, this.token)
         .get(id)
         .then((data) => {
+          console.log(this.data);
           this.object = data.data;
-          console.log(this.object);
           this.loaded = true;
         });
     },
