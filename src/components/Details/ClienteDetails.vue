@@ -18,7 +18,7 @@
             </thead>
             <tbody>
               <tr>
-                <td>{{ $store.state.details.object.region }}</td>
+                <td>{{ $store.state.details.object.nombre }}</td>
                 <td>{{ $store.state.details.object.direccion }}</td>
                 <td>{{ $store.state.details.object.email }}</td>
                 <td>{{ $store.state.details.object.telefono }}</td>
