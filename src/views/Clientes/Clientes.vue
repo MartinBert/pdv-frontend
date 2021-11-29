@@ -35,6 +35,7 @@ export default {
       sucursalId: "",
       personaSocialReason: "",
       personaName: "",
+      nombreRegion:"",
       personaCuit: "",
       personaDirection: "",
       personaContactName: "",
@@ -72,6 +73,7 @@ export default {
         .filter(this.filterParams)
         .then((data) => {
           this.clientes = data.data.content;
+          console.log(this.clientes);
           this.filterParams.totalPages = data.data.totalPages;
           this.loaded = true;
         });
