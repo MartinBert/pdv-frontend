@@ -35,7 +35,7 @@ export default {
       sucursalId: "",
       personaSocialReason: "",
       personaName: "",
-      nombreRegion:"",
+      region:"",
       personaCuit: "",
       personaDirection: "",
       personaContactName: "",
